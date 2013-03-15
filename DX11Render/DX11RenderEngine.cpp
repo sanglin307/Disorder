@@ -3,10 +3,7 @@
 namespace Disorder
 {
  
-	 RenderEnginePtr CreateDX11RenderEngine()
-	 {
-		 return boost::make_shared<DX11RenderEngine>();
-	 }
+	 
 
 	 DX11RenderEngine::DX11RenderEngine()
 	 {

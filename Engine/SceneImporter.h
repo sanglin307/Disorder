@@ -9,6 +9,8 @@ namespace Disorder
 	{
 	public:
 		virtual void Import(std::string const& fileName) = 0;
+		virtual void Init() = 0;
+		virtual void Exit() = 0;
 	 
 	};
 
@@ -16,17 +18,14 @@ namespace Disorder
 	{
 	public:
 		virtual void Import(std::string const& fileName);	
+		virtual void Init();
+		virtual void Exit();
 
 	private:
-
 		bool LoadScene(std::string const& fileName);
 
-		void Init();
-		void Exit();
-
 		FbxManager* _sdkManager;
-        FbxScene* _scene;
-
+     
 	};
 }
 

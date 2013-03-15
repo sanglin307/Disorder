@@ -53,6 +53,7 @@ namespace Disorder
 		CanvasPtr GameCanvas;
 
 		RenderEnginePtr RenderEngine;
+		SceneImporterPtr SceneImporter;
 
 	    EngineStat Stat;
 

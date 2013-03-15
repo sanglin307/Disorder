@@ -17,9 +17,10 @@ namespace Disorder
    {
 	   //Client Init
 	   GLogger->Init();
+	   SceneImporter->Init();
 	   GameClient->Init();
 	   RenderEngine->Init();
-	 
+	   
 
 	   ViewportPtr const& viewport = GameClient->GetViewport(0);
 	   RenderTargetPtr renderTarget = RenderEngine->CreateRenderTarget(GConfig->sRenderConfig,viewport->GetWindow());
@@ -63,6 +64,7 @@ namespace Disorder
 	   GSceneManager->Exit();
 	   RenderEngine->Exit();
 	   GameClient->Exit();
+	   SceneImporter->Exit();
 	   GLogger->Exit();
 
    }

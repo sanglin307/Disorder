@@ -47,7 +47,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FBXSDK_NEW_API;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>EngineInclude.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\External\boost_1_53_0;..\..\External\freetype-2.4.10\include;D:\Autodesk\FBX\FBX SDK\2013.2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\External\boost_1_53_0;..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm120 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -56,7 +56,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>ois_static_d.lib;xinput.lib;freetype2410MT_D.lib;fbxsdk-2013.2-mdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\External\ois-v1-3\lib;..\..\External\freetype-2.4.10\objs\win32\vc2010;d:\Autodesk\FBX\FBX SDK\2013.2\lib\vs2010\x86;..\..\External\boost_1_53_0\stage\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\External\ois-v1-3\lib;..\..\External\freetype-2.4.10\objs\win32\vc2010;$(FBXSDK)\lib\vs2010\x86;..\..\External\boost_1_53_0\stage\lib</AdditionalLibraryDirectories>
       <ForceSymbolReferences>
       </ForceSymbolReferences>
     </Lib>

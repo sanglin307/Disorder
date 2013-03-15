@@ -29,8 +29,7 @@ namespace Disorder
 
 		RenderResourceManagerPtr ResourceManager;
 	};
-
-	 extern RenderEnginePtr CreateDX11RenderEngine();
+ 
 }
 
 

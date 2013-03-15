@@ -22,8 +22,10 @@ void PeekMessage()
 	Disorder::GConfig->sRunningDictioary = boost::locale::conv::from_utf(fullPath,"UTF-8");
  
 	Disorder::GEngine->GameClient = boost::make_shared<Disorder::WinClient>();
-	Disorder::GEngine->RenderEngine = Disorder::CreateDX11RenderEngine();
+	Disorder::GEngine->RenderEngine = boost::make_shared<Disorder::DX11RenderEngine>();
 	Disorder::GEngine->FileManager = boost::make_shared<Disorder::WinFileSystem>();
+	Disorder::GEngine->SceneImporter = boost::make_shared<Disorder::FbxSceneImporter>();
+
 
 	Disorder::GMainLoop->Init();
 

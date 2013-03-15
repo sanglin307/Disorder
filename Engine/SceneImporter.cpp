@@ -8,6 +8,8 @@ namespace Disorder
 	{
 		 //The first thing to do is to create the FBX Manager which is the object allocator for almost all the classes in the SDK
 		_sdkManager = FbxManager::Create();
+		BOOST_ASSERT(_sdkManager);
+
 		if( !_sdkManager )
 		{
 			GLogger->Error("Error: Unable to create FBX Manager!\n");
@@ -16,15 +18,9 @@ namespace Disorder
  
 		//Create an IOSettings object. This object holds all import/export settings.
 		FbxIOSettings* ios = FbxIOSettings::Create(_sdkManager, IOSROOT);
+		BOOST_ASSERT(ios);
 		_sdkManager->SetIOSettings(ios);
 
-		//Create an FBX scene. This object holds most objects imported/exported from/to files.
-		_scene = FbxScene::Create(_sdkManager, "Disorder Scene");
-		if( !_scene )
-		{
-			GLogger->Error("Error: Unable to create FBX scene!\n");
-		    return;
-		}
 	}
 
 	void FbxSceneImporter::Exit()
@@ -41,13 +37,23 @@ namespace Disorder
 		// Get the file version number generate by the FBX SDK.
 		FbxManager::GetFileFormatVersion(lSDKMajor, lSDKMinor, lSDKRevision);
 
+		//Create an FBX scene. This object holds most objects imported/exported from/to files.
+		FbxScene* lscene = FbxScene::Create(_sdkManager, "Disorder Scene");
+		
+		BOOST_ASSERT(lscene);
+
+		if( !lscene )
+		{
+			GLogger->Error("Error: Unable to create FBX scene!\n");
+		    return false;
+		}
+
 		// Create an importer.
 		FbxImporter* lImporter = FbxImporter::Create(_sdkManager,"");
 
 		// Initialize the importer by providing a filename.
 		const bool lImportStatus = lImporter->Initialize(fileName.c_str(), -1, _sdkManager->GetIOSettings());
-		lImporter->GetFileVersion(lFileMajor, lFileMinor, lFileRevision);
-
+		
 		if( !lImportStatus )
 		{
 			GLogger->Error("Call to FbxImporter::Initialize() failed.\n");
@@ -67,6 +73,8 @@ namespace Disorder
 			return false;
 		}
  
+		lImporter->GetFileVersion(lFileMajor, lFileMinor, lFileRevision);
+
 		if (lImporter->IsFBX())
 		{
 			std::stringstream stream;
@@ -85,7 +93,7 @@ namespace Disorder
 		}
 
 		// Import the scene.
-		lStatus = lImporter->Import(_scene);
+		lStatus = lImporter->Import(lscene);
 
 		if(lStatus == false && lImporter->GetLastErrorID() == FbxIOBase::ePasswordError)
 		{
@@ -117,11 +125,6 @@ namespace Disorder
 
 	void FbxSceneImporter::Import(std::string const& fileName)
 	{
-		Init();
 		LoadScene(fileName);
-
-
-		Exit();
-
 	}
 }
