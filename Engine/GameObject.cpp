@@ -7,12 +7,11 @@ namespace Disorder
 		_vComponents.clear();
 	}
 
-	GameObject::GameObject(Vector3 const& position)
+	GameObject::GameObject(Vector3 const& pos,Quaternion const& rot,Vector3 const& scale)
+		:_position(pos),_rotation(rot),_scale(scale)
 	{
-		Position = position;
-		Scale = Vector3(1.0f);
-		Rotation = Quaternion::IDENTITY;
-		WorldMatrix.makeTransform(Position,Scale,Rotation);
+		_localMatrix.makeTransform(_position,_scale,_rotation);
+		_worldMatrix = _localMatrix;
 	}
 
 	void GameObject::AddComponent(ComponentPtr const& component)
@@ -29,8 +28,15 @@ namespace Disorder
 		static float radian = 0.0f;
 		radian += 0.01f;
 		// test code ,rotate it continuously~ 
-	    Rotation.FromAngleAxis(radian,Vector3::UNIT_Y);
-		WorldMatrix.makeTransform(Position,Scale,Rotation);
+	    _rotation.FromAngleAxis(radian,Vector3::UNIT_Y);
+		_worldMatrix.makeTransform(_position,_scale,_rotation);
 	}
 
+
+	void GameObject::AddChild(GameObjectPtr const& child,Vector3 const& pos,Quaternion const& rot,Vector3 const& scale)
+	{
+		child->LocalTransform(pos,rot,scale);
+		child->SetParent(shared_from_this());
+		_vChildren.push_back(child);
+	}
 }

@@ -117,10 +117,19 @@ namespace Disorder
 		RenderEnginePtr renderEngine = GEngine->RenderEngine;
 		renderEngine->SetRenderLayout(_renderLayout);
 
-		renderEngine->UpdateMVPMatrix(_renderTechnique,gameObject->WorldMatrix,GSceneManager->SceneCamera->ViewMatrix,GSceneManager->SceneCamera->ProjectMatrix);
+		renderEngine->UpdateMVPMatrix(_renderTechnique,gameObject->GetWorldMatrix(),GSceneManager->SceneCamera->ViewMatrix,GSceneManager->SceneCamera->ProjectMatrix);
 	
 		renderEngine->SetFX(_renderTechnique);
 		renderEngine->DrawIndexed(36,0,0);
 
+	}
+
+	void GeometryRenderer::SetGeometry(GeometryPtr const& geometry)
+	{
+		_geometryObject = geometry;
+	}
+
+	void GeometryRenderer::Draw()
+	{
 	}
 }

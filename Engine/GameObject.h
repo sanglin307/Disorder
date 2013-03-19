@@ -4,24 +4,54 @@
 
 namespace Disorder
 {
-	class GameObject
+	class GameObject : public boost::enable_shared_from_this<GameObject>
 	{
 	public:
  
-		void AddComponent(ComponentPtr const& component);
+	
+
+		GameObject(Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::ZERO,Vector3 const& scale = Vector3::UNIT_SCALE);
 		~GameObject();
 
-		GameObject(Vector3 const& position);
 		
+
+		void AddComponent(ComponentPtr const& component);
+
+		
+		void SetParent(GameObjectPtr const& parent)
+		{
+			_parent = parent;
+		}
+
+		void AddChild(GameObjectPtr const& child,Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::ZERO,Vector3 const& scale = Vector3::UNIT_SCALE);
+
+		void LocalTransform(Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::ZERO,Vector3 const& scale = Vector3::UNIT_SCALE)
+		{
+			_position = pos;
+			_scale = scale;
+			_rotation = rot;
+		}
+
+		const Matrix4& GetWorldMatrix() const
+		{
+			return _worldMatrix;
+		}
+
 		void Tick(float deltaSeconds);
 
-	    Vector3 Position;
-		Vector3 Scale;
-		Quaternion Rotation;
-		Matrix4 WorldMatrix;
+	private:
+
+	    Vector3 _position;
+		Vector3 _scale;
+		Quaternion _rotation;
+		Matrix4 _localMatrix;
+		Matrix4 _worldMatrix;
 
 	private:
-		std::list<ComponentPtr> _vComponents;
+		std::vector<ComponentPtr> _vComponents;
+
+		boost::weak_ptr<GameObject> _parent;
+		std::vector<GameObjectPtr> _vChildren;
 
 	
 

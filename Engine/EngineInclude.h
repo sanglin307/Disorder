@@ -29,6 +29,7 @@
 //boost lib
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+#include <boost/smart_ptr/enable_shared_from_this.hpp>
 #include <boost/assert.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -64,6 +65,10 @@ namespace Disorder
 	typedef boost::shared_ptr<WindowsClient> WindowsClientPtr;
 	class Viewport;
 	typedef boost::shared_ptr<Viewport> ViewportPtr;
+	class VertexElement;
+	typedef boost::shared_ptr<VertexElement> VertexElementPtr;
+	class Geometry;
+	typedef boost::shared_ptr<Geometry> GeometryPtr;
 	class GameObject;
 	typedef boost::shared_ptr<GameObject> GameObjectPtr;
 	class Level;
@@ -153,6 +158,8 @@ namespace Disorder
 #include "RenderView.h"
 #include "RenderTarget.h"
 #include "RenderLayout.h"
+#include "VertexElement.h"
+#include "Geometry.h"
 #include "Renderer.h"
 #include "Canvas.h"
 #include "RenderResourceManager.h"

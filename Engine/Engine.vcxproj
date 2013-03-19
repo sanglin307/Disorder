@@ -81,7 +81,6 @@
     <None Include="..\Resource\FX\2DFX.fx" />
     <None Include="..\Resource\FX\SimpleFX.fx" />
     <None Include="..\Resource\FX\SimpleFX_PT.fx" />
-    <None Include="ClassDiagram1.cd" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +98,7 @@
     <ClInclude Include="Font.h" />
     <ClInclude Include="FontManager.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Geometry.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="MainLoop.h" />
@@ -124,6 +124,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="Vectors.h" />
+    <ClInclude Include="VertexElement.h" />
     <ClInclude Include="Viewport.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
@@ -142,6 +143,7 @@
     <ClCompile Include="FontManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Common.cpp" />
+    <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Logger.cpp" />
@@ -160,6 +162,7 @@
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="Vectors.cpp" />
+    <ClCompile Include="VertexElement.cpp" />
     <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>

@@ -39,6 +39,17 @@ namespace Disorder
 
 	
 	};
+
+	class GeometryRenderer : public Renderer
+	{
+	private:
+		  GeometryPtr _geometryObject;
+
+	public:
+
+          void SetGeometry(GeometryPtr const& geometry); 
+		  virtual void Draw();
+	};
 }
 
 
