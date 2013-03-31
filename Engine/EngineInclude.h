@@ -39,6 +39,7 @@
 #include <boost/pool/pool.hpp>
 #include "ComPtr.h"
 #include <boost/locale.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -73,6 +74,10 @@ namespace Disorder
 	typedef boost::shared_ptr<GameObject> GameObjectPtr;
 	class Level;
 	typedef boost::shared_ptr<Level> LevelPtr;
+	class Material;
+	typedef boost::shared_ptr<Material> MaterialPtr;
+	class Texture;
+	typedef boost::shared_ptr<Texture> TexturePtr;
 	class RenderEngine;
 	typedef boost::shared_ptr<RenderEngine> RenderEnginePtr;
 	class Renderer;
@@ -149,6 +154,8 @@ namespace Disorder
 #include "Component.h"
 #include "Camera.h"
 #include "Light.h"
+#include "Texture.h"
+#include "Material.h"
 #include "RenderUtil.h"
 #include "RenderResource.h"
 #include "Font.h"

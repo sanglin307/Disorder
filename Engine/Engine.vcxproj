@@ -47,7 +47,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FBXSDK_NEW_API;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>EngineInclude.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\External\boost_1_53_0;..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm120 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -102,6 +102,7 @@
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="MainLoop.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="Matrixs.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Logger.h" />
@@ -123,6 +124,7 @@
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="GameTime.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Vectors.h" />
     <ClInclude Include="VertexElement.h" />
     <ClInclude Include="Viewport.h" />
@@ -148,6 +150,7 @@
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="MainLoop.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="MathTools.cpp" />
     <ClCompile Include="Matrixs.cpp" />
     <ClCompile Include="Plane.cpp" />
@@ -161,6 +164,7 @@
     <ClCompile Include="SceneImporter.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="GameTime.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Vectors.cpp" />
     <ClCompile Include="VertexElement.cpp" />
     <ClCompile Include="Viewport.cpp" />

@@ -17,7 +17,8 @@ void PeekMessage()
 	TCHAR exeFullPath[MAX_PATH]; // MAX_PATH
     GetModuleFileName(NULL,exeFullPath,MAX_PATH);//
 	std::wstring fullPath = exeFullPath;
-	int pos = fullPath.find(TEXT("Disorder"));
+	boost::to_lower(fullPath);
+	int pos = fullPath.find(TEXT("disorder"));
 	fullPath = fullPath.substr(0,pos+8);	
 	Disorder::GConfig->sRunningDictioary = boost::locale::conv::from_utf(fullPath,"UTF-8");
  
