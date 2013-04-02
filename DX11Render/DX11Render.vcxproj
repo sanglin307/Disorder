@@ -59,7 +59,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>D3D11.lib;d3dx11d.lib</AdditionalDependencies>
+      <AdditionalDependencies>D3D11.lib;d3dcompiler.lib;d3dx11d.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

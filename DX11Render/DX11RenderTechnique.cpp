@@ -51,18 +51,24 @@ namespace Disorder
 	{
 		HRESULT hr = S_OK;
 
-		DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
+		FileObjectPtr fileptr = GEngine->FileManager->OpenFile(fileName,std::ios::in);
+		std::string shaderContent = GEngine->FileManager->ReadFile(fileptr);
+
+		DWORD dwShaderFlags = 0; //D3DCOMPILE_ENABLE_STRICTNESS;
 	#if defined( DEBUG ) || defined( _DEBUG )
 		// Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
 		// Setting this flag improves the shader debugging experience, but still allows 
 		// the shaders to be optimized and to run exactly the way they will run in 
 		// the release configuration of this program.
-		dwShaderFlags |= D3DCOMPILE_DEBUG;
+		dwShaderFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;;
 	#endif
 
+	 
 		ID3DBlob* pErrorBlob;
-		hr = D3DX11CompileFromFileA( fileName.c_str(), NULL, NULL, entryPoint.c_str(), shaderModel.c_str(), 
-			dwShaderFlags, 0, NULL, ppBlobOut, &pErrorBlob, NULL );
+		hr = D3DCompile(shaderContent.c_str(),shaderContent.size(),"",NULL,NULL,entryPoint.c_str(),shaderModel.c_str(),dwShaderFlags, 0,ppBlobOut, &pErrorBlob);
+	 
+		/*hr = D3DX11CompileFromFileA( fileName.c_str(), NULL, NULL, entryPoint.c_str(), shaderModel.c_str(), 
+			dwShaderFlags, 0, NULL, ppBlobOut, &pErrorBlob, NULL );*/
 		if( FAILED(hr) )
 		{
 			if( pErrorBlob != NULL )

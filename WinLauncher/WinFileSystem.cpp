@@ -15,4 +15,12 @@ namespace Disorder
 	{
 		fileHandler->fileHandler << content << std::endl;
 	}
+
+	std::string WinFileSystem::ReadFile(FileObjectPtr const& fileHandler)
+	{
+		std::ostringstream tmp; 
+        tmp << fileHandler->fileHandler.rdbuf(); 
+        std::string content = tmp.str();
+		return content;
+	}
 }
