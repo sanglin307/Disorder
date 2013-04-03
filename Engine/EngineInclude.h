@@ -74,6 +74,8 @@ namespace Disorder
 	typedef boost::shared_ptr<GameObject> GameObjectPtr;
 	class Level;
 	typedef boost::shared_ptr<Level> LevelPtr;
+	class MaterialParam;
+	typedef boost::shared_ptr<MaterialParam> MaterialParamPtr;
 	class Material;
 	typedef boost::shared_ptr<Material> MaterialPtr;
 	class Texture;

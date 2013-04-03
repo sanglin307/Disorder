@@ -18,8 +18,9 @@ void PeekMessage()
     GetModuleFileName(NULL,exeFullPath,MAX_PATH);//
 	std::wstring fullPath = exeFullPath;
 	boost::to_lower(fullPath);
-	int pos = fullPath.find(TEXT("disorder"));
-	fullPath = fullPath.substr(0,pos+8);	
+	std::wstring fstr(TEXT("disorder"));
+	int pos = fullPath.find(fstr);
+	fullPath = fullPath.substr(0,pos+fstr.size());	
 	Disorder::GConfig->sRunningDictioary = boost::locale::conv::from_utf(fullPath,"UTF-8");
  
 	Disorder::GEngine->GameClient = boost::make_shared<Disorder::WinClient>();
