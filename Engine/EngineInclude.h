@@ -88,14 +88,10 @@ namespace Disorder
 	typedef boost::shared_ptr<RenderTarget> RenderTargetPtr;
 	class RenderLayout;
 	typedef boost::shared_ptr<RenderLayout> RenderLayoutPtr;
-	class RenderTechnique;
-	typedef boost::shared_ptr<RenderTechnique> RenderTechniquePtr;
+	class RenderEffect;
+	typedef boost::shared_ptr<RenderEffect> RenderEffectPtr;
 	class ShaderObject;
 	typedef boost::shared_ptr<ShaderObject> ShaderObjectPtr;
-	class VertexShader;
-	typedef boost::shared_ptr<VertexShader> VertexShaderPtr;
-	class PixelShader;
-	typedef boost::shared_ptr<PixelShader> PixelShaderPtr;
 	class RenderResourceManager;
 	typedef boost::shared_ptr<RenderResourceManager> RenderResourceManagerPtr;
 	class BrushRenderer;
@@ -161,7 +157,7 @@ namespace Disorder
 #include "Font.h"
 #include "FontManager.h"
 #include "RenderState.h"
-#include "RenderTechnique.h"
+#include "RenderEffect.h"
 #include "RenderView.h"
 #include "RenderTarget.h"
 #include "RenderLayout.h"

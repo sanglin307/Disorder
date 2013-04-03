@@ -37,10 +37,8 @@ namespace Disorder
 	typedef boost::shared_ptr<DX11RenderResourceManager> DX11RenderResourceManagerPtr;
 	class DX11RenderTarget;
 	typedef boost::shared_ptr<DX11RenderTarget> DX11RenderTargetPtr;
-	class DX11VertexShader;
-	typedef boost::shared_ptr<DX11VertexShader> DX11VertexShaderPtr;
-	class DX11PixelShader;
-	typedef boost::shared_ptr<DX11PixelShader> DX11PixelShaderPtr;
+	class DX11ShaderObject;
+	typedef boost::shared_ptr<DX11ShaderObject> DX11ShaderObjectPtr;
 	class DX11RenderView;
 	typedef boost::shared_ptr<DX11RenderView> DX11RenderViewPtr;
 	class DX11RenderTargetView;
@@ -76,7 +74,7 @@ namespace Disorder
 //project related
 #include "DX11RenderState.h"
 #include "DX11RenderResource.h"
-#include "DX11RenderTechnique.h"
+#include "DX11RenderEffect.h"
 #include "DX11RenderView.h"
 #include "DX11RenderTarget.h"
 #include "DX11RenderLayout.h"

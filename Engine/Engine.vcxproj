@@ -115,7 +115,7 @@
     <ClInclude Include="RenderResourceManager.h" />
     <ClInclude Include="RenderState.h" />
     <ClInclude Include="RenderTarget.h" />
-    <ClInclude Include="RenderTechnique.h" />
+    <ClInclude Include="RenderEffect.h" />
     <ClInclude Include="RenderUtil.h" />
     <ClInclude Include="RenderView.h" />
     <ClInclude Include="SceneImporter.h" />

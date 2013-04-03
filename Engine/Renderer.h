@@ -13,7 +13,7 @@ namespace Disorder
 		virtual void Draw() = 0;
 
 	public:
-		RenderTechniquePtr _renderTechnique;
+		RenderEffectPtr _renderEffect;
 		RenderLayoutPtr _renderLayout;
 	    
 

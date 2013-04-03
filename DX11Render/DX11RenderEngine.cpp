@@ -99,9 +99,9 @@ namespace Disorder
  
 	}
 
-	void DX11RenderEngine::UpdateMVPMatrix(RenderTechniquePtr const& technique, Matrix4 const& worldMatrix,Matrix4 const& viewMatrix,Matrix4 const& projMatrix)
+	void DX11RenderEngine::UpdateMVPMatrix(RenderEffectPtr const& technique, Matrix4 const& worldMatrix,Matrix4 const& viewMatrix,Matrix4 const& projMatrix)
 	{
-		VertexShaderPtr shader = technique->GetVertexShader();
+		ShaderObjectPtr shader = technique->GetVertexShader();
 		std::vector<RenderBufferPtr> constBuffers = shader->GetConstBuffers();
 		if( constBuffers.size() > 0 )
 		{
@@ -128,15 +128,15 @@ namespace Disorder
 		_pImmediateContext->DrawIndexed(indexCount,startIndexLocation,baseVertexLocation);
 	}
 
-	void DX11RenderEngine::SetFX(RenderTechniquePtr const& technique)
+	void DX11RenderEngine::SetFX(RenderEffectPtr const& technique)
 	{
-		VertexShaderPtr vertexShader = technique->GetVertexShader();
+		ShaderObjectPtr vertexShader = technique->GetVertexShader();
 		if( vertexShader != NULL )
 		{
 			ID3D11VertexShader *pShader = (ID3D11VertexShader *)(vertexShader->GetLowInterface());
 			_pImmediateContext->VSSetShader(pShader, NULL,0);
 
-			DX11VertexShaderPtr dxVertexShader = boost::dynamic_pointer_cast<DX11VertexShader>(vertexShader);
+			DX11ShaderObjectPtr dxVertexShader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
             std::size_t cbsize = dxVertexShader->ConstBufferArray.size();
 			if( cbsize > 0 )
 			{
@@ -156,13 +156,13 @@ namespace Disorder
 			}
 		}
 
-		PixelShaderPtr pixelShader = technique->GetPixelShader();
+		ShaderObjectPtr pixelShader = technique->GetPixelShader();
 		if( pixelShader != NULL )
 		{
 			ID3D11PixelShader *pShader = (ID3D11PixelShader *)(pixelShader->GetLowInterface());
 			_pImmediateContext->PSSetShader(pShader,NULL,0);
 
-			DX11PixelShaderPtr dxPixelShader = boost::dynamic_pointer_cast<DX11PixelShader>(pixelShader);
+			DX11ShaderObjectPtr dxPixelShader = boost::dynamic_pointer_cast<DX11ShaderObject>(pixelShader);
 
 			std::size_t csize = dxPixelShader->ConstBufferArray.size();
 			if( csize > 0 )

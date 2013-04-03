@@ -12,10 +12,10 @@ namespace Disorder
 
 		//compile shaders
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
-		RenderTechniquePtr technique =  resourceManager->CreateRenderTechnique("SimpleFX_PT.fx",SM_4_0,"VS","PS");
+		RenderEffectPtr technique =  resourceManager->CreateRenderEffect("SimpleFX_PT.fx",SM_4_0,"VS","PS");
 
-		VertexShaderPtr vertexShader = technique->GetVertexShader();
-		PixelShaderPtr pixelShader = technique->GetPixelShader();
+		ShaderObjectPtr vertexShader = technique->GetVertexShader();
+		ShaderObjectPtr pixelShader = technique->GetPixelShader();
 		
 		VertexInputDes vertexElementDes[] =
 		{
@@ -106,20 +106,20 @@ namespace Disorder
 		pixelShader->BindShaderResource(renderView);
 
 		_renderLayout = renderLayout;
-		_renderTechnique = technique;
+		_renderEffect = technique;
 	}
 
 	void CubeRenderer::Draw()
 	{
-		BOOST_ASSERT(_renderLayout != NULL && _renderTechnique != NULL );
+		BOOST_ASSERT(_renderLayout != NULL && _renderEffect != NULL );
 
 		GameObjectPtr gameObject = _baseObject.lock();
 		RenderEnginePtr renderEngine = GEngine->RenderEngine;
 		renderEngine->SetRenderLayout(_renderLayout);
 
-		renderEngine->UpdateMVPMatrix(_renderTechnique,gameObject->GetWorldMatrix(),GSceneManager->SceneCamera->ViewMatrix,GSceneManager->SceneCamera->ProjectMatrix);
+		renderEngine->UpdateMVPMatrix(_renderEffect,gameObject->GetWorldMatrix(),GSceneManager->SceneCamera->ViewMatrix,GSceneManager->SceneCamera->ProjectMatrix);
 	
-		renderEngine->SetFX(_renderTechnique);
+		renderEngine->SetFX(_renderEffect);
 		renderEngine->DrawIndexed(36,0,0);
 
 	}

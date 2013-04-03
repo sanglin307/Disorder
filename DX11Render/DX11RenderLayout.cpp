@@ -11,7 +11,7 @@ namespace Disorder
 
 	}
 
-	bool DX11RenderLayout::CreateLayout(VertexShaderPtr const& vertexShader,const VertexInputDes* pVertexInputDes,unsigned int vertexInputDesLength,TopologyType topologyType)
+	bool DX11RenderLayout::CreateLayout(ShaderObjectPtr const& vertexShader,const VertexInputDes* pVertexInputDes,unsigned int vertexInputDesLength,TopologyType topologyType)
 	{
 		//now we only support 12 input element des.
 		 BOOST_ASSERT(vertexInputDesLength>0 && vertexInputDesLength<= 12);

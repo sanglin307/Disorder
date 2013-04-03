@@ -61,9 +61,6 @@
     <ClInclude Include="RenderUtil.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
-    <ClInclude Include="RenderTechnique.h">
-      <Filter>RenderSystem</Filter>
-    </ClInclude>
     <ClInclude Include="RenderTarget.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
@@ -166,6 +163,9 @@
       <Filter>RenderSystem</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderEffect.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
   </ItemGroup>

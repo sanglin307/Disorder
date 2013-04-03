@@ -26,6 +26,8 @@ namespace Disorder
 	public:
 		virtual void Load(std::string const& entryPoint) = 0;
 
+		
+
 	    ShaderType const& GetType() const
 		{
 			return _type;
@@ -72,62 +74,35 @@ namespace Disorder
 		std::vector<SamplerStatePtr> _samplerStates;
 
 	};
-
-	class VertexShader : public ShaderObject
-	{
-	public:
-		VertexShader()
-		{
-			_type = ST_VertexShader;
-		}
  
-		virtual void Load(std::string const& entryPoint) = 0;
-
-	protected:
-		
-	};
-
-	class PixelShader : public ShaderObject
-	{
-	public:
-		PixelShader()
-		{
-			_type = ST_PixelShader;
-		}
-
-		virtual void Load(std::string const& entryPoint) = 0;
-	};
-
-	class RenderTechnique
+	class RenderEffect
 	{
 
 	public: 
-		RenderTechnique(ShaderModel shaderModel)
+		RenderEffect(ShaderModel shaderModel)
 		{
 			_shaderModel = shaderModel;
 		}
 
-		virtual VertexShaderPtr LoadVertexShaderFromFile(std::string const& fileName,std::string const& entryPoint) = 0;
-		virtual PixelShaderPtr LoadPixelShaderFromFile(std::string const& fileName,std::string const& entryPoint) = 0;
-
-
-		inline VertexShaderPtr const& GetVertexShader() const
+		virtual ShaderObjectPtr LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType) = 0;
+	 
+		inline ShaderObjectPtr const& GetVertexShader() const
 		{
 			return _vertexShader;
 		}
 
-		inline PixelShaderPtr const& GetPixelShader() const
+		inline ShaderObjectPtr const& GetPixelShader() const
 		{
 			return _pixelShader;
 		}
 
 	protected:
 		ShaderModel _shaderModel;
-		VertexShaderPtr _vertexShader;
-		PixelShaderPtr _pixelShader;
 
-
-
+		// shader slot!
+		ShaderObjectPtr _vertexShader;
+		ShaderObjectPtr _pixelShader;
+ 
 	};
 
 

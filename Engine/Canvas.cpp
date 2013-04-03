@@ -6,7 +6,7 @@ namespace Disorder
 	{
 		_texture = texture;
 		
-		PixelShaderPtr pixelShader = _renderTechnique->GetPixelShader();
+		ShaderObjectPtr pixelShader = _renderEffect->GetPixelShader();
 		RenderViewPtr renderView = GEngine->RenderEngine->ResourceManager->CreateTexture2DView(texture);
 	 
 	 
@@ -36,7 +36,7 @@ namespace Disorder
 		renderEngine->UnMap(indexRenderBuffer);
 
 		renderEngine->SetRenderLayout(_renderLayout);
-		renderEngine->SetFX(_renderTechnique);
+		renderEngine->SetFX(_renderEffect);
 		renderEngine->DrawIndexed(_indexs.size(),0,0);
 
 		_indexs.clear();
@@ -90,10 +90,10 @@ namespace Disorder
 	CanvasBatchElement::CanvasBatchElement()
 	{
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
-		RenderTechniquePtr technique =  resourceManager->CreateRenderTechnique("2DFX.fx",SM_4_0,"VS","PS");
+		RenderEffectPtr technique =  resourceManager->CreateRenderEffect("2DFX.fx",SM_4_0,"VS","PS");
 
-		VertexShaderPtr vertexShader = technique->GetVertexShader();
-		PixelShaderPtr pixelShader = technique->GetPixelShader();
+		ShaderObjectPtr vertexShader = technique->GetVertexShader();
+		ShaderObjectPtr pixelShader = technique->GetPixelShader();
 		
 		VertexInputDes vertexElementDes[] =
 		{
@@ -126,7 +126,7 @@ namespace Disorder
 		renderLayout->BindBlendState(blendState);
 
 		_renderLayout = renderLayout;
-		_renderTechnique = technique;
+		_renderEffect = technique;
 	}
 
 

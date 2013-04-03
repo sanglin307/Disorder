@@ -6,7 +6,7 @@ namespace Disorder
 	class DX11RenderLayout : public RenderLayout
 	{
 	public:
-		virtual bool CreateLayout(VertexShaderPtr const& vertexShader,const VertexInputDes* pVertexInputDes,unsigned int vertexInputDesLength,TopologyType topologyType);
+		virtual bool CreateLayout(ShaderObjectPtr const& vertexShader,const VertexInputDes* pVertexInputDes,unsigned int vertexInputDesLength,TopologyType topologyType);
 
 	    void GetSemanticDes(VertexInputSematic vertexDes,std::string& semanticDes,unsigned int& semanticIndex);
 

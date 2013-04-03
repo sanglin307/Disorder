@@ -89,7 +89,7 @@
     <ClInclude Include="DX11RenderResourceManager.h" />
     <ClInclude Include="DX11RenderState.h" />
     <ClInclude Include="DX11RenderTarget.h" />
-    <ClInclude Include="DX11RenderTechnique.h" />
+    <ClInclude Include="DX11RenderEffect.h" />
     <ClInclude Include="DX11RenderView.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -103,7 +103,7 @@
     <ClCompile Include="DX11RenderResource.cpp" />
     <ClCompile Include="DX11RenderResourceManager.cpp" />
     <ClCompile Include="DX11RenderState.cpp" />
-    <ClCompile Include="DX11RenderTechnique.cpp" />
+    <ClCompile Include="DX11RenderEffect.cpp" />
     <ClCompile Include="DX11RenderView.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

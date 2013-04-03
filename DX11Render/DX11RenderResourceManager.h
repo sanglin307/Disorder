@@ -6,8 +6,8 @@ namespace Disorder
 	class DX11RenderResourceManager : public RenderResourceManager
 	{
 	public :
-		virtual RenderTechniquePtr CreateRenderTechnique(std::string const& fileName, ShaderModel shaderModel,std::string const& entryPointVS,std::string const& entryPointPS);
-		virtual RenderLayoutPtr CreateRenderLayout(VertexShaderPtr const& vertexShader,const VertexInputDes* pVertexInputDes,unsigned int vertexInputDesLength,TopologyType topologyType);
+		virtual RenderEffectPtr CreateRenderEffect(std::string const& fileName, ShaderModel shaderModel,std::string const& entryPointVS,std::string const& entryPointPS);
+		virtual RenderLayoutPtr CreateRenderLayout(ShaderObjectPtr const& vertexShader,const VertexInputDes* pVertexInputDes,unsigned int vertexInputDesLength,TopologyType topologyType);
 		virtual RenderBufferPtr CreateRenderBuffer(RenderBufferType type,unsigned int elementSize,unsigned int bufferSize,unsigned int accessHint,BufferInitData const* pData);
 		virtual RenderTexture2DPtr CreateRenderTexture2D(SamplerStatePtr const& sampler,PixelFormat pixelFormat,unsigned int width,unsigned int hight,bool bMipmap,BufferInitData const* pData);
 		virtual RenderViewPtr CreateTexture2DViewFromFile(std::string const& fileName);

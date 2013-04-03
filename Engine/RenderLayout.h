@@ -24,7 +24,7 @@ namespace Disorder
 	{
 	public:
 
-		virtual bool CreateLayout(VertexShaderPtr const& vertexShader,const VertexInputDes* pVertexInputDes,unsigned int vertexInputDesLength,TopologyType topologyType) = 0;
+		virtual bool CreateLayout(ShaderObjectPtr const& vertexShader,const VertexInputDes* pVertexInputDes,unsigned int vertexInputDesLength,TopologyType topologyType) = 0;
 
 		static std::string GenerateMapKey(const VertexInputDes* pVertexInputDes,unsigned int vertexInputDesLength,TopologyType topologyType); 
 

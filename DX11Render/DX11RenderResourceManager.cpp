@@ -2,18 +2,18 @@
 
 namespace Disorder
 {
-    RenderTechniquePtr DX11RenderResourceManager::CreateRenderTechnique(std::string const& fileName,ShaderModel shaderModel,std::string const& entryPointVS,std::string const& entryPointPS)
+    RenderEffectPtr DX11RenderResourceManager::CreateRenderEffect(std::string const& fileName,ShaderModel shaderModel,std::string const& entryPointVS,std::string const& entryPointPS)
 	{
 
-		if( _techniqueMap.find(fileName) != _techniqueMap.end() )
-			return _techniqueMap.at(fileName);
+		if( _effectMap.find(fileName) != _effectMap.end() )
+			return _effectMap.at(fileName);
  
 		std::string strFilePath = GConfig->sRunningDictioary + "\\Resource\\FX\\" + fileName;
-		RenderTechniquePtr technique = boost::make_shared<DX11RenderTechnique>(shaderModel); 
-	    technique->LoadVertexShaderFromFile(strFilePath,entryPointVS);
-		technique->LoadPixelShaderFromFile(strFilePath,entryPointPS);
+		RenderEffectPtr technique = boost::make_shared<DX11RenderEffect>(shaderModel); 
+	    technique->LoadShaderFromFile(strFilePath,entryPointVS,ST_VertexShader);
+		technique->LoadShaderFromFile(strFilePath,entryPointPS,ST_PixelShader);
 
-		_techniqueMap.insert(std::pair<std::string,RenderTechniquePtr>(fileName,technique));
+		_effectMap.insert(std::pair<std::string,RenderEffectPtr>(fileName,technique));
 
 		return technique;
 		 
@@ -30,7 +30,7 @@ namespace Disorder
 			return boost::shared_ptr<RasterizeState>();
 	}
 
-	RenderLayoutPtr DX11RenderResourceManager::CreateRenderLayout(VertexShaderPtr const& vertexShader,const VertexInputDes* pVertexInputDes,unsigned int vertexInputDesLength,TopologyType topologyType)
+	RenderLayoutPtr DX11RenderResourceManager::CreateRenderLayout(ShaderObjectPtr const& vertexShader,const VertexInputDes* pVertexInputDes,unsigned int vertexInputDesLength,TopologyType topologyType)
 	{
 		// we should generate a vertexelement des string, and reuse the renderlayout if we can.
 		std::string key = RenderLayout::GenerateMapKey(pVertexInputDes,vertexInputDesLength,topologyType);
