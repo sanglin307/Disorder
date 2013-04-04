@@ -11,16 +11,13 @@ namespace Disorder
 
 	}
 
-	bool DX11RenderLayout::CreateLayout(ShaderObjectPtr const& vertexShader,const VertexInputDes* pVertexInputDes,unsigned int vertexInputDesLength,TopologyType topologyType)
+	bool DX11RenderLayout::CreateLayout(ShaderObjectPtr const& vertexShader,const std::vector<VertexInputDes> const& vertexInput,TopologyType topologyType)
 	{
-		//now we only support 12 input element des.
-		 BOOST_ASSERT(vertexInputDesLength>0 && vertexInputDesLength<= 12);
-
-		 for(unsigned int index=0;index<vertexInputDesLength;index++)
-		 {
-			 _vertexDes.push_back(*pVertexInputDes);
-			 pVertexInputDes ++;
-		 }
+		 
+		for(unsigned int index=0;index<vertexInput.size();index++)
+		{
+			 _vertexDes.push_back(vertexInput[index]);
+		}
 
 		 _topologyType = topologyType;
 

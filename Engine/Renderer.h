@@ -12,19 +12,16 @@ namespace Disorder
 
 		virtual void Draw() = 0;
 
-	public:
+	protected:
 		RenderEffectPtr _renderEffect;
 		RenderLayoutPtr _renderLayout;
 	    
 
 	};
 
+ 
 
-	class BrushRenderer : public Renderer
-	{
-	};
-
-	class CubeRenderer: public BrushRenderer
+	class CubeRenderer: public Renderer
 	{
 		typedef struct _SimpleVertex
 		{
@@ -44,10 +41,13 @@ namespace Disorder
 	{
 	private:
 		  GeometryPtr _geometryObject;
+		  MaterialPtr _material;
 
+	private:
+		  void BuildRenderResource();
 	public:
-
-          void SetGeometry(GeometryPtr const& geometry); 
+		  GeometryRenderer(GameObjectPtr const& base);
+          void SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat); 
 		  virtual void Draw();
 	};
 }

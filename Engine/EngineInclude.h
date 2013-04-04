@@ -74,8 +74,18 @@ namespace Disorder
 	typedef boost::shared_ptr<GameObject> GameObjectPtr;
 	class Level;
 	typedef boost::shared_ptr<Level> LevelPtr;
+	class ShaderReflection;
+	typedef boost::shared_ptr<ShaderReflection> ShaderReflectionPtr;
 	class MaterialParam;
 	typedef boost::shared_ptr<MaterialParam> MaterialParamPtr;
+	class MaterialParamConstantBuffer;
+	typedef boost::shared_ptr<MaterialParamConstantBuffer> MaterialParamConstantBufferPtr;
+	class MaterialParamShaderResouce;
+	typedef boost::shared_ptr<MaterialParamShaderResouce> MaterialParamShaderResoucePtr;
+	class MaterialParamSamplerState;
+	typedef boost::shared_ptr<MaterialParamSamplerState> MaterialParamSamplerStatePtr;
+	class MaterialParamUnordered;
+	typedef boost::shared_ptr<MaterialParamUnordered> MaterialParamUnorderedPtr;
 	class Material;
 	typedef boost::shared_ptr<Material> MaterialPtr;
 	class Texture;
@@ -163,7 +173,6 @@ namespace Disorder
 #include "RenderView.h"
 #include "RenderTarget.h"
 #include "RenderLayout.h"
-#include "VertexElement.h"
 #include "Geometry.h"
 #include "Renderer.h"
 #include "Canvas.h"

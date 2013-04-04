@@ -82,9 +82,6 @@
     <ClInclude Include="RenderEngine.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
-    <ClInclude Include="VertexElement.h">
-      <Filter>Geometry</Filter>
-    </ClInclude>
     <ClInclude Include="Client.h">
       <Filter>GameEngine</Filter>
     </ClInclude>
@@ -263,9 +260,6 @@
     </ClCompile>
     <ClCompile Include="World.cpp">
       <Filter>GameEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexElement.cpp">
-      <Filter>Geometry</Filter>
     </ClCompile>
     <ClCompile Include="Material.cpp">
       <Filter>RenderSystem</Filter>

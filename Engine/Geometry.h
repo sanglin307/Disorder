@@ -7,15 +7,20 @@ namespace Disorder
 	{
 	public:
 		
-		std::vector<VertexElementPtr>		    Elements;
+		std::vector<Vector3>		            Positions;
+		std::vector<Vector3>                    Normals;
+		std::vector<Vector2>                    Texcoords;
 		std::vector<unsigned int>				Indices;
-		
-	 
-		// The size 
-		int VertexSize;
-		int VertexCount;
+
 
 		TopologyType PrimitiveType;
+	};
+
+	class GeometryGenerator
+	{
+	public :
+
+		static GeometryPtr CreateCube(float length);
 	};
 }
 

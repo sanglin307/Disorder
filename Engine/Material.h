@@ -31,10 +31,31 @@ namespace Disorder
 	{
 	};
 
+	class MaterialParamMatrix : public MaterialParam
+	{
+	};
+
+	class MaterialParamConstantBuffer : public MaterialParam
+	{
+	};
+
+	class MaterialParamShaderResouce : public MaterialParam  // texture and structed thing.
+	{
+	};
+
+	class MaterialParamSamplerState : public MaterialParam
+	{
+	};
+
+	class MaterialParamUnordered : public MaterialParam  // Unordered view
+	{
+	};
 
 	class Material
 	{
 	public:
+		Material();
+
 		MaterialType Type;
 
 		//Common property

@@ -49,7 +49,8 @@ namespace Disorder
 	typedef boost::shared_ptr<DX11ShaderResourceView> DX11ShaderResourceViewPtr;
 	class DX11BlendState;
 	typedef boost::shared_ptr<DX11BlendState> DX11BlendStatePtr;
-
+	class DX11ShaderReflection;
+	typedef boost::shared_ptr<DX11ShaderReflection> DX11ShaderReflectionPtr;
 
 	typedef boost::shared_ptr<ID3D11Device> ID3D11DevicePtr;
 	typedef boost::shared_ptr<ID3D11DeviceContext> ID3D11DeviceContextPtr;

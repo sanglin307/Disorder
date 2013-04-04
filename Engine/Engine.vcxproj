@@ -126,7 +126,6 @@
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Vectors.h" />
-    <ClInclude Include="VertexElement.h" />
     <ClInclude Include="Viewport.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
@@ -166,7 +165,6 @@
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Vectors.cpp" />
-    <ClCompile Include="VertexElement.cpp" />
     <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>

@@ -21,6 +21,11 @@ namespace Disorder
 		ST_NumShaderTypes
 	};
 
+	class ShaderReflection
+	{
+	};
+
+
 	class ShaderObject
 	{
 	public:
@@ -66,18 +71,22 @@ namespace Disorder
 		virtual void* GetLowInterface(){ return 0;}
 		virtual void* GetDataInterface() { return 0;}
 
+	public :
+		ShaderReflectionPtr ShaderReflect;
+
 	protected:
 		std::string _entryPoint;
 		ShaderType _type;
 		std::vector<RenderBufferPtr> _constBuffers;
 		std::vector<RenderViewPtr> _shaderResources;
 		std::vector<SamplerStatePtr> _samplerStates;
-
+		
 	};
  
 	class RenderEffect
 	{
 
+	typedef boost::unordered_map<std::string,MaterialParamPtr> MaterialParamMap;
 	public: 
 		RenderEffect(ShaderModel shaderModel)
 		{
@@ -96,9 +105,17 @@ namespace Disorder
 			return _pixelShader;
 		}
 
+			// Material Param
+		virtual MaterialParamPtr GetConstantBufferParameter(std::string const& name) = 0;
+		virtual MaterialParamPtr GetVectorParameter(std::string const& name) = 0;
+		virtual MaterialParamPtr GetMatrixParameter(std::string const& name) = 0;
+		virtual MaterialParamPtr GetShaderResourceParameter(std::string const& name) =0;
+		virtual MaterialParamPtr GetSamplerStateParameter(std::string const& name) = 0;
+		virtual MaterialParamPtr GetUnorderedAccessParameter(std::string const& name) = 0;
+
 	protected:
 		ShaderModel _shaderModel;
-
+		MaterialParamMap _materialParamMap;
 		// shader slot!
 		ShaderObjectPtr _vertexShader;
 		ShaderObjectPtr _pixelShader;

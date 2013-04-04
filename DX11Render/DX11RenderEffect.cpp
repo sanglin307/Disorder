@@ -3,7 +3,7 @@
 
 namespace Disorder
 {
-	//=============================Vertex Shader=========================================
+	//=============================Shader object=========================================
 	void DX11ShaderObject::Load(std::string const& entryPoint)
 	{
 
@@ -99,6 +99,8 @@ namespace Disorder
 			DX11ShaderObjectPtr shader = boost::make_shared<DX11ShaderObject>(entryPoint,ST_VertexShader);
 			shader->VertexShaderInterface =  MakeComPtr<ID3D11VertexShader>(_pVertexShader);
 			shader->DataInterface = MakeComPtr<ID3DBlob>(pVSBlob);
+
+			ShaderReflection(shader);
 			_vertexShader = shader;
 			return shader;
 		}
@@ -116,10 +118,11 @@ namespace Disorder
 
 			DX11ShaderObjectPtr shader = boost::make_shared<DX11ShaderObject>(entryPoint,ST_PixelShader);
 			shader->PixelShaderInterface =  MakeComPtr<ID3D11PixelShader>(_pPixelShader);
-			_pixelShader = shader;
 			shader->DataInterface = MakeComPtr<ID3DBlob>(pVSBlob);
+			ShaderReflection(shader);
+			_pixelShader = shader;
+			
 			return shader;
-	
 		}
 		
 		BOOST_ASSERT(0);
@@ -127,6 +130,209 @@ namespace Disorder
 		return ShaderObjectPtr();
 	
 	}
- 
 
+	void DX11RenderEffect::ShaderReflection(ShaderObjectPtr const& shader)
+	{
+		DX11ShaderReflectionPtr pReflection = boost::make_shared<DX11ShaderReflection>();
+
+		ID3D11ShaderReflection* pReflector = NULL;
+		ID3DBlob* shaderData = (ID3DBlob*)(shader->GetDataInterface());
+		BOOST_ASSERT(shaderData);
+
+		HRESULT hr = D3DReflect(shaderData->GetBufferPointer(), shaderData->GetBufferSize(),
+			IID_ID3D11ShaderReflection, (void**) &pReflector);
+
+		if ( FAILED( hr ) )
+		{
+			MessageBox( NULL,
+							L"Failed to shader reflection ", L"Error", MB_OK );
+			return;
+		}
+
+		D3D11_SHADER_DESC desc;
+		pReflector->GetDesc( &desc );
+		pReflection->ShaderDescription = desc;
+
+		// input and output signature description arrays.
+		for ( UINT i = 0; i < desc.InputParameters; i++ )
+		{
+			D3D11_SIGNATURE_PARAMETER_DESC input_desc;
+			pReflector->GetInputParameterDesc( i, &input_desc );
+			pReflection->InputSignatureParameters.push_back( input_desc );
+		}
+		for ( UINT i = 0; i < desc.OutputParameters; i++ )
+		{
+			D3D11_SIGNATURE_PARAMETER_DESC output_desc;
+			pReflector->GetOutputParameterDesc( i, &output_desc );
+			pReflection->OutputSignatureParameters.push_back( output_desc );
+		}
+ 
+	    //constant buffer information 
+		for ( UINT i = 0; i < desc.ConstantBuffers; i++ )
+		{
+			ID3D11ShaderReflectionConstantBuffer* pConstBuffer = pReflector->GetConstantBufferByIndex( i );
+		
+			D3D11_SHADER_BUFFER_DESC bufferDesc;
+			pConstBuffer->GetDesc( &bufferDesc );
+		
+			if ( bufferDesc.Type == D3D_CT_CBUFFER || bufferDesc.Type == D3D_CT_TBUFFER )
+			{
+				ConstantBufferDesc constantBuffer;
+				constantBuffer.Description = bufferDesc;
+				std::string name = constantBuffer.Description.Name;
+				constantBuffer.BufferParamRef = GetConstantBufferParameter(name);
+
+				// Load the description of each variable for use later on when binding a buffer
+				for ( UINT j = 0; j < bufferDesc.Variables; j++ )
+				{
+					// Get the variable description and store it
+					ID3D11ShaderReflectionVariable* pVariable = pConstBuffer->GetVariableByIndex( j );
+					D3D11_SHADER_VARIABLE_DESC var_desc;
+					pVariable->GetDesc( &var_desc );
+
+					constantBuffer.Variables.push_back( var_desc );
+
+					// Get the variable type description and store it
+					ID3D11ShaderReflectionType* pType = pVariable->GetType();
+					D3D11_SHADER_TYPE_DESC type_desc;
+					pType->GetDesc( &type_desc );
+
+					constantBuffer.Types.push_back( type_desc );
+
+					// Get references to the parameters for binding to these variables.
+					MaterialParamPtr pParam;
+					std::string varname = var_desc.Name;
+					if ( type_desc.Class == D3D_SVC_VECTOR )
+					{					
+						pParam = GetVectorParameter(varname);
+					}
+					else if ( ( type_desc.Class == D3D_SVC_MATRIX_ROWS ) ||
+								( type_desc.Class == D3D_SVC_MATRIX_COLUMNS ) )
+					{
+						// Check if it is an array of matrices first...
+						unsigned int count = type_desc.Elements;
+						if ( count == 0 ) 
+						{
+							pParam = GetMatrixParameter(varname);
+						}
+						else
+						{
+							BOOST_ASSERT(0);
+						}
+					}
+
+					constantBuffer.Parameters.push_back( pParam );
+				}
+
+				pReflection->ConstantBuffers.push_back( constantBuffer );
+			}
+		}
+
+
+		// Get the overall resource binding information for this shader.
+		for ( UINT i = 0; i < desc.BoundResources; i++ )
+		{
+			D3D11_SHADER_INPUT_BIND_DESC resource_desc;
+			pReflector->GetResourceBindingDesc( i, &resource_desc );
+			ShaderInputBindDesc binddesc( resource_desc );
+
+			std::string rname = binddesc.Name;
+			if ( resource_desc.Type == D3D_SIT_CBUFFER || resource_desc.Type == D3D_SIT_TBUFFER )
+			{
+				binddesc.ParamRef = GetConstantBufferParameter(rname);
+			}
+			else if ( resource_desc.Type == D3D_SIT_TEXTURE || resource_desc.Type == D3D_SIT_STRUCTURED )
+			{
+				binddesc.ParamRef = GetShaderResourceParameter(rname);
+			}
+			else if ( resource_desc.Type == D3D_SIT_SAMPLER )
+			{
+				binddesc.ParamRef = GetSamplerStateParameter(rname);
+			}
+			else if ( resource_desc.Type == D3D_SIT_UAV_RWTYPED || resource_desc.Type == D3D_SIT_UAV_RWSTRUCTURED
+				|| resource_desc.Type == D3D_SIT_BYTEADDRESS || resource_desc.Type == D3D_SIT_UAV_RWBYTEADDRESS
+				|| resource_desc.Type == D3D_SIT_UAV_APPEND_STRUCTURED || resource_desc.Type == D3D_SIT_UAV_CONSUME_STRUCTURED
+				|| resource_desc.Type == D3D_SIT_UAV_RWSTRUCTURED_WITH_COUNTER )
+			{
+				binddesc.ParamRef = GetUnorderedAccessParameter(rname);
+			}
+
+
+			pReflection->ResourceBindings.push_back( binddesc );
+		}
+
+
+		// Release the shader reflection interface
+		pReflector->Release();
+
+		shader->ShaderReflect = pReflection;
+		return;
+	}
+ 
+	MaterialParamPtr DX11RenderEffect::GetConstantBufferParameter(std::string const& name)
+	{
+		if( _materialParamMap.find(name) != _materialParamMap.end() )
+			return _materialParamMap.at(name);
+
+		MaterialParamPtr constBuffer = boost::make_shared<MaterialParamConstantBuffer>();
+		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,constBuffer));
+
+		return constBuffer;
+	}
+
+	MaterialParamPtr DX11RenderEffect::GetVectorParameter(std::string const& name)
+	{
+		if( _materialParamMap.find(name) != _materialParamMap.end() )
+			return _materialParamMap.at(name);
+
+		MaterialParamPtr vector = boost::make_shared<MaterialParamVector>();
+		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,vector));
+
+		return vector;
+	}
+
+	MaterialParamPtr DX11RenderEffect::GetMatrixParameter(std::string const& name)
+	{
+		if( _materialParamMap.find(name) != _materialParamMap.end() )
+			return _materialParamMap.at(name);
+
+		MaterialParamPtr matrix = boost::make_shared<MaterialParamMatrix>();
+		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,matrix));
+
+		return matrix;
+	}
+
+	MaterialParamPtr DX11RenderEffect::GetShaderResourceParameter(std::string const& name)
+	{
+		// texture and structed.
+		if( _materialParamMap.find(name) != _materialParamMap.end() )
+			return _materialParamMap.at(name);
+
+		MaterialParamPtr shaderres = boost::make_shared<MaterialParamShaderResouce>();
+		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,shaderres));
+
+		return shaderres;
+	}
+
+	MaterialParamPtr DX11RenderEffect::GetSamplerStateParameter(std::string const& name)
+	{
+		if( _materialParamMap.find(name) != _materialParamMap.end() )
+			return _materialParamMap.at(name);
+
+		MaterialParamPtr ss = boost::make_shared<MaterialParamSamplerState>();
+		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,ss));
+
+		return ss;
+	}
+
+	MaterialParamPtr DX11RenderEffect::GetUnorderedAccessParameter(std::string const& name)
+	{
+		if( _materialParamMap.find(name) != _materialParamMap.end() )
+			return _materialParamMap.at(name);
+
+		MaterialParamPtr ua = boost::make_shared<MaterialParamUnordered>();
+		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,ua));
+
+		return ua;
+	}
 }
