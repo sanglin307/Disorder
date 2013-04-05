@@ -11,15 +11,13 @@ namespace Disorder
 
 	}
 
-	bool DX11RenderLayout::CreateLayout(ShaderObjectPtr const& vertexShader,const std::vector<VertexInputDes> const& vertexInput,TopologyType topologyType)
+	bool DX11RenderLayout::CreateLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType)
 	{
 		 
-		for(unsigned int index=0;index<vertexInput.size();index++)
-		{
-			 _vertexDes.push_back(vertexInput[index]);
-		}
-
-		 _topologyType = topologyType;
+		DX11ShaderReflectionPtr shaderReflection = boost::dynamic_pointer_cast<DX11ShaderReflection>(vertexShader->ShaderReflect);
+		BOOST_ASSERT(shaderReflection != NULL );
+ 
+		_topologyType = topologyType;
 
 		D3D11_INPUT_ELEMENT_DESC pElementDes[12];
 		std::string strSemantic[12];

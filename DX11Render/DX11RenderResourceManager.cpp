@@ -30,20 +30,16 @@ namespace Disorder
 			return boost::shared_ptr<RasterizeState>();
 	}
 
-	RenderLayoutPtr DX11RenderResourceManager::CreateRenderLayout(ShaderObjectPtr const& vertexShader,const std::vector<VertexInputDes> const& vertexInput,TopologyType topologyType)
+	RenderLayoutPtr DX11RenderResourceManager::CreateRenderLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType)
 	{
-		// we should generate a vertexelement des string, and reuse the renderlayout if we can.
-		std::string key = RenderLayout::GenerateMapKey(vertexInput,topologyType);
-
-		if( _renderLayoutMap.find(key) != _renderLayoutMap.end() )
-			return _renderLayoutMap.at(key);
-
+ 
 		RenderLayoutPtr renderLayout = boost::make_shared<DX11RenderLayout>();
-		bool result = renderLayout->CreateLayout(vertexShader,vertexInput,topologyType);
-		if( result )
-			_renderLayoutMap.insert(std::pair<std::string,RenderLayoutPtr>(key,renderLayout));
-
-		return renderLayout;
+		bool result = renderLayout->CreateLayout(vertexShader,topologyType);
+	 
+		if(result)
+		    return renderLayout;
+		else
+			return NULL;
 	}
 
 	RenderBufferPtr DX11RenderResourceManager::CreateRenderBuffer(RenderBufferType type,unsigned int elementSize,unsigned int bufferSize,unsigned int accessHint,BufferInitData const* pData)

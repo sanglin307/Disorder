@@ -7,13 +7,11 @@ namespace Disorder
 	class RenderResourceManager 
 	{
 		typedef boost::unordered_map<std::string,RenderEffectPtr>  EffectMap;
-		typedef boost::unordered_map<std::string,RenderLayoutPtr>  RenderLayoutMap;
-	
-      
+		 
 	public:
 
 		virtual RenderEffectPtr CreateRenderEffect(std::string const& fileName, ShaderModel shaderModel,std::string const& entryPointVS,std::string const& entryPointPS) = 0;
-		virtual RenderLayoutPtr CreateRenderLayout(ShaderObjectPtr const& vertexShader,const std::vector<VertexInputDes> const& vertexInput,TopologyType topologyType) = 0;
+		virtual RenderLayoutPtr CreateRenderLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType) = 0;
 		virtual RenderBufferPtr CreateRenderBuffer(RenderBufferType type,unsigned int elementSize,unsigned int bufferSize,unsigned int accessHint,BufferInitData const* pData) = 0;
 		virtual RenderTexture2DPtr CreateRenderTexture2D(SamplerStatePtr const& sampler,PixelFormat pixelFormat,unsigned int width,unsigned int hight,bool bMipmap,BufferInitData const* pData) = 0;
 		virtual SamplerStatePtr CreateSamplerState(SamplerFilter filter,TextureAddressMode addressUVW,UINT maxAnisotropy = 16) = 0;
@@ -25,9 +23,7 @@ namespace Disorder
 	
 	protected:
 		EffectMap _effectMap;
-		RenderLayoutMap _renderLayoutMap;
-	
-
+ 
 	};
 }
 

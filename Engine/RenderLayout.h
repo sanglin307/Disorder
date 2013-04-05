@@ -24,9 +24,9 @@ namespace Disorder
 	{
 	public:
 
-		virtual bool CreateLayout(ShaderObjectPtr const& vertexShader,const std::vector<VertexInputDes> const& vertexInput,TopologyType topologyType) = 0;
+		virtual bool CreateLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType) = 0;
 
-		static std::string GenerateMapKey(const std::vector<VertexInputDes> const& vertexInput,TopologyType topologyType); 
+		 
 
         virtual void BindVertexBuffer(RenderBufferPtr const& renderBuffer)
         {
@@ -76,7 +76,6 @@ namespace Disorder
 		virtual void * GetLowInterface(){ return 0;}
 
 	protected:
-		std::vector<VertexInputDes> _vertexDes;
 		std::vector<RenderBufferPtr> _vertexBuffers;
         RenderBufferPtr _indexBuffer;
         TopologyType _topologyType;
