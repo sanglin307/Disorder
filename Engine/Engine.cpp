@@ -25,7 +25,7 @@ namespace Disorder
 	   ViewportPtr const& viewport = GameClient->GetViewport(0);
 	   RenderTargetPtr renderTarget = RenderEngine->CreateRenderTarget(GConfig->sRenderConfig,viewport->GetWindow());
 
-	   GameCanvas = boost::make_shared<Canvas>(viewport->SizeX,viewport->SizeY);
+	  // GameCanvas = boost::make_shared<Canvas>(viewport->SizeX,viewport->SizeY);
 
 	   GSceneManager->Init();
 

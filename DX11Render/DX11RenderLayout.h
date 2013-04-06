@@ -8,7 +8,7 @@ namespace Disorder
 	public:
 		virtual bool CreateLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType);
 
-	    void GetSemanticDes(VertexInputSematic vertexDes,std::string& semanticDes,unsigned int& semanticIndex);
+	    DXGI_FORMAT GetInputFormat(D3D_REGISTER_COMPONENT_TYPE component,BYTE mask);
 
 		virtual void BindVertexBuffer(RenderBufferPtr const& renderBuffer)
 		{

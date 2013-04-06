@@ -96,6 +96,8 @@ namespace Disorder
 	typedef boost::shared_ptr<RenderEngine> RenderEnginePtr;
 	class Renderer;
 	typedef boost::shared_ptr<Renderer> RendererPtr;
+	class GeometryRenderer;
+	typedef boost::shared_ptr<GeometryRenderer> GeometryRendererPtr;
 	class RenderView;
 	typedef boost::shared_ptr<RenderView> RenderViewPtr;
 	class RenderTarget;
@@ -110,8 +112,6 @@ namespace Disorder
 	typedef boost::shared_ptr<RenderResourceManager> RenderResourceManagerPtr;
 	class BrushRenderer;
 	typedef boost::shared_ptr<BrushRenderer> BrushRendererPtr;
-	class CubeRenderer;
-	typedef boost::shared_ptr<CubeRenderer> CubeRendererPtr;
 	class RenderBuffer;
 	typedef boost::shared_ptr<RenderBuffer> RenderBufferPtr;
 	class RenderTexture;

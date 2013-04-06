@@ -16,7 +16,7 @@ namespace Disorder
 		mat->Type = MT_Lambert;
 
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
-		RenderEffectPtr effect =  resourceManager->CreateRenderEffect("SimpleFX_PT.fx",SM_4_0,"VS","PS");
+		RenderEffectPtr effect =  resourceManager->CreateRenderEffect("DiffuseTex.fx",SM_4_0,"VS","PS");
 		mat->Effect[MVT_Perspective] = effect;
 
 		return mat;

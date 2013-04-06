@@ -11,8 +11,11 @@ namespace Disorder
 		 LevelPtr level = boost::make_shared<Level>();
 		 Vector3 position = Vector3(0.0f);
 		 GameObjectPtr gameObject = boost::make_shared<GameObject>(position);
-		 CubeRendererPtr cube = boost::make_shared<CubeRenderer>(gameObject,1.0f);
-		 gameObject->AddComponent(cube);
+		 GeometryPtr cube = GeometryGenerator::CreateCube(1.0);
+		 GeometryRendererPtr cuberender = boost::make_shared<GeometryRenderer>(gameObject);
+		 MaterialPtr mat = MaterialGenerator::GenerateLambert();
+		 cuberender->SetGeometry(cube,mat);
+		 gameObject->AddComponent(cuberender);
 		 level->AddGameObject(gameObject);
 		 Levels.push_back(level);
 	 }

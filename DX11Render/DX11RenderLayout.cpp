@@ -27,21 +27,11 @@ namespace Disorder
 			desc.SemanticName = shaderReflection->InputSignatureParameters[index].SemanticName;
 			desc.SemanticIndex = shaderReflection->InputSignatureParameters[index].SemanticIndex;
 			desc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-			desc.Format =  DXGI_FORMAT_R32G32B32_FLOAT;
+			desc.Format =  GetInputFormat(shaderReflection->InputSignatureParameters[index].ComponentType,shaderReflection->InputSignatureParameters[index].Mask);
 			desc.InputSlot = 0;
 			desc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 			desc.InstanceDataStepRate = 0;
 			vElementDes.push_back(desc);
-		/*	if( iter->InstanceData)
-			{
-				pElementDes[index].InputSlotClass = D3D11_INPUT_PER_INSTANCE_DATA;
-				pElementDes[index].InstanceDataStepRate = iter->InstanceDataStepRate;
-			}
-			else
-			{
-				pElementDes[index].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-				pElementDes[index].InstanceDataStepRate = 0;
-			}*/
 		}
 
 		ID3DBlob* shaderData = (ID3DBlob*)(vertexShader->GetDataInterface());
@@ -63,32 +53,54 @@ namespace Disorder
 		return true;
 	}
 
-	void DX11RenderLayout::GetSemanticDes(VertexInputSematic vertexDes,std::string& semanticDes,unsigned int& semanticIndex)
+	DXGI_FORMAT DX11RenderLayout::GetInputFormat(D3D_REGISTER_COMPONENT_TYPE component,BYTE mask)
 	{
-		if( vertexDes == VIS_Position )
-		{
-			semanticDes = "POSITION";
-			semanticIndex = 0;
-		}
-		else if( vertexDes == VIS_Color )
-		{
-			semanticDes = "COLOR";
-			semanticIndex = 0;
-		}
-		else if( vertexDes == VIS_Normal )
-		{
-			semanticDes = "NORMAL";
-			semanticIndex = 0;
-		}
-		else if( vertexDes == VIS_TexCoord0 )
-		{
-			semanticDes = "TEXCOORD";
-			semanticIndex = 0;
-		}
-		else
-		{
-			BOOST_ASSERT(0);
-		}
+		 if( component == D3D_REGISTER_COMPONENT_UINT32 )
+		 {
+			 switch(mask)
+			 {
+			 case 1:
+				 return DXGI_FORMAT_R32_UINT;
+			 case 3:
+				 return DXGI_FORMAT_R32G32_UINT;
+			 case 7:
+				 return DXGI_FORMAT_R32G32B32_UINT;
+			 case 15:
+				 return DXGI_FORMAT_R32G32B32A32_UINT;
+			 }
+		 }
+		 else if( component == D3D_REGISTER_COMPONENT_SINT32 )
+		 {
+			 switch(mask)
+			 {
+			 case 1:
+				 return DXGI_FORMAT_R32_SINT;
+			 case 3:
+				 return DXGI_FORMAT_R32G32_SINT;
+			 case 7:
+				 return DXGI_FORMAT_R32G32B32_SINT;
+			 case 15:
+				 return DXGI_FORMAT_R32G32B32A32_SINT;
+			 }
+		 }
+		 else if( component == D3D_REGISTER_COMPONENT_FLOAT32 )
+		 {
+			 switch(mask)
+			 {
+			 case 1:
+				 return DXGI_FORMAT_R32_FLOAT;
+			 case 3:
+				 return DXGI_FORMAT_R32G32_FLOAT;
+			 case 7:
+				 return DXGI_FORMAT_R32G32B32_FLOAT;
+			 case 15:
+				 return DXGI_FORMAT_R32G32B32A32_FLOAT;
+			 }
+		 }
+
+		 BOOST_ASSERT(0);
+
+		 return DXGI_FORMAT_UNKNOWN;
 	}
 
 }

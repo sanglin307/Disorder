@@ -22,23 +22,7 @@ namespace Disorder
 		MaterialParamPtr ProjMatrix;
 	};
 
- 
 
-	class CubeRenderer: public Renderer
-	{
-		typedef struct _SimpleVertex
-		{
-			Vector3 position;
-			Vector3 normal;
-			Vector2 texcoord;
-		} SimpleVertex;
-	public:
-		CubeRenderer(GameObjectPtr const& base, float length);
-
-		virtual void Draw();
-
-	
-	};
 
 	class GeometryRenderer : public Renderer
 	{
