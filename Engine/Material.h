@@ -27,10 +27,6 @@ namespace Disorder
 	{
 	};
 
-	class MaterialParamTexture : public MaterialParam
-	{
-	};
-
 	class MaterialParamMatrix : public MaterialParam
 	{
 	};
@@ -61,8 +57,7 @@ namespace Disorder
 		//Common property
 		MaterialParamPtr DiffuseColor;
 		MaterialParamPtr SpecularColor;
-
-
+ 
 		//effect
 		RenderEffectPtr Effect[MVT_NUM_VIEW_TYPES];
 

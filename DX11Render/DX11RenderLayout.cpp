@@ -14,24 +14,25 @@ namespace Disorder
 	bool DX11RenderLayout::CreateLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType)
 	{
 		 
-		DX11ShaderReflectionPtr shaderReflection = boost::dynamic_pointer_cast<DX11ShaderReflection>(vertexShader->ShaderReflect);
+		DX11ShaderReflectionPtr shaderReflection = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader)->ShaderReflect;
 		BOOST_ASSERT(shaderReflection != NULL );
  
 		_topologyType = topologyType;
 
-		D3D11_INPUT_ELEMENT_DESC pElementDes[12];
-		std::string strSemantic[12];
+		std::vector<D3D11_INPUT_ELEMENT_DESC> vElementDes;
 
-		std::vector<VertexInputDes>::iterator iter = _vertexDes.begin();
-		int index = 0;
-		for(;iter != _vertexDes.end();iter++)
+		for(int index=0;index<shaderReflection->InputSignatureParameters.size();index++)
 		{
-			GetSemanticDes(iter->Semantic,strSemantic[index],pElementDes[index].SemanticIndex);
-			pElementDes[index].SemanticName = strSemantic[index].c_str();
-			pElementDes[index].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-			pElementDes[index].Format = (DXGI_FORMAT)GPixelFormats[ iter->Format ].PlatformFormat;
-			pElementDes[index].InputSlot = 0;
-			if( iter->InstanceData)
+			D3D11_INPUT_ELEMENT_DESC desc;
+			desc.SemanticName = shaderReflection->InputSignatureParameters[index].SemanticName;
+			desc.SemanticIndex = shaderReflection->InputSignatureParameters[index].SemanticIndex;
+			desc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+			desc.Format =  DXGI_FORMAT_R32G32B32_FLOAT;
+			desc.InputSlot = 0;
+			desc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+			desc.InstanceDataStepRate = 0;
+			vElementDes.push_back(desc);
+		/*	if( iter->InstanceData)
 			{
 				pElementDes[index].InputSlotClass = D3D11_INPUT_PER_INSTANCE_DATA;
 				pElementDes[index].InstanceDataStepRate = iter->InstanceDataStepRate;
@@ -40,8 +41,7 @@ namespace Disorder
 			{
 				pElementDes[index].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 				pElementDes[index].InstanceDataStepRate = 0;
-			}
-			index++;
+			}*/
 		}
 
 		ID3DBlob* shaderData = (ID3DBlob*)(vertexShader->GetDataInterface());
@@ -51,7 +51,7 @@ namespace Disorder
  
 		// Create the input layout
 		ID3D11InputLayout* pInputLayout = NULL;
-		HRESULT hr = renderEngine->D3DDevice()->CreateInputLayout( pElementDes, _vertexDes.size(), shaderData->GetBufferPointer(),
+		HRESULT hr = renderEngine->D3DDevice()->CreateInputLayout(vElementDes.data(), vElementDes.size(), shaderData->GetBufferPointer(),
 											  shaderData->GetBufferSize(), &pInputLayout );
 		BOOST_ASSERT(hr == S_OK);
 		

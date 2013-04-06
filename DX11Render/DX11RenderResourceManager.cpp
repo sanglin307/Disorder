@@ -42,10 +42,18 @@ namespace Disorder
 			return NULL;
 	}
 
-	RenderBufferPtr DX11RenderResourceManager::CreateRenderBuffer(RenderBufferType type,unsigned int elementSize,unsigned int bufferSize,unsigned int accessHint,BufferInitData const* pData)
+	RenderBufferPtr DX11RenderResourceManager::CreateConstBuffer(unsigned int size, unsigned int accessHint)
 	{
 		RenderBufferPtr renderBuffer = boost::make_shared<DX11RenderBuffer>();
-		renderBuffer->CreateBuffer(type,elementSize,bufferSize,accessHint,pData);
+		renderBuffer->CreateConstBuffer(size,accessHint);
+
+		return renderBuffer;
+	}
+
+	RenderBufferPtr DX11RenderResourceManager::CreateRenderBuffer(RenderBufferType type,unsigned int accessHint,GeometryPtr const& data,ShaderObjectPtr const& vertexShader)
+	{
+		RenderBufferPtr renderBuffer = boost::make_shared<DX11RenderBuffer>();
+		renderBuffer->CreateBuffer(type,data,accessHint);
 
 		return renderBuffer;
 	}

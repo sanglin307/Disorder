@@ -21,11 +21,7 @@ namespace Disorder
 		ST_NumShaderTypes
 	};
 
-	class ShaderReflection
-	{
-	};
-
-
+ 
 	class ShaderObject
 	{
 	public:
@@ -67,13 +63,11 @@ namespace Disorder
 		{
 			return _samplerStates;
 		}
-
+ 
 		virtual void* GetLowInterface(){ return 0;}
 		virtual void* GetDataInterface() { return 0;}
-
-	public :
-		ShaderReflectionPtr ShaderReflect;
-
+ 
+		
 	protected:
 		std::string _entryPoint;
 		ShaderType _type;
@@ -104,6 +98,8 @@ namespace Disorder
 		{
 			return _pixelShader;
 		}
+
+        virtual void ShaderReflection(ShaderObjectPtr const& shader) = 0;
 
 			// Material Param
 		virtual MaterialParamPtr GetConstantBufferParameter(std::string const& name) = 0;

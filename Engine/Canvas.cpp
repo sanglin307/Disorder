@@ -89,44 +89,44 @@ namespace Disorder
 
 	CanvasBatchElement::CanvasBatchElement()
 	{
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
-		RenderEffectPtr technique =  resourceManager->CreateRenderEffect("2DFX.fx",SM_4_0,"VS","PS");
+		//RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
+		//RenderEffectPtr technique =  resourceManager->CreateRenderEffect("2DFX.fx",SM_4_0,"VS","PS");
 
-		ShaderObjectPtr vertexShader = technique->GetVertexShader();
-		ShaderObjectPtr pixelShader = technique->GetPixelShader();
-		
-		VertexInputDes vertexElementDes[] =
-		{
-			{VIS_Position,PF_R32G32B32F,0,false},
-			{VIS_Color,PF_R32G32B32A32F,0,false},
-			{VIS_TexCoord0,PF_R32G32F,0,false},
-		};
+		//ShaderObjectPtr vertexShader = technique->GetVertexShader();
+		//ShaderObjectPtr pixelShader = technique->GetPixelShader();
+		//
+		//VertexInputDes vertexElementDes[] =
+		//{
+		//	{VIS_Position,PF_R32G32B32F,0,false},
+		//	{VIS_Color,PF_R32G32B32A32F,0,false},
+		//	{VIS_TexCoord0,PF_R32G32F,0,false},
+		//};
 
-		RenderLayoutPtr renderLayout = resourceManager->CreateRenderLayout(vertexShader,vertexElementDes,3,TT_TriangleList);
-	 
-		_savedVertexBufferSize = 2048;
-		_savedIndexBufferSize = (UINT)(_savedVertexBufferSize * 1.5f);
-	 
+		//RenderLayoutPtr renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList);
+	 //
+		//_savedVertexBufferSize = 2048;
+		//_savedIndexBufferSize = (UINT)(_savedVertexBufferSize * 1.5f);
+	 //
 
-		RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,sizeof(SimpleVertex),sizeof(SimpleVertex)*_savedVertexBufferSize,BAH_GPU_Read | BAH_CPU_Write,NULL);
-		renderLayout->BindVertexBuffer(vertexBuffer);
+		//RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,sizeof(SimpleVertex),sizeof(SimpleVertex)*_savedVertexBufferSize,BAH_GPU_Read | BAH_CPU_Write,NULL);
+		//renderLayout->BindVertexBuffer(vertexBuffer);
  
-		 
-		//Index buffer
-		RenderBufferPtr indexBuffer = resourceManager->CreateRenderBuffer(RBT_Index,sizeof(WORD),sizeof(WORD)*_savedIndexBufferSize,BAH_GPU_Read | BAH_CPU_Write,NULL);
-		renderLayout->BindIndexBuffer(indexBuffer);
+		// 
+		////Index buffer
+		//RenderBufferPtr indexBuffer = resourceManager->CreateRenderBuffer(RBT_Index,sizeof(WORD),sizeof(WORD)*_savedIndexBufferSize,BAH_GPU_Read | BAH_CPU_Write,NULL);
+		//renderLayout->BindIndexBuffer(indexBuffer);
 
-		BlendDesc blendDesc;
-		blendDesc.BlendEnable = true;
-		blendDesc.SrcBlend = BLEND_SRC_ALPHA;
-		blendDesc.DestBlend = BLEND_INV_SRC_ALPHA;
-		blendDesc.BlendOp = BLEND_OP_ADD;
-		 
-		BlendStatePtr blendState = resourceManager->CreateBlendState(&blendDesc,1);
-		renderLayout->BindBlendState(blendState);
+		//BlendDesc blendDesc;
+		//blendDesc.BlendEnable = true;
+		//blendDesc.SrcBlend = BLEND_SRC_ALPHA;
+		//blendDesc.DestBlend = BLEND_INV_SRC_ALPHA;
+		//blendDesc.BlendOp = BLEND_OP_ADD;
+		// 
+		//BlendStatePtr blendState = resourceManager->CreateBlendState(&blendDesc,1);
+		//renderLayout->BindBlendState(blendState);
 
-		_renderLayout = renderLayout;
-		_renderEffect = technique;
+		//_renderLayout = renderLayout;
+		//_renderEffect = technique;
 	}
 
 

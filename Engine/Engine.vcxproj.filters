@@ -29,10 +29,10 @@
     <None Include="..\Resource\FX\SimpleFX.fx">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\Resource\FX\SimpleFX_PT.fx">
+    <None Include="..\Resource\FX\2DFX.fx">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\Resource\FX\2DFX.fx">
+    <None Include="..\Resource\FX\DiffuseTex.fx">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

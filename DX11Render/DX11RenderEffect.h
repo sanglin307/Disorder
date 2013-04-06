@@ -52,16 +52,8 @@ namespace Disorder
 		MaterialParamPtr ParamRef;
 	};
 
-	class DX11ShaderReflection : public ShaderReflection
+	class DX11ShaderReflection
 	{
-	public:
-
-		/*void InitializeConstantBuffers( IParameterManager* pParamManager );
-		void UpdateParameters( PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );
-		void BindParameters( ShaderType type, PipelineManagerDX11* pPipeline, IParameterManager* pParamManager );*/
-
-		void PrintShaderDetails();
-
 	public:
 		D3D11_SHADER_DESC								ShaderDescription;
 		std::vector<D3D11_SIGNATURE_PARAMETER_DESC>		InputSignatureParameters;
@@ -104,6 +96,7 @@ namespace Disorder
 		virtual void* GetDataInterface();
 		
 	public:
+		DX11ShaderReflectionPtr  ShaderReflect;
 		ID3D11VertexShaderPtr VertexShaderInterface;
 		ID3D11PixelShaderPtr  PixelShaderInterface;
 		ID3DBlobPtr DataInterface;

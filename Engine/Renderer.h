@@ -16,7 +16,10 @@ namespace Disorder
 		RenderEffectPtr _renderEffect;
 		RenderLayoutPtr _renderLayout;
 	    
-
+		MaterialParamPtr WorldViewProjMatrix;
+		MaterialParamPtr WorldMatrix;
+		MaterialParamPtr ViewMatrix;
+		MaterialParamPtr ProjMatrix;
 	};
 
  

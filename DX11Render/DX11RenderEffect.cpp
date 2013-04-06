@@ -133,7 +133,10 @@ namespace Disorder
 
 	void DX11RenderEffect::ShaderReflection(ShaderObjectPtr const& shader)
 	{
+		DX11ShaderObjectPtr dx11Shader = boost::dynamic_pointer_cast<DX11ShaderObject>(shader);
 		DX11ShaderReflectionPtr pReflection = boost::make_shared<DX11ShaderReflection>();
+
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
 
 		ID3D11ShaderReflection* pReflector = NULL;
 		ID3DBlob* shaderData = (ID3DBlob*)(shader->GetDataInterface());
@@ -181,7 +184,7 @@ namespace Disorder
 				constantBuffer.Description = bufferDesc;
 				std::string name = constantBuffer.Description.Name;
 				constantBuffer.BufferParamRef = GetConstantBufferParameter(name);
-
+			 
 				// Load the description of each variable for use later on when binding a buffer
 				for ( UINT j = 0; j < bufferDesc.Variables; j++ )
 				{
@@ -222,7 +225,11 @@ namespace Disorder
 					}
 
 					constantBuffer.Parameters.push_back( pParam );
+					 
 				}
+				 
+				RenderBufferPtr constBuffer = resourceManager->CreateConstBuffer(bufferDesc.Size,BAH_GPU_Read);
+				shader->BindConstBuffer(constBuffer);
 
 				pReflection->ConstantBuffers.push_back( constantBuffer );
 			}
@@ -265,7 +272,7 @@ namespace Disorder
 		// Release the shader reflection interface
 		pReflector->Release();
 
-		shader->ShaderReflect = pReflection;
+		dx11Shader->ShaderReflect = pReflection;
 		return;
 	}
  

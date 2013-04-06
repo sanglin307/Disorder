@@ -20,7 +20,7 @@ namespace Disorder
 		DoCreateBuffer(NULL);
 	}
 
-	void DX11RenderBuffer::DoCreateBuffer(BufferInitData const* pData)
+	void DX11RenderBuffer::DoCreateBuffer(void *pData)
 	{
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory( &bd, sizeof(bd) );
@@ -36,9 +36,9 @@ namespace Disorder
 		{
 			D3D11_SUBRESOURCE_DATA InitData;
 			ZeroMemory( &InitData, sizeof(InitData) );
-			InitData.pSysMem = pData->Data;
-			InitData.SysMemPitch = pData->RowPitch;
-			InitData.SysMemSlicePitch = pData->SlicePitch;
+			InitData.pSysMem = pData;
+			InitData.SysMemPitch = 0;
+			InitData.SysMemSlicePitch = 0;
 			HRESULT hr = renderEngine->D3DDevice()->CreateBuffer( &bd, &InitData, &pBuffer );
 			BOOST_ASSERT(hr==S_OK);
 		}
@@ -51,19 +51,112 @@ namespace Disorder
 		D3DInterface = MakeComPtr<ID3D11Buffer>(pBuffer);
 	}
 
-	void DX11RenderBuffer::CreateBuffer(RenderBufferType type,unsigned int elementSize,unsigned int bufferSize,unsigned int accessHint,BufferInitData const* pData)
+	void DX11RenderBuffer::CreateConstBuffer(unsigned int size, unsigned int accessHint)
+	{
+		_bindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		_type = RBT_Constant;
+		_accessHint = accessHint;
+		_elementSize = size;
+		_bufferSize = size;
+		DoCreateBuffer(0);
+ 
+	}
+
+	void DX11RenderBuffer::CreateBuffer(RenderBufferType type,GeometryPtr const& data,unsigned int accessHint,ShaderObjectPtr const& vertexShader)
 	{
 		_type = type;
 		_accessHint = accessHint;
-		_elementSize = elementSize;
-		_bufferSize = bufferSize;
+		_elementSize = 0;
+		_bufferSize = 0;
+ 
+		void *pData = NULL;
 
 		if( _type == RBT_Vertex )
-		    _bindFlags = D3D11_BIND_VERTEX_BUFFER;
+		{
+			std::vector<float> vData;
+			_bindFlags = D3D11_BIND_VERTEX_BUFFER;
+			bool bPositionData = false;
+			bool bNormalData = false;
+			bool bTexcoodData = false;
+			DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
+			for(int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
+			{
+				if(strcmp(shader->ShaderReflect->InputSignatureParameters[i].SemanticName,"POSITION") == 0 )
+				{
+					bPositionData = true;
+					continue;
+				}
+				if(strcmp(shader->ShaderReflect->InputSignatureParameters[i].SemanticName,"NORMAL") == 0 )
+				{
+					bNormalData = true;
+					continue;
+				}
+				if(strcmp(shader->ShaderReflect->InputSignatureParameters[i].SemanticName,"TEXCOORD0") == 0 )
+				{
+					bTexcoodData = true;
+					continue;
+				}
+			}
+			if(bPositionData && data->Positions.size() > 0)
+			{
+				_elementSize += sizeof(Vector3);
+				_bufferSize += sizeof(Vector3) * data->Positions.size();
+			}
+
+			if(bNormalData && data->Normals.size() > 0)
+			{
+				_elementSize += sizeof(Vector3);
+				_bufferSize += sizeof(Vector3) * data->Normals.size();
+			}
+
+			if(bTexcoodData && data->Texcoords.size() > 0)
+			{
+				_elementSize += sizeof(Vector2);
+				_bufferSize += sizeof(Vector2) * data->Texcoords.size();
+			}
+
+			//data
+			if(bPositionData && data->Positions.size() > 0 )
+			{
+				for(int index=0;index<data->Positions.size();++index)
+				{
+					vData.push_back(data->Positions[index].x);
+					vData.push_back(data->Positions[index].y);
+					vData.push_back(data->Positions[index].z);
+					if( bNormalData && data->Normals.size() > index )
+					{
+						vData.push_back(data->Normals[index].x);
+						vData.push_back(data->Normals[index].y);
+						vData.push_back(data->Normals[index].z);
+					}
+					else
+					{
+						BOOST_ASSERT(0);
+					}
+					if( bTexcoodData && data->Texcoords.size() > index )
+					{
+						vData.push_back(data->Texcoords[index].x);
+						vData.push_back(data->Texcoords[index].y);
+					}
+					else
+					{
+						BOOST_ASSERT(0);
+					}
+				}
+				pData = vData.data();
+			}
+
+		}
 		else if( _type == RBT_Index )
+		{
 			_bindFlags = D3D11_BIND_INDEX_BUFFER;
-		else if( _type == RBT_Constant )
-			_bindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			if( data->Indices.size() > 0 )
+			{
+				_elementSize = sizeof(unsigned int);
+				_bufferSize = sizeof(unsigned int) * data->Indices.size();
+				pData = data->Indices.data();
+			}
+		}
 		else
 		{
 			BOOST_ASSERT(0);

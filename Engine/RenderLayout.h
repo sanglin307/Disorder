@@ -25,9 +25,7 @@ namespace Disorder
 	public:
 
 		virtual bool CreateLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType) = 0;
-
-		 
-
+ 
         virtual void BindVertexBuffer(RenderBufferPtr const& renderBuffer)
         {
 			_vertexBuffers.push_back(renderBuffer);
