@@ -16,6 +16,9 @@ namespace Disorder
 		virtual void OnDrawEnd();
 
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
+		virtual void SetBlendState(BlendStatePtr const& blendState);
+		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState);
+
 		virtual void UpdateMVPMatrix(RenderEffectPtr const& technique, Matrix4 const& worldMatrix,Matrix4 const& viewMatrix,Matrix4 const& projMatrix);
 		virtual void SetFX(RenderEffectPtr const& technique);
 		virtual void DrawIndexed(unsigned int indexCount,unsigned int startIndexLocation,int baseVertexLocation);

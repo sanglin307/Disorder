@@ -9,7 +9,7 @@ namespace Disorder
 		typedef boost::unordered_map<std::string,RenderEffectPtr>  EffectMap;
 		 
 	public:
-
+		virtual void Init();
 		virtual RenderEffectPtr CreateRenderEffect(std::string const& fileName, ShaderModel shaderModel,std::string const& entryPointVS,std::string const& entryPointPS) = 0;
 		virtual RenderLayoutPtr CreateRenderLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType) = 0;
 		virtual RenderBufferPtr CreateRenderBuffer(RenderBufferType type,unsigned int accessHint,GeometryPtr const& data,ShaderObjectPtr const& vertexShader = 0) = 0;
@@ -21,7 +21,11 @@ namespace Disorder
 		virtual RasterizeStatePtr CreateRasterizeState(RasterizeDesc *pDesc) = 0;
 		virtual BlendStatePtr CreateBlendState(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable = false,bool IndependentBlendEnable = false) = 0;
 
-	
+	public:
+		static RasterizeStatePtr DefaultRasterizeState;
+		static BlendStatePtr DefaultBlentState;
+
+
 	protected:
 		EffectMap _effectMap;
  

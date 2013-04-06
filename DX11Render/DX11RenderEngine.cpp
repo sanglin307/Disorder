@@ -2,8 +2,6 @@
 
 namespace Disorder
 {
- 
-	 
 
 	 DX11RenderEngine::DX11RenderEngine()
 	 {
@@ -17,12 +15,12 @@ namespace Disorder
 		_featureLevel = D3D_FEATURE_LEVEL_11_0;
 
 		ResourceManager = boost::make_shared<DX11RenderResourceManager>();
-		 
+ 
 	 }
  
 	void DX11RenderEngine::Init()
 	{
-		
+		ResourceManager->Init();
 	}
 
 	void DX11RenderEngine::Exit()
@@ -59,6 +57,27 @@ namespace Disorder
 		_pImmediateContext->Unmap((ID3D11Buffer*)(buffer->GetLowInterface()),D3D11CalcSubresource(0, 0, 1));
 	}
 
+	void DX11RenderEngine::SetBlendState(BlendStatePtr const& blendState)
+	{ 
+		if( CachedBlendState != blendState )
+		{
+			CachedBlendState = blendState;
+		    ID3D11BlendState *pState = (ID3D11BlendState*)(blendState->GetLowInterface());
+		    _pImmediateContext->OMSetBlendState(pState,blendState->BlendFactor,blendState->SampleMask);	 
+		}
+	}
+
+    void DX11RenderEngine::SetRasterizeState(RasterizeStatePtr const& rasterizeState)
+	{
+		if( CachedRasterizeState != rasterizeState )
+		{
+			CachedRasterizeState = rasterizeState;
+		    ID3D11RasterizerState* pState = (ID3D11RasterizerState*)(rasterizeState->GetLowInterface());
+		    _pImmediateContext->RSSetState(pState);
+		}
+	 
+	}
+
 	void DX11RenderEngine::SetRenderLayout( RenderLayoutPtr const& renderLayout)
 	{
 
@@ -82,20 +101,7 @@ namespace Disorder
 			ID3D11Buffer *pBuffer = (ID3D11Buffer *)(indexBuffer->GetLowInterface());
 			_pImmediateContext->IASetIndexBuffer(pBuffer,DXGI_FORMAT_R16_UINT,0);
 		}
-
-		RasterizeStatePtr rasterizeState = renderLayout->GetRasterizeState();
-		if( rasterizeState != NULL )
-		{
-			ID3D11RasterizerState* pState = (ID3D11RasterizerState*)(rasterizeState->GetLowInterface());
-			_pImmediateContext->RSSetState(pState);
-		}
-
-		BlendStatePtr blendState = renderLayout->GetBlendState();
-		if( blendState != NULL )
-		{
-			ID3D11BlendState *pState = (ID3D11BlendState*)(blendState->GetLowInterface());
-			_pImmediateContext->OMSetBlendState(pState,blendState->BlendFactor,blendState->SampleMask);
-		}
+ 
  
 	}
 
@@ -207,7 +213,7 @@ namespace Disorder
 		std::list<RendererPtr>::const_iterator iter = renderList.begin();
 		while( iter != renderList.end() )
 		{
-			(*iter)->Draw();
+			(*iter)->Draw(MVT_Perspective);
 			iter++;
 		}
 	}

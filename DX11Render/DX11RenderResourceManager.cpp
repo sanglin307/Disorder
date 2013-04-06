@@ -2,6 +2,7 @@
 
 namespace Disorder
 {
+ 
     RenderEffectPtr DX11RenderResourceManager::CreateRenderEffect(std::string const& fileName,ShaderModel shaderModel,std::string const& entryPointVS,std::string const& entryPointPS)
 	{
 
@@ -29,6 +30,7 @@ namespace Disorder
 		else
 			return boost::shared_ptr<RasterizeState>();
 	}
+
 
 	RenderLayoutPtr DX11RenderResourceManager::CreateRenderLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType)
 	{

@@ -4,6 +4,25 @@
 
 namespace Disorder
 {
+
+	enum ShaderModel
+	{
+		SM_4_0
+	};
+
+	enum ShaderType
+	{
+		ST_VertexShader,
+		ST_PixelShader,
+		ST_GeometryShader,
+		ST_ComputeShader,
+		ST_HullShader,
+		ST_DomainShader,
+
+		ST_NumShaderTypes
+	};
+
+
 	enum PixelFormat
 	{
 		PF_Unknown              =0,

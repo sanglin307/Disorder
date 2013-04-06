@@ -46,7 +46,7 @@ namespace Disorder
 		BuildRenderResource();
 	}
 
-	void GeometryRenderer::Draw()
+	void GeometryRenderer::Draw(MaterialViewType view)
 	{
 		BOOST_ASSERT(_renderLayout != NULL && _renderEffect != NULL );
 

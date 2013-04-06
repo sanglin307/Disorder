@@ -15,7 +15,7 @@ namespace Disorder
 		pixelShader->BindShaderResource(renderView);
 	}
 
-	void CanvasBatchElement::Draw()
+	void CanvasBatchElement::Draw(MaterialViewType view)
 	{
 		BOOST_ASSERT(_vertexs.size()%4==0);
 
@@ -139,7 +139,7 @@ namespace Disorder
 
 	void Canvas::Draw()
 	{
-		_stringElement.Draw();
+		_stringElement.Draw(MVT_Perspective);
 	}
 
 	unsigned int Canvas::GetCurrentDrawTriNumber()

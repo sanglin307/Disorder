@@ -4,31 +4,13 @@
 
 namespace Disorder
 {
-	enum ShaderModel
-	{
-		SM_4_0
-	};
-
-	enum ShaderType
-	{
-		ST_VertexShader,
-		ST_PixelShader,
-		ST_GeometryShader,
-		ST_ComputeShader,
-		ST_HullShader,
-		ST_DomainShader,
-
-		ST_NumShaderTypes
-	};
-
+	
  
 	class ShaderObject
 	{
 	public:
 		virtual void Load(std::string const& entryPoint) = 0;
-
-		
-
+ 
 	    ShaderType const& GetType() const
 		{
 			return _type;
@@ -63,6 +45,8 @@ namespace Disorder
 		{
 			return _samplerStates;
 		}
+
+		
  
 		virtual void* GetLowInterface(){ return 0;}
 		virtual void* GetDataInterface() { return 0;}
@@ -74,7 +58,6 @@ namespace Disorder
 		std::vector<RenderBufferPtr> _constBuffers;
 		std::vector<RenderViewPtr> _shaderResources;
 		std::vector<SamplerStatePtr> _samplerStates;
-		
 	};
  
 	class RenderEffect
@@ -85,6 +68,8 @@ namespace Disorder
 		RenderEffect(ShaderModel shaderModel)
 		{
 			_shaderModel = shaderModel;
+			_rasterizeState = RenderResourceManager::DefaultRasterizeState;
+			_blendState = RenderResourceManager::DefaultBlentState;
 		}
 
 		virtual ShaderObjectPtr LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType) = 0;
@@ -98,6 +83,27 @@ namespace Disorder
 		{
 			return _pixelShader;
 		}
+
+		void BindRasterizeState(RasterizeStatePtr const& rasterizeState)
+		{
+			_rasterizeState = rasterizeState;
+		}
+
+		void BindBlendState(BlendStatePtr const& blendState)
+		{
+			_blendState = blendState;
+		}
+
+		BlendStatePtr const& GetBlendState()
+		{
+			return _blendState;
+		}
+
+		RasterizeStatePtr const& GetRasterizeState()
+		{
+			return _rasterizeState;
+		}
+
 
         virtual void ShaderReflection(ShaderObjectPtr const& shader) = 0;
 
@@ -115,6 +121,8 @@ namespace Disorder
 		// shader slot!
 		ShaderObjectPtr _vertexShader;
 		ShaderObjectPtr _pixelShader;
+		RasterizeStatePtr _rasterizeState;
+		BlendStatePtr _blendState;
  
 	};
 

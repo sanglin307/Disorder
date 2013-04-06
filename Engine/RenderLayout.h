@@ -35,16 +35,6 @@ namespace Disorder
         {
              _indexBuffer = renderBuffer; 
         }
- 
-		void BindRasterizeState(RasterizeStatePtr const& rasterizeState)
-		{
-			_rasterizeState = rasterizeState;
-		}
-
-		void BindBlendState(BlendStatePtr const& blendState)
-		{
-			_blendState = blendState;
-		}
 
 		std::vector<RenderBufferPtr> const& GetVertexBuffers()
 		{
@@ -60,26 +50,13 @@ namespace Disorder
 		{
 			return _topologyType;
 		}
-
-		BlendStatePtr const& GetBlendState()
-		{
-			return _blendState;
-		}
-
-		RasterizeStatePtr const& GetRasterizeState()
-		{
-			return _rasterizeState;
-		}
-
+ 
 		virtual void * GetLowInterface(){ return 0;}
 
 	protected:
 		std::vector<RenderBufferPtr> _vertexBuffers;
         RenderBufferPtr _indexBuffer;
         TopologyType _topologyType;
-		RasterizeStatePtr _rasterizeState;
-		BlendStatePtr _blendState;
-	   
 	};
 }
 

@@ -10,7 +10,7 @@ namespace Disorder
 	public:
 		virtual ~Renderer(){};
 
-		virtual void Draw() = 0;
+		virtual void Draw(MaterialViewType view) = 0;
 
 	protected:
 		RenderEffectPtr _renderEffect;
@@ -35,7 +35,7 @@ namespace Disorder
 	public:
 		  GeometryRenderer(GameObjectPtr const& base);
           void SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat); 
-		  virtual void Draw();
+		  virtual void Draw(MaterialViewType view);
 	};
 }
 
