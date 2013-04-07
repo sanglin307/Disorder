@@ -53,7 +53,7 @@ namespace Disorder
 		}
 
 		virtual void Resize(unsigned int size) = 0;
-
+		virtual void * GetLowInterface(){ return 0;}
 	protected:
 		unsigned int _accessHint;
 		unsigned int _bindFlags;

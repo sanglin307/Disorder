@@ -1,4 +1,5 @@
 #include "DX11RenderInclude.h"
+#include "../Engine/Logger.h"
 
 namespace Disorder
 {
@@ -20,7 +21,6 @@ namespace Disorder
  
 	void DX11RenderEngine::Init()
 	{
-		ResourceManager->Init();
 	}
 
 	void DX11RenderEngine::Exit()
@@ -47,7 +47,7 @@ namespace Disorder
 			flag = D3D11_MAP_READ_WRITE;
 
 		D3D11_MAPPED_SUBRESOURCE pMappedResource;
-		_pImmediateContext->Map((ID3D11Buffer*)(buffer->GetLowInterface()),D3D11CalcSubresource(0, 0, 1),flag,0,&pMappedResource);
+		HRESULT hr = _pImmediateContext->Map((ID3D11Buffer*)(buffer->GetLowInterface()),D3D11CalcSubresource(0, 0, 1),flag,0,&pMappedResource);
 
 		return pMappedResource.pData;
 	}
@@ -105,7 +105,9 @@ namespace Disorder
  
 	}
 
-	void DX11RenderEngine::UpdateMVPMatrix(RenderEffectPtr const& technique, Matrix4 const& worldMatrix,Matrix4 const& viewMatrix,Matrix4 const& projMatrix)
+	void DX11RenderEngine::UpdateSubresource(RenderBufferPtr const& buffer,
+
+	/*void DX11RenderEngine::UpdateMVPMatrix(RenderEffectPtr const& technique, Matrix4 const& worldMatrix,Matrix4 const& viewMatrix,Matrix4 const& projMatrix)
 	{
 		ShaderObjectPtr shader = technique->GetVertexShader();
 		std::vector<RenderBufferPtr> constBuffers = shader->GetConstBuffers();
@@ -125,7 +127,7 @@ namespace Disorder
 			_pImmediateContext->UpdateSubresource(pBuffer, 0, NULL, &matrixBuffer, 0, 0);
 			 
 		}
-	}
+	}*/
 
 	void DX11RenderEngine::DrawIndexed(unsigned int indexCount,unsigned int startIndexLocation,int baseVertexLocation)
 	{
@@ -133,36 +135,59 @@ namespace Disorder
 
 		_pImmediateContext->DrawIndexed(indexCount,startIndexLocation,baseVertexLocation);
 	}
-
-	void DX11RenderEngine::SetFX(RenderEffectPtr const& technique)
+ 
+	void DX11RenderEngine::SetEffect(RenderEffectPtr const& effect)
 	{
-		ShaderObjectPtr vertexShader = technique->GetVertexShader();
+		effect->UpdateRenderParam();
+
+		ShaderObjectPtr vertexShader = effect->GetVertexShader();
 		if( vertexShader != NULL )
 		{
 			ID3D11VertexShader *pShader = (ID3D11VertexShader *)(vertexShader->GetLowInterface());
 			_pImmediateContext->VSSetShader(pShader, NULL,0);
 
 			DX11ShaderObjectPtr dxVertexShader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
-            std::size_t cbsize = dxVertexShader->ConstBufferArray.size();
+			std::size_t cbsize = dxVertexShader->CachedConstBuffer.size();
 			if( cbsize > 0 )
 			{
-				_pImmediateContext->VSSetConstantBuffers(0,cbsize,&(dxVertexShader->ConstBufferArray[0]));
+				_pImmediateContext->VSSetConstantBuffers(0,cbsize,&(dxVertexShader->CachedConstBuffer[0]));
+			}
+			else
+			{
+				ID3D11Buffer* buffer[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT];
+				ZeroMemory(buffer,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT*sizeof(ID3D11Buffer*));
+				_pImmediateContext->VSSetConstantBuffers(0,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT,buffer);
 			}
 
-			std::size_t sssize = dxVertexShader->SamplerStateArray.size();
+
+			std::size_t sssize = dxVertexShader->CachedSamplerState.size();
 			if( sssize > 0 )
 			{
-				_pImmediateContext->VSSetSamplers(0,sssize,&(dxVertexShader->SamplerStateArray[0]));	 
+				_pImmediateContext->VSSetSamplers(0,sssize,&(dxVertexShader->CachedSamplerState[0]));	 
+			}
+			else
+			{
+				ID3D11SamplerState* sampler[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT];
+				ZeroMemory(sampler,D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT*sizeof(ID3D11SamplerState*));
+				_pImmediateContext->VSSetSamplers(0,D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT,sampler);
 			}
 
-			std::size_t srsize = dxVertexShader->ShaderResourceViewArray.size();
+
+			std::size_t srsize = dxVertexShader->CachedShaderResourceView.size();
 			if( srsize > 0 )
 			{
-				_pImmediateContext->VSSetShaderResources(0,srsize,&(dxVertexShader->ShaderResourceViewArray[0]));	 
+				_pImmediateContext->VSSetShaderResources(0,srsize,&(dxVertexShader->CachedShaderResourceView[0]));	 
 			}
+			else
+			{
+				ID3D11ShaderResourceView* shaderrv[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT];
+				ZeroMemory(shaderrv,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT*sizeof(ID3D11ShaderResourceView*));
+				_pImmediateContext->VSSetShaderResources(0,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT,shaderrv);
+			}
+
 		}
 
-		ShaderObjectPtr pixelShader = technique->GetPixelShader();
+		ShaderObjectPtr pixelShader = effect->GetPixelShader();
 		if( pixelShader != NULL )
 		{
 			ID3D11PixelShader *pShader = (ID3D11PixelShader *)(pixelShader->GetLowInterface());
@@ -170,24 +195,40 @@ namespace Disorder
 
 			DX11ShaderObjectPtr dxPixelShader = boost::dynamic_pointer_cast<DX11ShaderObject>(pixelShader);
 
-			std::size_t csize = dxPixelShader->ConstBufferArray.size();
+			std::size_t csize = dxPixelShader->CachedConstBuffer.size();
 			if( csize > 0 )
 			{
-			    _pImmediateContext->PSSetConstantBuffers(0,csize,&(dxPixelShader->ConstBufferArray[0]));
-			 
+				_pImmediateContext->PSSetConstantBuffers(0,csize,&(dxPixelShader->CachedConstBuffer[0]));			 
+			}
+			else
+			{
+				ID3D11Buffer* buffer[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT];
+				ZeroMemory(buffer,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT*sizeof(ID3D11Buffer*));
+				_pImmediateContext->PSSetConstantBuffers(0,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT,buffer);
 			}
 
-			std::size_t sssize = dxPixelShader->SamplerStateArray.size();
+			std::size_t sssize = dxPixelShader->CachedSamplerState.size();
 			if( sssize > 0 )
 			{
-				_pImmediateContext->PSSetSamplers(0,sssize,&(dxPixelShader->SamplerStateArray[0]));		 
+				_pImmediateContext->PSSetSamplers(0,sssize,&(dxPixelShader->CachedSamplerState[0]));		 
+			}
+			else
+			{
+				ID3D11SamplerState* sampler[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT];
+				ZeroMemory(sampler,D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT*sizeof(ID3D11SamplerState*));
+				_pImmediateContext->PSSetSamplers(0,D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT,sampler);
 			}
 
-			std::size_t srsize = dxPixelShader->ShaderResourceViewArray.size();
+			std::size_t srsize = dxPixelShader->CachedShaderResourceView.size();
 			if( srsize > 0 )
 			{
-				_pImmediateContext->PSSetShaderResources(0,srsize,&(dxPixelShader->ShaderResourceViewArray[0]));
-				 
+				_pImmediateContext->PSSetShaderResources(0,srsize,&(dxPixelShader->CachedShaderResourceView[0]));				 
+			}
+			else
+			{
+				ID3D11ShaderResourceView* shaderrv[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT];
+				ZeroMemory(shaderrv,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT*sizeof(ID3D11ShaderResourceView*));
+				_pImmediateContext->PSSetShaderResources(0,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT,shaderrv);
 			}
 		}
 	}

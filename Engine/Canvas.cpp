@@ -11,8 +11,8 @@ namespace Disorder
 	 
 	 
 
-		pixelShader->BindSamplerState(texture->Sampler);
-		pixelShader->BindShaderResource(renderView);
+		//pixelShader->BindSamplerState(texture->Sampler);
+		//pixelShader->BindShaderResource(renderView);
 	}
 
 	void CanvasBatchElement::Draw(MaterialViewType view)
@@ -36,7 +36,7 @@ namespace Disorder
 		renderEngine->UnMap(indexRenderBuffer);
 
 		renderEngine->SetRenderLayout(_renderLayout);
-		renderEngine->SetFX(_renderEffect);
+		renderEngine->SetEffect(_renderEffect);
 		renderEngine->DrawIndexed(_indexs.size(),0,0);
 
 		_indexs.clear();

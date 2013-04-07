@@ -23,19 +23,25 @@ namespace Disorder
 		ShaderObjectPtr vertexShader = _material->Effect[MVT_Perspective]->GetVertexShader();
 		ShaderObjectPtr pixelShader = _material->Effect[MVT_Perspective]->GetPixelShader();
  
-		RenderLayoutPtr renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList);
+	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList);
  
-		RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,BAH_GPU_Read,_geometryObject);
-		renderLayout->BindVertexBuffer(vertexBuffer);
+		RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,BAH_GPU_Read,_geometryObject,vertexShader);
+		_renderLayout->BindVertexBuffer(vertexBuffer);
 
-		RenderBufferPtr indexBuffer = resourceManager->CreateRenderBuffer(RBT_Index,BAH_GPU_Read,_geometryObject);
-		renderLayout->BindIndexBuffer(indexBuffer);
+		RenderBufferPtr indexBuffer = resourceManager->CreateRenderBuffer(RBT_Index,BAH_GPU_Read,_geometryObject,vertexShader);
+		_renderLayout->BindIndexBuffer(indexBuffer);
  
 		//shader view
 		RenderViewPtr renderView = resourceManager->CreateTexture2DViewFromFile("seafloor.dds");
-	    SamplerStatePtr sampler = resourceManager->CreateSamplerState(SF_Point,TAM_Wrap,0);
-		pixelShader->BindSamplerState(sampler);
-		pixelShader->BindShaderResource(renderView);
+		MaterialParamShaderResPtr shaderres = _material->Effect[MVT_Perspective]->GetShaderResourceParameter("DiffuseTexture");
+		shaderres->SetValue(renderView);
+	    SamplerStatePtr sampler = resourceManager->CreateSamplerState(SF_Linear,TAM_Wrap,0);
+		MaterialParamSamplerStatePtr msampler = _material->Effect[MVT_Perspective]->GetSamplerStateParameter("LinearSampler");
+		msampler->SetValue(sampler);
+
+		vertexShader->PrepareRenderParam();
+		pixelShader->PrepareRenderParam();
+		 
 	}
 
 	void GeometryRenderer::SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat)
@@ -48,15 +54,28 @@ namespace Disorder
 
 	void GeometryRenderer::Draw(MaterialViewType view)
 	{
-		BOOST_ASSERT(_renderLayout != NULL && _renderEffect != NULL );
+		BOOST_ASSERT(_renderLayout != NULL);
+
+		_renderEffect = _material->Effect[view];
+		if( _renderEffect == NULL )
+			return;
 
 		GameObjectPtr gameObject = _baseObject.lock();
 		RenderEnginePtr renderEngine = GEngine->RenderEngine;
 		renderEngine->SetRenderLayout(_renderLayout);
 
-		renderEngine->UpdateMVPMatrix(_renderEffect,gameObject->GetWorldMatrix(),GSceneManager->SceneCamera->ViewMatrix,GSceneManager->SceneCamera->ProjectMatrix);
-	
-		renderEngine->SetFX(_renderEffect);
+		Matrix4 worldMat = gameObject->GetWorldMatrix();
+		Matrix4 viewMat = GSceneManager->SceneCamera->ViewMatrix;
+		Matrix4 projMat = GSceneManager->SceneCamera->ProjectMatrix;
+		Matrix4 wvpMat = worldMat*viewMat*projMat;
+
+		WorldMatrix->SetValue(worldMat);
+		ViewMatrix->SetValue(viewMat);
+		ProjMatrix->SetValue(projMat);
+		WorldViewProjMatrix->SetValue(wvpMat);
+		
+	 
+		renderEngine->SetEffect(_renderEffect);
 		renderEngine->DrawIndexed(_geometryObject->Indices.size(),0,0);
 	}
 }

@@ -4,18 +4,70 @@
 
 namespace Disorder
 {
+	struct ShaderVariableDesc
+	{
+		ShaderVariableDesc( D3D11_SHADER_VARIABLE_DESC const& desc )
+		{
+			Name = desc.Name==0?"":desc.Name;
+			StartOffset = desc.StartOffset;
+			Size = desc.Size;
+			uFlags = desc.uFlags;
+			StartTexture = desc.StartTexture;
+			TextureSize = desc.TextureSize;
+			StartSampler = desc.StartSampler;
+			SamplerSize = desc.SamplerSize;
+		}
+
+		std::string             Name;           // Name of the variable
+		UINT                    StartOffset;    // Offset in constant buffer's backing store
+		UINT                    Size;           // Size of variable (in bytes)
+		UINT                    uFlags;         // Variable flags
+		UINT                    StartTexture;   // First texture index (or -1 if no textures used)
+		UINT                    TextureSize;    // Number of texture slots possibly used.
+		UINT                    StartSampler;   // First sampler index (or -1 if no textures used)
+		UINT                    SamplerSize;    // Number of sampler slots possibly used.
+	};
+
+	struct ShaderTypeDesc
+	{
+		ShaderTypeDesc(D3D11_SHADER_TYPE_DESC const& desc)
+		{
+			Class = desc.Class;
+			Type = desc.Type;
+			Rows = desc.Rows;
+			Columns = desc.Columns;
+			Elements = desc.Elements;
+			Members = desc.Members;
+			Offset = desc.Offset;
+			Name = desc.Name==0?"":desc.Name;
+		};
+
+		D3D_SHADER_VARIABLE_CLASS   Class;          // Variable class (e.g. object, matrix, etc.)
+		D3D_SHADER_VARIABLE_TYPE    Type;           // Variable type (e.g. float, sampler, etc.)
+		UINT                        Rows;           // Number of rows (for matrices, 1 for other numeric, 0 if not applicable)
+		UINT                        Columns;        // Number of columns (for vectors & matrices, 1 for other numeric, 0 if not applicable)
+		UINT                        Elements;       // Number of elements (0 if not an array)
+		UINT                        Members;        // Number of members (0 if not a structure)
+		UINT                        Offset;         // Offset from the start of structure (0 if not a structure member)
+		std::string                 Name;           // Name of type, can be NULL
+	};
+
 	struct ConstantBufferDesc
 	{
-		D3D11_SHADER_BUFFER_DESC				Description;
-		std::vector<D3D11_SHADER_VARIABLE_DESC>	Variables;
-		std::vector<D3D11_SHADER_TYPE_DESC>		Types;
+		 std::string             CBName;           // Name of the constant buffer
+         D3D_CBUFFER_TYPE        CBType;           // Indicates type of buffer content
+         UINT                    CBVariables;      // Number of member variables
+         UINT                    CBSize;           // Size of CB (in bytes)
+         UINT                    CBuFlags;         // Buffer description flags
+		std::vector<ShaderVariableDesc>	        Variables;
+		std::vector<ShaderTypeDesc>		        Types;
 		std::vector<MaterialParamPtr>		    Parameters;
-		MaterialParamPtr					    BufferParamRef;
+		MaterialParamCBufferPtr					BufferParamRef;
 	};
 
 	struct ShaderInputBindDesc
 	{
-		ShaderInputBindDesc( D3D11_SHADER_INPUT_BIND_DESC desc )
+		ShaderInputBindDesc( D3D11_SHADER_INPUT_BIND_DESC const& desc )
 		{
 			Name = std::string(desc.Name);
 			Type = desc.Type;
@@ -52,12 +104,44 @@ namespace Disorder
 		MaterialParamPtr ParamRef;
 	};
 
+	struct ShaderSignatureDesc
+	{
+		ShaderSignatureDesc(D3D11_SIGNATURE_PARAMETER_DESC const& desc)
+		{
+			SemanticName = desc.SemanticName;
+			SemanticIndex = desc.SemanticIndex;
+			ComponentType = desc.ComponentType;
+			Mask = desc.Mask;
+		};
+
+		UINT GetElementSize()
+		{
+			if( Mask == 1)
+				return 4;
+			else if( Mask == 3)
+				return 4*2;
+			else if( Mask == 7)
+				return 4*3;
+			else if( Mask == 15)
+				return 4*4;
+
+			return 0;
+		};
+
+	    std::string             SemanticName;   // Name of the semantic
+        UINT                    SemanticIndex;  // Index of the semantic
+ 
+        D3D_REGISTER_COMPONENT_TYPE ComponentType; 
+        BYTE                        Mask;         
+ 
+	};
+
 	class DX11ShaderReflection
 	{
 	public:
 		D3D11_SHADER_DESC								ShaderDescription;
-		std::vector<D3D11_SIGNATURE_PARAMETER_DESC>		InputSignatureParameters;
-		std::vector<D3D11_SIGNATURE_PARAMETER_DESC>		OutputSignatureParameters;
+		std::vector<ShaderSignatureDesc>		        InputSignatureParameters;
+		std::vector<ShaderSignatureDesc>		        OutputSignatureParameters;
 		std::vector<ConstantBufferDesc>				    ConstantBuffers;
 		std::vector<ShaderInputBindDesc>				ResourceBindings;
 	};
@@ -66,14 +150,18 @@ namespace Disorder
 	{
 	public:
  
-		explicit DX11ShaderObject(std::string const& entryPoint,ShaderType shaderType)
+		explicit DX11ShaderObject(std::string const& effectName,std::string const& entryPoint,ShaderType shaderType)
 		{
+			_effectName = effectName;
 			_entryPoint = entryPoint;
 			_type = shaderType;
 
 		}
 
-		virtual void BindConstBuffer(RenderBufferPtr const& constBuffer)
+		virtual void PrepareRenderParam();
+		virtual void UpdateRenderParam();
+
+		/*virtual void BindConstBuffer(RenderBufferPtr const& constBuffer)
 		{
 			ShaderObject::BindConstBuffer(constBuffer);
 			ConstBufferArray.push_back((ID3D11Buffer*)(constBuffer->GetLowInterface()));
@@ -89,9 +177,9 @@ namespace Disorder
 		{
 			ShaderObject::BindSamplerState(samplerState);
 			SamplerStateArray.push_back((ID3D11SamplerState*)(samplerState->GetLowInterface()));
-		}
+		}*/
 
-		virtual void Load(std::string const& entryPoint);
+		//virtual void Load(std::string const& entryPoint);
 		virtual void* GetLowInterface();
 		virtual void* GetDataInterface();
 		
@@ -100,9 +188,9 @@ namespace Disorder
 		ID3D11VertexShaderPtr VertexShaderInterface;
 		ID3D11PixelShaderPtr  PixelShaderInterface;
 		ID3DBlobPtr DataInterface;
-		std::vector<ID3D11Buffer*> ConstBufferArray;
-		std::vector<ID3D11SamplerState*> SamplerStateArray;
-		std::vector<ID3D11ShaderResourceView*> ShaderResourceViewArray;
+		std::vector<ID3D11Buffer*> CachedConstBuffer;
+		std::vector<ID3D11SamplerState*> CachedSamplerState;
+		std::vector<ID3D11ShaderResourceView*> CachedShaderResourceView;
 
 		
 	};
@@ -140,14 +228,14 @@ namespace Disorder
 		virtual ShaderObjectPtr LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType);
 	 
 		virtual void ShaderReflection(ShaderObjectPtr const& shader);
-
+		virtual void UpdateRenderParam();
 		// Material Param
-		virtual MaterialParamPtr GetConstantBufferParameter(std::string const& name);
-		virtual MaterialParamPtr GetVectorParameter(std::string const& name);
-		virtual MaterialParamPtr GetMatrixParameter(std::string const& name);
-		virtual MaterialParamPtr GetShaderResourceParameter(std::string const& name);
-		virtual MaterialParamPtr GetSamplerStateParameter(std::string const& name);
-		virtual MaterialParamPtr GetUnorderedAccessParameter(std::string const& name);
+		virtual MaterialParamCBufferPtr GetConstantBufferParameter(std::string const& name);
+		virtual MaterialParamVectorPtr GetVectorParameter(std::string const& name);
+		virtual MaterialParamMatrixPtr GetMatrixParameter(std::string const& name);
+		virtual MaterialParamShaderResPtr GetShaderResourceParameter(std::string const& name);
+		virtual MaterialParamSamplerStatePtr GetSamplerStateParameter(std::string const& name);
+		virtual MaterialParamUnorderedPtr GetUnorderedAccessParameter(std::string const& name);
 	};
 }
 

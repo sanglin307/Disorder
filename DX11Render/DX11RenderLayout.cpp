@@ -24,7 +24,7 @@ namespace Disorder
 		for(int index=0;index<shaderReflection->InputSignatureParameters.size();index++)
 		{
 			D3D11_INPUT_ELEMENT_DESC desc;
-			desc.SemanticName = shaderReflection->InputSignatureParameters[index].SemanticName;
+			desc.SemanticName = shaderReflection->InputSignatureParameters[index].SemanticName.c_str();
 			desc.SemanticIndex = shaderReflection->InputSignatureParameters[index].SemanticIndex;
 			desc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 			desc.Format =  GetInputFormat(shaderReflection->InputSignatureParameters[index].ComponentType,shaderReflection->InputSignatureParameters[index].Mask);

@@ -75,73 +75,67 @@ namespace Disorder
 		{
 			std::vector<float> vData;
 			_bindFlags = D3D11_BIND_VERTEX_BUFFER;
-			bool bPositionData = false;
-			bool bNormalData = false;
-			bool bTexcoodData = false;
+			int positionElement = 0;
+			int normalElement = 0;
+			int texcoodElement = 0;
 			DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
 			for(int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
 			{
-				if(strcmp(shader->ShaderReflect->InputSignatureParameters[i].SemanticName,"POSITION") == 0 )
+				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare("POSITION") == 0 )
 				{
-					bPositionData = true;
+					positionElement = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
 					continue;
 				}
-				if(strcmp(shader->ShaderReflect->InputSignatureParameters[i].SemanticName,"NORMAL") == 0 )
+				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare("NORMAL") == 0 )
 				{
-					bNormalData = true;
+					normalElement = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
 					continue;
 				}
-				if(strcmp(shader->ShaderReflect->InputSignatureParameters[i].SemanticName,"TEXCOORD0") == 0 )
+				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare("TEXCOORD") == 0 )
 				{
-					bTexcoodData = true;
+					texcoodElement = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
 					continue;
 				}
 			}
-			if(bPositionData && data->Positions.size() > 0)
+			if(positionElement > 0 && data->Positions.size() > 0)
 			{
-				_elementSize += sizeof(Vector3);
-				_bufferSize += sizeof(Vector3) * data->Positions.size();
-			}
-
-			if(bNormalData && data->Normals.size() > 0)
-			{
-				_elementSize += sizeof(Vector3);
-				_bufferSize += sizeof(Vector3) * data->Normals.size();
+				_elementSize += positionElement;
+				_bufferSize += positionElement * data->Positions.size();
 			}
 
-			if(bTexcoodData && data->Texcoords.size() > 0)
+			if(normalElement > 0 && data->Normals.size() > 0)
 			{
-				_elementSize += sizeof(Vector2);
-				_bufferSize += sizeof(Vector2) * data->Texcoords.size();
+				_elementSize += normalElement;
+				_bufferSize += normalElement * data->Normals.size();
+			}
+
+			if(texcoodElement > 0 && data->Texcoords.size() > 0)
+			{
+				_elementSize += texcoodElement;
+				_bufferSize += texcoodElement * data->Texcoords.size();
 			}
 
 			//data
-			if(bPositionData && data->Positions.size() > 0 )
+			if(positionElement > 0 && data->Positions.size() > 0 )
 			{
 				for(int index=0;index<data->Positions.size();++index)
 				{
 					vData.push_back(data->Positions[index].x);
 					vData.push_back(data->Positions[index].y);
 					vData.push_back(data->Positions[index].z);
-					if( bNormalData && data->Normals.size() > index )
+					if( normalElement > 0 && data->Normals.size() > index )
 					{
 						vData.push_back(data->Normals[index].x);
 						vData.push_back(data->Normals[index].y);
 						vData.push_back(data->Normals[index].z);
 					}
-					else
-					{
-						BOOST_ASSERT(0);
-					}
-					if( bTexcoodData && data->Texcoords.size() > index )
+					 
+					if( texcoodElement > 0 && data->Texcoords.size() > index )
 					{
 						vData.push_back(data->Texcoords[index].x);
 						vData.push_back(data->Texcoords[index].y);
 					}
-					else
-					{
-						BOOST_ASSERT(0);
-					}
+					 
 				}
 				pData = vData.data();
 			}

@@ -80,10 +80,10 @@ namespace Disorder
 	typedef boost::shared_ptr<MaterialParamVector> MaterialParamVectorPtr;
 	class MaterialParamMatrix;
 	typedef boost::shared_ptr<MaterialParamMatrix> MaterialParamMatrixPtr;
-	class MaterialParamConstantBuffer;
-	typedef boost::shared_ptr<MaterialParamConstantBuffer> MaterialParamConstantBufferPtr;
-	class MaterialParamShaderResouce;
-	typedef boost::shared_ptr<MaterialParamShaderResouce> MaterialParamShaderResoucePtr;
+	class MaterialParamCBuffer;
+	typedef boost::shared_ptr<MaterialParamCBuffer> MaterialParamCBufferPtr;
+	class MaterialParamShaderRes;
+	typedef boost::shared_ptr<MaterialParamShaderRes> MaterialParamShaderResPtr;
 	class MaterialParamSamplerState;
 	typedef boost::shared_ptr<MaterialParamSamplerState> MaterialParamSamplerStatePtr;
 	class MaterialParamUnordered;
@@ -165,13 +165,13 @@ namespace Disorder
 #include "Camera.h"
 #include "Light.h"
 #include "Texture.h"
-#include "Material.h"
 #include "RenderUtil.h"
 #include "RenderResource.h"
-#include "Font.h"
-#include "FontManager.h"
 #include "RenderState.h"
 #include "RenderView.h"
+#include "Material.h"
+#include "Font.h"
+#include "FontManager.h"
 #include "RenderTarget.h"
 #include "RenderLayout.h"
 #include "Geometry.h"

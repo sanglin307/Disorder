@@ -1,12 +1,91 @@
 #include "DX11RenderInclude.h"
-
+#include "../Engine/Logger.h"
 
 namespace Disorder
 {
 	//=============================Shader object=========================================
-	void DX11ShaderObject::Load(std::string const& entryPoint)
+	void DX11ShaderObject::PrepareRenderParam()
 	{
+		if( ShaderReflect->ConstantBuffers.size() > 0 && CachedConstBuffer.size() == 0)
+		{
+			for(int i=0;i<ShaderReflect->ConstantBuffers.size();i++)
+			{
+				MaterialParamCBufferPtr cbuff = ShaderReflect->ConstantBuffers[i].BufferParamRef;
+				if( cbuff == NULL || cbuff->GetValue() == NULL)
+				{
+					std::stringstream stream;
+					stream << "vertex shader's constant buffer is null "<< GetShaderName() <<"," << ShaderReflect->ConstantBuffers[i].CBName;
+					GLogger->Error(stream.str());
+					continue;
+				}
+				CachedConstBuffer.push_back((ID3D11Buffer*)(cbuff->GetValue()->GetLowInterface()));
+			}
+		}
 
+		if( ShaderReflect->ResourceBindings.size() > 0 && CachedSamplerState.size() == 0 && CachedShaderResourceView.size() == 0)
+		{
+			for( int i=0;i<ShaderReflect->ResourceBindings.size();++i)
+			{
+				if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_TEXTURE )
+				{
+					MaterialParamShaderResPtr res = boost::dynamic_pointer_cast<MaterialParamShaderRes>(ShaderReflect->ResourceBindings[i].ParamRef);
+					if( res == NULL || res->GetValue() == NULL)
+					{
+						std::stringstream stream;
+						stream << "vertex shader's shader resource is null "<< GetShaderName() <<"," << ShaderReflect->ResourceBindings[i].Name;
+						GLogger->Error(stream.str());
+						continue;
+					}
+					CachedShaderResourceView.push_back((ID3D11ShaderResourceView*)(res->GetValue()->GetLowInterface()));
+				}
+
+				if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_SAMPLER )
+				{
+					MaterialParamSamplerStatePtr res = boost::dynamic_pointer_cast<MaterialParamSamplerState>(ShaderReflect->ResourceBindings[i].ParamRef);
+					if( res == NULL || res->GetValue() == NULL)
+					{
+						std::stringstream stream;
+						stream << "vertex shader's sampler state is null "<< GetShaderName() <<"," << ShaderReflect->ResourceBindings[i].Name;
+						GLogger->Error(stream.str());
+						continue;
+					}
+					CachedSamplerState.push_back((ID3D11SamplerState*)(res->GetValue()->GetLowInterface()));
+				}
+			}
+		}
+	}
+
+	void DX11ShaderObject::UpdateRenderParam()
+	{
+		if(ShaderReflect->ConstantBuffers.size())
+		{
+			RenderEnginePtr renderEngine = GEngine->RenderEngine;
+			for(int i=0;i<ShaderReflect->ConstantBuffers.size();i++)
+			{
+				void *pDest = renderEngine->Map(ShaderReflect->ConstantBuffers[i].BufferParamRef->GetValue(),BA_Write_Only);
+				void *pSrc = 0;
+				for( int j=0;j<ShaderReflect->ConstantBuffers[i].Parameters.size();j++)
+				{
+					if(ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_VECTOR)
+					{
+						pSrc = ShaderReflect->ConstantBuffers[i].Parameters[j]->GetData();
+						memcpy(pDest,pSrc,sizeof(Vector3));
+						pDest = ((char*)pDest) + sizeof(Vector3);
+					}
+					if(ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_MATRIX_ROWS ||
+					   ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_MATRIX_COLUMNS)
+					{
+						pSrc = ShaderReflect->ConstantBuffers[i].Parameters[j]->GetData();
+						memcpy(pDest,pSrc,sizeof(Matrix4));
+						pDest = ((char*)pDest) + sizeof(Matrix4);
+					}
+				}
+				
+				renderEngine->UnMap(ShaderReflect->ConstantBuffers[i].BufferParamRef->GetValue());
+
+
+			}
+		}
 	}
 
 	void* DX11ShaderObject::GetLowInterface()
@@ -96,7 +175,7 @@ namespace Disorder
 				return ShaderObjectPtr();
 			}
 
-			DX11ShaderObjectPtr shader = boost::make_shared<DX11ShaderObject>(entryPoint,ST_VertexShader);
+			DX11ShaderObjectPtr shader = boost::make_shared<DX11ShaderObject>(fileName,entryPoint,ST_VertexShader);
 			shader->VertexShaderInterface =  MakeComPtr<ID3D11VertexShader>(_pVertexShader);
 			shader->DataInterface = MakeComPtr<ID3DBlob>(pVSBlob);
 
@@ -116,7 +195,7 @@ namespace Disorder
 				return ShaderObjectPtr();
 			}
 
-			DX11ShaderObjectPtr shader = boost::make_shared<DX11ShaderObject>(entryPoint,ST_PixelShader);
+			DX11ShaderObjectPtr shader = boost::make_shared<DX11ShaderObject>(fileName,entryPoint,ST_PixelShader);
 			shader->PixelShaderInterface =  MakeComPtr<ID3D11PixelShader>(_pPixelShader);
 			shader->DataInterface = MakeComPtr<ID3DBlob>(pVSBlob);
 			ShaderReflection(shader);
@@ -161,13 +240,13 @@ namespace Disorder
 		{
 			D3D11_SIGNATURE_PARAMETER_DESC input_desc;
 			pReflector->GetInputParameterDesc( i, &input_desc );
-			pReflection->InputSignatureParameters.push_back( input_desc );
+			pReflection->InputSignatureParameters.push_back( ShaderSignatureDesc(input_desc) );
 		}
 		for ( UINT i = 0; i < desc.OutputParameters; i++ )
 		{
 			D3D11_SIGNATURE_PARAMETER_DESC output_desc;
 			pReflector->GetOutputParameterDesc( i, &output_desc );
-			pReflection->OutputSignatureParameters.push_back( output_desc );
+			pReflection->OutputSignatureParameters.push_back( ShaderSignatureDesc(output_desc) );
 		}
  
 	    //constant buffer information 
@@ -181,9 +260,13 @@ namespace Disorder
 			if ( bufferDesc.Type == D3D_CT_CBUFFER || bufferDesc.Type == D3D_CT_TBUFFER )
 			{
 				ConstantBufferDesc constantBuffer;
-				constantBuffer.Description = bufferDesc;
-				std::string name = constantBuffer.Description.Name;
-				constantBuffer.BufferParamRef = GetConstantBufferParameter(name);
+				constantBuffer.CBName = bufferDesc.Name;
+				constantBuffer.CBSize = bufferDesc.Size;
+				constantBuffer.CBType = bufferDesc.Type;
+				constantBuffer.CBuFlags = bufferDesc.uFlags;
+				constantBuffer.CBVariables = bufferDesc.Variables;
+			 
+				constantBuffer.BufferParamRef = GetConstantBufferParameter(constantBuffer.CBName);
 			 
 				// Load the description of each variable for use later on when binding a buffer
 				for ( UINT j = 0; j < bufferDesc.Variables; j++ )
@@ -193,14 +276,14 @@ namespace Disorder
 					D3D11_SHADER_VARIABLE_DESC var_desc;
 					pVariable->GetDesc( &var_desc );
 
-					constantBuffer.Variables.push_back( var_desc );
+					constantBuffer.Variables.push_back( ShaderVariableDesc(var_desc) );
 
 					// Get the variable type description and store it
 					ID3D11ShaderReflectionType* pType = pVariable->GetType();
 					D3D11_SHADER_TYPE_DESC type_desc;
 					pType->GetDesc( &type_desc );
 
-					constantBuffer.Types.push_back( type_desc );
+					constantBuffer.Types.push_back( ShaderTypeDesc(type_desc) );
 
 					// Get references to the parameters for binding to these variables.
 					MaterialParamPtr pParam;
@@ -229,7 +312,7 @@ namespace Disorder
 				}
 				 
 				RenderBufferPtr constBuffer = resourceManager->CreateConstBuffer(bufferDesc.Size,BAH_GPU_Read);
-				shader->BindConstBuffer(constBuffer);
+				constantBuffer.BufferParamRef->SetValue(constBuffer);
 
 				pReflection->ConstantBuffers.push_back( constantBuffer );
 			}
@@ -276,68 +359,76 @@ namespace Disorder
 		return;
 	}
  
-	MaterialParamPtr DX11RenderEffect::GetConstantBufferParameter(std::string const& name)
+	void DX11RenderEffect::UpdateRenderParam()
+	{
+		if( _vertexShader != NULL )
+			_vertexShader->UpdateRenderParam();
+		if( _pixelShader != NULL )
+			_pixelShader->UpdateRenderParam();
+	}
+
+	MaterialParamCBufferPtr DX11RenderEffect::GetConstantBufferParameter(std::string const& name)
 	{
 		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return _materialParamMap.at(name);
+			return boost::dynamic_pointer_cast<MaterialParamCBuffer>(_materialParamMap.at(name));
 
-		MaterialParamPtr constBuffer = boost::make_shared<MaterialParamConstantBuffer>();
+		MaterialParamCBufferPtr constBuffer = boost::make_shared<MaterialParamCBuffer>();
 		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,constBuffer));
 
 		return constBuffer;
 	}
 
-	MaterialParamPtr DX11RenderEffect::GetVectorParameter(std::string const& name)
+	MaterialParamVectorPtr DX11RenderEffect::GetVectorParameter(std::string const& name)
 	{
 		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return _materialParamMap.at(name);
+			return boost::dynamic_pointer_cast<MaterialParamVector>(_materialParamMap.at(name));
 
-		MaterialParamPtr vector = boost::make_shared<MaterialParamVector>();
+		MaterialParamVectorPtr vector = boost::make_shared<MaterialParamVector>();
 		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,vector));
 
 		return vector;
 	}
 
-	MaterialParamPtr DX11RenderEffect::GetMatrixParameter(std::string const& name)
+	MaterialParamMatrixPtr DX11RenderEffect::GetMatrixParameter(std::string const& name)
 	{
 		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return _materialParamMap.at(name);
+			return boost::dynamic_pointer_cast<MaterialParamMatrix>(_materialParamMap.at(name));
 
-		MaterialParamPtr matrix = boost::make_shared<MaterialParamMatrix>();
+		MaterialParamMatrixPtr matrix = boost::make_shared<MaterialParamMatrix>();
 		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,matrix));
 
 		return matrix;
 	}
 
-	MaterialParamPtr DX11RenderEffect::GetShaderResourceParameter(std::string const& name)
+	MaterialParamShaderResPtr DX11RenderEffect::GetShaderResourceParameter(std::string const& name)
 	{
 		// texture and structed.
 		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return _materialParamMap.at(name);
+			return boost::dynamic_pointer_cast<MaterialParamShaderRes>(_materialParamMap.at(name));
 
-		MaterialParamPtr shaderres = boost::make_shared<MaterialParamShaderResouce>();
+		MaterialParamShaderResPtr shaderres = boost::make_shared<MaterialParamShaderRes>();
 		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,shaderres));
 
 		return shaderres;
 	}
 
-	MaterialParamPtr DX11RenderEffect::GetSamplerStateParameter(std::string const& name)
+	MaterialParamSamplerStatePtr DX11RenderEffect::GetSamplerStateParameter(std::string const& name)
 	{
 		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return _materialParamMap.at(name);
+			return boost::dynamic_pointer_cast<MaterialParamSamplerState>(_materialParamMap.at(name));
 
-		MaterialParamPtr ss = boost::make_shared<MaterialParamSamplerState>();
+		MaterialParamSamplerStatePtr ss = boost::make_shared<MaterialParamSamplerState>();
 		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,ss));
 
 		return ss;
 	}
 
-	MaterialParamPtr DX11RenderEffect::GetUnorderedAccessParameter(std::string const& name)
+	MaterialParamUnorderedPtr DX11RenderEffect::GetUnorderedAccessParameter(std::string const& name)
 	{
 		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return _materialParamMap.at(name);
+			return boost::dynamic_pointer_cast<MaterialParamUnordered>(_materialParamMap.at(name));
 
-		MaterialParamPtr ua = boost::make_shared<MaterialParamUnordered>();
+		MaterialParamUnorderedPtr ua = boost::make_shared<MaterialParamUnordered>();
 		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,ua));
 
 		return ua;

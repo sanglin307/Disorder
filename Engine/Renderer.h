@@ -11,15 +11,15 @@ namespace Disorder
 		virtual ~Renderer(){};
 
 		virtual void Draw(MaterialViewType view) = 0;
-
+		 
 	protected:
 		RenderEffectPtr _renderEffect;
 		RenderLayoutPtr _renderLayout;
 	    
-		MaterialParamPtr WorldViewProjMatrix;
-		MaterialParamPtr WorldMatrix;
-		MaterialParamPtr ViewMatrix;
-		MaterialParamPtr ProjMatrix;
+		MaterialParamMatrixPtr WorldViewProjMatrix;
+		MaterialParamMatrixPtr WorldMatrix;
+		MaterialParamMatrixPtr ViewMatrix;
+		MaterialParamMatrixPtr ProjMatrix;
 	};
 
 

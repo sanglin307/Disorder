@@ -24,7 +24,7 @@ namespace Disorder
 
 	   ViewportPtr const& viewport = GameClient->GetViewport(0);
 	   RenderTargetPtr renderTarget = RenderEngine->CreateRenderTarget(GConfig->sRenderConfig,viewport->GetWindow());
-
+	   RenderEngine->ResourceManager->Init();
 	  // GameCanvas = boost::make_shared<Canvas>(viewport->SizeX,viewport->SizeY);
 
 	   GSceneManager->Init();
@@ -112,7 +112,7 @@ namespace Disorder
 
 	    std::stringstream strstream;
 		strstream << "Fps:" << fps;
-		canvas->DrawString(x,y,charSize,color,strstream.str());
+		//canvas->DrawString(x,y,charSize,color,strstream.str());
 		strstream.clear();
 
    }

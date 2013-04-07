@@ -55,7 +55,7 @@ namespace Disorder
 	RenderBufferPtr DX11RenderResourceManager::CreateRenderBuffer(RenderBufferType type,unsigned int accessHint,GeometryPtr const& data,ShaderObjectPtr const& vertexShader)
 	{
 		RenderBufferPtr renderBuffer = boost::make_shared<DX11RenderBuffer>();
-		renderBuffer->CreateBuffer(type,data,accessHint);
+		renderBuffer->CreateBuffer(type,data,accessHint,vertexShader);
 
 		return renderBuffer;
 	}

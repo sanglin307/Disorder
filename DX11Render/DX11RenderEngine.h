@@ -19,13 +19,14 @@ namespace Disorder
 		virtual void SetBlendState(BlendStatePtr const& blendState);
 		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState);
 
-		virtual void UpdateMVPMatrix(RenderEffectPtr const& technique, Matrix4 const& worldMatrix,Matrix4 const& viewMatrix,Matrix4 const& projMatrix);
-		virtual void SetFX(RenderEffectPtr const& technique);
+		//virtual void UpdateMVPMatrix(RenderEffectPtr const& technique, Matrix4 const& worldMatrix,Matrix4 const& viewMatrix,Matrix4 const& projMatrix);
+		virtual void SetEffect(RenderEffectPtr const& technique);
 		virtual void DrawIndexed(unsigned int indexCount,unsigned int startIndexLocation,int baseVertexLocation);
 
 		virtual void* Map(RenderBufferPtr const& buffer,BufferAccess bufferAccess);
 		virtual void UnMap(RenderBufferPtr const& buffer);
 
+		void PrepareRenderParam(RenderEffectPtr const& technique);
 
 		virtual RenderTargetPtr CreateRenderTarget(RenderConfig const& renderConfig,void *hWnd);
 
