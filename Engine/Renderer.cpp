@@ -68,7 +68,7 @@ namespace Disorder
 		Matrix4 viewMat = GSceneManager->SceneCamera->ViewMatrix;
 		Matrix4 projMat = GSceneManager->SceneCamera->ProjectMatrix;
 		Matrix4 wvpMat = worldMat*viewMat*projMat;
-
+		
 		WorldMatrix->SetValue(worldMat);
 		ViewMatrix->SetValue(viewMat);
 		ProjMatrix->SetValue(projMat);

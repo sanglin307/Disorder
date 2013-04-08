@@ -62,27 +62,31 @@ namespace Disorder
 			RenderEnginePtr renderEngine = GEngine->RenderEngine;
 			for(int i=0;i<ShaderReflect->ConstantBuffers.size();i++)
 			{
-				void *pDest = renderEngine->Map(ShaderReflect->ConstantBuffers[i].BufferParamRef->GetValue(),BA_Write_Only);
-				void *pSrc = 0;
+				//void *pDest = renderEngine->Map(ShaderReflect->ConstantBuffers[i].BufferParamRef->GetValue(),BA_Write_Only);
+				BYTE* pData = new BYTE[ShaderReflect->ConstantBuffers[i].CBSize];
+				BYTE* pDest = pData;
 				for( int j=0;j<ShaderReflect->ConstantBuffers[i].Parameters.size();j++)
 				{
 					if(ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_VECTOR)
 					{
-						pSrc = ShaderReflect->ConstantBuffers[i].Parameters[j]->GetData();
+						void *pSrc = ShaderReflect->ConstantBuffers[i].Parameters[j]->GetData();
 						memcpy(pDest,pSrc,sizeof(Vector3));
-						pDest = ((char*)pDest) + sizeof(Vector3);
+						pDest = pDest + sizeof(Vector3);
 					}
 					if(ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_MATRIX_ROWS ||
 					   ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_MATRIX_COLUMNS)
 					{
-						pSrc = ShaderReflect->ConstantBuffers[i].Parameters[j]->GetData();
+						void *pSrc = ShaderReflect->ConstantBuffers[i].Parameters[j]->GetData();
 						memcpy(pDest,pSrc,sizeof(Matrix4));
-						pDest = ((char*)pDest) + sizeof(Matrix4);
+						Matrix4 w = *((Matrix4*)pDest);
+						pDest = pDest + sizeof(Matrix4);
 					}
 				}
 				
-				renderEngine->UnMap(ShaderReflect->ConstantBuffers[i].BufferParamRef->GetValue());
-
+				
+				//renderEngine->UnMap(ShaderReflect->ConstantBuffers[i].BufferParamRef->GetValue());
+				renderEngine->UpdateSubresource(ShaderReflect->ConstantBuffers[i].BufferParamRef->GetValue(),pData,ShaderReflect->ConstantBuffers[i].CBSize);
+				delete pData;
 
 			}
 		}

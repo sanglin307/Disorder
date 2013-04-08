@@ -25,6 +25,7 @@ namespace Disorder
 
 		virtual void* Map(RenderBufferPtr const& buffer,BufferAccess bufferAccess);
 		virtual void UnMap(RenderBufferPtr const& buffer);
+		virtual void UpdateSubresource(RenderBufferPtr const& buffer,void* pSrcData,unsigned int srcDataSize);
 
 		void PrepareRenderParam(RenderEffectPtr const& technique);
 
