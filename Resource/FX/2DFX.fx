@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------------------
 // Textures and Samplers
 //-----------------------------------------------------------------------------------------
-Texture2D    g_txDiffuse : register( t0 );
-SamplerState g_samLinear : register( s0 );
+Texture2D    DiffuseTexture : register( t0 );
+SamplerState LinearSampler : register( s0 );
 
 //--------------------------------------------------------------------------------------
 // shader input/output structure
@@ -38,7 +38,7 @@ VS_OUTPUT VS( VS_INPUT input )
 float4 PS( VS_OUTPUT In ) : SV_TARGET
 { 
     // Lookup mesh texture and modulate it with diffuse
-	In.Color.a *= g_txDiffuse.Sample( g_samLinear, In.TextureUV ).g;
+	In.Color.a *= DiffuseTexture.Sample( LinearSampler, In.TextureUV ).g;
 	//return g_txDiffuse.Sample( g_samLinear, In.TextureUV ) ;
  
 

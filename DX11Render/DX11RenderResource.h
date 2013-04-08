@@ -7,6 +7,7 @@ namespace Disorder
 	{
 	public:
 		virtual void CreateBuffer(RenderBufferType type,GeometryPtr const& data,unsigned int accessHint,ShaderObjectPtr const& vertexShader = 0);
+		virtual void CreateBuffer(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData);
 		virtual void CreateConstBuffer(unsigned int size, unsigned int accessHint);
 		void GetD3DFlags(D3D11_USAGE& usage, UINT& cpuAccessFlags, UINT& bindFlags, UINT& miscFlags);
 		virtual void * GetLowInterface();

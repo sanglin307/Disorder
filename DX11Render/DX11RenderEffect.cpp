@@ -363,6 +363,14 @@ namespace Disorder
 		return;
 	}
  
+	void DX11RenderEffect::PrepareRenderParam()
+	{
+		if( _vertexShader != NULL )
+			_vertexShader->PrepareRenderParam();
+		if( _pixelShader != NULL )
+			_pixelShader->PrepareRenderParam();
+	}
+
 	void DX11RenderEffect::UpdateRenderParam()
 	{
 		if( _vertexShader != NULL )

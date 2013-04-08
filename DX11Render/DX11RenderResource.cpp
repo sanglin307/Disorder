@@ -62,6 +62,30 @@ namespace Disorder
  
 	}
 
+	void DX11RenderBuffer::CreateBuffer(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData)
+	{
+		_type = type;
+		_accessHint = accessHint;
+		_elementSize = elementSize;
+		_bufferSize = size;
+		if( _type == RBT_Vertex )
+		{		
+			_bindFlags = D3D11_BIND_VERTEX_BUFFER;
+ 
+		}
+		else if( _type == RBT_Index )
+		{
+			_bindFlags = D3D11_BIND_INDEX_BUFFER;
+		}
+		else
+		{
+			BOOST_ASSERT(0);
+		}
+
+		DoCreateBuffer(pData);
+ 
+	}
+
 	void DX11RenderBuffer::CreateBuffer(RenderBufferType type,GeometryPtr const& data,unsigned int accessHint,ShaderObjectPtr const& vertexShader)
 	{
 		_type = type;
@@ -70,10 +94,9 @@ namespace Disorder
 		_bufferSize = 0;
  
 		void *pData = NULL;
-
+		std::vector<float> vData;
 		if( _type == RBT_Vertex )
-		{
-			std::vector<float> vData;
+		{		
 			_bindFlags = D3D11_BIND_VERTEX_BUFFER;
 			int positionElement = 0;
 			int normalElement = 0;

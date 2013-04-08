@@ -33,7 +33,7 @@ VS_OUTPUT VS( VS_INPUT input )
 {
     VS_OUTPUT Output;
     
-    Output.Position = float4(0.5,0.5,0,1);//mul(float4(input.Position,1.0f), WorldViewProjMatrix );
+    Output.Position = mul(float4(input.Position,1.0f), WorldViewProjMatrix );
 	Output.TextureUV = input.TextureUV; 
     
     return Output;    
@@ -41,5 +41,5 @@ VS_OUTPUT VS( VS_INPUT input )
 
 float4 PS( VS_OUTPUT In ) : SV_TARGET
 { 
-    return float4(1,1,1,1); //DiffuseTexture.Sample( LinearSampler, In.TextureUV );
+    return DiffuseTexture.Sample( LinearSampler, In.TextureUV );
 }

@@ -28,8 +28,8 @@ namespace Disorder
 		static float radian = 0.0f;
 		radian += 0.01f;
 		// test code ,rotate it continuously~ 
-	    _rotation.FromAngleAxis(radian,Vector3::UNIT_Y);
-		_worldMatrix.makeTransform(_position,_scale,_rotation);
+	  //  _rotation.FromAngleAxis(radian,Vector3::UNIT_Y);
+	//	_worldMatrix.makeTransform(_position,_scale,_rotation);
 	}
 
 

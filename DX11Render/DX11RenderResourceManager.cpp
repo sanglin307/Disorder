@@ -60,6 +60,14 @@ namespace Disorder
 		return renderBuffer;
 	}
 
+    RenderBufferPtr DX11RenderResourceManager::CreateRenderBuffer(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData) 
+	{
+		RenderBufferPtr renderBuffer = boost::make_shared<DX11RenderBuffer>();
+		renderBuffer->CreateBuffer(type,accessHint,elementSize,size,pData);
+
+		return renderBuffer;
+	}
+
 	RenderViewPtr DX11RenderResourceManager::CreateTexture2DViewFromFile(std::string const& fileName)
 	{
 		DX11ShaderResourceViewPtr shaderView = boost::make_shared<DX11ShaderResourceView>();

@@ -21,8 +21,7 @@ namespace Disorder
  
 		//compile shader
 		ShaderObjectPtr vertexShader = _material->Effect[MVT_Perspective]->GetVertexShader();
-		ShaderObjectPtr pixelShader = _material->Effect[MVT_Perspective]->GetPixelShader();
- 
+		 
 	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList);
  
 		RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,BAH_GPU_Read,_geometryObject,vertexShader);
@@ -31,17 +30,6 @@ namespace Disorder
 		RenderBufferPtr indexBuffer = resourceManager->CreateRenderBuffer(RBT_Index,BAH_GPU_Read,_geometryObject,vertexShader);
 		_renderLayout->BindIndexBuffer(indexBuffer);
  
-		//shader view
-		RenderViewPtr renderView = resourceManager->CreateTexture2DViewFromFile("seafloor.dds");
-		MaterialParamShaderResPtr shaderres = _material->Effect[MVT_Perspective]->GetShaderResourceParameter("DiffuseTexture");
-		shaderres->SetValue(renderView);
-	    SamplerStatePtr sampler = resourceManager->CreateSamplerState(SF_Linear,TAM_Wrap,0);
-		MaterialParamSamplerStatePtr msampler = _material->Effect[MVT_Perspective]->GetSamplerStateParameter("LinearSampler");
-		msampler->SetValue(sampler);
-
-		vertexShader->PrepareRenderParam();
-		pixelShader->PrepareRenderParam();
-		 
 	}
 
 	void GeometryRenderer::SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat)
@@ -74,6 +62,8 @@ namespace Disorder
 		ProjMatrix->SetValue(projMat);
 		WorldViewProjMatrix->SetValue(wvpMat);
 		
+		renderEngine->SetBlendState(_renderEffect->GetBlendState());
+		renderEngine->SetRasterizeState(_renderEffect->GetRasterizeState());
 	 
 		renderEngine->SetEffect(_renderEffect);
 		renderEngine->DrawIndexed(_geometryObject->Indices.size(),0,0);

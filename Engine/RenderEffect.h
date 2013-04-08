@@ -79,6 +79,7 @@ namespace Disorder
 			return _rasterizeState;
 		}
 
+		virtual void PrepareRenderParam() = 0;
 		virtual void UpdateRenderParam() = 0;
 
         virtual void ShaderReflection(ShaderObjectPtr const& shader) = 0;

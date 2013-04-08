@@ -229,6 +229,7 @@ namespace Disorder
 	 
 		virtual void ShaderReflection(ShaderObjectPtr const& shader);
 		virtual void UpdateRenderParam();
+		virtual void PrepareRenderParam();
 		// Material Param
 		virtual MaterialParamCBufferPtr GetConstantBufferParameter(std::string const& name);
 		virtual MaterialParamVectorPtr GetVectorParameter(std::string const& name);
