@@ -124,7 +124,7 @@ namespace Disorder
 		FileObjectPtr fileptr = GEngine->FileManager->OpenFile(fileName,std::ios::in);
 		std::string shaderContent = GEngine->FileManager->ReadFile(fileptr);
 
-		DWORD dwShaderFlags = 0; //D3DCOMPILE_ENABLE_STRICTNESS;
+		DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 	#if defined( DEBUG ) || defined( _DEBUG )
 		// Set the D3DCOMPILE_DEBUG flag to embed debug information in the shaders.
 		// Setting this flag improves the shader debugging experience, but still allows 

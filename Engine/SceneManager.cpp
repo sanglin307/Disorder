@@ -32,7 +32,7 @@ namespace Disorder
 			GEngine->Stat.DrawStat();
 		}
 
-		GEngine->GameCanvas->Draw();
+		//GEngine->GameCanvas->Draw();
 
 		GEngine->RenderEngine->OnDrawEnd();
 	}

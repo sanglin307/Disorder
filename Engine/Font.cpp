@@ -162,7 +162,7 @@ namespace Disorder
 			}
 		}
 
-		SamplerStatePtr sampler = GEngine->RenderEngine->ResourceManager->CreateSamplerState(SF_Linear,TAM_Wrap,0);
+		SamplerStatePtr sampler = GEngine->RenderEngine->ResourceManager->CreateSamplerState(SF_Linear,TAM_Clamp,0);
 		BufferInitData initData;
 		initData.Data = imageData;
 		initData.RowPitch = 0;

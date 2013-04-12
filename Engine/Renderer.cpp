@@ -60,10 +60,10 @@ namespace Disorder
 		WorldMatrix->SetValue(worldMat);
 		ViewMatrix->SetValue(viewMat);
 		ProjMatrix->SetValue(projMat);
-		WorldViewProjMatrix->SetValue(wvpMat);
+		WorldViewProjMatrix->SetValue(wvpMat.transpose());
 		
-		renderEngine->SetBlendState(_renderEffect->GetBlendState());
-		renderEngine->SetRasterizeState(_renderEffect->GetRasterizeState());
+		//renderEngine->SetBlendState(_renderEffect->GetBlendState());
+		//renderEngine->SetRasterizeState(_renderEffect->GetRasterizeState());
 	 
 		renderEngine->SetEffect(_renderEffect);
 		renderEngine->DrawIndexed(_geometryObject->Indices.size(),0,0);

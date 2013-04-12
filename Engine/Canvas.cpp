@@ -24,9 +24,14 @@ namespace Disorder
 
 		if( _vertexs.size() == 0 )
 			return;
-
+ 
 		RenderEnginePtr renderEngine = GEngine->RenderEngine;
 	
+		AddVertex(Vector3(-0.5f,0.5f,0.0f),Vector4(1.0f),Vector2(0.0f,0.0f));
+		AddVertex(Vector3(0.5f,0.5f,0.0f),Vector4(1.0f),Vector2(1.0f,0.0f));
+	    AddVertex(Vector3(-0.5f,-0.5f,0.0f),Vector4(1.0f),Vector2(0.0f,1.0f));
+		AddVertex(Vector3(0.5f,-0.5f,0.0f),Vector4(1.0f),Vector2(1.0f,1.0f));
+
 
 		const RenderBufferPtr & vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
 		void* vertexBuffer = renderEngine->Map(vertexRenderBuffer,BA_Write_Only);
@@ -39,7 +44,7 @@ namespace Disorder
 		renderEngine->UnMap(indexRenderBuffer);
 
 		renderEngine->SetRenderLayout(_renderLayout);
-		renderEngine->SetBlendState(_renderEffect->GetBlendState());
+		//renderEngine->SetBlendState(_renderEffect->GetBlendState());
 		renderEngine->SetRasterizeState(_renderEffect->GetRasterizeState());
 		renderEngine->SetEffect(_renderEffect);
 		renderEngine->DrawIndexed(_indexs.size(),0,0);
