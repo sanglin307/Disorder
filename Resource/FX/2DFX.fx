@@ -38,9 +38,9 @@ VS_OUTPUT VS( VS_INPUT input )
 float4 PS( VS_OUTPUT In ) : SV_TARGET
 { 
     // Lookup mesh texture and modulate it with diffuse
-	In.Color.r = DiffuseTexture.Sample( LinearSampler, In.TextureUV ).g;
-	In.Color.g = DiffuseTexture.Sample( LinearSampler, In.TextureUV ).g;
-	In.Color.b = DiffuseTexture.Sample( LinearSampler, In.TextureUV ).g;
+	//In.Color.r = DiffuseTexture.Sample( LinearSampler, In.TextureUV ).g;
+	//In.Color.g = DiffuseTexture.Sample( LinearSampler, In.TextureUV ).g;
+	//In.Color.b = DiffuseTexture.Sample( LinearSampler, In.TextureUV ).g;
 
 	In.Color.a *= DiffuseTexture.Sample( LinearSampler, In.TextureUV ).g;
 	//return g_txDiffuse.Sample( g_samLinear, In.TextureUV ) ;

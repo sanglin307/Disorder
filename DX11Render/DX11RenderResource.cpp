@@ -232,7 +232,8 @@ namespace Disorder
 		{
 			if (_accessHint & BAH_GPU_Read)
 			{
-				bindFlags |= D3D11_BIND_SHADER_RESOURCE;
+				if( _bindFlags != D3D11_BIND_VERTEX_BUFFER && _bindFlags != D3D11_BIND_INDEX_BUFFER )
+				    bindFlags |= D3D11_BIND_SHADER_RESOURCE;
 			}
 			if (_accessHint & BAH_GPU_Write)
 			{

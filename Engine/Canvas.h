@@ -7,7 +7,7 @@ namespace Disorder
 	{
 	    typedef struct _SimpleVertex
 		{
-			Vector3 position;
+			Vector4 position;
 			Vector4 color;
 			Vector2 texcoord;
 		} SimpleVertex;

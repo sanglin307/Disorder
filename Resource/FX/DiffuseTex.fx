@@ -34,6 +34,7 @@ VS_OUTPUT VS( VS_INPUT input )
     VS_OUTPUT Output;
     
     Output.Position = mul(float4(input.Position,1.0f), WorldViewProjMatrix );
+ 
 	Output.TextureUV = input.TextureUV; 
     
     return Output;    

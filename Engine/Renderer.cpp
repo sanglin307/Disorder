@@ -55,15 +55,15 @@ namespace Disorder
 		Matrix4 worldMat = gameObject->GetWorldMatrix();
 		Matrix4 viewMat = GSceneManager->SceneCamera->ViewMatrix;
 		Matrix4 projMat = GSceneManager->SceneCamera->ProjectMatrix;
-		Matrix4 wvpMat = worldMat*viewMat*projMat;
+		Matrix4 wvpMat = projMat*viewMat*worldMat;
 		
 		WorldMatrix->SetValue(worldMat);
 		ViewMatrix->SetValue(viewMat);
 		ProjMatrix->SetValue(projMat);
-		WorldViewProjMatrix->SetValue(wvpMat.transpose());
+		WorldViewProjMatrix->SetValue(wvpMat);
 		
-		//renderEngine->SetBlendState(_renderEffect->GetBlendState());
-		//renderEngine->SetRasterizeState(_renderEffect->GetRasterizeState());
+		renderEngine->SetBlendState(_renderEffect->GetBlendState());
+		renderEngine->SetRasterizeState(_renderEffect->GetRasterizeState());
 	 
 		renderEngine->SetEffect(_renderEffect);
 		renderEngine->DrawIndexed(_geometryObject->Indices.size(),0,0);
