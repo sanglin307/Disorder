@@ -9,7 +9,7 @@ SamplerState LinearSampler : register( s0 );
 //--------------------------------------------------------------------------------------
 struct VS_INPUT
 {
-    float4 Position     : POSITION; // vertex position 
+    float3 Position     : POSITION; // vertex position 
 	float4 Color        : COLOR;
     float2 TextureUV    : TEXCOORD0;// vertex texture coords 
 };
@@ -28,7 +28,7 @@ VS_OUTPUT VS( VS_INPUT input )
 {
     VS_OUTPUT Output;
     
-	Output.Position  = input.Position;
+	Output.Position  = float4(input.Position,1);
 	Output.Color     = input.Color;
     Output.TextureUV = input.TextureUV; 
     

@@ -8,6 +8,11 @@ namespace Disorder
 		_vGameObjects.push_back(gameObject);
 	}
 
+	Level::Level()
+	{
+		_vAmbientColor = Vector4(0.0f,0.0f,0.0f,1.0f);
+	}
+
 	Level::~Level()
 	{
 		_vGameObjects.clear();

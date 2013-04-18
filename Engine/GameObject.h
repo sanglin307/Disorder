@@ -8,9 +8,7 @@ namespace Disorder
 	{
 	public:
  
-	
-
-		GameObject(Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::ZERO,Vector3 const& scale = Vector3::UNIT_SCALE);
+		GameObject(std::string const& name, Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::ZERO,Vector3 const& scale = Vector3::UNIT_SCALE);
 		~GameObject();
 
 		
@@ -18,23 +16,53 @@ namespace Disorder
 		void AddComponent(ComponentPtr const& component);
 
 		
+
+		void SetName(std::string const& name)
+		{
+			_name = name;
+		}
+
+		
 		void SetParent(GameObjectPtr const& parent)
 		{
 			_parent = parent;
 		}
+		void AddChild(GameObjectPtr const& child,Vector3 const& pos,Quaternion const& rot,Vector3 const& scale);
+		void AddChild(GameObjectPtr const& child);
 
-		void AddChild(GameObjectPtr const& child,Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::ZERO,Vector3 const& scale = Vector3::UNIT_SCALE);
-
-		void LocalTransform(Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::ZERO,Vector3 const& scale = Vector3::UNIT_SCALE)
+		unsigned int GetChildCount()
 		{
-			_position = pos;
-			_scale = scale;
-			_rotation = rot;
+			return _vChildren.size();
 		}
+		
+		GameObjectPtr GetChild(unsigned int index)
+		{
+			if( index < _vChildren.size())
+				return _vChildren[index];
+
+			return NULL;
+		}
+
+		void LocalTransform(Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::ZERO,Vector3 const& scale = Vector3::UNIT_SCALE);
 
 		const Matrix4& GetWorldMatrix() const
 		{
 			return _worldMatrix;
+		}
+
+		const Vector3& GetPosition()
+		{
+			return _position;
+		}
+
+		const Quaternion& GetRotation()
+		{
+			return _rotation;
+		}
+
+		const Vector3& GetScale()
+		{
+			return _scale;
 		}
 
 		void Tick(float deltaSeconds);
@@ -46,6 +74,8 @@ namespace Disorder
 		Quaternion _rotation;
 		Matrix4 _localMatrix;
 		Matrix4 _worldMatrix;
+
+		std::string _name;
 
 	private:
 		std::vector<ComponentPtr> _vComponents;

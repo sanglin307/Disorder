@@ -30,7 +30,7 @@ namespace Disorder
 
 		const RenderBufferPtr & vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
 		void* vertexBuffer = renderEngine->Map(vertexRenderBuffer,BA_Write_Only);
-		memcpy(vertexBuffer,_vertexs.data(),_vertexs.size()*sizeof(SimpleVertex));
+		memcpy(vertexBuffer,_vertexs.data(),_vertexs.size()*sizeof(CanvasVertex));
 		renderEngine->UnMap(vertexRenderBuffer);
 
 		const RenderBufferPtr & indexRenderBuffer = _renderLayout->GetIndexBuffer();
@@ -59,7 +59,7 @@ namespace Disorder
 		{
 			_savedVertexBufferSize *= 2;
 			const RenderBufferPtr & vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
-			vertexRenderBuffer->Resize(sizeof(SimpleVertex) * _savedVertexBufferSize);
+			vertexRenderBuffer->Resize(sizeof(CanvasVertex) * _savedVertexBufferSize);
 		}
 
 		if( _indexs.size() >= _savedIndexBufferSize )
@@ -71,9 +71,8 @@ namespace Disorder
 
 	
 
-		SimpleVertex vertex;
+		CanvasVertex vertex;
 		vertex.position = position;
-		vertex.position.w = 1.0f;
 		vertex.color = color;
 		vertex.texcoord = texcoord;
 
@@ -115,7 +114,7 @@ namespace Disorder
 		_savedVertexBufferSize = 2048;
 		_savedIndexBufferSize = (UINT)(_savedVertexBufferSize * 1.5f);
  
-		RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,BAH_GPU_Read | BAH_CPU_Write,sizeof(SimpleVertex),sizeof(SimpleVertex)*_savedVertexBufferSize,NULL);
+		RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,BAH_GPU_Read | BAH_CPU_Write,sizeof(CanvasVertex),sizeof(CanvasVertex)*_savedVertexBufferSize,NULL);
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 
 		//Index buffer

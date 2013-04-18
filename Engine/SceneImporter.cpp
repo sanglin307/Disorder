@@ -28,9 +28,12 @@ namespace Disorder
 		if( _sdkManager ) 
 			_sdkManager->Destroy();
 	}
+ 
+	
 
-	bool FbxSceneImporter::LoadScene(std::string const& fileName)
+	LevelPtr FbxSceneImporter::Import(std::string const& fileName)
 	{
+		std::string fbxFile = Disorder::GConfig->sRunningDictioary + "\\Resource\\Fbx\\" + fileName;
 		int lFileMajor, lFileMinor, lFileRevision;
 		int lSDKMajor,  lSDKMinor,  lSDKRevision;	 
 		bool lStatus = false;
@@ -45,14 +48,14 @@ namespace Disorder
 		if( !lscene )
 		{
 			GLogger->Error("Error: Unable to create FBX scene!\n");
-		    return false;
+		    return NULL;
 		}
 
 		// Create an importer.
 		FbxImporter* lImporter = FbxImporter::Create(_sdkManager,"");
 
 		// Initialize the importer by providing a filename.
-		const bool lImportStatus = lImporter->Initialize(fileName.c_str(), -1, _sdkManager->GetIOSettings());
+		const bool lImportStatus = lImporter->Initialize(fbxFile.c_str(), -1, _sdkManager->GetIOSettings());
 		
 		if( !lImportStatus )
 		{
@@ -70,7 +73,7 @@ namespace Disorder
 				GLogger->Error(stream.str());
 			}
 
-			return false;
+			return NULL;
 		}
  
 		lImporter->GetFileVersion(lFileMajor, lFileMinor, lFileRevision);
@@ -98,6 +101,7 @@ namespace Disorder
 		if(lStatus == false && lImporter->GetLastErrorID() == FbxIOBase::ePasswordError)
 		{
 			GLogger->Error("FBX file need a password!!!!");
+			return NULL;
 		/*	FBXSDK_printf("Please enter password: ");
 
 			lPassword[0] = '\0';
@@ -119,12 +123,77 @@ namespace Disorder
 			}*/
 		}
 
+		LevelPtr level = boost::make_shared<Level>();
+
+		ProcessGlobalSetting(lscene,level);
+ 
+		ProcessHierarchy(lscene,level);
+
+
+
 		// Destroy the importer.
 		lImporter->Destroy();
+		return level;
 	}
 
-	void FbxSceneImporter::Import(std::string const& fileName)
+	void FbxSceneImporter::ProcessGlobalSetting(FbxScene* lscene,LevelPtr const& level)
 	{
-		LoadScene(fileName);
+		FbxGlobalSettings &rGlobalSetting =  lscene->GetGlobalSettings();
+		FbxColor ambient = rGlobalSetting.GetAmbientColor();
+		level->SetAmbientColor(Vector4(ambient.mRed,ambient.mGreen,ambient.mBlue,ambient.mAlpha));
+
+	}
+
+	 
+
+    void FbxSceneImporter::ProcessHierarchy(FbxScene* lscene,LevelPtr const& level)
+	{
+		FbxNode* lNode = lscene->GetRootNode();
+
+		if(lNode)
+		{
+			for(int i = 0; i < lNode->GetChildCount(); i++)
+			{
+				FbxNode* pNode = lNode->GetChild(i);
+				GameObjectPtr gameObject = ProcessTranform(pNode);
+				level->AddGameObject(gameObject);
+
+				int childnum = pNode->GetChildCount();
+				for(int ic = 0;ic < childnum;ic++ )
+				{
+					FbxNode* pChildNode = pNode->GetChild(ic);
+					ProcessHierarchy(pChildNode,gameObject);
+				}
+			}
+		}
+	}
+
+	void FbxSceneImporter::ProcessHierarchy(FbxNode* node,GameObjectPtr const& gameObject)
+	{
+		GameObjectPtr childObject = ProcessTranform(node);
+		gameObject->AddChild(childObject);
+		int childnum = node->GetChildCount();
+		for(int ic = 0;ic < childnum;ic++ )
+		{
+			FbxNode* pChildNode = node->GetChild(ic);
+			ProcessHierarchy(pChildNode,gameObject);
+		}
+				 
+	}
+
+	GameObjectPtr FbxSceneImporter::ProcessTranform(FbxNode* pNode)
+	{
+		FbxVector4 lTmpVector = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);
+		Vector3 position(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
+		lTmpVector =  pNode->GetGeometricRotation(FbxNode::eSourcePivot);
+		Matrix3 rotMatrix;
+		rotMatrix.FromEulerAnglesXYZ(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
+		Quaternion rot;
+		rot.FromRotationMatrix(rotMatrix);
+		lTmpVector = pNode->GetGeometricScaling(FbxNode::eSourcePivot);
+		Vector3 scale(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
+		std::string name(pNode->GetName());
+		GameObjectPtr gameObject = boost::make_shared<GameObject>(name,position,rot,scale);
+		return gameObject;
 	}
 }

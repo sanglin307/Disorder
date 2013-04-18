@@ -5,12 +5,12 @@ namespace Disorder
 {
 	class CanvasBatchElement : public Renderer
 	{
-	    typedef struct _SimpleVertex
+	    typedef struct _CanvasVertex
 		{
-			Vector4 position;
+			Vector3 position;
 			Vector4 color;
 			Vector2 texcoord;
-		} SimpleVertex;
+		} CanvasVertex;
 	public:
 		CanvasBatchElement();
 		void SetTexture(RenderTexture2DPtr const& texture);
@@ -21,7 +21,7 @@ namespace Disorder
 		unsigned int GetCurrentDrawTriNumber();
 
 	protected:
-		std::vector<SimpleVertex> _vertexs;
+		std::vector<CanvasVertex> _vertexs;
 		std::vector<WORD> _indexs;
 		unsigned int _savedVertexBufferSize;
 		unsigned int _savedIndexBufferSize;
