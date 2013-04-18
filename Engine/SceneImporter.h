@@ -26,8 +26,12 @@ namespace Disorder
 		void ProcessGlobalSetting(FbxScene* lscene,LevelPtr const& level);
 	 
 		void ProcessHierarchy(FbxScene* lscene,LevelPtr const& level);
-		void ProcessHierarchy(FbxNode* node,GameObjectPtr const& gameObject);
-		GameObjectPtr ProcessTranform(FbxNode* node);
+		void ProcessHierarchy(FbxNode* pNode,GameObjectPtr const& gameObject);
+		void ProcessContent(FbxNode* pNode,GameObjectPtr const& gameObject);
+		void ProcessMesh(FbxNode* pNode,GameObjectPtr const& gameObject);
+		void ProcessGeometry(FbxMesh *pMesh,GeometryPtr const& geometry);
+
+		GameObjectPtr ProcessTranform(FbxNode* pNode);
 
 
 		FbxManager* _sdkManager;

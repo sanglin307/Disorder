@@ -6,8 +6,9 @@ namespace Disorder
 	class Geometry
 	{
 	public:
-		
+		std::string                             Name;
 		std::vector<Vector3>		            Positions;
+		std::vector<Vector4>                    Colors;
 		std::vector<Vector3>                    Normals;
 		std::vector<Vector2>                    Texcoords;
 		std::vector<unsigned int>				Indices;

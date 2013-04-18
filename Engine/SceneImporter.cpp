@@ -156,6 +156,7 @@ namespace Disorder
 			{
 				FbxNode* pNode = lNode->GetChild(i);
 				GameObjectPtr gameObject = ProcessTranform(pNode);
+				ProcessContent(pNode,gameObject);
 				level->AddGameObject(gameObject);
 
 				int childnum = pNode->GetChildCount();
@@ -168,17 +169,322 @@ namespace Disorder
 		}
 	}
 
-	void FbxSceneImporter::ProcessHierarchy(FbxNode* node,GameObjectPtr const& gameObject)
+	void FbxSceneImporter::ProcessHierarchy(FbxNode* pNode,GameObjectPtr const& gameObject)
 	{
-		GameObjectPtr childObject = ProcessTranform(node);
+		GameObjectPtr childObject = ProcessTranform(pNode);
+		ProcessContent(pNode,childObject);
 		gameObject->AddChild(childObject);
-		int childnum = node->GetChildCount();
+		int childnum = pNode->GetChildCount();
 		for(int ic = 0;ic < childnum;ic++ )
 		{
-			FbxNode* pChildNode = node->GetChild(ic);
+			FbxNode* pChildNode = pNode->GetChild(ic);
 			ProcessHierarchy(pChildNode,gameObject);
 		}
 				 
+	}
+
+	void FbxSceneImporter::ProcessContent(FbxNode* pNode,GameObjectPtr const& gameObject)
+	{
+		if(pNode->GetNodeAttribute() == NULL)
+			return;
+
+        FbxNodeAttribute::EType lAttributeType = (pNode->GetNodeAttribute()->GetAttributeType());
+
+        switch (lAttributeType)
+        {
+        case FbxNodeAttribute::eMarker:  
+            //DisplayMarker(pNode);
+			GLogger->Info("Node has marker info!");
+            break;
+
+        case FbxNodeAttribute::eSkeleton:  
+            //DisplaySkeleton(pNode);
+			GLogger->Info("Node has Skeleton info!");
+            break;
+
+        case FbxNodeAttribute::eMesh:      
+			ProcessMesh(pNode,gameObject);
+            break;
+
+        case FbxNodeAttribute::eNurbs:      
+            //DisplayNurb(pNode);
+			GLogger->Info("Node has Nurbs info!");
+            break;
+
+        case FbxNodeAttribute::ePatch:     
+            //DisplayPatch(pNode);
+			GLogger->Info("Node has Patch info!");
+            break;
+
+        case FbxNodeAttribute::eCamera:    
+            //DisplayCamera(pNode);
+			GLogger->Info("Node has Camera info!");
+            break;
+
+        case FbxNodeAttribute::eLight:     
+            //DisplayLight(pNode);
+			GLogger->Info("Node has light info!");
+            break;
+
+        case FbxNodeAttribute::eLODGroup:
+            //DisplayLodGroup(pNode);
+			GLogger->Info("Node has LodGroup info!");
+            break;
+        }   
+
+
+    
+	}
+
+	void FbxSceneImporter::ProcessGeometry(FbxMesh *pMesh,GeometryPtr const& geometry)
+	{
+		int lPolygonCount = pMesh->GetPolygonCount();
+        FbxVector4* lControlPoints = pMesh->GetControlPoints(); 
+		int vertexCount = pMesh->GetControlPointsCount();
+
+		// Vertex read
+		for(int i=0;i<vertexCount;i++)
+		{
+			geometry->Positions.push_back(Vector3(lControlPoints[i][0],lControlPoints[i][1],lControlPoints[i][2]));
+		}
+
+
+		int vertexId = 0;
+		for (int i = 0; i < lPolygonCount; i++)
+		{
+			// skip element polygon group		 
+			int lPolygonSize = pMesh->GetPolygonSize(i);
+			if( lPolygonSize != 3 )
+			{
+				GLogger->Error("Not support polygon size not equal to 3!");
+				return;
+			}
+
+			for (int j = 0; j < lPolygonSize; j++)
+			{
+				int lControlPointIndex = pMesh->GetPolygonVertex(i, j);
+				geometry->Indices.push_back(lControlPointIndex);
+
+				// vertex color.
+				for (int l = 0; l < pMesh->GetElementVertexColorCount(); l++)
+				{
+					FbxGeometryElementVertexColor* leVtxc = pMesh->GetElementVertexColor( l);
+					 
+					switch (leVtxc->GetMappingMode())
+					{
+					case FbxGeometryElement::eByControlPoint:
+						switch (leVtxc->GetReferenceMode())
+						{
+						case FbxGeometryElement::eDirect:
+							DisplayColor(header, leVtxc->GetDirectArray().GetAt(lControlPointIndex));
+							break;
+						case FbxGeometryElement::eIndexToDirect:
+							{
+								int id = leVtxc->GetIndexArray().GetAt(lControlPointIndex);
+								DisplayColor(header, leVtxc->GetDirectArray().GetAt(id));
+							}
+							break;
+						default:
+							break; // other reference modes not shown here!
+						}
+						break;
+
+					case FbxGeometryElement::eByPolygonVertex:
+						{
+							switch (leVtxc->GetReferenceMode())
+							{
+							case FbxGeometryElement::eDirect:
+								DisplayColor(header, leVtxc->GetDirectArray().GetAt(vertexId));
+								break;
+							case FbxGeometryElement::eIndexToDirect:
+								{
+									int id = leVtxc->GetIndexArray().GetAt(vertexId);
+									DisplayColor(header, leVtxc->GetDirectArray().GetAt(id));
+								}
+								break;
+							default:
+								break; // other reference modes not shown here!
+							}
+						}
+						break;
+
+					case FbxGeometryElement::eByPolygon: // doesn't make much sense for UVs
+					case FbxGeometryElement::eAllSame:   // doesn't make much sense for UVs
+					case FbxGeometryElement::eNone:       // doesn't make much sense for UVs
+						break;
+					}
+				}
+				for (l = 0; l < pMesh->GetElementUVCount(); ++l)
+				{
+					FbxGeometryElementUV* leUV = pMesh->GetElementUV( l);
+					FBXSDK_sprintf(header, 100, "            Texture UV: "); 
+
+					switch (leUV->GetMappingMode())
+					{
+					case FbxGeometryElement::eByControlPoint:
+						switch (leUV->GetReferenceMode())
+						{
+						case FbxGeometryElement::eDirect:
+							Display2DVector(header, leUV->GetDirectArray().GetAt(lControlPointIndex));
+							break;
+						case FbxGeometryElement::eIndexToDirect:
+							{
+								int id = leUV->GetIndexArray().GetAt(lControlPointIndex);
+								Display2DVector(header, leUV->GetDirectArray().GetAt(id));
+							}
+							break;
+						default:
+							break; // other reference modes not shown here!
+						}
+						break;
+
+					case FbxGeometryElement::eByPolygonVertex:
+						{
+							int lTextureUVIndex = pMesh->GetTextureUVIndex(i, j);
+							switch (leUV->GetReferenceMode())
+							{
+							case FbxGeometryElement::eDirect:
+							case FbxGeometryElement::eIndexToDirect:
+								{
+									Display2DVector(header, leUV->GetDirectArray().GetAt(lTextureUVIndex));
+								}
+								break;
+							default:
+								break; // other reference modes not shown here!
+							}
+						}
+						break;
+
+					case FbxGeometryElement::eByPolygon: // doesn't make much sense for UVs
+					case FbxGeometryElement::eAllSame:   // doesn't make much sense for UVs
+					case FbxGeometryElement::eNone:       // doesn't make much sense for UVs
+						break;
+					}
+				}
+				for( l = 0; l < pMesh->GetElementNormalCount(); ++l)
+				{
+					FbxGeometryElementNormal* leNormal = pMesh->GetElementNormal( l);
+					FBXSDK_sprintf(header, 100, "            Normal: "); 
+
+					if(leNormal->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+					{
+						switch (leNormal->GetReferenceMode())
+						{
+						case FbxGeometryElement::eDirect:
+							Display3DVector(header, leNormal->GetDirectArray().GetAt(vertexId));
+							break;
+						case FbxGeometryElement::eIndexToDirect:
+							{
+								int id = leNormal->GetIndexArray().GetAt(vertexId);
+								Display3DVector(header, leNormal->GetDirectArray().GetAt(id));
+							}
+							break;
+						default:
+							break; // other reference modes not shown here!
+						}
+					}
+
+				}
+				for( l = 0; l < pMesh->GetElementTangentCount(); ++l)
+				{
+					FbxGeometryElementTangent* leTangent = pMesh->GetElementTangent( l);
+					FBXSDK_sprintf(header, 100, "            Tangent: "); 
+
+					if(leTangent->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+					{
+						switch (leTangent->GetReferenceMode())
+						{
+						case FbxGeometryElement::eDirect:
+							Display3DVector(header, leTangent->GetDirectArray().GetAt(vertexId));
+							break;
+						case FbxGeometryElement::eIndexToDirect:
+							{
+								int id = leTangent->GetIndexArray().GetAt(vertexId);
+								Display3DVector(header, leTangent->GetDirectArray().GetAt(id));
+							}
+							break;
+						default:
+							break; // other reference modes not shown here!
+						}
+					}
+
+				}
+				for( l = 0; l < pMesh->GetElementBinormalCount(); ++l)
+				{
+
+					FbxGeometryElementBinormal* leBinormal = pMesh->GetElementBinormal( l);
+
+					FBXSDK_sprintf(header, 100, "            Binormal: "); 
+					if(leBinormal->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+					{
+						switch (leBinormal->GetReferenceMode())
+						{
+						case FbxGeometryElement::eDirect:
+							Display3DVector(header, leBinormal->GetDirectArray().GetAt(vertexId));
+							break;
+						case FbxGeometryElement::eIndexToDirect:
+							{
+								int id = leBinormal->GetIndexArray().GetAt(vertexId);
+								Display3DVector(header, leBinormal->GetDirectArray().GetAt(id));
+							}
+							break;
+						default:
+							break; // other reference modes not shown here!
+						}
+					}
+				}
+				vertexId++;
+			} // for polygonSize
+		} // for polygonCount
+
+
+		//check visibility for the edges of the mesh
+		for(int l = 0; l < pMesh->GetElementVisibilityCount(); ++l)
+		{
+			FbxGeometryElementVisibility* leVisibility=pMesh->GetElementVisibility(l);
+			FBXSDK_sprintf(header, 100, "    Edge Visibility : ");
+			DisplayString(header);
+			switch(leVisibility->GetMappingMode())
+			{
+				//should be eByEdge
+			case FbxGeometryElement::eByEdge:
+				//should be eDirect
+				for(int j=0; j!=pMesh->GetMeshEdgeCount();++j)
+				{
+					DisplayInt("        Edge ", j);
+					DisplayBool("              Edge visibility: ", leVisibility->GetDirectArray().GetAt(j));
+				}
+
+				break;
+			}
+		}
+   
+
+	}
+
+	void FbxSceneImporter::ProcessMesh(FbxNode *pNode,GameObjectPtr const& gameObject)
+	{
+		 FbxMesh* lMesh = (FbxMesh*) pNode->GetNodeAttribute ();
+		 GeometryPtr geometry = boost::make_shared<Geometry>();
+		 geometry->Name = pNode->GetName();
+   
+		 // skip meta data connections...
+   
+		 // skip controll points...
+   
+		 ProcessGeometry(lMesh,geometry);
+
+
+
+		/*DisplayMaterialMapping(lMesh);
+		DisplayMaterial(lMesh);
+		DisplayTexture(lMesh);
+		DisplayMaterialConnections(lMesh);*/
+		
+		// skip link...
+
+		// skip shape...
+
 	}
 
 	GameObjectPtr FbxSceneImporter::ProcessTranform(FbxNode* pNode)
