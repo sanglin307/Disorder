@@ -7,11 +7,13 @@ namespace Disorder
 	{
 	public:
 		std::string                             Name;
-		std::vector<Vector3>		            Positions;
-		std::vector<Vector4>                    Colors;
-		std::vector<Vector3>                    Normals;
-		std::vector<Vector2>                    Texcoords;
-		std::vector<unsigned int>				Indices;
+		std::vector<Vector3>		            Positions;   // Controll point, no duplicate
+		std::vector<Vector4>                    Colors;      // Foreach Polygon Index.
+		std::vector<Vector3>                    Normals;     // Foreach Polygon Index.
+		std::vector<Vector3>                    Tangents;
+		std::vector<Vector3>                    Binormals;  
+		std::vector<Vector2>                    Texcoords;   // Foreach Polygon Index.
+		std::vector<unsigned int>				Indices;     // conterclock
 
 
 		TopologyType PrimitiveType;

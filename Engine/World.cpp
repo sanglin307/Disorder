@@ -8,7 +8,7 @@ namespace Disorder
 	 {
 		 // temp code to init a world
 		
-		 GEngine->SceneImporter->Import(std::string("TorusMesh.fbx"));
+		// GEngine->SceneImporter->Import(std::string("TorusMesh.fbx"));
 		 LevelPtr level = boost::make_shared<Level>();
 		 Vector3 position = Vector3(0.0f);
 		 GameObjectPtr gameObject = boost::make_shared<GameObject>("",position);

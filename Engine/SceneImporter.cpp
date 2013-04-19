@@ -252,7 +252,7 @@ namespace Disorder
 		int vertexId = 0;
 		for (int i = 0; i < lPolygonCount; i++)
 		{
-			// skip element polygon group		 
+			// skip element polygon group layer element ...		 
 			int lPolygonSize = pMesh->GetPolygonSize(i);
 			if( lPolygonSize != 3 )
 			{
@@ -276,14 +276,20 @@ namespace Disorder
 						switch (leVtxc->GetReferenceMode())
 						{
 						case FbxGeometryElement::eDirect:
-							DisplayColor(header, leVtxc->GetDirectArray().GetAt(lControlPointIndex));
-							break;
+							{
+								FbxColor fColor = leVtxc->GetDirectArray().GetAt(lControlPointIndex);
+								Vector4 color(fColor.mRed,fColor.mGreen,fColor.mBlue,fColor.mAlpha);
+								geometry->Colors.push_back(color);
+								break;
+							}
 						case FbxGeometryElement::eIndexToDirect:
 							{
 								int id = leVtxc->GetIndexArray().GetAt(lControlPointIndex);
-								DisplayColor(header, leVtxc->GetDirectArray().GetAt(id));
+								FbxColor fColor = leVtxc->GetDirectArray().GetAt(id);
+								Vector4 color(fColor.mRed,fColor.mGreen,fColor.mBlue,fColor.mAlpha);
+							    geometry->Colors.push_back(color);
+								break;
 							}
-							break;
 						default:
 							break; // other reference modes not shown here!
 						}
@@ -294,12 +300,18 @@ namespace Disorder
 							switch (leVtxc->GetReferenceMode())
 							{
 							case FbxGeometryElement::eDirect:
-								DisplayColor(header, leVtxc->GetDirectArray().GetAt(vertexId));
+								{
+									FbxColor fColor = leVtxc->GetDirectArray().GetAt(vertexId);
+									Vector4 color(fColor.mRed,fColor.mGreen,fColor.mBlue,fColor.mAlpha);
+								    geometry->Colors.push_back(color);
+								}
 								break;
 							case FbxGeometryElement::eIndexToDirect:
 								{
 									int id = leVtxc->GetIndexArray().GetAt(vertexId);
-									DisplayColor(header, leVtxc->GetDirectArray().GetAt(id));
+									FbxColor fColor = leVtxc->GetDirectArray().GetAt(id);
+									Vector4 color(fColor.mRed,fColor.mGreen,fColor.mBlue,fColor.mAlpha);
+							        geometry->Colors.push_back(color);
 								}
 								break;
 							default:
@@ -311,26 +323,34 @@ namespace Disorder
 					case FbxGeometryElement::eByPolygon: // doesn't make much sense for UVs
 					case FbxGeometryElement::eAllSame:   // doesn't make much sense for UVs
 					case FbxGeometryElement::eNone:       // doesn't make much sense for UVs
+						GLogger->Error("Fbx vertex color not supported mapping mode!");
 						break;
 					}
 				}
-				for (l = 0; l < pMesh->GetElementUVCount(); ++l)
+
+				// uv 
+				for (int l = 0; l < pMesh->GetElementUVCount(); ++l)
 				{
 					FbxGeometryElementUV* leUV = pMesh->GetElementUV( l);
-					FBXSDK_sprintf(header, 100, "            Texture UV: "); 
-
+				 
 					switch (leUV->GetMappingMode())
 					{
 					case FbxGeometryElement::eByControlPoint:
 						switch (leUV->GetReferenceMode())
 						{
 						case FbxGeometryElement::eDirect:
-							Display2DVector(header, leUV->GetDirectArray().GetAt(lControlPointIndex));
+							{
+								FbxVector2 uv = leUV->GetDirectArray().GetAt(lControlPointIndex);
+								Vector2 vuv(uv[0],uv[1]);
+								geometry->Texcoords.push_back(vuv);
+							}
 							break;
 						case FbxGeometryElement::eIndexToDirect:
 							{
 								int id = leUV->GetIndexArray().GetAt(lControlPointIndex);
-								Display2DVector(header, leUV->GetDirectArray().GetAt(id));
+								FbxVector2 uv = leUV->GetDirectArray().GetAt(id);
+								Vector2 vuv(uv[0],uv[1]);
+								geometry->Texcoords.push_back(vuv);
 							}
 							break;
 						default:
@@ -346,7 +366,9 @@ namespace Disorder
 							case FbxGeometryElement::eDirect:
 							case FbxGeometryElement::eIndexToDirect:
 								{
-									Display2DVector(header, leUV->GetDirectArray().GetAt(lTextureUVIndex));
+									FbxVector2 uv = leUV->GetDirectArray().GetAt(lTextureUVIndex);
+									Vector2 vuv(uv[0],uv[1]);
+								    geometry->Texcoords.push_back(vuv);
 								}
 								break;
 							default:
@@ -361,46 +383,63 @@ namespace Disorder
 						break;
 					}
 				}
-				for( l = 0; l < pMesh->GetElementNormalCount(); ++l)
+
+				// normal
+				for(int l = 0; l < pMesh->GetElementNormalCount(); ++l)
 				{
 					FbxGeometryElementNormal* leNormal = pMesh->GetElementNormal( l);
-					FBXSDK_sprintf(header, 100, "            Normal: "); 
-
+					 
 					if(leNormal->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
 					{
 						switch (leNormal->GetReferenceMode())
 						{
 						case FbxGeometryElement::eDirect:
-							Display3DVector(header, leNormal->GetDirectArray().GetAt(vertexId));
+							{
+								FbxVector4 normal = leNormal->GetDirectArray().GetAt(vertexId);
+								normal.Normalize();
+								Vector3 vNormal(normal[0],normal[1],normal[2]);
+								geometry->Normals.push_back(vNormal);
+							}
 							break;
 						case FbxGeometryElement::eIndexToDirect:
 							{
 								int id = leNormal->GetIndexArray().GetAt(vertexId);
-								Display3DVector(header, leNormal->GetDirectArray().GetAt(id));
+								FbxVector4 normal = leNormal->GetDirectArray().GetAt(id);
+								normal.Normalize();
+								Vector3 vNormal(normal[0],normal[1],normal[2]);
+								geometry->Normals.push_back(vNormal);
 							}
 							break;
 						default:
 							break; // other reference modes not shown here!
 						}
 					}
-
 				}
-				for( l = 0; l < pMesh->GetElementTangentCount(); ++l)
+
+				// tangent
+				for(int l = 0; l < pMesh->GetElementTangentCount(); ++l)
 				{
 					FbxGeometryElementTangent* leTangent = pMesh->GetElementTangent( l);
-					FBXSDK_sprintf(header, 100, "            Tangent: "); 
-
+				 
 					if(leTangent->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
 					{
 						switch (leTangent->GetReferenceMode())
 						{
 						case FbxGeometryElement::eDirect:
-							Display3DVector(header, leTangent->GetDirectArray().GetAt(vertexId));
+							{
+								FbxVector4 tangent = leTangent->GetDirectArray().GetAt(vertexId);
+								tangent.Normalize();
+								Vector3 vTangent(tangent[0],tangent[1],tangent[2]);
+								geometry->Tangents.push_back(vTangent);
+							}
 							break;
 						case FbxGeometryElement::eIndexToDirect:
 							{
 								int id = leTangent->GetIndexArray().GetAt(vertexId);
-								Display3DVector(header, leTangent->GetDirectArray().GetAt(id));
+								FbxVector4 tangent = leTangent->GetDirectArray().GetAt(id);
+								tangent.Normalize();
+								Vector3 vTangent(tangent[0],tangent[1],tangent[2]);
+								geometry->Tangents.push_back(vTangent);
 							}
 							break;
 						default:
@@ -409,23 +448,31 @@ namespace Disorder
 					}
 
 				}
-				for( l = 0; l < pMesh->GetElementBinormalCount(); ++l)
+
+				//binormal
+				for(int l = 0; l < pMesh->GetElementBinormalCount(); ++l)
 				{
-
 					FbxGeometryElementBinormal* leBinormal = pMesh->GetElementBinormal( l);
-
-					FBXSDK_sprintf(header, 100, "            Binormal: "); 
+					 
 					if(leBinormal->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
 					{
 						switch (leBinormal->GetReferenceMode())
 						{
 						case FbxGeometryElement::eDirect:
-							Display3DVector(header, leBinormal->GetDirectArray().GetAt(vertexId));
+							{
+								FbxVector4 binormal = leBinormal->GetDirectArray().GetAt(vertexId);
+								binormal.Normalize();
+								Vector3 vBinormal(binormal[0],binormal[1],binormal[2]);
+								geometry->Binormals.push_back(vBinormal);
+							}
 							break;
 						case FbxGeometryElement::eIndexToDirect:
 							{
 								int id = leBinormal->GetIndexArray().GetAt(vertexId);
-								Display3DVector(header, leBinormal->GetDirectArray().GetAt(id));
+								FbxVector4 binormal = leBinormal->GetDirectArray().GetAt(id);
+								binormal.Normalize();
+								Vector3 vBinormal(binormal[0],binormal[1],binormal[2]);
+								geometry->Binormals.push_back(vBinormal);
 							}
 							break;
 						default:
@@ -436,29 +483,37 @@ namespace Disorder
 				vertexId++;
 			} // for polygonSize
 		} // for polygonCount
-
-
-		//check visibility for the edges of the mesh
-		for(int l = 0; l < pMesh->GetElementVisibilityCount(); ++l)
+ 
+		// Should check if color uv normal equal to index
+		if( geometry->Colors.size() > 0 && geometry->Indices.size() != geometry->Colors.size() )
 		{
-			FbxGeometryElementVisibility* leVisibility=pMesh->GetElementVisibility(l);
-			FBXSDK_sprintf(header, 100, "    Edge Visibility : ");
-			DisplayString(header);
-			switch(leVisibility->GetMappingMode())
-			{
-				//should be eByEdge
-			case FbxGeometryElement::eByEdge:
-				//should be eDirect
-				for(int j=0; j!=pMesh->GetMeshEdgeCount();++j)
-				{
-					DisplayInt("        Edge ", j);
-					DisplayBool("              Edge visibility: ", leVisibility->GetDirectArray().GetAt(j));
-				}
-
-				break;
-			}
+			GLogger->Error("Mesh vertex color size not equal to index size!");
+			BOOST_ASSERT(0);
 		}
-   
+
+		if( geometry->Texcoords.size() > 0 && geometry->Indices.size() != geometry->Texcoords.size() )
+		{
+			GLogger->Error("Mesh vertex uv size not equal to index size!");
+			BOOST_ASSERT(0);
+		}
+
+		if( geometry->Normals.size() > 0 && geometry->Indices.size() != geometry->Normals.size() )
+		{
+			GLogger->Error("Mesh vertex normals size not equal to index size!");
+			BOOST_ASSERT(0);
+		}
+
+		if( geometry->Binormals.size() > 0 && geometry->Indices.size() != geometry->Binormals.size() )
+		{
+			GLogger->Error("Mesh vertex binormals size not equal to index size!");
+			BOOST_ASSERT(0);
+		}
+
+		if( geometry->Tangents.size() > 0 && geometry->Indices.size() != geometry->Tangents.size() )
+		{
+			GLogger->Error("Mesh vertex tangents size not equal to index size!");
+			BOOST_ASSERT(0);
+		}
 
 	}
 
@@ -466,6 +521,8 @@ namespace Disorder
 	{
 		 FbxMesh* lMesh = (FbxMesh*) pNode->GetNodeAttribute ();
 		 GeometryPtr geometry = boost::make_shared<Geometry>();
+		 GeometryRendererPtr geometryRender = boost::make_shared<GeometryRenderer>(gameObject);
+		 
 		 geometry->Name = pNode->GetName();
    
 		 // skip meta data connections...
@@ -474,6 +531,9 @@ namespace Disorder
    
 		 ProcessGeometry(lMesh,geometry);
 
+		 // use default material now
+		 MaterialPtr mat = MaterialGenerator::GenerateLambert();
+		 geometryRender->SetGeometry(geometry,mat);
 
 
 		/*DisplayMaterialMapping(lMesh);
@@ -485,6 +545,7 @@ namespace Disorder
 
 		// skip shape...
 
+		 gameObject->AddComponent(geometryRender);
 	}
 
 	GameObjectPtr FbxSceneImporter::ProcessTranform(FbxNode* pNode)
