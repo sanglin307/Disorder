@@ -24,8 +24,16 @@ namespace Disorder
 		 
 	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList);
  
-		RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,BAH_GPU_Read,_geometryObject,vertexShader);
-		_renderLayout->BindVertexBuffer(vertexBuffer);
+		std::vector<RenderBufferPtr> vertexBufferArray;
+		resourceManager->CreateVertexBufferArray(_geometryObject,BAH_GPU_Read,vertexShader,vertexBufferArray);
+		for(int index=0;index<vertexBufferArray.size();index++)
+		{
+		    _renderLayout->BindVertexBuffer(vertexBufferArray[index]);
+		}
+
+		//RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,BAH_GPU_Read,_geometryObject,vertexShader);
+		//_renderLayout->BindVertexBuffer(vertexBuffer);
+
 
 		RenderBufferPtr indexBuffer = resourceManager->CreateRenderBuffer(RBT_Index,BAH_GPU_Read,_geometryObject,vertexShader);
 		_renderLayout->BindIndexBuffer(indexBuffer);

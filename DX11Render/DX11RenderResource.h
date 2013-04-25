@@ -6,7 +6,8 @@ namespace Disorder
 	class DX11RenderBuffer : public RenderBuffer
 	{
 	public:
-		virtual void CreateBuffer(RenderBufferType type,GeometryPtr const& data,unsigned int accessHint,ShaderObjectPtr const& vertexShader = 0);
+		virtual void CreateVertexBuffer(GeometryPtr const& data,std::string const& sematic,unsigned int accessHint,ShaderObjectPtr const& vertexShader);
+		virtual void CreateBuffer(RenderBufferType type,GeometryPtr const& data,unsigned int accessHint,ShaderObjectPtr const& vertexShader);
 		virtual void CreateBuffer(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData);
 		virtual void CreateConstBuffer(unsigned int size, unsigned int accessHint);
 		void GetD3DFlags(D3D11_USAGE& usage, UINT& cpuAccessFlags, UINT& bindFlags, UINT& miscFlags);

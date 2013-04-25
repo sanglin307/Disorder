@@ -45,8 +45,9 @@ namespace Disorder
 	class RenderBuffer :public RenderResource
 	{
 	public:
-		virtual void CreateBuffer(RenderBufferType type,GeometryPtr const& data,unsigned int accessHint,ShaderObjectPtr const& vertexShader = 0) = 0;
+		virtual void CreateBuffer(RenderBufferType type,GeometryPtr const& data,unsigned int accessHint,ShaderObjectPtr const& vertexShader) = 0;
 		virtual void CreateBuffer(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData) = 0;
+		virtual void CreateVertexBuffer(GeometryPtr const& data,std::string const& sematic, unsigned int accessHint,ShaderObjectPtr const& vertexShader) = 0;
 		virtual void CreateConstBuffer(unsigned int size, unsigned int accessHint)=0;
 		unsigned int const& GetElementSize() const
 	    {

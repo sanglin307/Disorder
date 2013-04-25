@@ -60,6 +60,17 @@ namespace Disorder
 		return renderBuffer;
 	}
 
+	void DX11RenderResourceManager::CreateVertexBufferArray(GeometryPtr const& data, unsigned int accessHint,ShaderObjectPtr const& vertexShader,std::vector<RenderBufferPtr> & bufferArray )
+	{		 
+		DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
+		for(int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
+		{
+			RenderBufferPtr renderBuffer = boost::make_shared<DX11RenderBuffer>();
+			renderBuffer->CreateVertexBuffer(data,shader->ShaderReflect->InputSignatureParameters[i].SemanticName,accessHint,vertexShader);
+			bufferArray.push_back(renderBuffer);
+		}
+	}
+
     RenderBufferPtr DX11RenderResourceManager::CreateRenderBuffer(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData) 
 	{
 		RenderBufferPtr renderBuffer = boost::make_shared<DX11RenderBuffer>();

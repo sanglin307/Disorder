@@ -115,27 +115,6 @@ namespace Disorder
 		_pImmediateContext->UpdateSubresource(pBuffer, 0, NULL, pSrcData, srcDataSize, 0);
 	}
 
-	/*void DX11RenderEngine::UpdateMVPMatrix(RenderEffectPtr const& technique, Matrix4 const& worldMatrix,Matrix4 const& viewMatrix,Matrix4 const& projMatrix)
-	{
-		ShaderObjectPtr shader = technique->GetVertexShader();
-		std::vector<RenderBufferPtr> constBuffers = shader->GetConstBuffers();
-		if( constBuffers.size() > 0 )
-		{
-			ID3D11Buffer *pBuffer = (ID3D11Buffer *)(constBuffers[0]->GetLowInterface());
-			typedef struct _sMatrixs
-			{
-				Matrix4 worldMatrix;
-				Matrix4 viewMatrix;
-				Matrix4 projMatrix;
-			} sMatrix;
-			sMatrix matrixBuffer;
-			matrixBuffer.worldMatrix = worldMatrix.transpose();
-			matrixBuffer.viewMatrix = viewMatrix;
-			matrixBuffer.projMatrix = projMatrix;
-			_pImmediateContext->UpdateSubresource(pBuffer, 0, NULL, &matrixBuffer, 0, 0);
-			 
-		}
-	}*/
 
 	void DX11RenderEngine::DrawIndexed(unsigned int indexCount,unsigned int startIndexLocation,int baseVertexLocation)
 	{

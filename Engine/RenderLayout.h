@@ -4,25 +4,15 @@
 
 namespace Disorder
 {
-	enum VertexInputSematic
-	{
-		VIS_Position,
-		VIS_Color,
-		VIS_Normal,
-		VIS_TexCoord0
-	};
-
-	typedef struct _VertexInputDes
-	{
-		VertexInputSematic Semantic;
-		PixelFormat Format;
-		unsigned int InstanceDataStepRate;
-        bool InstanceData;
-	} VertexInputDes;
-
+ 
 	class RenderLayout
 	{
 	public:
+
+		static std::string POSITION;
+		static std::string COLOR;
+		static std::string NORMAL;
+		static std::string TEXCOORD;
 
 		virtual bool CreateLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType) = 0;
  

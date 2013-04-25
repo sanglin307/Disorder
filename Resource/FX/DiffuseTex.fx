@@ -25,6 +25,17 @@ struct VS_OUTPUT
 };
 
 
+//VS_OUTPUT VS( float4 Position:POSITION,float4 TextureUV :TEXCOORD0 )
+//{
+//    VS_OUTPUT Output;
+//    
+//    Output.Position = mul(float4(Position.xyz,1.0f), WorldViewProjMatrix );
+// 
+//	Output.TextureUV = TextureUV.xy; 
+//    
+//    return Output;    
+//}
+
  
 //--------------------------------------------------------------------------------------
 // This shader computes standard transform
@@ -33,7 +44,7 @@ VS_OUTPUT VS( VS_INPUT input )
 {
     VS_OUTPUT Output;
     
-    Output.Position = mul(float4(input.Position,1.0f), WorldViewProjMatrix );
+    Output.Position = mul(float4(input.Position.xyz,1.0f), WorldViewProjMatrix );
  
 	Output.TextureUV = input.TextureUV; 
     

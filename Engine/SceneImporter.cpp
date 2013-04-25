@@ -245,7 +245,7 @@ namespace Disorder
 		// Vertex read
 		for(int i=0;i<vertexCount;i++)
 		{
-			geometry->Positions.push_back(Vector3(lControlPoints[i][0],lControlPoints[i][1],lControlPoints[i][2]));
+			geometry->ControllPositions.push_back(Vector3(lControlPoints[i][0],lControlPoints[i][1],lControlPoints[i][2]));
 		}
 
 

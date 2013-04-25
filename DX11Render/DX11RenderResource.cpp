@@ -86,6 +86,87 @@ namespace Disorder
  
 	}
 
+	void DX11RenderBuffer::CreateVertexBuffer(GeometryPtr const& data,std::string const& sematic,unsigned int accessHint,ShaderObjectPtr const& vertexShader)
+	{
+		_type = RBT_Vertex;
+		_accessHint = accessHint;
+		_elementSize = 0;
+		_bufferSize = 0;
+		_bindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+		void *pData = NULL;
+		std::vector<float> vData;
+  
+		DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
+		for(int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
+		{
+			if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(sematic) == 0 )
+			{
+				_elementSize = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
+				break;
+			}		 
+		}
+
+		if( _elementSize == 0 )
+		{
+			BOOST_ASSERT(0);
+			return ;
+		}
+
+		if(sematic.compare(RenderLayout::POSITION)==0)
+		{
+			_bufferSize = _elementSize*data->Positions.size();
+			for(int index=0;index<data->Positions.size();++index)
+			{
+				Vector3 vec = data->ControllPositions[data->Positions[index]];
+				vData.push_back(vec.x);
+				vData.push_back(vec.y);
+				vData.push_back(vec.z);
+			}
+		}
+		else if(sematic.compare(RenderLayout::COLOR)==0)
+		{
+			_bufferSize = _elementSize*data->Colors.size();
+			for(int index=0;index<data->Colors.size();++index)
+			{
+				Vector4 vec = data->Colors[index];
+				vData.push_back(vec.x);
+				vData.push_back(vec.y);
+				vData.push_back(vec.z);
+				vData.push_back(vec.w);
+			}
+		}
+		else if(sematic.compare(RenderLayout::NORMAL) == 0 )
+		{
+			_bufferSize = _elementSize*data->Normals.size();
+			for(int index=0;index<data->Normals.size();++index)
+			{
+				Vector3 vec = data->Normals[index];
+				vData.push_back(vec.x);
+				vData.push_back(vec.y);
+				vData.push_back(vec.z);
+			}
+		}
+		else if(sematic.compare(RenderLayout::TEXCOORD) == 0 )
+		{
+			_bufferSize = _elementSize*data->Texcoords.size();
+			for(int index=0;index<data->Texcoords.size();++index)
+			{
+				Vector2 vec = data->Texcoords[index];
+				vData.push_back(vec.x);
+				vData.push_back(vec.y);
+			}
+		}
+		else
+		{
+			BOOST_ASSERT(0);
+		}
+
+	    pData = vData.data();
+		DoCreateBuffer(pData);
+
+	}
+
 	void DX11RenderBuffer::CreateBuffer(RenderBufferType type,GeometryPtr const& data,unsigned int accessHint,ShaderObjectPtr const& vertexShader)
 	{
 		_type = type;
@@ -99,22 +180,27 @@ namespace Disorder
 		{		
 			_bindFlags = D3D11_BIND_VERTEX_BUFFER;
 			int positionElement = 0;
+			int colorElement = 0;
 			int normalElement = 0;
 			int texcoodElement = 0;
 			DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
 			for(int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
 			{
-				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare("POSITION") == 0 )
+				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(RenderLayout::POSITION) == 0 )
 				{
 					positionElement = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
 					continue;
 				}
-				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare("NORMAL") == 0 )
+				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(RenderLayout::COLOR) == 0 )
+				{
+					colorElement = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
+				}
+				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(RenderLayout::NORMAL) == 0 )
 				{
 					normalElement = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
 					continue;
 				}
-				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare("TEXCOORD") == 0 )
+				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(RenderLayout::TEXCOORD) == 0 )
 				{
 					texcoodElement = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
 					continue;
@@ -125,7 +211,11 @@ namespace Disorder
 				_elementSize += positionElement;
 				_bufferSize += positionElement * data->Positions.size();
 			}
-
+			if(colorElement > 0 && data->Colors.size() > 0 )
+			{
+				_elementSize += colorElement;
+				_bufferSize += colorElement * data->Colors.size();
+			}
 			if(normalElement > 0 && data->Normals.size() > 0)
 			{
 				_elementSize += normalElement;
@@ -143,9 +233,18 @@ namespace Disorder
 			{
 				for(int index=0;index<data->Positions.size();++index)
 				{
-					vData.push_back(data->Positions[index].x);
-					vData.push_back(data->Positions[index].y);
-					vData.push_back(data->Positions[index].z);
+					Vector3 vec = data->ControllPositions[data->Positions[index]];
+					vData.push_back(vec.x);
+					vData.push_back(vec.y);
+					vData.push_back(vec.z);
+
+					if( colorElement > 0 && data->Colors.size() > index )
+					{
+						vData.push_back(data->Colors[index].x);
+						vData.push_back(data->Colors[index].y);
+						vData.push_back(data->Colors[index].z);
+					}
+
 					if( normalElement > 0 && data->Normals.size() > index )
 					{
 						vData.push_back(data->Normals[index].x);
