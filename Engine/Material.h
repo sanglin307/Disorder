@@ -4,10 +4,18 @@
 
 namespace Disorder
 {
+	// fbx means...
 	enum MaterialType
 	{
+		MT_Phong,
 		MT_Lambert,
+		MT_HLSL,
+		MT_CGFX,
+		MT_MentalRay,
+		MT_None
 	};
+
+	 
 
 	enum MaterialViewType
 	{
@@ -168,15 +176,21 @@ namespace Disorder
 		Material();
 
 		MaterialType Type;
+		std::string ShaderModel;
 
 		//Common property
-		MaterialParamPtr DiffuseColor;
-		MaterialParamPtr SpecularColor;
+		Vector3 AmbientColor;
+		Vector3 DiffuseColor;
+		Vector3 SpecularColor;
+		Vector3 EmissiveColor;
+		double Opacity;
+		double Shininess;
+		double Reflectivity;
  
 		//effect
 		RenderEffectPtr Effect[MVT_NUM_VIEW_TYPES];
 
-
+		std::string Name;
 	};
 
 	class MaterialGenerator

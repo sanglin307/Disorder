@@ -30,6 +30,7 @@ namespace Disorder
 		void ProcessContent(FbxNode* pNode,GameObjectPtr const& gameObject);
 		void ProcessMesh(FbxNode* pNode,GameObjectPtr const& gameObject);
 		void ProcessGeometry(FbxMesh *pMesh,GeometryPtr const& geometry);
+		void ProcessMaterials(FbxMesh *pMesh,std::vector<MaterialPtr> & materials);
 
 		GameObjectPtr ProcessTranform(FbxNode* pNode);
 
