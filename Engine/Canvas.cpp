@@ -109,7 +109,7 @@ namespace Disorder
 		BlendStatePtr blendState = resourceManager->CreateBlendState(&blendDesc,1);
 		_renderEffect->BindBlendState(blendState);
 
-	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList);
+	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList,true);
 	 
 		_savedVertexBufferSize = 2048;
 		_savedIndexBufferSize = (UINT)(_savedVertexBufferSize * 1.5f);

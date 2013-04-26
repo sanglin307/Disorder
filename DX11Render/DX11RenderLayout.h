@@ -6,7 +6,7 @@ namespace Disorder
 	class DX11RenderLayout : public RenderLayout
 	{
 	public:
-		virtual bool CreateLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType);
+		virtual bool CreateLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType,bool soloBuffer);
 
 	    DXGI_FORMAT GetInputFormat(D3D_REGISTER_COMPONENT_TYPE component,BYTE mask);
 

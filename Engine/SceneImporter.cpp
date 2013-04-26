@@ -249,7 +249,7 @@ namespace Disorder
 		}
 
 
-		int vertexId = 0;
+		unsigned int vertexId = 0;
 		for (int i = 0; i < lPolygonCount; i++)
 		{
 			// skip element polygon group layer element ...		 
@@ -263,8 +263,9 @@ namespace Disorder
 			for (int j = 0; j < lPolygonSize; j++)
 			{
 				int lControlPointIndex = pMesh->GetPolygonVertex(i, j);
-				geometry->Indices.push_back(lControlPointIndex);
-
+			 
+				geometry->Positions.push_back(lControlPointIndex);
+				geometry->Indices.push_back(vertexId);
 				// vertex color.
 				for (int l = 0; l < pMesh->GetElementVertexColorCount(); l++)
 				{
@@ -485,6 +486,7 @@ namespace Disorder
 		} // for polygonCount
  
 		// Should check if color uv normal equal to index
+
 		if( geometry->Colors.size() > 0 && geometry->Indices.size() != geometry->Colors.size() )
 		{
 			GLogger->Error("Mesh vertex color size not equal to index size!");

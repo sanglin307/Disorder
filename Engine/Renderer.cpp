@@ -22,7 +22,7 @@ namespace Disorder
 		//compile shader
 		ShaderObjectPtr vertexShader = _material->Effect[MVT_Perspective]->GetVertexShader();
 		 
-	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList);
+	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList,false);
  
 		std::vector<RenderBufferPtr> vertexBufferArray;
 		resourceManager->CreateVertexBufferArray(_geometryObject,BAH_GPU_Read,vertexShader,vertexBufferArray);

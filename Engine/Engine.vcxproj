@@ -81,7 +81,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="..\Resource\FX\2DFX.fx" />
-    <None Include="..\Resource\FX\SimpleFX.fx" />
+    <None Include="..\Resource\FX\Default.fx" />
     <None Include="..\Resource\FX\DiffuseTex.fx" />
     <None Include="ReadMe.txt" />
   </ItemGroup>

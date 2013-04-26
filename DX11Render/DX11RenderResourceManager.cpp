@@ -32,11 +32,11 @@ namespace Disorder
 	}
 
 
-	RenderLayoutPtr DX11RenderResourceManager::CreateRenderLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType)
+	RenderLayoutPtr DX11RenderResourceManager::CreateRenderLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType,bool soloBuffer)
 	{
  
 		RenderLayoutPtr renderLayout = boost::make_shared<DX11RenderLayout>();
-		bool result = renderLayout->CreateLayout(vertexShader,topologyType);
+		bool result = renderLayout->CreateLayout(vertexShader,topologyType,soloBuffer);
 	 
 		if(result)
 		    return renderLayout;

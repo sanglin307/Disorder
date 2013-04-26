@@ -11,7 +11,7 @@ namespace Disorder
 
 	}
 
-	bool DX11RenderLayout::CreateLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType)
+	bool DX11RenderLayout::CreateLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType,bool soloBuffer)
 	{
 		 
 		DX11ShaderReflectionPtr shaderReflection = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader)->ShaderReflect;
@@ -21,6 +21,8 @@ namespace Disorder
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> vElementDes;
 
+		int inputSlot = 0;
+
 		for(int index=0;index<shaderReflection->InputSignatureParameters.size();index++)
 		{
 			D3D11_INPUT_ELEMENT_DESC desc;
@@ -28,7 +30,14 @@ namespace Disorder
 			desc.SemanticIndex = shaderReflection->InputSignatureParameters[index].SemanticIndex;
 			desc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 			desc.Format =  GetInputFormat(shaderReflection->InputSignatureParameters[index].ComponentType,shaderReflection->InputSignatureParameters[index].Mask);
-			desc.InputSlot = 0;
+			if( soloBuffer )
+			    desc.InputSlot = 0;
+			else
+			{
+				desc.InputSlot = inputSlot;
+				inputSlot++;
+			}
+
 			desc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 			desc.InstanceDataStepRate = 0;
 			vElementDes.push_back(desc);
