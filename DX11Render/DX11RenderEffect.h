@@ -232,11 +232,14 @@ namespace Disorder
 		virtual void PrepareRenderParam();
 		// Material Param
 		virtual MaterialParamCBufferPtr GetConstantBufferParameter(std::string const& name);
-		virtual MaterialParamVectorPtr GetVectorParameter(std::string const& name);
 		virtual MaterialParamMatrixPtr GetMatrixParameter(std::string const& name);
 		virtual MaterialParamShaderResPtr GetShaderResourceParameter(std::string const& name);
 		virtual MaterialParamSamplerStatePtr GetSamplerStateParameter(std::string const& name);
 		virtual MaterialParamUnorderedPtr GetUnorderedAccessParameter(std::string const& name);
+		virtual MaterialParamVector3Ptr GetVector3Parameter(std::string const& name);
+		virtual MaterialParamVector4Ptr GetVector4Parameter(std::string const& name);
+		virtual MaterialParamIntPtr GetIntParameter(std::string const& name);
+		virtual MaterialParamFloatPtr GetFloatParameter(std::string const& name);
 	};
 }
 

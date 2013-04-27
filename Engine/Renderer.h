@@ -20,6 +20,12 @@ namespace Disorder
 		MaterialParamMatrixPtr WorldMatrix;
 		MaterialParamMatrixPtr ViewMatrix;
 		MaterialParamMatrixPtr ProjMatrix;
+
+		MaterialParamIntPtr    LightType;
+	    MaterialParamFloatPtr  LightIntensity;
+	    MaterialParamVector3Ptr LightPos;
+	    MaterialParamVector3Ptr LightDir;
+	    MaterialParamVector3Ptr LightColor;
 	};
 
 
@@ -33,7 +39,7 @@ namespace Disorder
 	private:
 		  void BuildRenderResource();
 	public:
-		  GeometryRenderer(GameObjectPtr const& base);
+		 
           void SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat); 
 		  virtual void Draw(MaterialViewType view);
 	};

@@ -76,8 +76,14 @@ namespace Disorder
 	typedef boost::shared_ptr<Level> LevelPtr;
 	class MaterialParam;
 	typedef boost::shared_ptr<MaterialParam> MaterialParamPtr;
-	class MaterialParamVector;
-	typedef boost::shared_ptr<MaterialParamVector> MaterialParamVectorPtr;
+	class MaterialParamInt;
+	typedef boost::shared_ptr<MaterialParamInt> MaterialParamIntPtr;
+	class MaterialParamFloat;
+	typedef boost::shared_ptr<MaterialParamFloat> MaterialParamFloatPtr;
+	class MaterialParamVector3;
+	typedef boost::shared_ptr<MaterialParamVector3> MaterialParamVector3Ptr;
+	class MaterialParamVector4;
+	typedef boost::shared_ptr<MaterialParamVector4> MaterialParamVector4Ptr;
 	class MaterialParamMatrix;
 	typedef boost::shared_ptr<MaterialParamMatrix> MaterialParamMatrixPtr;
 	class MaterialParamCBuffer;

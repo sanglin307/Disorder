@@ -86,7 +86,10 @@ namespace Disorder
 		
 		// Material Param
 		virtual MaterialParamCBufferPtr GetConstantBufferParameter(std::string const& name) = 0;
-		virtual MaterialParamVectorPtr GetVectorParameter(std::string const& name) = 0;
+		virtual MaterialParamVector3Ptr GetVector3Parameter(std::string const& name) = 0;
+		virtual MaterialParamVector4Ptr GetVector4Parameter(std::string const& name) = 0;
+		virtual MaterialParamIntPtr GetIntParameter(std::string const& name) = 0;
+		virtual MaterialParamFloatPtr GetFloatParameter(std::string const& name) = 0;
 		virtual MaterialParamMatrixPtr GetMatrixParameter(std::string const& name) = 0;
 		virtual MaterialParamShaderResPtr GetShaderResourceParameter(std::string const& name) =0;
 		virtual MaterialParamSamplerStatePtr GetSamplerStateParameter(std::string const& name) = 0;

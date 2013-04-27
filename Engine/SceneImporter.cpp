@@ -222,8 +222,7 @@ namespace Disorder
             break;
 
         case FbxNodeAttribute::eLight:     
-            //DisplayLight(pNode);
-			GLogger->Info("Node has light info!");
+			ProcessLight(pNode,gameObject);
             break;
 
         case FbxNodeAttribute::eLODGroup:
@@ -518,6 +517,33 @@ namespace Disorder
 
 	}
 
+	void FbxSceneImporter::ProcessLight(FbxNode* pNode,GameObjectPtr const& gameObject)
+	{
+		 FbxLight* lLight = (FbxLight*) pNode->GetNodeAttribute();
+		 LightPtr lightObj = boost::make_shared<Light>();
+		
+		 if(lLight->LightType.Get() == FbxLight::ePoint )
+			 lightObj->Type = LT_Point;
+		 else if(lLight->LightType.Get() == FbxLight::eDirectional )
+			 lightObj->Type = LT_Parallel;
+		 else if(lLight->LightType.Get() == FbxLight::eSpot )
+			 lightObj->Type = LT_Spot;
+		 else
+		 {
+			 GLogger->Error("Not supported light Type!");
+			 BOOST_ASSERT(0);
+		 }
+
+		 lightObj->Color.x = lLight->Color.Get()[0];
+		 lightObj->Color.y = lLight->Color.Get()[1];
+		 lightObj->Color.z = lLight->Color.Get()[2];
+
+		 lightObj->Intensity = lLight->Intensity.Get();
+		 lightObj->Range = lLight->InnerAngle.Get();
+
+		 gameObject->AddComponent(lightObj);
+	}
+
 	void FbxSceneImporter::ProcessMaterials(FbxMesh *pMesh,std::vector<MaterialPtr> & materials)
 	{
 		int lMaterialCount = 0;
@@ -757,7 +783,7 @@ namespace Disorder
 	{
 		 FbxMesh* lMesh = (FbxMesh*) pNode->GetNodeAttribute ();
 		 GeometryPtr geometry = boost::make_shared<Geometry>();
-		 GeometryRendererPtr geometryRender = boost::make_shared<GeometryRenderer>(gameObject);
+		 GeometryRendererPtr geometryRender = boost::make_shared<GeometryRenderer>();
 		 
 		 geometry->Name = pNode->GetName();
    
@@ -770,7 +796,7 @@ namespace Disorder
 		 ProcessMaterials(lMesh,matArray);
 
 		 // use default material now
-		 MaterialPtr mat = MaterialGenerator::GenerateLambert();
+		 MaterialPtr mat = MaterialGenerator::GenerateLambert(Vector3(0.1f),Vector3(0.6f));
 		 geometryRender->SetGeometry(geometry,mat);
 
 

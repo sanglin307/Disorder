@@ -292,9 +292,24 @@ namespace Disorder
 					// Get references to the parameters for binding to these variables.
 					MaterialParamPtr pParam;
 					std::string varname = var_desc.Name;
-					if ( type_desc.Class == D3D_SVC_VECTOR )
-					{					
-						pParam = GetVectorParameter(varname);
+					if( type_desc.Class == D3D_SVC_SCALAR && type_desc.Type == D3D_SVT_INT)
+					{
+						pParam = GetIntParameter(varname);
+					}
+					else if(type_desc.Class == D3D_SVC_SCALAR && type_desc.Type == D3D_SVT_FLOAT)
+					{
+						pParam = GetFloatParameter(varname);
+					}
+					else if ( type_desc.Class == D3D_SVC_VECTOR )
+					{		
+						if( var_desc.Size == 12)
+						    pParam = GetVector3Parameter(varname);
+						else if( var_desc.Size == 16)
+							pParam = GetVector4Parameter(varname);
+						else
+						{
+							BOOST_ASSERT(0);
+						}
 					}
 					else if ( ( type_desc.Class == D3D_SVC_MATRIX_ROWS ) ||
 								( type_desc.Class == D3D_SVC_MATRIX_COLUMNS ) )
@@ -390,16 +405,50 @@ namespace Disorder
 		return constBuffer;
 	}
 
-	MaterialParamVectorPtr DX11RenderEffect::GetVectorParameter(std::string const& name)
+	MaterialParamVector3Ptr DX11RenderEffect::GetVector3Parameter(std::string const& name)
 	{
 		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return boost::dynamic_pointer_cast<MaterialParamVector>(_materialParamMap.at(name));
+			return boost::dynamic_pointer_cast<MaterialParamVector3>(_materialParamMap.at(name));
 
-		MaterialParamVectorPtr vector = boost::make_shared<MaterialParamVector>();
+		MaterialParamVector3Ptr vector = boost::make_shared<MaterialParamVector3>();
 		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,vector));
 
 		return vector;
 	}
+
+	MaterialParamVector4Ptr DX11RenderEffect::GetVector4Parameter(std::string const& name)
+	{
+		if( _materialParamMap.find(name) != _materialParamMap.end() )
+			return boost::dynamic_pointer_cast<MaterialParamVector4>(_materialParamMap.at(name));
+
+		MaterialParamVector4Ptr vector = boost::make_shared<MaterialParamVector4>();
+		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,vector));
+
+		return vector;
+	}
+
+	MaterialParamIntPtr DX11RenderEffect::GetIntParameter(std::string const& name)
+	{
+		if( _materialParamMap.find(name) != _materialParamMap.end() )
+			return boost::dynamic_pointer_cast<MaterialParamInt>(_materialParamMap.at(name));
+
+		MaterialParamIntPtr vector = boost::make_shared<MaterialParamInt>();
+		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,vector));
+
+		return vector;
+	}
+
+	MaterialParamFloatPtr DX11RenderEffect::GetFloatParameter(std::string const& name)
+	{
+		if( _materialParamMap.find(name) != _materialParamMap.end() )
+			return boost::dynamic_pointer_cast<MaterialParamFloat>(_materialParamMap.at(name));
+
+		MaterialParamFloatPtr vector = boost::make_shared<MaterialParamFloat>();
+		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,vector));
+
+		return vector;
+	}
+
 
 	MaterialParamMatrixPtr DX11RenderEffect::GetMatrixParameter(std::string const& name)
 	{

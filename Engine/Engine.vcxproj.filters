@@ -267,5 +267,8 @@
     <ClCompile Include="Texture.cpp">
       <Filter>RenderSystem</Filter>
     </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>GameEngine</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

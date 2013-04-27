@@ -32,7 +32,7 @@ namespace Disorder
 	void GameObject::AddComponent(ComponentPtr const& component)
 	{
 		_vComponents.push_back(component);
-
+		component->SetBase(shared_from_this());
 		RendererPtr renderer = boost::dynamic_pointer_cast<Renderer>(component);
 		if( renderer != NULL )
 			GSceneManager->AddRenderer(renderer);

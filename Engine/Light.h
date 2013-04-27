@@ -11,17 +11,14 @@ namespace Disorder
 		LT_Spot
 	};
 
-	class Light
+	class Light : public Component
 	{
 	public:
+		Light();
 		LightType Type;
-		Vector3   LightPos;
-		Vector3   LightDirection;
-		Vector4   Ambient;
-		Vector4   Diffuse;
-		Vector4   Spec;
-		Vector3   Attenuate;  // for point light 
-		float     SpotPower;
+		Vector3   Color;
+		float     Intensity; 
+		float     SpotAngle;
 		float     Range;
 	};
 }

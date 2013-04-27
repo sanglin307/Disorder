@@ -34,11 +34,95 @@ namespace Disorder
 
 	};
 
-	class MaterialParamVector : public MaterialParam
+	class MaterialParamInt : public MaterialParam
 	{
 	public:
 
-		MaterialParamVector()
+		MaterialParamInt()
+		{
+			_value = 0;
+		}
+
+		void SetValue(int value)
+		{
+			_value = value;
+		}
+
+		int GetValue()
+		{
+			return _value;
+		}
+
+        virtual void* GetData()
+        {
+			return (void*)&_value;
+        }
+
+	private:
+		int _value;
+	};
+
+	class MaterialParamFloat : public MaterialParam
+	{
+	public:
+
+		MaterialParamFloat()
+		{
+			_value = 0.0f;
+		}
+
+		void SetValue(float value)
+		{
+			_value = value;
+		}
+
+		float GetValue()
+		{
+			return _value;
+		}
+
+        virtual void* GetData()
+        {
+			return (void*)&_value;
+        }
+
+	private:
+		float _value;
+	};
+
+	class MaterialParamVector4 : public MaterialParam
+	{
+	public:
+
+		MaterialParamVector4()
+		{
+		   _vec = Vector3::ZERO;
+		}
+
+		void SetValue(Vector4 const& vec)
+		{
+			_vec = vec;
+		}
+
+		Vector4 GetValue()
+		{
+			return _vec;
+		}
+
+        virtual void* GetData()
+        {
+            return (void*)&_vec;
+        }
+
+	private:
+		Vector4 _vec;
+	};
+
+	class MaterialParamVector3 : public MaterialParam
+	{
+	public:
+
+		MaterialParamVector3()
 		{
 		   _vec = Vector3::ZERO;
 		}
@@ -196,7 +280,7 @@ namespace Disorder
 	class MaterialGenerator
 	{
 	public:
-		static MaterialPtr GenerateLambert();
+		static MaterialPtr GenerateLambert(Vector3 const& ambientColor,Vector3 const& diffuseColor);
 
 	};
 

@@ -149,6 +149,7 @@
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="MainLoop.cpp" />
     <ClCompile Include="Material.cpp" />

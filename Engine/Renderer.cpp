@@ -2,12 +2,7 @@
 
 namespace Disorder
 {
-
-	GeometryRenderer::GeometryRenderer(GameObjectPtr const& base)
-	{
-		SetBase(base);
-	}
-
+ 
 	void GeometryRenderer::BuildRenderResource()
 	{
 		BOOST_ASSERT(_geometryObject != NULL && _material != NULL);
@@ -19,6 +14,12 @@ namespace Disorder
 		ViewMatrix = _material->Effect[MVT_Perspective]->GetMatrixParameter("ViewMatrix");
 		ProjMatrix =  _material->Effect[MVT_Perspective]->GetMatrixParameter("ProjMatrix");
  
+		LightType = _material->Effect[MVT_Perspective]->GetIntParameter("LightType");
+		LightIntensity = _material->Effect[MVT_Perspective]->GetFloatParameter("LightIntensity");
+		LightPos =  _material->Effect[MVT_Perspective]->GetVector3Parameter("LightPos");
+	    LightDir = _material->Effect[MVT_Perspective]->GetVector3Parameter("LightDir");
+	    LightColor = _material->Effect[MVT_Perspective]->GetVector3Parameter("LightColor");
+
 		//compile shader
 		ShaderObjectPtr vertexShader = _material->Effect[MVT_Perspective]->GetVertexShader();
 		 
