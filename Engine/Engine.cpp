@@ -19,8 +19,7 @@ namespace Disorder
 	   GLogger->Init();
 	   SceneImporter->Init();
 	   GameClient->Init();
-	   RenderEngine->Init();
-	   
+	   RenderEngine->Init();   
 
 	   ViewportPtr const& viewport = GameClient->GetViewport(0);
 	   RenderTargetPtr renderTarget = RenderEngine->CreateRenderTarget(GConfig->sRenderConfig,viewport->GetWindow());
@@ -31,9 +30,10 @@ namespace Disorder
 
 	   //create camera
 	   CameraPtr sceneCamera = boost::make_shared<Camera>();
+	   sceneCamera->Name = "MainCamera";
 	   sceneCamera->LookAt(Vector3(0.0f,1.0f,-5.0f),Vector3(0.0f,1.0f,0.0f),Vector3(0.0f,1.0f,0.0f));
-	   sceneCamera->ProjCalculate(Math::PI/2,viewport->SizeX*1.0f/viewport->SizeY,1.0f,1000.0f);
-	   GSceneManager->SceneCamera = sceneCamera;
+	   sceneCamera->ProjCalculate(Math::PI/3,viewport->SizeX*1.0f/viewport->SizeY,1.0f,1000.0f);
+	   GSceneManager->AddCamera(sceneCamera);
 	   GameClient->AddInputListener(sceneCamera);
 
 	   GWorld->Init();
@@ -47,7 +47,7 @@ namespace Disorder
 	   GameClient->Tick(deltaSeconds);
 
 	   //tick camera here
-	   GSceneManager->SceneCamera->Tick(deltaSeconds);
+	   GSceneManager->Tick(deltaSeconds);
 
 	   //GWorld
 	   GWorld->Tick(deltaSeconds);

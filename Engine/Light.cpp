@@ -2,6 +2,8 @@
 
 namespace Disorder
 {
+	Vector3 Light::DirectLight = Vector3::NEGATIVE_UNIT_Z;
+
 	Light::Light()
 	{
 		Type = LT_Parallel;

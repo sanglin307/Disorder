@@ -6,8 +6,8 @@ namespace Disorder
 
 	enum LightType
 	{
+		LT_Parallel = 0,
 		LT_Point,
-		LT_Parallel,
 		LT_Spot
 	};
 
@@ -20,6 +20,8 @@ namespace Disorder
 		float     Intensity; 
 		float     SpotAngle;
 		float     Range;
+
+		static Vector3 DirectLight;
 	};
 }
 

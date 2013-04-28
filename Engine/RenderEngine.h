@@ -15,8 +15,6 @@ namespace Disorder
 
 		virtual void AdjustProjMatrix(Matrix4 &matrix){};
 
-		virtual void Draw(std::list<RendererPtr> const& renderList) = 0;
-
 		virtual RenderTargetPtr CreateRenderTarget(RenderConfig const& renderConfig,void *hWnd) = 0;
 
 		virtual void SetBlendState(BlendStatePtr const& blendState) = 0;

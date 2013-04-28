@@ -16,6 +16,13 @@ namespace Disorder
 		   _baseObject = base;
 	   }
 
+	   GameObjectPtr GetBase()
+	   {
+		   return _baseObject.lock();
+	   }
+
+	   std::string Name;
+
 	protected:
 		boost::weak_ptr<GameObject> _baseObject;
 	};

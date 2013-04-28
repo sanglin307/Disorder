@@ -9,6 +9,15 @@ namespace Disorder
 		 // temp code to init a world
 		
 		 LevelPtr level = GEngine->SceneImporter->Import(std::string("TorusMesh.fbx"));
+		 LightPtr light = boost::make_shared<Light>();
+		 GameObjectPtr go = boost::make_shared<GameObject>("test");
+		 light->Color = Vector3(1.0f,0,0);
+		 light->Name = "light";
+		 light->Type = LT_Point;
+		 light->Intensity = 0.8f;
+		 light->Range = 100;
+		 go->AddComponent(light);
+		 level->AddGameObject(go);
 		// LevelPtr level = boost::make_shared<Level>();
 		// Vector3 position = Vector3(0.0f);
 		/* GameObjectPtr gameObject = boost::make_shared<GameObject>("",position);

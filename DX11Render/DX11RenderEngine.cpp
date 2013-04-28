@@ -224,15 +224,6 @@ namespace Disorder
 		_pSwapChain->Present( 0, 0 );
 	}
 
-	void DX11RenderEngine::Draw(std::list<RendererPtr> const& renderList)
-	{
-		std::list<RendererPtr>::const_iterator iter = renderList.begin();
-		while( iter != renderList.end() )
-		{
-			(*iter)->Draw(MVT_Perspective);
-			iter++;
-		}
-	}
 
 	RenderTargetPtr DX11RenderEngine::CreateRenderTarget(RenderConfig const& renderConfig,void *hWnd)
 	{

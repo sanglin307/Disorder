@@ -10,8 +10,7 @@ namespace Disorder
 		DX11RenderEngine();
 		virtual void Init();
 		virtual void Exit();
-		virtual void Draw(std::list<RendererPtr> const& renderList);
-
+		
 		virtual void OnDrawBegin();
 		virtual void OnDrawEnd();
 

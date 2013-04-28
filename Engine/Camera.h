@@ -4,7 +4,7 @@
 
 namespace Disorder
 {
-	class Camera : public InputListener
+	class Camera : public InputListener,public Component
 	{
 	public:
 		Camera();

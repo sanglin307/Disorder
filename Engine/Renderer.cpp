@@ -10,9 +10,9 @@ namespace Disorder
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
 
 		WorldViewProjMatrix = _material->Effect[MVT_Perspective]->GetMatrixParameter("WorldViewProjMatrix");
-		WorldMatrix = _material->Effect[MVT_Perspective]->GetMatrixParameter("WorldMatrix");
-		ViewMatrix = _material->Effect[MVT_Perspective]->GetMatrixParameter("ViewMatrix");
-		ProjMatrix =  _material->Effect[MVT_Perspective]->GetMatrixParameter("ProjMatrix");
+		WorldMatrix = _material->Effect[MVT_Perspective]->GetMatrixParameter("World");
+		ViewMatrix = _material->Effect[MVT_Perspective]->GetMatrixParameter("View");
+		ProjMatrix =  _material->Effect[MVT_Perspective]->GetMatrixParameter("Projection");
  
 		LightType = _material->Effect[MVT_Perspective]->GetIntParameter("LightType");
 		LightIntensity = _material->Effect[MVT_Perspective]->GetFloatParameter("LightIntensity");
@@ -43,13 +43,31 @@ namespace Disorder
 
 	void GeometryRenderer::SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat)
 	{
+		Name = geometry->Name;
 		_geometryObject = geometry;
 		_material = mat;
 
 		BuildRenderResource();
 	}
 
-	void GeometryRenderer::Draw(MaterialViewType view)
+	 void GeometryRenderer::SetLightParam(LightPtr const& light)
+	 {
+		 LightType->SetValue((int)(light->Type));
+		 LightIntensity->SetValue((float)(light->Intensity));
+		 GameObjectPtr go = light->GetBase();
+		 if(light->Type == LT_Parallel)
+		 {
+			 LightDir->SetValue(go->GetRotation()*Light::DirectLight);
+		 }
+		 else if( light->Type == LT_Point )
+		 {
+			 LightPos->SetValue(go->GetPosition());
+		 }
+
+		 LightColor->SetValue(light->Color);
+	 }
+
+	 void GeometryRenderer::Draw(MaterialViewType view,CameraPtr const& camera)
 	{
 		BOOST_ASSERT(_renderLayout != NULL);
 
@@ -62,8 +80,8 @@ namespace Disorder
 		renderEngine->SetRenderLayout(_renderLayout);
 
 		Matrix4 worldMat = gameObject->GetWorldMatrix();
-		Matrix4 viewMat = GSceneManager->SceneCamera->ViewMatrix;
-		Matrix4 projMat = GSceneManager->SceneCamera->ProjectMatrix;
+		Matrix4 viewMat = camera->ViewMatrix;
+		Matrix4 projMat = camera->ProjectMatrix;
 		Matrix4 wvpMat = projMat*viewMat*worldMat;
 		
 		WorldMatrix->SetValue(worldMat);

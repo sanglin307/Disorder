@@ -36,6 +36,12 @@ namespace Disorder
 		RendererPtr renderer = boost::dynamic_pointer_cast<Renderer>(component);
 		if( renderer != NULL )
 			GSceneManager->AddRenderer(renderer);
+		else 
+		{
+			LightPtr light = boost::dynamic_pointer_cast<Light>(component);
+			if( light != NULL )
+				GSceneManager->AddLight(light);
+		}
 	}
 
 	void GameObject::Tick(float deltaSeconds)

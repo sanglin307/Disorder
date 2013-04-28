@@ -18,7 +18,7 @@ namespace Disorder
 		_renderEffect->PrepareRenderParam();
 	}
 
-	void CanvasBatchElement::Draw(MaterialViewType view)
+	void CanvasBatchElement::Draw(MaterialViewType view,CameraPtr const& camera)
 	{
 		BOOST_ASSERT(_vertexs.size()%4==0);
 
@@ -133,9 +133,9 @@ namespace Disorder
 		_stringElement.SetTexture(_font->GetGlyphTexture());
 	}
 
-	void Canvas::Draw()
+	void Canvas::Draw(CameraPtr const& camera)
 	{
-		_stringElement.Draw(MVT_Perspective);
+		_stringElement.Draw(MVT_Perspective,camera);
 	}
 
 	unsigned int Canvas::GetCurrentDrawTriNumber()

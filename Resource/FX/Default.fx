@@ -43,10 +43,10 @@ struct VS_OUTPUT
 VS_OUTPUT VS( VS_INPUT input )
 {
     VS_OUTPUT output;
-    output.Pos = mul( input.Pos, World );
+    output.Pos = mul( input.Pos,Projection);
     output.Pos = mul( output.Pos, View );
 	output.PosView = output.Pos;
-    output.Pos = mul( output.Pos, Projection );
+    output.Pos = mul( output.Pos, World );
     output.NormView = mul(float4(input.Norm,1.0),World);
 	output.NormView = mul(output.NormView,View);
 	 
@@ -71,5 +71,6 @@ float4 PS( VS_OUTPUT input ) : SV_Target
 		diffuseColor.xyz = saturate( dot(lightDir,normalize(input.NormView).xyz) * LightColor * LightIntensity);
 	}
 
-    return AmbientColor + diffuseColor * DiffuseColor;
+    //return AmbientColor + diffuseColor * DiffuseColor;
+	return float4(1.0f,0,0,1);
 }

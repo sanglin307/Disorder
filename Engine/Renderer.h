@@ -10,7 +10,10 @@ namespace Disorder
 	public:
 		virtual ~Renderer(){};
 
-		virtual void Draw(MaterialViewType view) = 0;
+		virtual void Draw(MaterialViewType view,CameraPtr const& camera) = 0;
+
+		virtual void SetLightParam(LightPtr const& light){;}
+	 
 		 
 	protected:
 		RenderEffectPtr _renderEffect;
@@ -41,7 +44,8 @@ namespace Disorder
 	public:
 		 
           void SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat); 
-		  virtual void Draw(MaterialViewType view);
+		  void SetLightParam(LightPtr const& light);
+		  virtual void Draw(MaterialViewType view,CameraPtr const& camera);
 	};
 }
 
