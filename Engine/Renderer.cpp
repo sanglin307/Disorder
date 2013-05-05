@@ -13,6 +13,7 @@ namespace Disorder
 		WorldMatrix = _material->Effect[MVT_Perspective]->GetMatrixParameter("World");
 		ViewMatrix = _material->Effect[MVT_Perspective]->GetMatrixParameter("View");
 		ProjMatrix =  _material->Effect[MVT_Perspective]->GetMatrixParameter("Projection");
+		WorldNormal = _material->Effect[MVT_Perspective]->GetMatrixParameter("WorldNormal");
  
 		LightType = _material->Effect[MVT_Perspective]->GetIntParameter("LightType");
 		LightIntensity = _material->Effect[MVT_Perspective]->GetFloatParameter("LightIntensity");
@@ -85,6 +86,10 @@ namespace Disorder
 		Matrix4 wvpMat = projMat*viewMat*worldMat;
 		
 		WorldMatrix->SetValue(worldMat);
+		if( worldMat.IdentityScale() )
+			WorldNormal->SetValue(worldMat);
+		else
+		    WorldNormal->SetValue(worldMat.inverse().transpose());
 		ViewMatrix->SetValue(viewMat);
 		ProjMatrix->SetValue(projMat);
 		WorldViewProjMatrix->SetValue(wvpMat);

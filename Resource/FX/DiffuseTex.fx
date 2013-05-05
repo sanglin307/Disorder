@@ -23,19 +23,6 @@ struct VS_OUTPUT
     float4 Position     : SV_POSITION; // vertex position
     float2 TextureUV    : TEXCOORD0;   // vertex texture coords 
 };
-
-
-//VS_OUTPUT VS( float4 Position:POSITION,float4 TextureUV :TEXCOORD0 )
-//{
-//    VS_OUTPUT Output;
-//    
-//    Output.Position = mul(float4(Position.xyz,1.0f), WorldViewProjMatrix );
-// 
-//	Output.TextureUV = TextureUV.xy; 
-//    
-//    return Output;    
-//}
-
  
 //--------------------------------------------------------------------------------------
 // This shader computes standard transform

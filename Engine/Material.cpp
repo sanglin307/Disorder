@@ -23,7 +23,7 @@ namespace Disorder
 		mat->Shininess = 1.0;
 
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
-		RenderEffectPtr effect =  resourceManager->CreateRenderEffect("DiffuseTex.fx",SM_4_0,"VS","PS");
+		RenderEffectPtr effect =  resourceManager->CreateRenderEffect("Default.fx",SM_4_0,"VS","PS");
 	 
 		MaterialParamVector4Ptr ambient = effect->GetVector4Parameter("AmbientColor");
 		ambient->SetValue(Vector4(ambientColor));

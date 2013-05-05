@@ -23,6 +23,7 @@ namespace Disorder
 		MaterialParamMatrixPtr WorldMatrix;
 		MaterialParamMatrixPtr ViewMatrix;
 		MaterialParamMatrixPtr ProjMatrix;
+		MaterialParamMatrixPtr WorldNormal;
 
 		MaterialParamIntPtr    LightType;
 	    MaterialParamFloatPtr  LightIntensity;

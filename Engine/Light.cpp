@@ -11,7 +11,7 @@ namespace Disorder
 		Color.y = 1.0f;
 		Color.z = 1.0f;
 
-		Intensity = 100.0f; 
+		Intensity = 0.8f; 
 		SpotAngle = 30;
 		Range = 10.0f;
 	}

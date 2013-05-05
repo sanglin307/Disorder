@@ -67,17 +67,19 @@ namespace Disorder
 				BYTE* pDest = pData;
 				for( int j=0;j<ShaderReflect->ConstantBuffers[i].Parameters.size();j++)
 				{
+					ShaderVariableDesc vaDesc = ShaderReflect->ConstantBuffers[i].Variables[j];
+					ShaderTypeDesc taDesc = ShaderReflect->ConstantBuffers[i].Types[j];
+					pDest = pData + ShaderReflect->ConstantBuffers[i].Variables[j].StartOffset;
+
 					if( ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_SCALAR && ShaderReflect->ConstantBuffers[i].Types[j].Type == D3D_SVT_INT)
 					{
 						void *pSrc = ShaderReflect->ConstantBuffers[i].Parameters[j]->GetData();
 						memcpy(pDest,pSrc,sizeof(int));
-						pDest = pDest + sizeof(int);
 					}
 					else if(ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_SCALAR && ShaderReflect->ConstantBuffers[i].Types[j].Type == D3D_SVT_FLOAT)
 					{
 						void *pSrc = ShaderReflect->ConstantBuffers[i].Parameters[j]->GetData();
 						memcpy(pDest,pSrc,sizeof(float));
-						pDest = pDest + sizeof(float);
 					}
 
 					if(ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_VECTOR)
@@ -86,12 +88,10 @@ namespace Disorder
 						if( ShaderReflect->ConstantBuffers[i].Variables[j].Size == 12 )
 						{
 							memcpy(pDest,pSrc,sizeof(Vector3));
-						    pDest = pDest + sizeof(Vector3);
 						}
 						else if( ShaderReflect->ConstantBuffers[i].Variables[j].Size == 16 )
 						{
 							memcpy(pDest,pSrc,sizeof(Vector4));
-						    pDest = pDest + sizeof(Vector4);
 						}
 					}
 					if(ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_MATRIX_ROWS ||
@@ -99,8 +99,6 @@ namespace Disorder
 					{
 						void *pSrc = ShaderReflect->ConstantBuffers[i].Parameters[j]->GetData();
 						memcpy(pDest,pSrc,sizeof(Matrix4));
-						Matrix4 w = *((Matrix4*)pDest);
-						pDest = pDest + sizeof(Matrix4);
 					}
 				}
 				

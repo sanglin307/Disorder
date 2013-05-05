@@ -10,11 +10,11 @@ namespace Disorder
 		
 		 LevelPtr level = GEngine->SceneImporter->Import(std::string("TorusMesh.fbx"));
 		 LightPtr light = boost::make_shared<Light>();
-		 GameObjectPtr go = boost::make_shared<GameObject>("test");
-		 light->Color = Vector3(1.0f,0,0);
+		 GameObjectPtr go = boost::make_shared<GameObject>("test",Vector3(4.0f,0,0));
+		 light->Color = Vector3(1.0f,1.0f,1.0f);
 		 light->Name = "light";
 		 light->Type = LT_Point;
-		 light->Intensity = 0.8f;
+		 light->Intensity = 0.5f;
 		 light->Range = 100;
 		 go->AddComponent(light);
 		 level->AddGameObject(go);
