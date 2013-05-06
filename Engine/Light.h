@@ -21,6 +21,8 @@ namespace Disorder
 		float     SpotAngle;
 		float     Range;
 
+		Vector3 GetDirect();
+
 		static Vector3 DirectLight;
 	};
 }

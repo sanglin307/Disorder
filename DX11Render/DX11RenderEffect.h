@@ -240,6 +240,7 @@ namespace Disorder
 		virtual MaterialParamVector4Ptr GetVector4Parameter(std::string const& name);
 		virtual MaterialParamIntPtr GetIntParameter(std::string const& name);
 		virtual MaterialParamFloatPtr GetFloatParameter(std::string const& name);
+
 	};
 }
 

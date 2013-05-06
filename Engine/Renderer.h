@@ -12,24 +12,14 @@ namespace Disorder
 
 		virtual void Draw(MaterialViewType view,CameraPtr const& camera) = 0;
 
+		virtual void SetDirectLightParam(std::vector<LightPtr> const& lightArray){;}
 		virtual void SetLightParam(LightPtr const& light){;}
 	 
 		 
 	protected:
 		RenderEffectPtr _renderEffect;
 		RenderLayoutPtr _renderLayout;
-	    
-		MaterialParamMatrixPtr WorldViewProjMatrix;
-		MaterialParamMatrixPtr WorldMatrix;
-		MaterialParamMatrixPtr ViewMatrix;
-		MaterialParamMatrixPtr ProjMatrix;
-		MaterialParamMatrixPtr WorldNormal;
-
-		MaterialParamIntPtr    LightType;
-	    MaterialParamFloatPtr  LightIntensity;
-	    MaterialParamVector3Ptr LightPos;
-	    MaterialParamVector3Ptr LightDir;
-	    MaterialParamVector3Ptr LightColor;
+ 
 	};
 
 
@@ -45,7 +35,8 @@ namespace Disorder
 	public:
 		 
           void SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat); 
-		  void SetLightParam(LightPtr const& light);
+		  virtual void SetLightParam(LightPtr const& light);
+		  virtual void SetDirectLightParam(std::vector<LightPtr> const& lightArray);
 		  virtual void Draw(MaterialViewType view,CameraPtr const& camera);
 	};
 }

@@ -19,7 +19,7 @@ namespace Disorder
 
 	enum MaterialViewType
 	{
-		MVT_Perspective,
+		MVT_Perspective = 0,
 		MVT_Depth_Normal,
 		MVT_GBuffer,
 		MVT_Lights,
@@ -31,7 +31,9 @@ namespace Disorder
 	{
 	public :
 		virtual void* GetData() = 0;
+		virtual int GetElementNumber() = 0;
 
+		int MaxElementNumber;
 	};
 
 	class MaterialParamInt : public MaterialParam
@@ -40,26 +42,35 @@ namespace Disorder
 
 		MaterialParamInt()
 		{
-			_value = 0;
+			MaxElementNumber = 0;
 		}
 
 		void SetValue(int value)
 		{
-			_value = value;
+			if(_value.size() == 0 )
+				_value.push_back(value);
+			else
+				_value[0] = value;
 		}
 
-		int GetValue()
+		void SetValueArray(std::vector<int> const& vec)
 		{
-			return _value;
+			BOOST_ASSERT(vec.size()<=MaxElementNumber);
+			_value = vec;
 		}
 
+		virtual int GetElementNumber()
+		{
+			return _value.size();
+		}
+ 
         virtual void* GetData()
         {
-			return (void*)&_value;
+			return (void*)(_value.data());
         }
 
 	private:
-		int _value;
+		std::vector<int> _value;
 	};
 
 	class MaterialParamFloat : public MaterialParam
@@ -68,26 +79,35 @@ namespace Disorder
 
 		MaterialParamFloat()
 		{
-			_value = 0.0f;
+			MaxElementNumber = 0;
 		}
-
+ 
 		void SetValue(float value)
 		{
-			_value = value;
+			if(_value.size() == 0 )
+				_value.push_back(value);
+			else
+				_value[0] = value;
 		}
 
-		float GetValue()
+		void SetValueArray(std::vector<float> const& vec)
 		{
-			return _value;
+			BOOST_ASSERT(vec.size()<=MaxElementNumber);
+			_value = vec;
 		}
 
+		virtual int GetElementNumber()
+		{
+			return _value.size();
+		}
+ 
         virtual void* GetData()
         {
-			return (void*)&_value;
+			return (void*)(_value.data());
         }
 
 	private:
-		float _value;
+		std::vector<float> _value;
 	};
 
 	class MaterialParamVector4 : public MaterialParam
@@ -96,81 +116,122 @@ namespace Disorder
 
 		MaterialParamVector4()
 		{
-		   _vec = Vector3::ZERO;
+			MaxElementNumber = 0;
 		}
 
 		void SetValue(Vector4 const& vec)
 		{
+			if(_vec.size() == 0 )
+				_vec.push_back(vec);
+			else
+				_vec[0] = vec;
+		}
+
+		void SetValueArray(std::vector<Vector4> const& vec)
+		{
+			BOOST_ASSERT(vec.size()<=MaxElementNumber);
 			_vec = vec;
 		}
 
-		Vector4 GetValue()
+		virtual int GetElementNumber()
 		{
-			return _vec;
+			return _vec.size();
 		}
-
+ 
         virtual void* GetData()
         {
-            return (void*)&_vec;
+			return (void*)(_vec.data());
         }
 
 	private:
-		Vector4 _vec;
+		std::vector<Vector4> _vec;
 	};
 
+ 
 	class MaterialParamVector3 : public MaterialParam
 	{
 	public:
 
 		MaterialParamVector3()
 		{
-		   _vec = Vector3::ZERO;
+			MaxElementNumber = 0;
 		}
 
-		void SetValue(Vector3 const& vec)
+	    void SetValue(Vector3 const& vec)
 		{
+			if(_vec.size() == 0 )
+				_vec.push_back(vec);
+			else
+				_vec[0] = vec;
+		}
+
+		void SetValueArray(std::vector<Vector3> const& vec)
+		{
+			BOOST_ASSERT(vec.size()<=MaxElementNumber);
 			_vec = vec;
 		}
 
-		Vector3 GetValue()
+		virtual int GetElementNumber()
 		{
-			return _vec;
+			return _vec.size();
 		}
-
+ 
         virtual void* GetData()
         {
-            return (void*)&_vec;
+			return (void*)(_vec.data());
         }
 
 	private:
-		Vector3 _vec;
+		std::vector<Vector3> _vec;
 	};
 
 	class MaterialParamMatrix : public MaterialParam
 	{
 	public :
-		void SetValue(Matrix4 const& mat)
+
+		MaterialParamMatrix()
 		{
-			_mat = mat;
+			MaxElementNumber = 0;
 		}
 
-		Matrix4 GetValue()
+		void SetValue(Matrix4 const& mat)
 		{
-			return _mat;
+			if(_mat.size() == 0 )
+				_mat.push_back(mat);
+			else
+				_mat[0] = mat;
+		}
+ 
+		void SetValueArray(std::vector<Matrix4> const& vec)
+		{
+			BOOST_ASSERT(vec.size()<=MaxElementNumber);
+			_mat = vec;
+		}
+
+		virtual int GetElementNumber()
+		{
+			return _mat.size();
 		}
         
         virtual void* GetData()
         {
-            return (void*)&_mat;
+			return (void*)(_mat.data());
         }
 
 	private:
-		Matrix4 _mat;
+		std::vector<Matrix4> _mat;
 	};
 
 	class MaterialParamCBuffer : public MaterialParam
 	{
 	public:
+
+		MaterialParamCBuffer()
+		{
+			MaxElementNumber = 1;
+		}
+
+
 		void SetValue(RenderBufferPtr const& buffer)
 		{
 			_constBuffer = buffer;
@@ -181,6 +242,11 @@ namespace Disorder
 			return _constBuffer;
 		}
 
+		virtual int GetElementNumber()
+		{
+			return 1;
+		}
+
         virtual void* GetData()
         {
             return _constBuffer->GetLowInterface();
@@ -189,10 +255,17 @@ namespace Disorder
 	private:
 		RenderBufferPtr _constBuffer;
 	};
-
+ 
 	class MaterialParamShaderRes : public MaterialParam  // texture and structed thing.
 	{
 	public:
+
+		MaterialParamShaderRes()
+		{
+			MaxElementNumber = 1;
+		}
+
+
 		void SetValue(RenderViewPtr const& view)
 		{
 			_renderView = view;
@@ -201,6 +274,11 @@ namespace Disorder
 		RenderViewPtr GetValue()
 		{
 			return _renderView;
+		}
+
+		virtual int GetElementNumber()
+		{
+			return 1;
 		}
 
         virtual void* GetData()
@@ -214,6 +292,12 @@ namespace Disorder
 	class MaterialParamSamplerState : public MaterialParam
 	{
 	public:
+
+		MaterialParamSamplerState()
+		{
+			MaxElementNumber = 1;
+		}
+
 		void SetValue(SamplerStatePtr const& sampler)
 		{
 			_sampler = sampler;
@@ -222,6 +306,11 @@ namespace Disorder
 		SamplerStatePtr GetValue()
 		{
 			return _sampler;
+		}
+
+		virtual int GetElementNumber()
+		{
+			return 1;
 		}
 
         virtual void* GetData()
@@ -235,6 +324,12 @@ namespace Disorder
 	class MaterialParamUnordered : public MaterialParam  // Unordered view
 	{
 	public:
+
+		MaterialParamUnordered()
+		{
+			MaxElementNumber = 1;
+		}
+
 		void SetValue(RenderViewPtr const& view)
 		{
 			_renderView = view;
@@ -243,6 +338,11 @@ namespace Disorder
 		RenderViewPtr GetValue()
 		{
 			return _renderView;
+		}
+
+		virtual int GetElementNumber()
+		{
+			return 1;
 		}
         
         virtual void* GetData()
@@ -271,6 +371,29 @@ namespace Disorder
 		double Shininess;
 		double Reflectivity;
  
+
+		//material parameters
+		//transform
+		MaterialParamMatrixPtr WorldViewProjMatrix;
+		MaterialParamMatrixPtr WorldMatrix;
+		MaterialParamMatrixPtr ViewMatrix;
+		MaterialParamMatrixPtr ProjMatrix;
+		MaterialParamMatrixPtr WorldNormal;
+
+		// light array
+		MaterialParamIntPtr LightNumber;
+		MaterialParamFloatPtr LightIntensityArray;
+		MaterialParamVector3Ptr LightDirArray;
+		MaterialParamVector3Ptr LightColorArray;
+
+
+		// for each light
+		MaterialParamIntPtr    LightType;
+	    MaterialParamFloatPtr  LightIntensity;
+	    MaterialParamVector3Ptr LightPos;
+	    MaterialParamVector3Ptr LightDir;
+	    MaterialParamVector3Ptr LightColor;
+
 		//effect
 		RenderEffectPtr Effect[MVT_NUM_VIEW_TYPES];
 

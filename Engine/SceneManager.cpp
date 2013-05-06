@@ -50,8 +50,13 @@ namespace Disorder
 		BOOST_ASSERT(light->Name != "");
 
 		if( _mLightObjects.find(light->Name) == _mLightObjects.end() )
+		{
 			_mLightObjects.insert(std::pair<std::string,LightPtr>(light->Name,light));
-
+			if( light->Type == LT_Parallel )
+				_mDirectLights.push_back(light);
+			else
+				_mNonDirectLights.push_back(light);
+		}
 	}
 
 	void SceneManager::AddRenderer(RendererPtr const& renderer)
@@ -81,13 +86,27 @@ namespace Disorder
 		RendererMap::const_iterator iter = _mRenderObjects.begin();
 		while (iter != _mRenderObjects.end())
 		{
-			LightMap::const_iterator lightIter = _mLightObjects.begin();
-			while( lightIter != _mLightObjects.end() )
+			for( int i = 0;i<MVT_NUM_VIEW_TYPES;i++)
 			{
-				iter->second->SetLightParam(lightIter->second);
-				iter->second->Draw(MVT_Perspective,mainCamera);
-				lightIter++;
+				if( i == MVT_Perspective )
+				{
+					iter->second->SetDirectLightParam(_mDirectLights);
+				}
+
+				if( i != MVT_Lights )
+				{
+					iter->second->Draw((MaterialViewType)i,mainCamera);
+				}
+				else
+				{
+					for(int lightIndex=0;lightIndex<_mNonDirectLights.size();lightIndex++)
+					{
+						iter->second->SetLightParam(_mNonDirectLights[lightIndex]);
+						iter->second->Draw((MaterialViewType)i,mainCamera);
+					}
+				}
 			}
+			
 			iter++;
 		}
 

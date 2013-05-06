@@ -27,6 +27,9 @@ namespace Disorder
 	private:
 		RendererMap _mRenderObjects;
         LightMap    _mLightObjects;
+		std::vector<LightPtr> _mDirectLights;
+		std::vector<LightPtr> _mNonDirectLights;
+
 		CameraMap   _mCameraObjects;
 
 		SceneImporterPtr _sceneImporter;

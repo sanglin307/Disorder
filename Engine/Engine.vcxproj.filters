@@ -32,7 +32,10 @@
     <None Include="..\Resource\FX\DiffuseTex.fx">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\Resource\FX\Default.fx">
+    <None Include="..\Resource\FX\BaseLightPass.fx">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\Resource\FX\LightPass.fx">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

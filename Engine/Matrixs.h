@@ -641,6 +641,17 @@ namespace Disorder
 			return false;
 		}
 
+		inline Matrix4 GetNormalMatrix()
+		{
+			if(Math::FloatEqual(m[0][0], m[1][1], (float)1e-04) && Math::FloatEqual(m[0][0], m[2][2], (float)1e-04) )
+			{
+				return inverse().transpose();
+			}
+
+			return *this;
+		}
+
+
         /** Gets a scale matrix.
         */
         inline static Matrix4 getScale( const Vector3& v )

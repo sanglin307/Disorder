@@ -66,7 +66,7 @@ float4 PS( VS_OUTPUT input ) : SV_Target
 	float4 diffuseColor = (float4)0;
 	if( LightType == 0 ) // parallel 
 	{
-		diffuseColor.xyz = saturate( dot(normalize(LightDir),normalize(input.NormWorld).xyz) * LightColor * LightIntensity);
+		diffuseColor.xyz = saturate( dot(LightDir,normalize(input.NormWorld).xyz) * LightColor * LightIntensity);
 	}
 	else if( LightType == 1) // point 
 	{
@@ -74,5 +74,5 @@ float4 PS( VS_OUTPUT input ) : SV_Target
 		diffuseColor.xyz = saturate( dot(lightDir,normalize(input.NormWorld).xyz) * LightColor * LightIntensity);
 	}
 
-    return AmbientColor*DiffuseColor + diffuseColor * DiffuseColor;
+    return diffuseColor * DiffuseColor;
 }

@@ -15,4 +15,15 @@ namespace Disorder
 		SpotAngle = 30;
 		Range = 10.0f;
 	}
+
+	Vector3 Light::GetDirect()
+	{
+		if( Type == LT_Parallel )
+		{
+			GameObjectPtr go = GetBase();
+			return go->GetRotation() * Light::DirectLight;
+		}
+		else
+			return Vector3::ZERO;
+	}
 }

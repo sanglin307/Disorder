@@ -23,17 +23,38 @@ namespace Disorder
 		mat->Shininess = 1.0;
 
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
-		RenderEffectPtr effect =  resourceManager->CreateRenderEffect("Default.fx",SM_4_0,"VS","PS");
+		RenderEffectPtr baseEffect =  resourceManager->CreateRenderEffect("BaseLightPass.fx",SM_4_0,"VS","PS");
 	 
-		MaterialParamVector4Ptr ambient = effect->GetVector4Parameter("AmbientColor");
+		mat->WorldViewProjMatrix = baseEffect->GetMatrixParameter("WorldViewProjMatrix");
+		mat->WorldMatrix = baseEffect->GetMatrixParameter("World");
+		mat->ViewMatrix = baseEffect->GetMatrixParameter("View");
+		mat->ProjMatrix = baseEffect->GetMatrixParameter("Projection");
+		mat->WorldNormal = baseEffect->GetMatrixParameter("WorldNormal");
+
+        MaterialParamVector4Ptr ambient = baseEffect->GetVector4Parameter("AmbientColor");
 		ambient->SetValue(Vector4(ambientColor));
 
-		MaterialParamVector4Ptr diffuse = effect->GetVector4Parameter("DiffuseColor");
+		MaterialParamVector4Ptr diffuse = baseEffect->GetVector4Parameter("DiffuseColor");
 		diffuse->SetValue(Vector4(diffuseColor));
  
-		effect->PrepareRenderParam();
+		mat->LightNumber = baseEffect->GetIntParameter("LightNumber");
+		mat->LightIntensityArray = baseEffect->GetFloatParameter("LightIntensityArray");
+		mat->LightDirArray = baseEffect->GetVector3Parameter("LightDirArray");
+		mat->LightColorArray = baseEffect->GetVector3Parameter("LightColorArray");
 
-		mat->Effect[MVT_Perspective] = effect;
+		baseEffect->PrepareRenderParam();
+		mat->Effect[MVT_Perspective] = baseEffect;
+
+
+		RenderEffectPtr lightEffect =  resourceManager->CreateRenderEffect("LightPass.fx",SM_4_0,"VS","PS");
+	 
+		mat->LightType = lightEffect->GetIntParameter("LightType");
+		mat->LightIntensity = lightEffect->GetFloatParameter("LightIntensity");
+		mat->LightPos =  lightEffect->GetVector3Parameter("LightPos");
+	    mat->LightDir =  lightEffect->GetVector3Parameter("LightDir");
+	    mat->LightColor = lightEffect->GetVector3Parameter("LightColor");
+		lightEffect->PrepareRenderParam();
+		mat->Effect[MVT_Lights] = lightEffect;
 
 		return mat;
 

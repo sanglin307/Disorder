@@ -314,28 +314,31 @@ namespace Disorder
 					if( type_desc.Class == D3D_SVC_SCALAR && type_desc.Type == D3D_SVT_INT)
 					{
 						pParam = GetIntParameter(varname);
+						pParam->MaxElementNumber = type_desc.Elements==0?1:type_desc.Elements;
 					}
 					else if(type_desc.Class == D3D_SVC_SCALAR && type_desc.Type == D3D_SVT_FLOAT)
 					{
 						pParam = GetFloatParameter(varname);
+						pParam->MaxElementNumber = type_desc.Elements==0?1:type_desc.Elements;
 					}
 					else if ( type_desc.Class == D3D_SVC_VECTOR )
 					{		
-						if( var_desc.Size == 12)
+						if( type_desc.Columns == 3)
 						    pParam = GetVector3Parameter(varname);
-						else if( var_desc.Size == 16)
+						else if( type_desc.Columns == 4)
 							pParam = GetVector4Parameter(varname);
 						else
 						{
 							BOOST_ASSERT(0);
 						}
+
+						pParam->MaxElementNumber = type_desc.Elements==0?1:type_desc.Elements;
 					}
 					else if ( ( type_desc.Class == D3D_SVC_MATRIX_ROWS ) ||
 								( type_desc.Class == D3D_SVC_MATRIX_COLUMNS ) )
 					{
-						// Check if it is an array of matrices first...
-						unsigned int count = type_desc.Elements;
-						if ( count == 0 ) 
+						 
+						if ( type_desc.Columns == 4 && type_desc.Rows == 4  ) 
 						{
 							pParam = GetMatrixParameter(varname);
 						}
@@ -343,6 +346,8 @@ namespace Disorder
 						{
 							BOOST_ASSERT(0);
 						}
+
+						pParam->MaxElementNumber = type_desc.Elements==0?1:type_desc.Elements;
 					}
 
 					constantBuffer.Parameters.push_back( pParam );
