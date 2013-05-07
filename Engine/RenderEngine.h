@@ -32,6 +32,7 @@ namespace Disorder
 
 
 		RenderResourceManagerPtr ResourceManager;
+		MaterialParameterManagerPtr ParameterManager;
 	};
  
 }

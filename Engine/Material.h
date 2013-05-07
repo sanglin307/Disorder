@@ -354,8 +354,30 @@ namespace Disorder
 		RenderViewPtr _renderView;
 	};
 
+	class MaterialParameterManager
+	{
+		typedef boost::unordered_map<std::string,MaterialParamPtr> MaterialParamMap;
+
+	public:
+		// Material Param
+	    MaterialParamCBufferPtr GetConstantBufferParameter(std::string const& name);
+		MaterialParamMatrixPtr GetMatrixParameter(std::string const& name);
+		MaterialParamShaderResPtr GetShaderResourceParameter(std::string const& name);
+		MaterialParamSamplerStatePtr GetSamplerStateParameter(std::string const& name);
+		MaterialParamUnorderedPtr GetUnorderedAccessParameter(std::string const& name);
+		MaterialParamVector3Ptr GetVector3Parameter(std::string const& name);
+		MaterialParamVector4Ptr GetVector4Parameter(std::string const& name);
+		MaterialParamIntPtr GetIntParameter(std::string const& name);
+		MaterialParamFloatPtr GetFloatParameter(std::string const& name);
+
+	private:
+		MaterialParamMap _materialParamMap;
+
+	};
+
 	class Material
 	{
+ 
 	public:
 		Material();
 
@@ -382,22 +404,21 @@ namespace Disorder
 
 		// light array
 		MaterialParamIntPtr LightNumber;
-		MaterialParamFloatPtr LightIntensityArray;
+		MaterialParamVector4Ptr LightIntensityPack;
 		MaterialParamVector3Ptr LightDirArray;
 		MaterialParamVector3Ptr LightColorArray;
-
-
+ 
 		// for each light
 		MaterialParamIntPtr    LightType;
 	    MaterialParamFloatPtr  LightIntensity;
 	    MaterialParamVector3Ptr LightPos;
-	    MaterialParamVector3Ptr LightDir;
 	    MaterialParamVector3Ptr LightColor;
 
 		//effect
 		RenderEffectPtr Effect[MVT_NUM_VIEW_TYPES];
-
+ 
 		std::string Name;
+ 
 	};
 
 	class MaterialGenerator

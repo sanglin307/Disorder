@@ -16,6 +16,7 @@ namespace Disorder
 		_featureLevel = D3D_FEATURE_LEVEL_11_0;
 
 		ResourceManager = boost::make_shared<DX11RenderResourceManager>();
+		ParameterManager = boost::make_shared<MaterialParameterManager>();
  
 	 }
  

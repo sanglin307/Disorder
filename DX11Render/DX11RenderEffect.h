@@ -161,25 +161,6 @@ namespace Disorder
 		virtual void PrepareRenderParam();
 		virtual void UpdateRenderParam();
 
-		/*virtual void BindConstBuffer(RenderBufferPtr const& constBuffer)
-		{
-			ShaderObject::BindConstBuffer(constBuffer);
-			ConstBufferArray.push_back((ID3D11Buffer*)(constBuffer->GetLowInterface()));
-		}
-
-		virtual void BindShaderResource(RenderViewPtr const& shaderView)
-		{
-			ShaderObject::BindShaderResource(shaderView);
-			ShaderResourceViewArray.push_back((ID3D11ShaderResourceView*)(shaderView->GetLowInterface()));
-		}
-
-		virtual void BindSamplerState(SamplerStatePtr const& samplerState)
-		{
-			ShaderObject::BindSamplerState(samplerState);
-			SamplerStateArray.push_back((ID3D11SamplerState*)(samplerState->GetLowInterface()));
-		}*/
-
-		//virtual void Load(std::string const& entryPoint);
 		virtual void* GetLowInterface();
 		virtual void* GetDataInterface();
 		
@@ -230,16 +211,7 @@ namespace Disorder
 		virtual void ShaderReflection(ShaderObjectPtr const& shader);
 		virtual void UpdateRenderParam();
 		virtual void PrepareRenderParam();
-		// Material Param
-		virtual MaterialParamCBufferPtr GetConstantBufferParameter(std::string const& name);
-		virtual MaterialParamMatrixPtr GetMatrixParameter(std::string const& name);
-		virtual MaterialParamShaderResPtr GetShaderResourceParameter(std::string const& name);
-		virtual MaterialParamSamplerStatePtr GetSamplerStateParameter(std::string const& name);
-		virtual MaterialParamUnorderedPtr GetUnorderedAccessParameter(std::string const& name);
-		virtual MaterialParamVector3Ptr GetVector3Parameter(std::string const& name);
-		virtual MaterialParamVector4Ptr GetVector4Parameter(std::string const& name);
-		virtual MaterialParamIntPtr GetIntParameter(std::string const& name);
-		virtual MaterialParamFloatPtr GetFloatParameter(std::string const& name);
+	
 
 	};
 }

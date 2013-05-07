@@ -94,6 +94,8 @@ namespace Disorder
 	typedef boost::shared_ptr<MaterialParamSamplerState> MaterialParamSamplerStatePtr;
 	class MaterialParamUnordered;
 	typedef boost::shared_ptr<MaterialParamUnordered> MaterialParamUnorderedPtr;
+	class MaterialParameterManager;
+	typedef boost::shared_ptr<MaterialParameterManager> MaterialParameterManagerPtr;
 	class Material;
 	typedef boost::shared_ptr<Material> MaterialPtr;
 	class Texture;

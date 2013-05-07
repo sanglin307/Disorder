@@ -2,7 +2,7 @@
 
 namespace Disorder
 {
-	Vector3 Light::DirectLight = Vector3::NEGATIVE_UNIT_Z;
+	Vector3 Light::DefaultLightDirection(0,0,-1);
 
 	Light::Light()
 	{
@@ -21,7 +21,7 @@ namespace Disorder
 		if( Type == LT_Parallel )
 		{
 			GameObjectPtr go = GetBase();
-			return go->GetRotation() * Light::DirectLight;
+			return go->GetRotation() * Light::DefaultLightDirection;
 		}
 		else
 			return Vector3::ZERO;

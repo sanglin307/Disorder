@@ -8,7 +8,7 @@ namespace Disorder
 	{
 	public:
  
-		GameObject(std::string const& name, Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::ZERO,Vector3 const& scale = Vector3::UNIT_SCALE);
+		GameObject(std::string const& name, Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::IDENTITY,Vector3 const& scale = Vector3::UNIT_SCALE);
 		~GameObject();
 
 		
@@ -43,7 +43,11 @@ namespace Disorder
 			return NULL;
 		}
 
-		void LocalTransform(Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::ZERO,Vector3 const& scale = Vector3::UNIT_SCALE);
+		void LocalRotation(float pitch,float yaw,float roll);
+		void LocalPosition(Vector3 const& position);
+		void LocalScale(Vector3 const& scale);
+
+		void LocalTransform(Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::IDENTITY,Vector3 const& scale = Vector3::UNIT_SCALE);
 
 		const Matrix4& GetWorldMatrix() const
 		{

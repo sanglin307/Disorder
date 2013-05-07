@@ -42,24 +42,25 @@ namespace Disorder
 	void GeometryRenderer::SetDirectLightParam(std::vector<LightPtr> const& lightArray)
 	{
 		int lightNumber = lightArray.size();
-		if( _material->Effect[MVT_Lights] == 0 )
+	
+		if(lightNumber == 0)
 			return;
 
 		if( lightNumber > _material->LightColorArray->MaxElementNumber )
 			lightNumber = _material->LightColorArray->MaxElementNumber;
 
 		_material->LightNumber->SetValue(lightNumber);
-		std::vector<float> intensityVec;
+		Vector4 intensityVec(0.0f);
 		std::vector<Vector3> dirVec;
 		std::vector<Vector3> colorVec;
 		for(int i=0;i<lightArray.size();i++)
 		{
-			intensityVec.push_back(lightArray[i]->Intensity);
+			intensityVec[i] = lightArray[i]->Intensity;
 			dirVec.push_back(lightArray[i]->GetDirect());
 			colorVec.push_back(lightArray[i]->Color);
 		}
 
-		_material->LightIntensityArray->SetValueArray(intensityVec);
+		_material->LightIntensityPack->SetValue(intensityVec);
 		_material->LightDirArray->SetValueArray(dirVec);
 		_material->LightColorArray->SetValueArray(colorVec);
 
@@ -68,14 +69,15 @@ namespace Disorder
 
 	void GeometryRenderer::SetLightParam(LightPtr const& light)
 	{
+		if( _material->Effect[MVT_Lights] == 0 )
+			return;
+
+		BOOST_ASSERT(light->Type != LT_Parallel);
+
 		_material->LightType->SetValue((int)(light->Type));
 		_material->LightIntensity->SetValue((float)(light->Intensity));
 		GameObjectPtr go = light->GetBase();
-		if(light->Type == LT_Parallel)
-		{
-			_material->LightDir->SetValue(light->GetDirect());
-		}
-		else if( light->Type == LT_Point )
+		if( light->Type == LT_Point )
 		{
 			_material->LightPos->SetValue(go->GetPosition());
 		}

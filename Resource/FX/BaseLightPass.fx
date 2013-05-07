@@ -16,7 +16,7 @@ cbuffer GobalSetting
 cbuffer LightSetting
 {
 	int    LightNumber;
-	float  LightIntensityArray[4];
+	float4 LightIntensityPack;
 	float3 LightDirArray[4];
 	float3 LightColorArray[4];	
 }
@@ -66,7 +66,7 @@ float4 PS( VS_OUTPUT input ) : SV_Target
 	// max 4 direct lights add
 	for( int i=0;i<LightNumber;i++)
 	{
-		diffuseColor.xyz += saturate( dot(LightDirArray[i],normal) * LightColorArray[i] * LightIntensityArray[i]);
+		diffuseColor.xyz += saturate( dot(LightDirArray[i],normal) * LightColorArray[i] * LightIntensityPack[i]);
 	}
 	
 	diffuseColor.a = 1.0f;

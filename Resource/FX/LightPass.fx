@@ -19,7 +19,6 @@ cbuffer LightSetting
 	int    LightType;
 	float  LightIntensity;
 	float3 LightPos;
-	float3 LightDir;
 	float3 LightColor;
 	
 }
@@ -64,11 +63,7 @@ VS_OUTPUT VS( VS_INPUT input )
 float4 PS( VS_OUTPUT input ) : SV_Target
 {
 	float4 diffuseColor = (float4)0;
-	if( LightType == 0 ) // parallel 
-	{
-		diffuseColor.xyz = saturate( dot(LightDir,normalize(input.NormWorld).xyz) * LightColor * LightIntensity);
-	}
-	else if( LightType == 1) // point 
+	if( LightType == 1) // point 
 	{
 		float3 lightDir = LightPos - normalize(input.PosWorld).xyz;
 		diffuseColor.xyz = saturate( dot(lightDir,normalize(input.NormWorld).xyz) * LightColor * LightIntensity);

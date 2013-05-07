@@ -14,6 +14,24 @@ namespace Disorder
 		_worldMatrix = _localMatrix;
 	}
 
+	void GameObject::LocalRotation(float pitch,float yaw,float roll)
+	{
+		Matrix3 matrix;
+		matrix.FromEulerAnglesXYZ(pitch,yaw,roll);
+		_rotation.FromRotationMatrix(matrix);
+		LocalTransform(_position,_rotation,_scale);
+	}
+
+	void GameObject::LocalPosition(Vector3 const& position)
+	{
+		LocalTransform(position,_rotation,_scale);
+	}
+
+	void GameObject::LocalScale(Vector3 const& scale)
+	{
+		LocalTransform(_position,_rotation,scale);
+	}
+
 	void GameObject::LocalTransform(Vector3 const& pos,Quaternion const& rot,Vector3 const& scale)
 	{
 		_position = pos;
@@ -26,7 +44,6 @@ namespace Disorder
 		{
 			_worldMatrix = parent->GetWorldMatrix() * _localMatrix;
 		}
-		 
 	}
 
 	void GameObject::AddComponent(ComponentPtr const& component)

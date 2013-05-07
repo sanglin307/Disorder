@@ -19,6 +19,7 @@ namespace Disorder
 	protected:
 		RenderEffectPtr _renderEffect;
 		RenderLayoutPtr _renderLayout;
+
  
 	};
 
@@ -28,7 +29,7 @@ namespace Disorder
 	{
 	private:
 		  GeometryPtr _geometryObject;
-		  MaterialPtr _material;
+	      MaterialPtr _material;
 
 	private:
 		  void BuildRenderResource();

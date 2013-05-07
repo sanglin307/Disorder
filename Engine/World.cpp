@@ -11,6 +11,7 @@ namespace Disorder
 		 LevelPtr level = GEngine->SceneImporter->Import(std::string("TorusMesh.fbx"));
 		 LightPtr light = boost::make_shared<Light>();
 		 GameObjectPtr go = boost::make_shared<GameObject>("test",Vector3(4.0f,0,0));
+		 go->LocalRotation(30,30,0);
 		 light->Color = Vector3(1.0f,1.0f,1.0f);
 		 light->Name = "light";
 		 light->Type = LT_Parallel;
@@ -21,13 +22,23 @@ namespace Disorder
 
 		 LightPtr light2 = boost::make_shared<Light>();
 		 GameObjectPtr go2 = boost::make_shared<GameObject>("test2",Vector3(-4.0f,0,0));
-		 light2->Color = Vector3(0.0f,1.0f,1.0f);
+		 light2->Color = Vector3(1.0f,0.0f,0.0f);
 		 light2->Name = "light2";
 		 light2->Type = LT_Parallel;
 		 light2->Intensity = 0.5f;
 		 light2->Range = 100;
 		 go2->AddComponent(light2);
 		 level->AddGameObject(go2);
+
+		 LightPtr light3 = boost::make_shared<Light>();
+		 GameObjectPtr go3 = boost::make_shared<GameObject>("test3",Vector3(0.0f,4.0f,0));
+		 light3->Color = Vector3(0.0f,1.0f,0.0f);
+		 light3->Name = "light3";
+		 light3->Type = LT_Point;
+		 light3->Intensity = 0.7f;
+		 light3->Range = 100;
+		 go3->AddComponent(light3);
+		 level->AddGameObject(go3);
 		// LevelPtr level = boost::make_shared<Level>();
 		// Vector3 position = Vector3(0.0f);
 		/* GameObjectPtr gameObject = boost::make_shared<GameObject>("",position);

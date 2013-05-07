@@ -23,7 +23,7 @@ namespace Disorder
 
 		Vector3 GetDirect();
 
-		static Vector3 DirectLight;
+		static Vector3 DefaultLightDirection;
 	};
 }
 

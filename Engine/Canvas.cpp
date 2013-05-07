@@ -9,10 +9,10 @@ namespace Disorder
 		ShaderObjectPtr pixelShader = _renderEffect->GetPixelShader();
 		RenderViewPtr renderView = GEngine->RenderEngine->ResourceManager->CreateTexture2DView(texture);
  
-		MaterialParamShaderResPtr shaderres = _renderEffect->GetShaderResourceParameter("DiffuseTexture");
+		MaterialParamShaderResPtr shaderres = GEngine->RenderEngine->ParameterManager->GetShaderResourceParameter("DiffuseTexture");
 		shaderres->SetValue(renderView);
 	  
-		MaterialParamSamplerStatePtr msampler = _renderEffect->GetSamplerStateParameter("LinearSampler");
+		MaterialParamSamplerStatePtr msampler = GEngine->RenderEngine->ParameterManager->GetSamplerStateParameter("LinearSampler");
 		msampler->SetValue(texture->Sampler);
 
 		_renderEffect->PrepareRenderParam();

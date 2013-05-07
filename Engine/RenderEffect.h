@@ -37,7 +37,6 @@ namespace Disorder
 	class RenderEffect
 	{
 
-	typedef boost::unordered_map<std::string,MaterialParamPtr> MaterialParamMap;
 	public: 
 		RenderEffect(ShaderModel shaderModel)
 		{
@@ -83,22 +82,9 @@ namespace Disorder
 		virtual void UpdateRenderParam() = 0;
 
         virtual void ShaderReflection(ShaderObjectPtr const& shader) = 0;
-		
-		// Material Param
-		virtual MaterialParamCBufferPtr GetConstantBufferParameter(std::string const& name) = 0;
-		virtual MaterialParamVector3Ptr GetVector3Parameter(std::string const& name) = 0;
-		virtual MaterialParamVector4Ptr GetVector4Parameter(std::string const& name) = 0;
-		virtual MaterialParamIntPtr GetIntParameter(std::string const& name) = 0;
-		virtual MaterialParamFloatPtr GetFloatParameter(std::string const& name) = 0;
-		virtual MaterialParamMatrixPtr GetMatrixParameter(std::string const& name) = 0;
-		virtual MaterialParamShaderResPtr GetShaderResourceParameter(std::string const& name) =0;
-		virtual MaterialParamSamplerStatePtr GetSamplerStateParameter(std::string const& name) = 0;
-		virtual MaterialParamUnorderedPtr GetUnorderedAccessParameter(std::string const& name) = 0;
- 
 
 	protected:
-		ShaderModel _shaderModel;
-		MaterialParamMap _materialParamMap;
+		ShaderModel _shaderModel;	
 		// shader slot!
 		ShaderObjectPtr _vertexShader;
 		ShaderObjectPtr _pixelShader;
