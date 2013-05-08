@@ -105,6 +105,50 @@ namespace Disorder
 	}
 	//==================================================================
 
+	void* DX11DepthStencilState::GetLowInterface()
+	{
+		return D3DInterface.get();
+	}
+
+	bool DX11DepthStencilState::Create(DepthStencilDesc *pDepthStencilDesc)
+	{
+		D3D11_DEPTH_STENCIL_DESC desc;
+		ZeroMemory(&desc,sizeof(desc));
+
+		desc.DepthEnable = pDepthStencilDesc->DepthEnable;
+		if(pDepthStencilDesc->DepthWrite)
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		else
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+		desc.DepthFunc = GetD3DComparisonFunc(pDepthStencilDesc->DepthFunc);
+
+		desc.StencilEnable = pDepthStencilDesc->StencilEnable;
+		desc.StencilReadMask = pDepthStencilDesc->StencilReadMask;
+		desc.StencilWriteMask = pDepthStencilDesc->StencilWriteMask;
+
+		desc.FrontFace.StencilDepthFailOp = GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilDepthFailOp);
+		desc.FrontFace.StencilFailOp = GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilFailOp);
+		desc.FrontFace.StencilPassOp = GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilPassOp);
+		desc.FrontFace.StencilFunc = GetD3DComparisonFunc(pDepthStencilDesc->FrontFaceStencilFunc);
+
+		desc.BackFace.StencilDepthFailOp = GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilDepthFailOp);
+		desc.BackFace.StencilFailOp = GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilFailOp);
+		desc.BackFace.StencilPassOp = GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilPassOp);
+		desc.BackFace.StencilFunc = GetD3DComparisonFunc(pDepthStencilDesc->BackFaceStencilFunc);
+
+		ID3D11DepthStencilState *pState;
+		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
+		HRESULT hr = renderEngine->D3DDevice()->CreateDepthStencilState(&desc,&pState);
+		BOOST_ASSERT(hr==S_OK);
+
+		D3DInterface = MakeComPtr<ID3D11DepthStencilState>(pState);
+
+		return true;
+
+	}
+
+
+	// ===================================================================
 	bool DX11BlendState::Create(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable,bool IndependentBlendEnable)
 	{
 		BOOST_ASSERT(BlendArraySize <= 8 );

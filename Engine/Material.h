@@ -360,15 +360,11 @@ namespace Disorder
 
 	public:
 		// Material Param
-	    MaterialParamCBufferPtr GetConstantBufferParameter(std::string const& name);
-		MaterialParamMatrixPtr GetMatrixParameter(std::string const& name);
-		MaterialParamShaderResPtr GetShaderResourceParameter(std::string const& name);
-		MaterialParamSamplerStatePtr GetSamplerStateParameter(std::string const& name);
-		MaterialParamUnorderedPtr GetUnorderedAccessParameter(std::string const& name);
 		MaterialParamVector3Ptr GetVector3Parameter(std::string const& name);
 		MaterialParamVector4Ptr GetVector4Parameter(std::string const& name);
 		MaterialParamIntPtr GetIntParameter(std::string const& name);
 		MaterialParamFloatPtr GetFloatParameter(std::string const& name);
+		MaterialParamMatrixPtr GetMatrixParameter(std::string const& name);
 
 	private:
 		MaterialParamMap _materialParamMap;

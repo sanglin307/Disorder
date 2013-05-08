@@ -158,6 +158,7 @@
     <ClCompile Include="Matrixs.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Quaternion.cpp" />
+    <ClCompile Include="RenderEffect.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderLayout.cpp" />
     <ClCompile Include="RenderResource.cpp" />

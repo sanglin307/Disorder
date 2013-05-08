@@ -273,5 +273,8 @@
     <ClCompile Include="Light.cpp">
       <Filter>GameEngine</Filter>
     </ClCompile>
+    <ClCompile Include="RenderEffect.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

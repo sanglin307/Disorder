@@ -67,6 +67,8 @@ namespace Disorder
 	typedef boost::shared_ptr<ID3D11Texture2D> ID3D11Texture2DPtr;
 	typedef boost::shared_ptr<ID3D11RasterizerState> ID3D11RasterizerStatePtr;
 	typedef boost::shared_ptr<ID3D11BlendState> ID3D11BlendStatePtr;
+	typedef boost::shared_ptr<ID3D11DepthStencilState> ID3D11DepthStencilStatePtr;
+
 
 
 }

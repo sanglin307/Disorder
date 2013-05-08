@@ -37,6 +37,8 @@ namespace Disorder
 	class RenderEffect
 	{
 
+		typedef boost::unordered_map<std::string,MaterialParamPtr> MaterialParamMap;
+
 	public: 
 		RenderEffect(ShaderModel shaderModel)
 		{
@@ -45,6 +47,11 @@ namespace Disorder
 			_blendState = RenderResourceManager::DefaultBlentState;
 
 		}
+
+	    MaterialParamCBufferPtr GetConstantBufferParameter(std::string const& name);
+		MaterialParamShaderResPtr GetShaderResourceParameter(std::string const& name);
+		MaterialParamSamplerStatePtr GetSamplerStateParameter(std::string const& name);
+		MaterialParamUnorderedPtr GetUnorderedAccessParameter(std::string const& name);
 
 		virtual ShaderObjectPtr LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType) = 0;
 	 
@@ -90,6 +97,9 @@ namespace Disorder
 		ShaderObjectPtr _pixelShader;
 		RasterizeStatePtr _rasterizeState;
 		BlendStatePtr _blendState;
+
+	private:
+		MaterialParamMap _materialParamMap;
  
 	};
 

@@ -176,6 +176,9 @@ namespace Disorder
 		return S_OK;
 	}
 
+	
+
+
 	ShaderObjectPtr DX11RenderEffect::LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType type)
 	{
 		HRESULT hr = S_OK;
@@ -295,8 +298,8 @@ namespace Disorder
 				constantBuffer.CBType = bufferDesc.Type;
 				constantBuffer.CBuFlags = bufferDesc.uFlags;
 				constantBuffer.CBVariables = bufferDesc.Variables;
-			 
-				constantBuffer.BufferParamRef = parameterManager->GetConstantBufferParameter(constantBuffer.CBName);
+ 
+				constantBuffer.BufferParamRef = GetConstantBufferParameter(constantBuffer.CBName);
 			 
 				// Load the description of each variable for use later on when binding a buffer
 				for ( UINT j = 0; j < bufferDesc.Variables; j++ )
@@ -360,9 +363,11 @@ namespace Disorder
 					constantBuffer.Parameters.push_back( pParam );
 					 
 				}
+				
 				 
 				RenderBufferPtr constBuffer = resourceManager->CreateConstBuffer(bufferDesc.Size,BAH_GPU_Read);
 				constantBuffer.BufferParamRef->SetValue(constBuffer);
+				 
 
 				pReflection->ConstantBuffers.push_back( constantBuffer );
 			}
@@ -377,24 +382,25 @@ namespace Disorder
 			ShaderInputBindDesc binddesc( resource_desc );
 
 			std::string rname = binddesc.Name;
+ 
 			if ( resource_desc.Type == D3D_SIT_CBUFFER || resource_desc.Type == D3D_SIT_TBUFFER )
 			{
-				binddesc.ParamRef = parameterManager->GetConstantBufferParameter(rname);
+				binddesc.ParamRef = GetConstantBufferParameter(rname);
 			}
 			else if ( resource_desc.Type == D3D_SIT_TEXTURE || resource_desc.Type == D3D_SIT_STRUCTURED )
 			{
-				binddesc.ParamRef = parameterManager->GetShaderResourceParameter(rname);
+				binddesc.ParamRef = GetShaderResourceParameter(rname);
 			}
 			else if ( resource_desc.Type == D3D_SIT_SAMPLER )
 			{
-				binddesc.ParamRef = parameterManager->GetSamplerStateParameter(rname);
+				binddesc.ParamRef = GetSamplerStateParameter(rname);
 			}
 			else if ( resource_desc.Type == D3D_SIT_UAV_RWTYPED || resource_desc.Type == D3D_SIT_UAV_RWSTRUCTURED
 				|| resource_desc.Type == D3D_SIT_BYTEADDRESS || resource_desc.Type == D3D_SIT_UAV_RWBYTEADDRESS
 				|| resource_desc.Type == D3D_SIT_UAV_APPEND_STRUCTURED || resource_desc.Type == D3D_SIT_UAV_CONSUME_STRUCTURED
 				|| resource_desc.Type == D3D_SIT_UAV_RWSTRUCTURED_WITH_COUNTER )
 			{
-				binddesc.ParamRef = parameterManager->GetUnorderedAccessParameter(rname);
+				binddesc.ParamRef = GetUnorderedAccessParameter(rname);
 			}
 
 

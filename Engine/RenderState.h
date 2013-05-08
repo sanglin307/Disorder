@@ -74,6 +74,18 @@ namespace Disorder
         BLEND_OP_MAX
 	};
 
+	enum StencilOperation
+	{
+	    STENCIL_OP_KEEP       = 1,
+        STENCIL_OP_ZERO       = 2,
+        STENCIL_OP_REPLACE    = 3,
+        STENCIL_OP_INCR_SAT   = 4,
+        STENCIL_OP_DECR_SAT   = 5,
+        STENCIL_OP_INVERT     = 6,
+        STENCIL_OP_INCR       = 7,
+        STENCIL_OP_DECR       = 8 
+	};
+
 	enum BlendWriteEnable
 	{
 	    COLOR_WRITE_ENABLE_RED     = 1,
@@ -123,6 +135,35 @@ namespace Disorder
 		unsigned char  RenderTargetWriteMask;
     } BlendDesc;
 
+	typedef struct _DepthStencilDesc
+	{
+		_DepthStencilDesc()
+		:DepthEnable(true),DepthWrite(true),DepthFunc(CF_Less),StencilEnable(false),StencilReadMask(0xff),StencilWriteMask(0xff),
+			FrontFaceStencilFailOp(STENCIL_OP_KEEP),FrontFaceStencilDepthFailOp(STENCIL_OP_KEEP),FrontFaceStencilPassOp(STENCIL_OP_KEEP),FrontFaceStencilFunc(CF_Always),
+			BackFaceStencilFailOp(STENCIL_OP_KEEP),BackFaceStencilDepthFailOp(STENCIL_OP_KEEP),BackFaceStencilPassOp(STENCIL_OP_KEEP),BackFaceStencilFunc(CF_Always)
+		{
+		}
+
+		bool               DepthEnable;
+        bool               DepthWrite;  // if write to depth buffer
+        ComparisonFunc     DepthFunc;
+
+        bool               StencilEnable;
+        BYTE               StencilReadMask;
+        BYTE               StencilWriteMask;
+
+		StencilOperation   FrontFaceStencilFailOp;
+        StencilOperation   FrontFaceStencilDepthFailOp;
+        StencilOperation   FrontFaceStencilPassOp;
+        ComparisonFunc     FrontFaceStencilFunc;
+
+		StencilOperation   BackFaceStencilFailOp;
+        StencilOperation   BackFaceStencilDepthFailOp;
+        StencilOperation   BackFaceStencilPassOp;
+        ComparisonFunc     BackFaceStencilFunc;
+
+	} DepthStencilDesc;
+
 	class RenderState
 	{
 	public:
@@ -138,6 +179,8 @@ namespace Disorder
 
 	class DepthStencilState : public RenderState
 	{
+	public:
+		virtual bool Create(DepthStencilDesc *pDepthStencilDesc) = 0;
 	};
 
 	class BlendState : public RenderState

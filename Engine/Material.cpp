@@ -10,17 +10,7 @@ namespace Disorder
 		}
 	}
 
-	MaterialParamCBufferPtr MaterialParameterManager::GetConstantBufferParameter(std::string const& name)
-	{
-		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return boost::dynamic_pointer_cast<MaterialParamCBuffer>(_materialParamMap.at(name));
-
-		MaterialParamCBufferPtr constBuffer = boost::make_shared<MaterialParamCBuffer>();
-		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,constBuffer));
-
-		return constBuffer;
-	}
-
+ 
 	MaterialParamVector3Ptr MaterialParameterManager::GetVector3Parameter(std::string const& name)
 	{
 		if( _materialParamMap.find(name) != _materialParamMap.end() )
@@ -76,42 +66,7 @@ namespace Disorder
 
 		return matrix;
 	}
-
-	MaterialParamShaderResPtr MaterialParameterManager::GetShaderResourceParameter(std::string const& name)
-	{
-		// texture and structed.
-		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return boost::dynamic_pointer_cast<MaterialParamShaderRes>(_materialParamMap.at(name));
-
-		MaterialParamShaderResPtr shaderres = boost::make_shared<MaterialParamShaderRes>();
-		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,shaderres));
-
-		return shaderres;
-	}
-
-	MaterialParamSamplerStatePtr MaterialParameterManager::GetSamplerStateParameter(std::string const& name)
-	{
-		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return boost::dynamic_pointer_cast<MaterialParamSamplerState>(_materialParamMap.at(name));
-
-		MaterialParamSamplerStatePtr ss = boost::make_shared<MaterialParamSamplerState>();
-		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,ss));
-
-		return ss;
-	}
-
-	MaterialParamUnorderedPtr MaterialParameterManager::GetUnorderedAccessParameter(std::string const& name)
-	{
-		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return boost::dynamic_pointer_cast<MaterialParamUnordered>(_materialParamMap.at(name));
-
-		MaterialParamUnorderedPtr ua = boost::make_shared<MaterialParamUnordered>();
-		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,ua));
-
-		return ua;
-	}
-
-
+ 
 	MaterialPtr MaterialGenerator::GenerateLambert(Vector3 const& ambientColor,Vector3 const& diffuseColor)
 	{
 		MaterialPtr mat = boost::make_shared<Material>();

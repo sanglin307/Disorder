@@ -26,6 +26,71 @@ namespace Disorder
 
 	};
 
+	class DX11DepthStencilState : public DepthStencilState
+	{
+	public:
+		virtual bool Create(DepthStencilDesc *pDepthStencilDesc);
+		virtual void* GetLowInterface();
+
+		inline D3D11_COMPARISON_FUNC GetD3DComparisonFunc(ComparisonFunc func)
+		{
+			switch( func )
+			{
+			case CF_Never:
+				return D3D11_COMPARISON_NEVER;
+			case CF_Less:
+				return D3D11_COMPARISON_LESS;
+			case CF_Equal:
+				return D3D11_COMPARISON_EQUAL;
+			case CF_Less_Equal:
+				return D3D11_COMPARISON_LESS_EQUAL;
+			case CF_Greater:
+				return D3D11_COMPARISON_GREATER;
+			case CF_Not_Equal:
+				return D3D11_COMPARISON_NOT_EQUAL;
+			case CF_Greater_Equal:
+				return D3D11_COMPARISON_GREATER_EQUAL;
+			case CF_Always:
+				return D3D11_COMPARISON_ALWAYS;
+			default:
+				BOOST_ASSERT(0);
+			}
+
+			return D3D11_COMPARISON_NEVER;
+		}
+
+		inline D3D11_STENCIL_OP GetD3DStencilOp(StencilOperation op)
+		{
+			switch ( op )
+			{
+			case STENCIL_OP_KEEP:
+				return D3D11_STENCIL_OP_KEEP;
+			case STENCIL_OP_ZERO:
+				return D3D11_STENCIL_OP_ZERO;
+			case STENCIL_OP_REPLACE:
+				return D3D11_STENCIL_OP_REPLACE;
+			case STENCIL_OP_INCR_SAT:
+				return D3D11_STENCIL_OP_INCR_SAT;
+			case STENCIL_OP_DECR_SAT:
+				return D3D11_STENCIL_OP_DECR_SAT;
+			case STENCIL_OP_INVERT:
+				return D3D11_STENCIL_OP_INVERT;
+			case STENCIL_OP_INCR:
+				return D3D11_STENCIL_OP_INCR;
+			case STENCIL_OP_DECR:
+				return D3D11_STENCIL_OP_DECR;
+			default:
+				BOOST_ASSERT(0);
+			}
+
+			return D3D11_STENCIL_OP_KEEP;
+		}
+
+	protected:
+		ID3D11DepthStencilStatePtr D3DInterface;
+	};
+
+
 	class DX11BlendState : public BlendState
 	{
 	public:
