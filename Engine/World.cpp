@@ -22,7 +22,7 @@ namespace Disorder
 
 		 LightPtr light2 = boost::make_shared<Light>();
 		 GameObjectPtr go2 = boost::make_shared<GameObject>("test2",Vector3(-4.0f,0,0));
-		 light2->Color = Vector3(1.0f,0.0f,0.0f);
+		 light2->Color = Vector3(1.0f,1.0f,0.0f);
 		 light2->Name = "light2";
 		 light2->Type = LT_Parallel;
 		 light2->Intensity = 0.5f;
@@ -32,13 +32,24 @@ namespace Disorder
 
 		 LightPtr light3 = boost::make_shared<Light>();
 		 GameObjectPtr go3 = boost::make_shared<GameObject>("test3",Vector3(0.0f,4.0f,0));
-		 light3->Color = Vector3(0.0f,1.0f,0.0f);
+		 light3->Color = Vector3(1.0f,1.0f,0.0f);
 		 light3->Name = "light3";
 		 light3->Type = LT_Point;
-		 light3->Intensity = 0.7f;
+		 light3->Intensity = 0.5f;
 		 light3->Range = 100;
 		 go3->AddComponent(light3);
 		 level->AddGameObject(go3);
+
+		 LightPtr light4 = boost::make_shared<Light>();
+		 GameObjectPtr go4 = boost::make_shared<GameObject>("test4",Vector3(8.0f,2.0f,-1));
+		 light4->Color = Vector3(0.0f,1.0f,1.0f);
+		 light4->Name = "light4";
+		 light4->Type = LT_Point;
+		 light4->Intensity = 0.5f;
+		 light4->Range = 100;
+		 go4->AddComponent(light4);
+		 level->AddGameObject(go4);
+
 		// LevelPtr level = boost::make_shared<Level>();
 		// Vector3 position = Vector3(0.0f);
 		/* GameObjectPtr gameObject = boost::make_shared<GameObject>("",position);

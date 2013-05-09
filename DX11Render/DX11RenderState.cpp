@@ -110,7 +110,7 @@ namespace Disorder
 		return D3DInterface.get();
 	}
 
-	bool DX11DepthStencilState::Create(DepthStencilDesc *pDepthStencilDesc)
+	bool DX11DepthStencilState::Create(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef)
 	{
 		D3D11_DEPTH_STENCIL_DESC desc;
 		ZeroMemory(&desc,sizeof(desc));
@@ -141,6 +141,7 @@ namespace Disorder
 		HRESULT hr = renderEngine->D3DDevice()->CreateDepthStencilState(&desc,&pState);
 		BOOST_ASSERT(hr==S_OK);
 
+		StencilRef = stencilRef;
 		D3DInterface = MakeComPtr<ID3D11DepthStencilState>(pState);
 
 		return true;

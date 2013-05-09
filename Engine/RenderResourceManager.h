@@ -21,11 +21,13 @@ namespace Disorder
 		virtual RenderViewPtr CreateTexture2DView(RenderTexture2DPtr const& textureResource) = 0;
 		virtual RenderViewPtr CreateTexture2DViewFromFile(std::string const& fileName) = 0;
 		virtual RasterizeStatePtr CreateRasterizeState(RasterizeDesc *pDesc) = 0;
+		virtual DepthStencilStatePtr CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef) = 0;
 		virtual BlendStatePtr CreateBlendState(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable = false,bool IndependentBlendEnable = false) = 0;
 
 	public:
 		static RasterizeStatePtr DefaultRasterizeState;
 		static BlendStatePtr DefaultBlentState;
+		static DepthStencilStatePtr DefaultDepthStencilState;
 
 
 	protected:

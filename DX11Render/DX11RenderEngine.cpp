@@ -64,7 +64,12 @@ namespace Disorder
 		{
 			CachedBlendState = blendState;
 		    ID3D11BlendState *pState = (ID3D11BlendState*)(blendState->GetLowInterface());
+
+			D3D11_BLEND_DESC desc;
+			pState->GetDesc(&desc);
+
 		    _pImmediateContext->OMSetBlendState(pState,blendState->BlendFactor,blendState->SampleMask);	 
+		
 		}
 	}
 
@@ -126,6 +131,12 @@ namespace Disorder
  
 	void DX11RenderEngine::SetEffect(RenderEffectPtr const& effect)
 	{
+
+		// render State
+        SetBlendState(effect->GetBlendState());
+		SetRasterizeState(effect->GetRasterizeState());
+		SetDepthStencilState(effect->GetDepthStencilState());
+
 		effect->UpdateRenderParam();
 
 		ShaderObjectPtr vertexShader = effect->GetVertexShader();
@@ -206,6 +217,16 @@ namespace Disorder
 			{
 				_pImmediateContext->PSSetShaderResources(0,0,0);
 			}
+		}
+	}
+
+	void DX11RenderEngine::SetDepthStencilState(DepthStencilStatePtr const& depthStencilState)
+	{
+		if( CachedDepthStencilState != depthStencilState )
+		{
+			CachedDepthStencilState = depthStencilState;
+			ID3D11DepthStencilState* pState = (ID3D11DepthStencilState*)(depthStencilState->GetLowInterface());
+			_pImmediateContext->OMSetDepthStencilState(pState,depthStencilState->StencilRef);
 		}
 	}
 

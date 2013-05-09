@@ -39,8 +39,7 @@ namespace Disorder
 		renderEngine->UnMap(indexRenderBuffer);
 
 		renderEngine->SetRenderLayout(_renderLayout);
-		renderEngine->SetBlendState(_renderEffect->GetBlendState());
-		renderEngine->SetRasterizeState(_renderEffect->GetRasterizeState());
+	
 		renderEngine->SetEffect(_renderEffect);
 		renderEngine->DrawIndexed(_indexs.size(),0,0);
 

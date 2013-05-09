@@ -112,9 +112,7 @@ namespace Disorder
 		
 		}
 
-		renderEngine->SetBlendState(_renderEffect->GetBlendState());
-		renderEngine->SetRasterizeState(_renderEffect->GetRasterizeState());
-	 
+ 
 		renderEngine->SetEffect(_renderEffect);
 		renderEngine->DrawIndexed(_geometryObject->Indices.size(),0,0);
 	}

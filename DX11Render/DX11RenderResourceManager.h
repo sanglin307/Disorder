@@ -16,6 +16,7 @@ namespace Disorder
 		virtual RenderViewPtr CreateTexture2DViewFromFile(std::string const& fileName);
 		virtual SamplerStatePtr CreateSamplerState(SamplerFilter filter,TextureAddressMode addressUVW,UINT maxAnisotropy = 16);
 		virtual RasterizeStatePtr CreateRasterizeState(RasterizeDesc *pDesc);
+		virtual DepthStencilStatePtr CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef);
 		virtual RenderViewPtr CreateTexture2DView(RenderTexture2DPtr const& textureResource);
 		virtual BlendStatePtr CreateBlendState(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable = false,bool IndependentBlendEnable = false);
 

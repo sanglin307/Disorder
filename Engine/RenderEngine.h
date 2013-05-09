@@ -17,8 +17,7 @@ namespace Disorder
 
 		virtual RenderTargetPtr CreateRenderTarget(RenderConfig const& renderConfig,void *hWnd) = 0;
 
-		virtual void SetBlendState(BlendStatePtr const& blendState) = 0;
-		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState)=0;
+		
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout) = 0;
 		
 		virtual void SetEffect(RenderEffectPtr const& effect) = 0;
@@ -29,10 +28,17 @@ namespace Disorder
 
         BlendStatePtr CachedBlendState;
         RasterizeStatePtr CachedRasterizeState;
+		DepthStencilStatePtr CachedDepthStencilState;
 
 
 		RenderResourceManagerPtr ResourceManager;
 		MaterialParameterManagerPtr ParameterManager;
+
+	protected:
+		virtual void SetBlendState(BlendStatePtr const& blendState) = 0;
+		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState)=0;
+		virtual void SetDepthStencilState(DepthStencilStatePtr const& depthStencilState) = 0;
+
 	};
  
 }

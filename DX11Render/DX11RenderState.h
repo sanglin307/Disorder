@@ -29,7 +29,7 @@ namespace Disorder
 	class DX11DepthStencilState : public DepthStencilState
 	{
 	public:
-		virtual bool Create(DepthStencilDesc *pDepthStencilDesc);
+		virtual bool Create(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef);
 		virtual void* GetLowInterface();
 
 		inline D3D11_COMPARISON_FUNC GetD3DComparisonFunc(ComparisonFunc func)

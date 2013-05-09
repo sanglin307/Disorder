@@ -180,7 +180,9 @@ namespace Disorder
 	class DepthStencilState : public RenderState
 	{
 	public:
-		virtual bool Create(DepthStencilDesc *pDepthStencilDesc) = 0;
+		virtual bool Create(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef) = 0;
+		
+		unsigned int StencilRef;
 	};
 
 	class BlendState : public RenderState

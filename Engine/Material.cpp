@@ -107,6 +107,18 @@ namespace Disorder
 
 		RenderEffectPtr lightEffect =  resourceManager->CreateRenderEffect("LightPass.fx",SM_4_0,"VS","PS");
 	 
+		DepthStencilDesc dsDesc;
+		dsDesc.DepthEnable = false;
+		DepthStencilStatePtr noDepthState = resourceManager->CreateDepthStencilState(&dsDesc,0);
+		lightEffect->BindDepthStencilState(noDepthState);
+		BlendDesc bDesc;
+		bDesc.BlendEnable = true;
+		bDesc.BlendOp = BLEND_OP_ADD;
+		bDesc.SrcBlend = BLEND_ONE;
+		bDesc.DestBlend = BLEND_ONE;
+		BlendStatePtr blendState = resourceManager->CreateBlendState(&bDesc,1);
+		lightEffect->BindBlendState(blendState);
+
 		mat->LightType = parameterManager->GetIntParameter("LightType");
 		mat->LightIntensity = parameterManager->GetFloatParameter("LightIntensity");
 		mat->LightPos =  parameterManager->GetVector3Parameter("LightPos");

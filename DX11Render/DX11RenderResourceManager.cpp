@@ -20,6 +20,16 @@ namespace Disorder
 		 
 	}
 
+	DepthStencilStatePtr DX11RenderResourceManager::CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef)
+	{
+		DepthStencilStatePtr state = boost::make_shared<DX11DepthStencilState>();
+		bool result = state->Create(pDepthStencilDesc,stencilRef);
+		if( result )
+			return state;
+		else
+			return NULL;
+	}
+
 	RasterizeStatePtr DX11RenderResourceManager::CreateRasterizeState(RasterizeDesc *pDesc)
 	{
 		RasterizeStatePtr state = boost::make_shared<DX11RasterizeState>();
@@ -28,7 +38,7 @@ namespace Disorder
 		if( result )
 			return state;
 		else
-			return boost::shared_ptr<RasterizeState>();
+			return NULL;
 	}
 
 

@@ -68,6 +68,7 @@ float4 PS( VS_OUTPUT input ) : SV_Target
 		float3 lightDir = LightPos - normalize(input.PosWorld).xyz;
 		diffuseColor.xyz = saturate( dot(lightDir,normalize(input.NormWorld).xyz) * LightColor * LightIntensity);
 	}
+	diffuseColor.a = 1.0f;
 
     return diffuseColor * DiffuseColor;
 }

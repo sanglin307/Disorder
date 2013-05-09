@@ -45,6 +45,7 @@ namespace Disorder
 			_shaderModel = shaderModel;
 			_rasterizeState = RenderResourceManager::DefaultRasterizeState;
 			_blendState = RenderResourceManager::DefaultBlentState;
+			_depthStencilState = RenderResourceManager::DefaultDepthStencilState;
 
 		}
 
@@ -75,6 +76,11 @@ namespace Disorder
 			_blendState = blendState;
 		}
 
+		void BindDepthStencilState(DepthStencilStatePtr const& depthStencilState)
+		{
+			_depthStencilState = depthStencilState;
+		}
+
 		BlendStatePtr const& GetBlendState()
 		{
 			return _blendState;
@@ -83,6 +89,11 @@ namespace Disorder
 		RasterizeStatePtr const& GetRasterizeState()
 		{
 			return _rasterizeState;
+		}
+
+		DepthStencilStatePtr const& GetDepthStencilState()
+		{
+			return _depthStencilState;
 		}
 
 		virtual void PrepareRenderParam() = 0;
@@ -97,6 +108,7 @@ namespace Disorder
 		ShaderObjectPtr _pixelShader;
 		RasterizeStatePtr _rasterizeState;
 		BlendStatePtr _blendState;
+		DepthStencilStatePtr _depthStencilState;
 
 	private:
 		MaterialParamMap _materialParamMap;
