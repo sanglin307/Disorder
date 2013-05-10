@@ -38,6 +38,12 @@
     <None Include="..\Resource\FX\LightPass.fx">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\Resource\FX\BasePassPhong.fx">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\Resource\FX\LightPassPhong.fx">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vectors.h">

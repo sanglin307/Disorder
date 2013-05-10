@@ -66,7 +66,7 @@ float4 PS( VS_OUTPUT input ) : SV_Target
 	if( LightType == 1) // point 
 	{
 		float3 lightDir = LightPos - normalize(input.PosWorld).xyz;
-		diffuseColor.xyz = saturate( max(dot(lightDir,normalize(input.NormWorld).xyz),0) * LightColor * LightIntensity);
+		diffuseColor.xyz = saturate( dot(lightDir,normalize(input.NormWorld).xyz) * LightColor * LightIntensity);
 	}
 	diffuseColor.a = 1.0f;
 

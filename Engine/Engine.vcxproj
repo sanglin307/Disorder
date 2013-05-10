@@ -82,8 +82,10 @@
   <ItemGroup>
     <None Include="..\Resource\FX\2DFX.fx" />
     <None Include="..\Resource\FX\BaseLightPass.fx" />
+    <None Include="..\Resource\FX\BasePassPhong.fx" />
     <None Include="..\Resource\FX\LightPass.fx" />
     <None Include="..\Resource\FX\DiffuseTex.fx" />
+    <None Include="..\Resource\FX\LightPassPhong.fx" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>

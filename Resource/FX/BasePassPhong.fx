@@ -1,5 +1,3 @@
-// simple fx for render simple brush component.
-
 cbuffer Transforms
 {
 	matrix World;
@@ -12,15 +10,18 @@ cbuffer GobalSetting
 {
 	float4 AmbientColor;
 	float4 DiffuseColor;
+	float4 CameraPosition;
+	float4 SpecularColor;
+	float  Shininess;
 }
 
+// support max 4 direct lights now
 cbuffer LightSetting
 {
-	int    LightType;
-	float  LightIntensity;
-	float3 LightPos;
-	float3 LightColor;
-	
+	int    LightNumber;
+	float4 LightIntensityPack;
+	float3 LightDirArray[4];
+	float3 LightColorArray[4];	
 }
 
 struct VS_INPUT
@@ -63,12 +64,22 @@ VS_OUTPUT VS( VS_INPUT input )
 float4 PS( VS_OUTPUT input ) : SV_Target
 {
 	float4 diffuseColor = (float4)0;
-	if( LightType == 1) // point 
-	{
-		float3 lightDir = LightPos - normalize(input.PosWorld).xyz;
-		diffuseColor.xyz = saturate( max(dot(lightDir,normalize(input.NormWorld).xyz),0) * LightColor * LightIntensity);
-	}
-	diffuseColor.a = 1.0f;
+	float4 specularColor = (float4)0;
+	float3 reflectVector = (float3)0;
+	float3 cameraVector = normalize(CameraPosition - input.PosWorld).xyz;
+	float3 normal = normalize(input.NormWorld).xyz;
 
-    return diffuseColor * DiffuseColor;
+	// max 4 direct lights add
+	for( int i=0;i<LightNumber;i++)
+	{
+		diffuseColor.xyz += saturate( dot(LightDirArray[i],normal) * LightColorArray[i] * LightIntensityPack[i]);
+
+		reflectVector = reflect(LightDirArray[i],normal);
+		specularColor.xyz += saturate( pow(max(dot(reflectVector,cameraVector),0),Shininess) * LightColorArray[i] * LightIntensityPack[i]);
+	}
+	
+	diffuseColor.a = 1.0f;
+	specularColor.a = 1.0f;
+
+    return AmbientColor*DiffuseColor + diffuseColor * DiffuseColor + specularColor * SpecularColor;
 }
