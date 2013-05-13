@@ -39,6 +39,20 @@ namespace Disorder
 		BuildRenderResource();
 	}
 
+	 void GeometryRenderer::PreDraw(CameraPtr const& camera)
+	 {
+		 if( _material != NULL )
+		 {
+			GameObjectPtr gameObject = _baseObject.lock();
+			_material->UpdateMaterialParameters(gameObject,camera);
+		 }
+	 }
+	
+	 void GeometryRenderer::PostDraw(CameraPtr const& camera)
+	 {
+
+	 }
+
 	void GeometryRenderer::SetDirectLightParam(std::vector<LightPtr> const& lightArray)
 	{
 		int lightNumber = lightArray.size();
@@ -96,22 +110,6 @@ namespace Disorder
 		GameObjectPtr gameObject = _baseObject.lock();
 		RenderEnginePtr renderEngine = GEngine->RenderEngine;
 		renderEngine->SetRenderLayout(_renderLayout);
-
-		if( view == MVT_Perspective )
-		{
-			Matrix4 worldMat = gameObject->GetWorldMatrix();
-			Matrix4 viewMat = camera->ViewMatrix;
-			Matrix4 projMat = camera->ProjectMatrix;
-			Matrix4 wvpMat = projMat*viewMat*worldMat;
-		
-			_material->WorldMatrix->SetValue(worldMat);
-			_material->WorldNormal->SetValue(worldMat.GetNormalMatrix());
-			_material->ViewMatrix->SetValue(viewMat);
-			_material->ProjMatrix->SetValue(projMat);
-			_material->WorldViewProjMatrix->SetValue(wvpMat);
-		
-		}
-
  
 		renderEngine->SetEffect(_renderEffect);
 		renderEngine->DrawIndexed(_geometryObject->Indices.size(),0,0);

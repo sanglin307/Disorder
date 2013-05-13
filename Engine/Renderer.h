@@ -10,7 +10,10 @@ namespace Disorder
 	public:
 		virtual ~Renderer(){};
 
+		virtual void PreDraw(CameraPtr const& camera){};
 		virtual void Draw(MaterialViewType view,CameraPtr const& camera) = 0;
+		virtual void PostDraw(CameraPtr const& camera){};
+
 
 		virtual void SetDirectLightParam(std::vector<LightPtr> const& lightArray){;}
 		virtual void SetLightParam(LightPtr const& light){;}
@@ -38,7 +41,9 @@ namespace Disorder
           void SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat); 
 		  virtual void SetLightParam(LightPtr const& light);
 		  virtual void SetDirectLightParam(std::vector<LightPtr> const& lightArray);
+		  virtual void PreDraw(CameraPtr const& camera);
 		  virtual void Draw(MaterialViewType view,CameraPtr const& camera);
+		  virtual void PostDraw(CameraPtr const& camera);
 	};
 }
 

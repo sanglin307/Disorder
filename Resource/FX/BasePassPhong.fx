@@ -4,13 +4,13 @@ cbuffer Transforms
 	matrix View;
 	matrix Projection;
 	matrix WorldNormal;  // translate for normal.
+	float3 CameraPosition;
 }
 
 cbuffer GobalSetting
 {
 	float4 AmbientColor;
 	float4 DiffuseColor;
-	float4 CameraPosition;
 	float4 SpecularColor;
 	float  Shininess;
 }

@@ -66,6 +66,90 @@ namespace Disorder
 
 		return matrix;
 	}
+
+	void Material::UpdateMaterialParameters(GameObjectPtr const& gameObject,CameraPtr const& camera)
+	{
+		Matrix4 worldMat = gameObject->GetWorldMatrix();
+		Matrix4 viewMat = camera->ViewMatrix;
+		Matrix4 projMat = camera->ProjectMatrix;
+		Matrix4 wvpMat = projMat*viewMat*worldMat;
+		
+		WorldMatrix->SetValue(worldMat);
+		WorldNormal->SetValue(worldMat.GetNormalMatrix());
+		ViewMatrix->SetValue(viewMat);
+		ProjMatrix->SetValue(projMat);
+		WorldViewProjMatrix->SetValue(wvpMat);
+
+		if(CameraPosition != NULL)
+		{
+			GameObjectPtr goCamera = camera->GetBase();
+			CameraPosition->SetValue(goCamera->GetPosition());
+		}
+
+
+
+	}
+
+	MaterialPtr MaterialGenerator::GeneratePhong(Vector3 const& ambientColor,Vector3 const& diffuseColor,Vector3 const& specularColor,float shininess)
+	{
+		MaterialPtr mat = boost::make_shared<Material>();
+		mat->Type = MT_Phong;
+		mat->AmbientColor = ambientColor;
+		mat->DiffuseColor = diffuseColor;
+		mat->SpecularColor = specularColor;
+		mat->EmissiveColor = Vector3(0.0f);
+		mat->Opacity = 1.0;
+		mat->Reflectivity = 0.0;
+		mat->Shininess = shininess;
+
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
+		MaterialParameterManagerPtr parameterManager = GEngine->RenderEngine->ParameterManager;
+
+		RenderEffectPtr baseEffect =  resourceManager->CreateRenderEffect("BaseLightPass.fx",SM_4_0,"VS","PS");
+	 
+		mat->WorldViewProjMatrix = parameterManager->GetMatrixParameter("WorldViewProjMatrix");
+		mat->WorldMatrix = parameterManager->GetMatrixParameter("World");
+		mat->ViewMatrix = parameterManager->GetMatrixParameter("View");
+		mat->ProjMatrix = parameterManager->GetMatrixParameter("Projection");
+		mat->WorldNormal = parameterManager->GetMatrixParameter("WorldNormal");
+
+		mat->AmbientColorParam = parameterManager->GetVector4Parameter("AmbientColor");
+		mat->DiffuseColorParam = parameterManager->GetVector4Parameter("DiffuseColor");
+		mat->SpecularColorParam = parameterManager->GetVector4Parameter("SpecularColor");
+		mat->ShininessParam = parameterManager->GetFloatParameter("Shininess");
+		mat->CameraPosition = parameterManager->GetVector3Parameter("CameraPosition");
+ 
+		mat->LightNumber = parameterManager->GetIntParameter("LightNumber");
+		mat->LightIntensityPack = parameterManager->GetVector4Parameter("LightIntensityPack");
+		mat->LightDirArray = parameterManager->GetVector3Parameter("LightDirArray");
+		mat->LightColorArray = parameterManager->GetVector3Parameter("LightColorArray");
+
+		baseEffect->PrepareRenderParam();
+		mat->Effect[MVT_Perspective] = baseEffect;
+ 
+		RenderEffectPtr lightEffect =  resourceManager->CreateRenderEffect("LightPass.fx",SM_4_0,"VS","PS");
+	 
+		DepthStencilDesc dsDesc;
+		dsDesc.DepthEnable = false;
+		DepthStencilStatePtr noDepthState = resourceManager->CreateDepthStencilState(&dsDesc,0);
+		lightEffect->BindDepthStencilState(noDepthState);
+		BlendDesc bDesc;
+		bDesc.BlendEnable = true;
+		bDesc.BlendOp = BLEND_OP_ADD;
+		bDesc.SrcBlend = BLEND_ONE;
+		bDesc.DestBlend = BLEND_ONE;
+		BlendStatePtr blendState = resourceManager->CreateBlendState(&bDesc,1);
+		lightEffect->BindBlendState(blendState);
+
+		mat->LightType = parameterManager->GetIntParameter("LightType");
+		mat->LightIntensity = parameterManager->GetFloatParameter("LightIntensity");
+		mat->LightPos =  parameterManager->GetVector3Parameter("LightPos");
+	    mat->LightColor = parameterManager->GetVector3Parameter("LightColor");
+		lightEffect->PrepareRenderParam();
+		mat->Effect[MVT_Lights] = lightEffect;
+
+		return mat;
+	}
  
 	MaterialPtr MaterialGenerator::GenerateLambert(Vector3 const& ambientColor,Vector3 const& diffuseColor)
 	{
@@ -74,7 +158,7 @@ namespace Disorder
 		mat->AmbientColor = ambientColor;
 		mat->DiffuseColor = diffuseColor;
 		mat->SpecularColor = Vector3(1.0f);
-		mat->EmissiveColor = Vector3(1.0f);
+		mat->EmissiveColor = Vector3(0.0f);
 		mat->Opacity = 1.0;
 		mat->Reflectivity = 0.0;
 		mat->Shininess = 1.0;
@@ -90,12 +174,9 @@ namespace Disorder
 		mat->ProjMatrix = parameterManager->GetMatrixParameter("Projection");
 		mat->WorldNormal = parameterManager->GetMatrixParameter("WorldNormal");
 
-        MaterialParamVector4Ptr ambient = parameterManager->GetVector4Parameter("AmbientColor");
-		ambient->SetValue(Vector4(ambientColor));
-
-		MaterialParamVector4Ptr diffuse = parameterManager->GetVector4Parameter("DiffuseColor");
-		diffuse->SetValue(Vector4(diffuseColor));
- 
+		mat->AmbientColorParam = parameterManager->GetVector4Parameter("AmbientColor");
+		mat->DiffuseColorParam = parameterManager->GetVector4Parameter("DiffuseColor");
+	 
 		mat->LightNumber = parameterManager->GetIntParameter("LightNumber");
 		mat->LightIntensityPack = parameterManager->GetVector4Parameter("LightIntensityPack");
 		mat->LightDirArray = parameterManager->GetVector3Parameter("LightDirArray");

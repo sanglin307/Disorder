@@ -385,10 +385,11 @@ namespace Disorder
 		Vector3 DiffuseColor;
 		Vector3 SpecularColor;
 		Vector3 EmissiveColor;
-		double Opacity;
-		double Shininess;
-		double Reflectivity;
+		float Opacity;
+		float Shininess;
+		float Reflectivity;
  
+		void UpdateMaterialParameters(GameObjectPtr const& gameObject,CameraPtr const& camera);
 
 		//material parameters
 		//transform
@@ -397,6 +398,15 @@ namespace Disorder
 		MaterialParamMatrixPtr ViewMatrix;
 		MaterialParamMatrixPtr ProjMatrix;
 		MaterialParamMatrixPtr WorldNormal;
+
+		MaterialParamVector3Ptr CameraPosition;
+		MaterialParamVector4Ptr AmbientColorParam;
+		MaterialParamVector4Ptr DiffuseColorParam;
+		MaterialParamVector4Ptr SpecularColorParam;
+		MaterialParamVector4Ptr EmissiveColorParam;
+		MaterialParamFloatPtr OpacityParam;
+		MaterialParamFloatPtr ShininessParam;
+		MaterialParamFloatPtr RelectivityParam;
 
 		// light array
 		MaterialParamIntPtr LightNumber;
@@ -421,6 +431,8 @@ namespace Disorder
 	{
 	public:
 		static MaterialPtr GenerateLambert(Vector3 const& ambientColor,Vector3 const& diffuseColor);
+		static MaterialPtr GeneratePhong(Vector3 const& ambientColor,Vector3 const& diffuseColor,Vector3 const& specularColor,float shininess);
+
 
 	};
 
