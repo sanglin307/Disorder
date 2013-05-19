@@ -8,6 +8,7 @@ namespace Disorder
 	class Renderer : public Component
 	{
 	public:
+		Renderer();
 		virtual ~Renderer(){};
 
 		virtual void PreDraw(CameraPtr const& camera){};

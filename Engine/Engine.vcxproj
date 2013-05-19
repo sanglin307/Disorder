@@ -126,6 +126,7 @@
     <ClInclude Include="SceneImporter.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="MathLib.h" />
+    <ClInclude Include="SceneObjectGenerator.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="GameTime.h" />
@@ -170,6 +171,7 @@
     <ClCompile Include="SceneImporter.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="GameTime.cpp" />
+    <ClCompile Include="SceneObjectGenerator.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Vectors.cpp" />
     <ClCompile Include="Viewport.cpp" />

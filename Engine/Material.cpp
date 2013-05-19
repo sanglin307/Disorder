@@ -80,14 +80,42 @@ namespace Disorder
 		ProjMatrix->SetValue(projMat);
 		WorldViewProjMatrix->SetValue(wvpMat);
 
+
 		if(CameraPosition != NULL)
 		{
 			GameObjectPtr goCamera = camera->GetBase();
 			CameraPosition->SetValue(goCamera->GetPosition());
 		}
 
-
-
+		//material colors parameters
+		if( AmbientColorParam != NULL )
+		{
+			AmbientColorParam->SetValue(Vector4(AmbientColor));
+		}
+		if( DiffuseColorParam != NULL )
+		{
+			DiffuseColorParam->SetValue(Vector4(DiffuseColor));
+		}
+		if( SpecularColorParam != NULL )
+		{
+			SpecularColorParam->SetValue(Vector4(SpecularColor));
+		}
+		if( EmissiveColorParam != NULL )
+		{
+			EmissiveColorParam->SetValue(Vector4(EmissiveColor));
+		}
+		if( OpacityParam != NULL )
+		{
+			OpacityParam->SetValue(Opacity);
+		}
+		if( ShininessParam != NULL )
+		{
+			ShininessParam->SetValue(Shininess);
+		}
+		if( RelectivityParam != NULL )
+		{
+			RelectivityParam->SetValue(Reflectivity);
+		}
 	}
 
 	MaterialPtr MaterialGenerator::GeneratePhong(Vector3 const& ambientColor,Vector3 const& diffuseColor,Vector3 const& specularColor,float shininess)
@@ -105,7 +133,7 @@ namespace Disorder
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
 		MaterialParameterManagerPtr parameterManager = GEngine->RenderEngine->ParameterManager;
 
-		RenderEffectPtr baseEffect =  resourceManager->CreateRenderEffect("BaseLightPass.fx",SM_4_0,"VS","PS");
+		RenderEffectPtr baseEffect =  resourceManager->CreateRenderEffect("BasePassPhong.fx",SM_4_0,"VS","PS");
 	 
 		mat->WorldViewProjMatrix = parameterManager->GetMatrixParameter("WorldViewProjMatrix");
 		mat->WorldMatrix = parameterManager->GetMatrixParameter("World");

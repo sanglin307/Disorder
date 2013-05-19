@@ -185,6 +185,7 @@ namespace Disorder
 #include "RenderTarget.h"
 #include "RenderLayout.h"
 #include "Geometry.h"
+#include "SceneObjectGenerator.h"
 #include "Renderer.h"
 #include "Canvas.h"
 #include "RenderResourceManager.h"

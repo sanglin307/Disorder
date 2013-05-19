@@ -15,7 +15,7 @@ namespace Disorder
 	{
 	public:
 		Light();
-		LightType Type;
+		LightType LType;
 		Vector3   Color;
 		float     Intensity; 
 		float     SpotAngle;

@@ -6,7 +6,8 @@ namespace Disorder
 
 	Light::Light()
 	{
-		Type = LT_Parallel;
+		Type = CT_Light;
+		LType = LT_Parallel;
 		Color.x = 1.0f;
 		Color.y = 1.0f;
 		Color.z = 1.0f;

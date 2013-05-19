@@ -52,7 +52,7 @@ namespace Disorder
 		if( _mLightObjects.find(light->Name) == _mLightObjects.end() )
 		{
 			_mLightObjects.insert(std::pair<std::string,LightPtr>(light->Name,light));
-			if( light->Type == LT_Parallel )
+			if( light->LType == LT_Parallel )
 				_mDirectLights.push_back(light);
 			else
 				_mNonDirectLights.push_back(light);
@@ -86,6 +86,8 @@ namespace Disorder
 		RendererMap::const_iterator iter = _mRenderObjects.begin();
 		while (iter != _mRenderObjects.end())
 		{
+			iter->second->PreDraw(mainCamera);
+
 			for( int i = 0;i<MVT_NUM_VIEW_TYPES;i++)
 			{
 				if( i == MVT_Perspective )
@@ -106,6 +108,8 @@ namespace Disorder
 					}
 				}
 			}
+
+			iter->second->PostDraw(mainCamera);
 			
 			iter++;
 		}

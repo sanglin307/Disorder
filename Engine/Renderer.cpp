@@ -3,6 +3,11 @@
 namespace Disorder
 {
  
+	Renderer::Renderer()
+	{
+		Type = CT_Renderer;
+	}
+
 	void GeometryRenderer::BuildRenderResource()
 	{
 		BOOST_ASSERT(_geometryObject != NULL && _material != NULL);

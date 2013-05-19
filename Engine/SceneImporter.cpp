@@ -523,11 +523,11 @@ namespace Disorder
 		 LightPtr lightObj = boost::make_shared<Light>();
 		
 		 if(lLight->LightType.Get() == FbxLight::ePoint )
-			 lightObj->Type = LT_Point;
+			 lightObj->LType = LT_Point;
 		 else if(lLight->LightType.Get() == FbxLight::eDirectional )
-			 lightObj->Type = LT_Parallel;
+			 lightObj->LType = LT_Parallel;
 		 else if(lLight->LightType.Get() == FbxLight::eSpot )
-			 lightObj->Type = LT_Spot;
+			 lightObj->LType = LT_Spot;
 		 else
 		 {
 			 GLogger->Error("Not supported light Type!");
@@ -796,7 +796,7 @@ namespace Disorder
 		 ProcessMaterials(lMesh,matArray);
 
 		 // use default material now
-		 MaterialPtr mat = MaterialGenerator::GenerateLambert(Vector3(0.1f),Vector3(0.6f));
+		 MaterialPtr mat = MaterialGenerator::GeneratePhong(Vector3(0.1f),Vector3(0.6f),Vector3(0.7f),1);
 		 geometryRender->SetGeometry(geometry,mat);
 
 

@@ -27,15 +27,7 @@ namespace Disorder
 	   GameCanvas = boost::make_shared<Canvas>(viewport->SizeX,viewport->SizeY);
 
 	   GSceneManager->Init();
-
-	   //create camera
-	   CameraPtr sceneCamera = boost::make_shared<Camera>();
-	   sceneCamera->Name = "MainCamera";
-	   sceneCamera->LookAt(Vector3(0.0f,1.0f,-5.0f),Vector3(0.0f,1.0f,0.0f),Vector3(0.0f,1.0f,0.0f));
-	   sceneCamera->ProjCalculate(Math::PI/3,viewport->SizeX*1.0f/viewport->SizeY,1.0f,1000.0f);
-	   GSceneManager->AddCamera(sceneCamera);
-	   GameClient->AddInputListener(sceneCamera);
-
+ 
 	   GWorld->Init();
 	   
    }

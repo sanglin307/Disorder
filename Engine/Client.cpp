@@ -64,7 +64,7 @@ namespace Disorder
 			iter++;
 		}
 
-		if( iter != _inputListenerList.end() )
+		if( iter == _inputListenerList.end() )
 			_inputListenerList.push_back(listener);
 		
 	}
