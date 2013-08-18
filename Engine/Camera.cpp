@@ -10,10 +10,10 @@ namespace Disorder
 		_upVec =  Vector3(0.0f,1.0f,0.0f);
 
 		_viewVec = Vector3(0.0f,1.0f,0.0f) - _eyePos;
-		_viewVec.normalise();
+		_viewVec.Normalise();
 
-		_xAxis = _upVec.crossProduct(_viewVec);
-		_xAxis.normalise();
+		_xAxis = _upVec.Cross(_viewVec);
+		_xAxis.Normalise();
 
 		_rotation.FromAxes(_xAxis,_upVec,_viewVec);
 
@@ -41,7 +41,7 @@ namespace Disorder
 			_rotation.ToAxes(_xAxis,_upVec,_viewVec);
 			 
 
-			 Vector3 yAxis = _viewVec.crossProduct(_xAxis);
+			 Vector3 yAxis = _viewVec.Cross(_xAxis);
 			// yAxis.normalise();
 		 
 			/* ViewMatrix = Matrix4(xAxis.x,                   yAxis.x,	                 _viewVec.x,	               0,
@@ -49,9 +49,9 @@ namespace Disorder
 								  xAxis.z,                   yAxis.z,	                 _viewVec.z,                   0,
 								  -xAxis.dotProduct(_eyePos),-yAxis.dotProduct(_eyePos), -_viewVec.dotProduct(_eyePos),1);*/
 		 
-			 ViewMatrix = Matrix4(_xAxis.x,           _xAxis.y,	                  _xAxis.z,	       -_xAxis.dotProduct(_eyePos),
-								  yAxis.x,            yAxis.y,	                  yAxis.z,	       -yAxis.dotProduct(_eyePos),
-								  _viewVec.x,         _viewVec.y,	              _viewVec.z,      -_viewVec.dotProduct(_eyePos),
+			 ViewMatrix = Matrix4(_xAxis.x,           _xAxis.y,	                  _xAxis.z,	       -_xAxis.Dot(_eyePos),
+				                  yAxis.x,            yAxis.y,	                  yAxis.z,	       -yAxis.Dot(_eyePos),
+								  _viewVec.x,         _viewVec.y,	              _viewVec.z,      -_viewVec.Dot(_eyePos),
 								  0,                  0,                          0,               1 );
 
 			 _viewMatrixInvalid = false;
@@ -156,10 +156,10 @@ namespace Disorder
 		 _upVec  = upVec;
 
 		 _viewVec = lookAt - eyePos;
-		 _viewVec.normalise();
+		 _viewVec.Normalise();
 
-		 _xAxis = _upVec.crossProduct(_viewVec);
-		 _xAxis.normalise();
+		 _xAxis = _upVec.Cross(_viewVec);
+		 _xAxis.Normalise();
 
 		 _viewMatrixInvalid = true;
 	}

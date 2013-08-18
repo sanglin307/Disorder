@@ -3,21 +3,6 @@
  
 namespace Disorder
 {
-	/// from Oger Vector3 code...
- 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
-	/** Standard 2-dimensional vector.
-        @remarks
-            A direction in 2D space represented as distances along the 2
-            orthogonal axes (x, y). Note that positions, directions and
-            scaling factors can be represented by a vector, depending on how
-            you interpret the values.
-    */
     class  Vector2
     {
     public:
@@ -57,33 +42,31 @@ namespace Disorder
 
 		/** Exchange the contents of this vector with another. 
 		*/
-		inline void swap(Vector2& other)
+		inline void Swap(Vector2& other)
 		{
-			std::swap(x, other.x);
-			std::swap(y, other.y);
+			Disorder::Swap<float>(x, other.x);
+			Disorder::Swap<float>(y, other.y);
 		}
 
 		inline float operator [] ( const size_t i ) const
         {
             BOOST_ASSERT( i < 2 );
-
             return *(&x+i);
         }
 
 		inline float& operator [] ( const size_t i )
         {
             BOOST_ASSERT( i < 2 );
-
             return *(&x+i);
         }
 
 		/// Pointer accessor for direct copying
-		inline float* ptr()
+		inline float* Ptr()
 		{
 			return &x;
 		}
 		/// Pointer accessor for direct copying
-		inline const float* ptr() const
+		inline const float* Ptr() const
 		{
 			return &x;
 		}
@@ -287,97 +270,41 @@ namespace Disorder
             return *this;
         }
 
-        /** Returns the length (magnitude) of the vector.
-            @warning
-                This operation requires a square root and is expensive in
-                terms of CPU operations. If you don't need to know the exact
-                length (e.g. for just comparing lengths) use squaredLength()
-                instead.
-        */
-        inline float length () const
+        
+        inline float Length () const
         {
             return Math::Sqrtf( x * x + y * y );
         }
 
-        /** Returns the square of the length(magnitude) of the vector.
-            @remarks
-                This  method is for efficiency - calculating the actual
-                length of a vector requires a square root, which is expensive
-                in terms of the operations required. This method returns the
-                square of the length of the vector, i.e. the same as the
-                length but before the square root is taken. Use this if you
-                want to find the longest / shortest vector without incurring
-                the square root.
-        */
-        inline float squaredLength () const
+        
+        inline float SquaredLength () const
         {
             return x * x + y * y;
         }
 
-        /** Returns the distance to another vector.
-            @warning
-                This operation requires a square root and is expensive in
-                terms of CPU operations. If you don't need to know the exact
-                distance (e.g. for just comparing distances) use squaredDistance()
-                instead.
-        */
-        inline float distance(const Vector2& rhs) const
+      
+        inline float Distance(const Vector2& rhs) const
         {
-            return (*this - rhs).length();
+            return (*this - rhs).Length();
         }
 
-        /** Returns the square of the distance to another vector.
-            @remarks
-                This method is for efficiency - calculating the actual
-                distance to another vector requires a square root, which is
-                expensive in terms of the operations required. This method
-                returns the square of the distance to another vector, i.e.
-                the same as the distance but before the square root is taken.
-                Use this if you want to find the longest / shortest distance
-                without incurring the square root.
-        */
-        inline float squaredDistance(const Vector2& rhs) const
+       
+        inline float SquaredDistance(const Vector2& rhs) const
         {
-            return (*this - rhs).squaredLength();
+			return (*this - rhs).SquaredLength();
         }
 
-        /** Calculates the dot (scalar) product of this vector with another.
-            @remarks
-                The dot product can be used to calculate the angle between 2
-                vectors. If both are unit vectors, the dot product is the
-                cosine of the angle; otherwise the dot product must be
-                divided by the product of the lengths of both vectors to get
-                the cosine of the angle. This result can further be used to
-                calculate the distance of a point from a plane.
-            @param
-                vec Vector with which to calculate the dot product (together
-                with this one).
-            @return
-                A float representing the dot product value.
-        */
-        inline float dotProduct(const Vector2& vec) const
+       
+        inline float Dot(const Vector2& vec) const
         {
             return x * vec.x + y * vec.y;
         }
-
-        /** Normalises the vector.
-            @remarks
-                This method normalises the vector such that it's
-                length / magnitude is 1. The result is called a unit vector.
-            @note
-                This function will not crash for zero-sized vectors, but there
-                will be no changes made to their components.
-            @return The previous length of the vector.
-        */
-
-        inline float normalise()
+ 
+        inline float Normalise()
         {
             float fLength = Math::Sqrtf( x * x + y * y);
-
-            // Will also work for zero-sized vectors, but will change nothing
-			// We're not using epsilons because we don't need to.
-            // Read http://www.ogre3d.org/forums/viewtopic.php?f=4&t=61259
-            if ( fLength > float(0.0f) )
+ 
+			if ( fLength > float(0.0f) && fLength != 1.0f )
             {
                 float fInvLength = 1.0f / fLength;
                 x *= fInvLength;
@@ -387,19 +314,14 @@ namespace Disorder
             return fLength;
         }
 
-        /** Returns a vector at a point half way between this and the passed
-            in vector.
-        */
-        inline Vector2 midPoint( const Vector2& vec ) const
+ 
+        inline Vector2 MidPoint( const Vector2& vec ) const
         {
             return Vector2(
                 ( x + vec.x ) * 0.5f,
                 ( y + vec.y ) * 0.5f );
         }
 
-        /** Returns true if the vector's scalar components are all greater
-            that the ones of the vector it is compared against.
-        */
         inline bool operator < ( const Vector2& rhs ) const
         {
             if( x < rhs.x && y < rhs.y )
@@ -407,58 +329,20 @@ namespace Disorder
             return false;
         }
 
-        /** Returns true if the vector's scalar components are all smaller
-            that the ones of the vector it is compared against.
-        */
         inline bool operator > ( const Vector2& rhs ) const
         {
             if( x > rhs.x && y > rhs.y )
                 return true;
             return false;
         }
-
-        /** Sets this vector's components to the minimum of its own and the
-            ones of the passed in vector.
-            @remarks
-                'Minimum' in this case means the combination of the lowest
-                value of x, y and z from both vectors. Lowest is taken just
-                numerically, not magnitude, so -1 < 0.
-        */
-        inline void makeFloor( const Vector2& cmp )
-        {
-            if( cmp.x < x ) x = cmp.x;
-            if( cmp.y < y ) y = cmp.y;
-        }
-
-        /** Sets this vector's components to the maximum of its own and the
-            ones of the passed in vector.
-            @remarks
-                'Maximum' in this case means the combination of the highest
-                value of x, y and z from both vectors. Highest is taken just
-                numerically, not magnitude, so 1 > -3.
-        */
-        inline void makeCeil( const Vector2& cmp )
-        {
-            if( cmp.x > x ) x = cmp.x;
-            if( cmp.y > y ) y = cmp.y;
-        }
-
-        /** Generates a vector perpendicular to this vector (eg an 'up' vector).
-            @remarks
-                This method will return a vector which is perpendicular to this
-                vector. There are an infinite number of possibilities but this
-                method will guarantee to generate one of them. If you need more
-                control you should use the Quaternion class.
-        */
-        inline Vector2 perpendicular(void) const
+ 
+        inline Vector2 Perpendicular(void) const
         {
             return Vector2 (-y, x);
         }
-
-        /** Calculates the 2 dimensional cross-product of 2 vectors, which results
-			in a single floating point value which is 2 times the area of the triangle.
-        */
-        inline float crossProduct( const Vector2& rkVector ) const
+ 
+		// equal to the area of parallelogram
+        inline float Cross( const Vector2& rkVector ) const
         {
             return x * rkVector.y - y * rkVector.x;
         }
@@ -469,7 +353,7 @@ namespace Disorder
                 This method assumes that the random number generator has already
                 been seeded appropriately.
             @param
-                angle The angle at which to deviate in radians
+                angle The angle at which to deviate in radians, the angle is the max one
             @param
                 up Any vector perpendicular to this one (which could generated
                 by cross-product of this vector and any other non-colinear
@@ -482,7 +366,7 @@ namespace Disorder
                 vector will not be normalised, normalise it if you wish
                 afterwards.
         */
-        inline Vector2 randomDeviant(float angle) const
+        inline Vector2 RandomDeviant(float angle) const
         {
 
             angle *=  Math::UnitRandom() * Math::TWO_PI;
@@ -493,48 +377,39 @@ namespace Disorder
         }
 
         /** Returns true if this vector is zero length. */
-        inline bool isZeroLength(void) const
+        inline bool IsZeroLength(void) const
         {
             float sqlen = (x * x) + (y * y);
             return (sqlen < (1e-06 * 1e-06));
 
         }
-
-        /** As normalise, except that this vector is unaffected and the
-            normalised vector is returned as a copy. */
-        inline Vector2 normalisedCopy(void) const
-        {
-            Vector2 ret = *this;
-            ret.normalise();
-            return ret;
-        }
-
+ 
         /** Calculates a reflection vector to the plane with the given normal .
         @remarks NB assumes 'this' is pointing AWAY FROM the plane, invert if it is not.
         */
-        inline Vector2 reflect(const Vector2& normal) const
+        inline Vector2 Reflect(const Vector2& normal) const
         {
-            return Vector2( *this - ( 2 * this->dotProduct(normal) * normal ) );
+			return Vector2( *this - ( 2 * this->Dot(normal) * normal ) );
         }
 
-		/*/// Check whether this vector contains valid values
-		inline bool isNaN() const
+	    /// Check whether this vector contains valid values
+		inline bool IsNaN() const
 		{
-			return Math::isNaN(x) || Math::isNaN(y);
+			return Math::IsNaN(x) || Math::IsNaN(y);
 		}
-*/
+
 		/**	 Gets the angle between 2 vectors.
 		@remarks
 			Vectors do not have to be unit-length but must represent directions.
 		*/
-		inline float angleBetween(const Vector2& other) const
+		inline float AngleBetween(const Vector2& other) const
 		{		
-			float lenProduct = length() * other.length();
+			float lenProduct = Length() * other.Length();
 			// Divide by zero check
 			if(lenProduct < 1e-6f)
 				lenProduct = 1e-6f;
 		
-			float f = dotProduct(other) / lenProduct;
+			float f = Dot(other) / lenProduct;
 	
 			f = Clamp<float>(f, -1.0f, 1.0f);
 			return Math::ACosf(f);
@@ -545,11 +420,11 @@ namespace Disorder
 			Vectors do not have to be unit-length but must represent directions.
 			The angle is comprised between 0 and 2 PI.
 		*/
-		inline float angleTo(const Vector2& other) const
+		inline float AngleTo(const Vector2& other) const
 		{
-			float angle = angleBetween(other);
+			float angle = AngleBetween(other);
 		
-			if (crossProduct(other)<0)			
+			if (Cross(other)<0)			
 				angle = (float)Math::TWO_PI - angle;		
 
 			return angle;
@@ -564,8 +439,6 @@ namespace Disorder
         static const Vector2 UNIT_SCALE;
  
     };
-
-	//-------------------------------------------------------
 
     class Vector3
     {
@@ -611,11 +484,11 @@ namespace Disorder
 
 		/** Exchange the contents of this vector with another. 
 		*/
-		inline void swap(Vector3& other)
+		inline void Swap(Vector3& other)
 		{
-			Swap<float>(x, other.x);
-			Swap<float>(y, other.y);
-			Swap<float>(z, other.z);
+			Disorder::Swap<float>(x, other.x);
+			Disorder::Swap<float>(y, other.y);
+			Disorder::Swap<float>(z, other.z);
 		}
 
 		inline float operator [] ( const size_t i ) const
@@ -630,12 +503,12 @@ namespace Disorder
             return *(&x+i);
         }
 		/// Pointer accessor for direct copying
-		inline float* ptr()
+		inline float* Ptr()
 		{
 			return &x;
 		}
 		/// Pointer accessor for direct copying
-		inline const float* ptr() const
+		inline const float* Ptr() const
 		{
 			return &x;
 		}
@@ -857,49 +730,47 @@ namespace Disorder
 
             return *this;
         }
-
-
-       
-        inline float length () const
+ 
+        inline float Length () const
         {
 			return Math::Sqrtf( x * x + y * y + z * z );
         }
 
         
-        inline float squaredLength () const
+        inline float SquaredLength () const
         {
             return x * x + y * y + z * z;
         }
 
         
-        inline float distance(const Vector3& rhs) const
+        inline float Distance(const Vector3& rhs) const
         {
-            return (*this - rhs).length();
+            return (*this - rhs).Length();
         }
 
         
-        inline float squaredDistance(const Vector3& rhs) const
+        inline float SquaredDistance(const Vector3& rhs) const
         {
-            return (*this - rhs).squaredLength();
+            return (*this - rhs).SquaredLength();
         }
 
         
-        inline float dotProduct(const Vector3& vec) const
+        inline float Dot(const Vector3& vec) const
         {
             return x * vec.x + y * vec.y + z * vec.z;
         }
  
-        inline float absDotProduct(const Vector3& vec) const
+        inline float AbsDot(const Vector3& vec) const
         {
             return Abs<float>(x * vec.x) + Abs<float>(y * vec.y) + Abs<float>(z * vec.z);
         }
 
        
-        inline float normalise()
+        inline float Normalise()
         {
 			float fLength = Math::Sqrtf( x * x + y * y + z * z );
 
-            if ( fLength > float(0.0f) )
+			if ( fLength > float(0.0f) && fLength != 1.0f )
             {
                 float fInvLength = 1.0f / fLength;
                 x *= fInvLength;
@@ -910,7 +781,7 @@ namespace Disorder
             return fLength;
         }
  
-        inline Vector3 crossProduct( const Vector3& rkVector ) const
+        inline Vector3 Cross( const Vector3& rkVector ) const
         {
             return Vector3(
                 y * rkVector.z - z * rkVector.y,
@@ -919,7 +790,7 @@ namespace Disorder
         }
 
         
-        inline Vector3 midPoint( const Vector3& vec ) const
+        inline Vector3 MidPoint( const Vector3& vec ) const
         {
             return Vector3(
                 ( x + vec.x ) * 0.5f,
@@ -943,53 +814,37 @@ namespace Disorder
             return false;
         }
  
-        inline void makeFloor( const Vector3& cmp )
-        {
-            if( cmp.x < x ) x = cmp.x;
-            if( cmp.y < y ) y = cmp.y;
-            if( cmp.z < z ) z = cmp.z;
-        }
- 
-        inline void makeCeil( const Vector3& cmp )
-        {
-            if( cmp.x > x ) x = cmp.x;
-            if( cmp.y > y ) y = cmp.y;
-            if( cmp.z > z ) z = cmp.z;
-        }
-
         
-        inline Vector3 perpendicular(void) const
+        inline Vector3 Perpendicular(void) const
         {
             static const float fSquareZero = (float)(1e-06 * 1e-06);
 
-            Vector3 perp = this->crossProduct( Vector3::UNIT_X );
+			Vector3 perp = this->Cross( Vector3::UNIT_X );
 
             // Check length
-            if( perp.squaredLength() < fSquareZero )
+            if( perp.SquaredLength() < fSquareZero )
             {
                 /* This vector is the Y axis multiplied by a scalar, so we have
                    to use another axis.
                 */
-                perp = this->crossProduct( Vector3::UNIT_Y );
+				perp = this->Cross( Vector3::UNIT_Y );
             }
-			perp.normalise();
+			perp.Normalise();
 
             return perp;
         }
        
 		/** Gets the angle between 2 vectors.
-		@remarks
-			Vectors do not have to be unit-length but must represent directions.
 		*/
-		inline float angleBetween(const Vector3& dest) const
+		inline float AngleBetween(const Vector3& dest) const
 		{
-			float lenProduct = length() * dest.length();
+			float lenProduct = Length() * dest.Length();
 
 			// Divide by zero check
 			if(lenProduct < 1e-6f)
 				lenProduct = 1e-6f;
 
-		    float f = dotProduct(dest) / lenProduct;
+		    float f = Dot(dest) / lenProduct;
 
 			f = Clamp<float>(f, (float)-1.0, (float)1.0);
 			return Math::ACosf(f);
@@ -1003,7 +858,7 @@ namespace Disorder
 			(if specified, or a generated axis if not) since in this case
 			ANY axis of rotation is valid.
         */
-        Quaternion getRotationTo(const Vector3& dest,
+        Quaternion GetRotationTo(const Vector3& dest,
 			const Vector3& fallbackAxis = Vector3::ZERO) const
         {
             // Based on Stan Melax's article in Game Programming Gems
@@ -1011,10 +866,10 @@ namespace Disorder
             // Copy, since cannot modify local
             Vector3 v0 = *this;
             Vector3 v1 = dest;
-            v0.normalise();
-            v1.normalise();
+            v0.Normalise();
+            v1.Normalise();
 
-            float d = v0.dotProduct(v1);
+			float d = v0.Dot(v1);
             // If dot == 1, vectors are the same
             if (d >= 1.0f)
             {
@@ -1030,10 +885,10 @@ namespace Disorder
 				else
 				{
 					// Generate an axis
-					Vector3 axis = Vector3::UNIT_X.crossProduct(*this);
-					if (axis.isZeroLength()) // pick another if colinear
-						axis = Vector3::UNIT_Y.crossProduct(*this);
-					axis.normalise();
+					Vector3 axis = Vector3::UNIT_X.Cross(*this);
+					if (axis.IsZeroLength()) // pick another if colinear
+						axis = Vector3::UNIT_Y.Cross(*this);
+					axis.Normalise();
 					q.FromAngleAxis(float(Math::PI), axis);
 				}
 			}
@@ -1042,40 +897,31 @@ namespace Disorder
                 float s = Math::Sqrtf( (1+d)*2 );
 	            float invs = 1 / s;
 
-				Vector3 c = v0.crossProduct(v1);
+				Vector3 c = v0.Cross(v1);
 
     	        q.x = c.x * invs;
         	    q.y = c.y * invs;
             	q.z = c.z * invs;
             	q.w = s * 0.5f;
-				q.normalise();
+				q.Normalise();
 			}
             return q;
         }
 
         /** Returns true if this vector is zero length. */
-        inline bool isZeroLength(void) const
+        inline bool IsZeroLength(void) const
         {
             float sqlen = (x * x) + (y * y) + (z * z);
             return (sqlen < (1e-06 * 1e-06));
 
         }
-
-        /** As normalise, except that this vector is unaffected and the
-            normalised vector is returned as a copy. */
-        inline Vector3 normalisedCopy(void) const
-        {
-            Vector3 ret = *this;
-            ret.normalise();
-            return ret;
-        }
-
+ 
         /** Calculates a reflection vector to the plane with the given normal .
         @remarks NB assumes 'this' is pointing AWAY FROM the plane, invert if it is not.
         */
-        inline Vector3 reflect(const Vector3& normal) const
+        inline Vector3 Reflect(const Vector3& normal) const
         {
-            return Vector3( *this - ( 2 * this->dotProduct(normal) * normal ) );
+            return Vector3( *this - ( 2 * this->Dot(normal) * normal ) );
         }
 
 		/** Returns whether this vector is within a positional tolerance
@@ -1084,24 +930,12 @@ namespace Disorder
 		@param tolerance The amount that each element of the vector may vary by
 			and still be considered equal
 		*/
-		inline bool positionEquals(const Vector3& rhs, float tolerance = 1e-03) const
+		inline bool PositionEquals(const Vector3& rhs, float tolerance = 1e-03) const
 		{
 			return Math::FloatEqual(x, rhs.x, tolerance) &&
 				Math::FloatEqual(y, rhs.y, tolerance) &&
 				Math::FloatEqual(z, rhs.z, tolerance);
 
-		}
-
-		/** Returns whether this vector is within a positional tolerance
-			of another vector, also take scale of the vectors into account.
-		@param rhs The vector to compare with
-		@param tolerance The amount (related to the scale of vectors) that distance
-            of the vector may vary by and still be considered close
-		*/
-		inline bool positionCloses(const Vector3& rhs, float tolerance = 1e-03f) const
-		{
-			return squaredDistance(rhs) <=
-                (squaredLength() + rhs.squaredLength()) * tolerance;
 		}
 
 		/** Returns whether this vector is within a directional tolerance
@@ -1111,24 +945,24 @@ namespace Disorder
 			still be considered equal
 		@note Both vectors should be normalised.
 		*/
-		inline bool directionEquals(const Vector3& rhs,
+		inline bool DirectionEquals(const Vector3& rhs,
 			const float& tolerance) const
 		{
-			float dot = dotProduct(rhs);
+			float dot = Dot(rhs);
 			float angle = Math::ACosf(dot);
 
 			return Abs<float>(angle) <= tolerance;
 
 		}
 
-	/*	/// Check whether this vector contains valid values
-		inline bool isNaN() const
+		/// Check whether this vector contains valid values
+	 	inline bool IsNaN() const
 		{
-			return Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z);
-		}*/
+			return Math::IsNaN(x) || Math::IsNaN(y) || Math::IsNaN(z);
+		}
 
 		/// Extract the primary (dominant) axis from this direction vector
-		inline Vector3 primaryAxis() const
+		inline Vector3 PrimaryAxis() const
 		{
 			float absx = Abs<float>(x);
 			float absy = Abs<float>(y);
@@ -1143,8 +977,6 @@ namespace Disorder
 					return y > 0 ? Vector3::UNIT_Y : Vector3::NEGATIVE_UNIT_Y;
 				else
 					return z > 0 ? Vector3::UNIT_Z : Vector3::NEGATIVE_UNIT_Z;
-
-
 		}
 
 		// special points
@@ -1156,21 +988,8 @@ namespace Disorder
         static const Vector3 NEGATIVE_UNIT_Y;
         static const Vector3 NEGATIVE_UNIT_Z;
         static const Vector3 UNIT_SCALE;
-
-      
     };
-
-
-	//---------------------------------------------------------------------------------
-
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
-	/** 4-dimensional homogeneous vector.
-    */
+ 
     class  Vector4
     {
     public:
@@ -1222,12 +1041,12 @@ namespace Disorder
 
 		/** Exchange the contents of this vector with another. 
 		*/
-		inline void swap(Vector4& other)
+		inline void Swap(Vector4& other)
 		{
-			std::swap(x, other.x);
-			std::swap(y, other.y);
-			std::swap(z, other.z);
-			std::swap(w, other.w);
+			Disorder::Swap<float>(x, other.x);
+			Disorder::Swap<float>(y, other.y);
+			Disorder::Swap<float>(z, other.z);
+			Disorder::Swap<float>(w, other.w);
 		}
 	
 		inline float operator [] ( const size_t i ) const
@@ -1245,20 +1064,17 @@ namespace Disorder
         }
 
 		/// Pointer accessor for direct copying
-		inline float* ptr()
+		inline float* Ptr()
 		{
 			return &x;
 		}
 		/// Pointer accessor for direct copying
-		inline const float* ptr() const
+		inline const float* Ptr() const
 		{
 			return &x;
 		}
 
-        /** Assigns the value of the other vector.
-            @param
-                rkVector The other vector
-        */
+ 
         inline Vector4& operator = ( const Vector4& rkVector )
         {
             x = rkVector.x;
@@ -1508,22 +1324,16 @@ namespace Disorder
             return *this;
         }
 
-        /** Calculates the dot (scalar) product of this vector with another.
-            @param
-                vec Vector with which to calculate the dot product (together
-                with this one).
-            @return
-                A float representing the dot product value.
-        */
-        inline float dotProduct(const Vector4& vec) const
+         
+        inline float Dot(const Vector4& vec) const
         {
             return x * vec.x + y * vec.y + z * vec.z + w * vec.w;
         }
-	/*	/// Check whether this vector contains valid values
-		inline bool isNaN() const
+		/// Check whether this vector contains valid values
+		inline bool IsNaN() const
 		{
-			return Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z) || Math::isNaN(w);
-		}*/
+			return Math::IsNaN(x) || Math::IsNaN(y) || Math::IsNaN(z) || Math::IsNaN(w);
+		}
         
         // special
         static const Vector4 ZERO;

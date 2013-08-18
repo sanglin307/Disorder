@@ -440,12 +440,12 @@ namespace Disorder
         {
             Plane ret;
 			Matrix4 invTrans = inverse().transpose();
-			Vector4 v4( p.normal.x, p.normal.y, p.normal.z, p.d );
+			Vector4 v4( p.Normal.x, p.Normal.y, p.Normal.z, p.D );
 			v4 = invTrans * v4;
-			ret.normal.x = v4.x; 
-			ret.normal.y = v4.y; 
-			ret.normal.z = v4.z;
-			ret.d = v4.w / ret.normal.normalise();
+			ret.Normal.x = v4.x; 
+			ret.Normal.y = v4.y; 
+			ret.Normal.z = v4.z;
+			ret.D = v4.w / ret.Normal.Normalise();
 
             return ret;
         }

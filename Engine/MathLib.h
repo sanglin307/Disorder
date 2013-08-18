@@ -97,6 +97,11 @@ namespace Disorder
 		{
 			return acosf(a);
 		}
+ 
+		static inline float Lerp(float t, float v1, float v2)
+		{
+           return (1.f - t) * v1 + t * v2;
+        }
 
 		static inline float ATan2f (float fY, float fX) 
 		{ 
@@ -106,6 +111,16 @@ namespace Disorder
 		static inline float Tan(float fx)
 		{
 			return tan(fx);
+		}
+
+		static inline bool IsNaN(float fx)
+		{
+			return _isnan(fx) != 0;
+		}
+
+		static inline bool IsFinite(float fx)
+		{
+			return _finite(fx) != 0;
 		}
 
 		static inline bool FloatEqual( float a, float b, float tolerance = std::numeric_limits<float>::epsilon() )

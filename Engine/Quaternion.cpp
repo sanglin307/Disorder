@@ -361,8 +361,8 @@ namespace Disorder
 		// nVidia SDK implementation
 		Vector3 uv, uuv;
 		Vector3 qvec(x, y, z);
-		uv = qvec.crossProduct(v);
-		uuv = qvec.crossProduct(uv);
+		uv = qvec.Cross(v);
+		uuv = qvec.Cross(uv);
 		uv *= (2.0f * w);
 		uuv *= 2.0f;
 
@@ -370,7 +370,7 @@ namespace Disorder
 
     }
     //-----------------------------------------------------------------------
-	bool Quaternion::equals(const Quaternion& rhs, const float& tolerance) const
+	bool Quaternion::Equals(const Quaternion& rhs, const float& tolerance) const
 	{
         float fCos = Dot(rhs);
         float angle = Math::ACosf(fCos);
@@ -418,7 +418,7 @@ namespace Disorder
             //    have method to fix this case, so just use linear interpolation here.
             Quaternion t = (1.0f - fT) * rkP + fT * rkT;
             // taking the complement requires renormalisation
-            t.normalise();
+            t.Normalise();
             return t;
         }
     }
@@ -467,7 +467,7 @@ namespace Disorder
         return Slerp(fSlerpT, kSlerpP ,kSlerpQ);
     }
     //-----------------------------------------------------------------------
-    float Quaternion::normalise(void)
+    float Quaternion::Normalise(void)
     {
         float len = Norm();
         float factor = 1.0f / Math::Sqrtf(len);
@@ -475,7 +475,7 @@ namespace Disorder
         return len;
     }
     //-----------------------------------------------------------------------
-	float Quaternion::getRoll(bool reprojectAxis) const
+	float Quaternion::GetRoll(bool reprojectAxis) const
 	{
 		if (reprojectAxis)
 		{
@@ -500,7 +500,7 @@ namespace Disorder
 		}
 	}
     //-----------------------------------------------------------------------
-	float Quaternion::getPitch(bool reprojectAxis) const
+	float Quaternion::GetPitch(bool reprojectAxis) const
 	{
 		if (reprojectAxis)
 		{
@@ -524,7 +524,7 @@ namespace Disorder
 		}
 	}
     //-----------------------------------------------------------------------
-	float Quaternion::getYaw(bool reprojectAxis) const
+	float Quaternion::GetYaw(bool reprojectAxis) const
 	{
 		if (reprojectAxis)
 		{
@@ -563,7 +563,7 @@ namespace Disorder
 		{
 			result = rkP + fT * (rkQ - rkP);
 		}
-        result.normalise();
+        result.Normalise();
         return result;
     }
 }

@@ -20,8 +20,8 @@ namespace Disorder
             respectively), and a constant (D) which is the distance along
             the normal you have to go to move the plane back to the origin.
      */
-	class AABB;
 
+	struct BoxBounds;
 
     class  Plane
     {
@@ -50,13 +50,13 @@ namespace Disorder
             BOTH_SIDE
         };
 
-        Side getSide (const Vector3& rkPoint) const;
+        Side GetSide (const Vector3& rkPoint) const;
 
         /**
         Returns the side where the alignedBox is. The flag BOTH_SIDE indicates an intersecting box.
         One corner ON the plane is sufficient to consider the box and the plane intersecting.
         */
-        Side getSide (const AABB& rkBox) const;
+        Side GetSide (const BoxBounds& rkBox) const;
 
         /** Returns which side of the plane that the given box lies on.
             The box is defined as centre/half-size pairs for effectively.
@@ -67,7 +67,7 @@ namespace Disorder
             NEGATIVE_SIDE if the box complete lies on the "negative side" of the plane,
             and BOTH_SIDE if the box intersects the plane.
         */
-        Side getSide (const Vector3& centre, const Vector3& halfSize) const;
+        Side GetSide (const Vector3& centre, const Vector3& halfSize) const;
 
         /** This is a pseudodistance. The sign of the return value is
             positive if the point is on the positive side of the plane,
@@ -77,14 +77,14 @@ namespace Disorder
             The absolute value of the return value is the true distance only
             when the plane normal is a unit length vector.
         */
-        float getDistance (const Vector3& rkPoint) const;
+        float GetDistance (const Vector3& rkPoint) const;
 
         /** Redefine this plane based on 3 points. */
-        void redefine(const Vector3& rkPoint0, const Vector3& rkPoint1,
+        void Redefine(const Vector3& rkPoint0, const Vector3& rkPoint1,
             const Vector3& rkPoint2);
 
 		/** Redefine this plane based on a normal and a point. */
-		void redefine(const Vector3& rkNormal, const Vector3& rkPoint);
+		void Redefine(const Vector3& rkNormal, const Vector3& rkPoint);
 
 		/** Project a vector onto the plane. 
 		@remarks This gives you the element of the input vector that is perpendicular 
@@ -93,7 +93,7 @@ namespace Disorder
 			from the original vector, since parallel + perpendicular = original.
 		@param v The input vector
 		*/
-		Vector3 projectVector(const Vector3& v) const;
+		Vector3 ProjectVector(const Vector3& v) const;
 
         /** Normalises the plane.
             @remarks
@@ -104,19 +104,19 @@ namespace Disorder
                 will be no changes made to their components.
             @return The previous length of the plane's normal.
         */
-        float normalise(void);
+        float Normalise(void);
 
-		Vector3 normal;
-        float d;
+		Vector3 Normal;
+        float D;
 
         /// Comparison operator
         bool operator==(const Plane& rhs) const
         {
-            return (rhs.d == d && rhs.normal == normal);
+            return (rhs.D == D && rhs.Normal == Normal);
         }
         bool operator!=(const Plane& rhs) const
         {
-            return (rhs.d != d || rhs.normal != normal);
+            return (rhs.D != D || rhs.Normal != Normal);
         }
 
        

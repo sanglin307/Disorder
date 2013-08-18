@@ -46,9 +46,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Vectors.h">
-      <Filter>Mathematics</Filter>
-    </ClInclude>
     <ClInclude Include="Matrixs.h">
       <Filter>Mathematics</Filter>
     </ClInclude>
@@ -142,9 +139,6 @@
     <ClInclude Include="Camera.h">
       <Filter>GameEngine</Filter>
     </ClInclude>
-    <ClInclude Include="AABB.h">
-      <Filter>Mathematics</Filter>
-    </ClInclude>
     <ClInclude Include="World.h">
       <Filter>GameEngine</Filter>
     </ClInclude>
@@ -176,6 +170,12 @@
     </ClInclude>
     <ClInclude Include="SceneObjectGenerator.h">
       <Filter>GameEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Vectors.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="Bounds.h">
+      <Filter>Mathematics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -218,9 +218,6 @@
     </ClCompile>
     <ClCompile Include="Logger.cpp">
       <Filter>Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="MathTools.cpp">
-      <Filter>Mathematics</Filter>
     </ClCompile>
     <ClCompile Include="Level.cpp">
       <Filter>GameEngine</Filter>
@@ -287,6 +284,12 @@
     </ClCompile>
     <ClCompile Include="SceneObjectGenerator.cpp">
       <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Bounds.cpp">
+      <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="MathLib.cpp">
+      <Filter>Mathematics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

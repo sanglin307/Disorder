@@ -58,12 +58,12 @@ namespace Disorder
 
 		/** Exchange the contents of this quaternion with another. 
 		*/
-		inline void swap(Quaternion& other)
+		inline void Swap(Quaternion& other)
 		{
-			std::swap(w, other.w);
-			std::swap(x, other.x);
-			std::swap(y, other.y);
-			std::swap(z, other.z);
+			Disorder::Swap<float>(w, other.w);
+			Disorder::Swap<float>(x, other.x);
+			Disorder::Swap<float>(y, other.y);
+			Disorder::Swap<float>(z, other.z);
 		}
 
 		/// Array accessor operator
@@ -83,13 +83,13 @@ namespace Disorder
 		}
 
 		/// Pointer accessor for direct copying
-		inline float* ptr()
+		inline float* Ptr()
 		{
 			return &w;
 		}
 
 		/// Pointer accessor for direct copying
-		inline const float* ptr() const
+		inline const float* Ptr() const
 		{
 			return &w;
 		}
@@ -162,7 +162,7 @@ namespace Disorder
         */
         float Norm () const;
         /// Normalises this quaternion, and returns the previous length
-        float normalise(void); 
+        float Normalise(void); 
         Quaternion Inverse () const;  // apply to non-zero quaternion
         Quaternion UnitInverse () const;  // apply to unit-length quaternion
         Quaternion Exp () const;
@@ -180,7 +180,7 @@ namespace Disorder
              may involve less axial rotation.  The co-domain of the returned value is 
              from -180 to 180 degrees.
 		*/
-		float getRoll(bool reprojectAxis = true) const;
+		float GetRoll(bool reprojectAxis = true) const;
    		/** Calculate the local pitch element of this quaternion
 		@param reprojectAxis By default the method returns the 'intuitive' result
 			that is, if you projected the local Z of the quaternion onto the X and
@@ -190,7 +190,7 @@ namespace Disorder
             may involve less axial rotation.  The co-domain of the returned value is 
             from -180 to 180 degrees.
 		*/
-		float getPitch(bool reprojectAxis = true) const;
+		float GetPitch(bool reprojectAxis = true) const;
    		/** Calculate the local yaw element of this quaternion
 		@param reprojectAxis By default the method returns the 'intuitive' result
 			that is, if you projected the local Y of the quaternion onto the X and
@@ -200,9 +200,9 @@ namespace Disorder
 			may involve less axial rotation. The co-domain of the returned value is 
             from -180 to 180 degrees.
 		*/
-		float getYaw(bool reprojectAxis = true) const;		
+		float GetYaw(bool reprojectAxis = true) const;		
 		/// Equality with tolerance (tolerance is max angle difference)
-		bool equals(const Quaternion& rhs, const float& tolerance) const;
+		bool Equals(const Quaternion& rhs, const float& tolerance) const;
 		
 	    /** Performs Spherical linear interpolation between two quaternions, and returns the result.
 			Slerp ( 0.0f, A, B ) = A
@@ -263,16 +263,13 @@ namespace Disorder
 
 		float w, x, y, z;
 
-	/*	/// Check whether this quaternion contains valid values
+		/// Check whether this quaternion contains valid values
 		inline bool isNaN() const
 		{
-			return Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z) || Math::isNaN(w);
+			return Math::IsNaN(x) || Math::IsNaN(y) || Math::IsNaN(z) || Math::IsNaN(w);
 		}
-*/
-        /** Function for writing to a stream. Outputs "Quaternion(w, x, y, z)" with w,x,y,z
-            being the member values of the quaternion.
-        */
- 
+
+        
     };
  
 

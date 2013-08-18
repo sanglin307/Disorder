@@ -885,7 +885,7 @@ namespace Disorder
                 rkAxis.x = m[2][1]-m[1][2];
                 rkAxis.y = m[0][2]-m[2][0];
                 rkAxis.z = m[1][0]-m[0][1];
-                rkAxis.normalise();
+                rkAxis.Normalise();
             }
             else
             {
@@ -1458,8 +1458,8 @@ namespace Disorder
         }
 
         // make eigenvectors form a right--handed system
-        Vector3 kCross = akEigenvector[1].crossProduct(akEigenvector[2]);
-        float fDet = akEigenvector[0].dotProduct(kCross);
+        Vector3 kCross = akEigenvector[1].Cross(akEigenvector[2]);
+        float fDet = akEigenvector[0].Dot(kCross);
         if ( fDet < 0.0 )
         {
             akEigenvector[2][0] = - akEigenvector[2][0];

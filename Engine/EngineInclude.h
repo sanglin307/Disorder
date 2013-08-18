@@ -48,8 +48,6 @@
 //Class pre declare
 namespace Disorder
 {
-	class AABB;
-	typedef boost::shared_ptr<AABB> AxisAlignedBoxPtr;
 	class Component;
 	typedef boost::shared_ptr<Component> ComponentPtr;
 	class Camera;
@@ -165,7 +163,7 @@ namespace Disorder
 #include "Vectors.h"
 #include "Plane.h"
 #include "Matrixs.h"
-#include "AABB.h"
+#include "Bounds.h"
 #include "FileSystem.h"
 #include "MainLoop.h"
 

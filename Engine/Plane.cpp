@@ -6,46 +6,46 @@ namespace Disorder
 	//-----------------------------------------------------------------------
 	Plane::Plane ()
 	{
-		normal = Vector3::ZERO;
-		d = 0.0;
+		Normal = Vector3::ZERO;
+		D = 0.0f;
 	}
 	//-----------------------------------------------------------------------
 	Plane::Plane (const Plane& rhs)
 	{
-		normal = rhs.normal;
-		d = rhs.d;
+		Normal = rhs.Normal;
+		D = rhs.D;
 	}
 	//-----------------------------------------------------------------------
 	Plane::Plane (const Vector3& rkNormal, float fConstant)
 	{
-		normal = rkNormal;
-		d = -fConstant;
+		Normal = rkNormal;
+		D = -fConstant;
 	}
 	//---------------------------------------------------------------------
 	Plane::Plane (float a, float b, float c, float _d)
-		: normal(a, b, c), d(_d)
+		: Normal(a, b, c), D(_d)
 	{
 	}
 	//-----------------------------------------------------------------------
 	Plane::Plane (const Vector3& rkNormal, const Vector3& rkPoint)
 	{
-		redefine(rkNormal, rkPoint);
+		Redefine(rkNormal, rkPoint);
 	}
 	//-----------------------------------------------------------------------
 	Plane::Plane (const Vector3& rkPoint0, const Vector3& rkPoint1,
 		const Vector3& rkPoint2)
 	{
-		redefine(rkPoint0, rkPoint1, rkPoint2);
+		Redefine(rkPoint0, rkPoint1, rkPoint2);
 	}
 	//-----------------------------------------------------------------------
-	float Plane::getDistance (const Vector3& rkPoint) const
+	float Plane::GetDistance (const Vector3& rkPoint) const
 	{
-		return normal.dotProduct(rkPoint) + d;
+		return Normal.Dot(rkPoint) + D;
 	}
 	//-----------------------------------------------------------------------
-	Plane::Side Plane::getSide (const Vector3& rkPoint) const
+	Plane::Side Plane::GetSide (const Vector3& rkPoint) const
 	{
-		float fDistance = getDistance(rkPoint);
+		float fDistance = GetDistance(rkPoint);
 
 		if ( fDistance < 0.0 )
 			return Plane::NEGATIVE_SIDE;
@@ -58,24 +58,22 @@ namespace Disorder
 
 
 	//-----------------------------------------------------------------------
-	Plane::Side Plane::getSide (const AABB& box) const
+	Plane::Side Plane::GetSide (const BoxBounds& box) const
 	{
-		if (box.isNull()) 
-			return NO_SIDE;
-		if (box.isInfinite())
-			return BOTH_SIDE;
+		if( box.IsValid() == false )
+			return Plane::NO_SIDE;
 
-        return getSide(box.getCenter(), box.getHalfSize());
+        return GetSide(box.GetCenter(), box.GetExtent());
 	}
     //-----------------------------------------------------------------------
-    Plane::Side Plane::getSide (const Vector3& centre, const Vector3& halfSize) const
+    Plane::Side Plane::GetSide (const Vector3& centre, const Vector3& halfSize) const
     {
         // Calculate the distance between box centre and the plane
-        float dist = getDistance(centre);
+        float dist = GetDistance(centre);
 
         // Calculate the maximise allows absolute distance for
         // the distance between box centre and plane
-        float maxAbsDist = normal.absDotProduct(halfSize);
+        float maxAbsDist = Normal.AbsDot(halfSize);
 
         if (dist < -maxAbsDist)
             return Plane::NEGATIVE_SIDE;
@@ -86,51 +84,48 @@ namespace Disorder
         return Plane::BOTH_SIDE;
     }
 	//-----------------------------------------------------------------------
-	void Plane::redefine(const Vector3& rkPoint0, const Vector3& rkPoint1,
+	void Plane::Redefine(const Vector3& rkPoint0, const Vector3& rkPoint1,
 		const Vector3& rkPoint2)
 	{
 		Vector3 kEdge1 = rkPoint1 - rkPoint0;
 		Vector3 kEdge2 = rkPoint2 - rkPoint0;
-		normal = kEdge1.crossProduct(kEdge2);
-		normal.normalise();
-		d = -normal.dotProduct(rkPoint0);
+		Normal = kEdge1.Cross(kEdge2);
+		Normal.Normalise();
+		D = -Normal.Dot(rkPoint0);
 	}
 	//-----------------------------------------------------------------------
-	void Plane::redefine(const Vector3& rkNormal, const Vector3& rkPoint)
+	void Plane::Redefine(const Vector3& rkNormal, const Vector3& rkPoint)
 	{
-		normal = rkNormal;
-		d = -rkNormal.dotProduct(rkPoint);
+		Normal = rkNormal;
+		D = -rkNormal.Dot(rkPoint);
 	}
 	//-----------------------------------------------------------------------
-	Vector3 Plane::projectVector(const Vector3& p) const
+	Vector3 Plane::ProjectVector(const Vector3& p) const
 	{
 		// We know plane normal is unit length, so use simple method
 		Matrix3 xform;
-		xform[0][0] = 1.0f - normal.x * normal.x;
-		xform[0][1] = -normal.x * normal.y;
-		xform[0][2] = -normal.x * normal.z;
-		xform[1][0] = -normal.y * normal.x;
-		xform[1][1] = 1.0f - normal.y * normal.y;
-		xform[1][2] = -normal.y * normal.z;
-		xform[2][0] = -normal.z * normal.x;
-		xform[2][1] = -normal.z * normal.y;
-		xform[2][2] = 1.0f - normal.z * normal.z;
+		xform[0][0] = 1.0f - Normal.x * Normal.x;
+		xform[0][1] = -Normal.x * Normal.y;
+		xform[0][2] = -Normal.x * Normal.z;
+		xform[1][0] = -Normal.y * Normal.x;
+		xform[1][1] = 1.0f - Normal.y * Normal.y;
+		xform[1][2] = -Normal.y * Normal.z;
+		xform[2][0] = -Normal.z * Normal.x;
+		xform[2][1] = -Normal.z * Normal.y;
+		xform[2][2] = 1.0f - Normal.z * Normal.z;
 		return xform * p;
 
 	}
 	//-----------------------------------------------------------------------
-    float Plane::normalise(void)
+    float Plane::Normalise(void)
     {
-        float fLength = normal.length();
+        float fLength = Normal.Length();
 
-        // Will also work for zero-sized vectors, but will change nothing
-		// We're not using epsilons because we don't need to.
-        // Read http://www.ogre3d.org/forums/viewtopic.php?f=4&t=61259
         if ( fLength > float(0.0f) )
         {
             float fInvLength = 1.0f / fLength;
-            normal *= fInvLength;
-            d *= fInvLength;
+            Normal *= fInvLength;
+            D *= fInvLength;
         }
 
         return fLength;
