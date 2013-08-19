@@ -65,7 +65,7 @@ namespace Disorder
 
 		/** Exchange the contents of this matrix with another. 
 		*/
-		inline void swap(Matrix3& other)
+		inline void Swap(Matrix3& other)
 		{
 			std::swap(m[0][0], other.m[0][0]);
 			std::swap(m[0][1], other.m[0][1]);
@@ -159,7 +159,8 @@ namespace Disorder
 
         // matrix must be orthonormal
         void RadianToAngleAxis (Vector3& rkAxis, float& rfAngle) const;
-		inline void DegreeToAngleAxis (Vector3& rkAxis, int& rfAngle) const {
+		inline void DegreeToAngleAxis (Vector3& rkAxis, int& rfAngle) const 
+		{
 			float r;
 			RadianToAngleAxis ( rkAxis, r );
 			rfAngle = (int)(Math::fRad2Deg * r);
@@ -195,7 +196,7 @@ namespace Disorder
             Matrix3& rkProduct);
 
 		/** Determines if this matrix involves a scaling. */
-		inline bool hasScale() const
+		inline bool HasScale() const
 		{
 			// check magnitude of column vectors (==local axes)
 			float t = m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0];
@@ -341,7 +342,7 @@ namespace Disorder
 
 		/** Exchange the contents of this matrix with another. 
 		*/
-		inline void swap(Matrix4& other)
+		inline void Swap(Matrix4& other)
 		{
 			std::swap(m[0][0], other.m[0][0]);
 			std::swap(m[0][1], other.m[0][1]);
@@ -373,7 +374,7 @@ namespace Disorder
             return m[iRow];
         }
 
-        inline Matrix4 concatenate(const Matrix4 &m2) const
+        inline Matrix4 Concatenate(const Matrix4 &m2) const
         {
             Matrix4 r;
             r.m[0][0] = m[0][0] * m2.m[0][0] + m[0][1] * m2.m[1][0] + m[0][2] * m2.m[2][0] + m[0][3] * m2.m[3][0];
@@ -403,7 +404,7 @@ namespace Disorder
         */
         inline Matrix4 operator * ( const Matrix4 &m2 ) const
         {
-            return concatenate( m2 );
+            return Concatenate( m2 );
         }
 
         /** Vector transformation using '*'.
@@ -439,7 +440,7 @@ namespace Disorder
         inline Plane operator * (const Plane& p) const
         {
             Plane ret;
-			Matrix4 invTrans = inverse().transpose();
+			Matrix4 invTrans = Inverse().Transpose();
 			Vector4 v4( p.Normal.x, p.Normal.y, p.Normal.z, p.D );
 			v4 = invTrans * v4;
 			ret.Normal.x = v4.x; 
@@ -543,7 +544,7 @@ namespace Disorder
             m[2][0] = mat3.m[2][0]; m[2][1] = mat3.m[2][1]; m[2][2] = mat3.m[2][2];
         }
 
-        inline Matrix4 transpose(void) const
+        inline Matrix4 Transpose(void) const
         {
             return Matrix4(m[0][0], m[1][0], m[2][0], m[3][0],
                            m[0][1], m[1][1], m[2][1], m[3][1],
@@ -558,7 +559,7 @@ namespace Disorder
         */
         /** Sets the translation transformation part of the matrix.
         */
-        inline void setTrans( const Vector3& v )
+        inline void SetTrans( const Vector3& v )
         {
             m[0][3] = v.x;
             m[1][3] = v.y;
@@ -567,7 +568,7 @@ namespace Disorder
 
         /** Extracts the translation transformation part of the matrix.
          */
-        inline Vector3 getTrans() const
+        inline Vector3 GetTrans() const
         {
           return Vector3(m[0][3], m[1][3], m[2][3]);
         }
@@ -575,7 +576,7 @@ namespace Disorder
 
         /** Builds a translation matrix
         */
-        inline void makeTrans( const Vector3& v )
+        inline void MakeTrans( const Vector3& v )
         {
             m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = v.x;
             m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = v.y;
@@ -583,7 +584,7 @@ namespace Disorder
             m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
         }
 
-        inline void makeTrans( float tx, float ty, float tz )
+        inline void MakeTrans( float tx, float ty, float tz )
         {
             m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = tx;
             m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = ty;
@@ -593,7 +594,7 @@ namespace Disorder
 
         /** Gets a translation matrix.
         */
-        inline static Matrix4 getTrans( const Vector3& v )
+        inline static Matrix4 GetTrans( const Vector3& v )
         {
             Matrix4 r;
 
@@ -607,7 +608,7 @@ namespace Disorder
 
         /** Gets a translation matrix - variation for not using a vector.
         */
-        inline static Matrix4 getTrans( float t_x, float t_y, float t_z )
+        inline static Matrix4 GetTrans( float t_x, float t_y, float t_z )
         {
             Matrix4 r;
 
@@ -626,7 +627,7 @@ namespace Disorder
         */
         /** Sets the scale part of the matrix.
         */
-        inline void setScale( const Vector3& v )
+        inline void SetScale( const Vector3& v )
         {
             m[0][0] = v.x;
             m[1][1] = v.y;
@@ -645,7 +646,7 @@ namespace Disorder
 		{
 			if(Math::FloatEqual(m[0][0], m[1][1], (float)1e-04) && Math::FloatEqual(m[0][0], m[2][2], (float)1e-04) )
 			{
-				return inverse().transpose();
+				return Inverse().Transpose();
 			}
 
 			return *this;
@@ -654,7 +655,7 @@ namespace Disorder
 
         /** Gets a scale matrix.
         */
-        inline static Matrix4 getScale( const Vector3& v )
+        inline static Matrix4 GetScale( const Vector3& v )
         {
             Matrix4 r;
             r.m[0][0] = v.x; r.m[0][1] = 0.0; r.m[0][2] = 0.0; r.m[0][3] = 0.0;
@@ -667,7 +668,7 @@ namespace Disorder
 
         /** Gets a scale matrix - variation for not using a vector.
         */
-        inline static Matrix4 getScale( float s_x, float s_y, float s_z )
+        inline static Matrix4 GetScale( float s_x, float s_y, float s_z )
         {
             Matrix4 r;
             r.m[0][0] = s_x; r.m[0][1] = 0.0; r.m[0][2] = 0.0; r.m[0][3] = 0.0;
@@ -681,7 +682,7 @@ namespace Disorder
         /** Extracts the rotation / scaling part of the Matrix as a 3x3 matrix. 
         @param m3x3 Destination Matrix3
         */
-        inline void extract3x3Matrix(Matrix3& m3x3) const
+        inline void Extract3x3Matrix(Matrix3& m3x3) const
         {
             m3x3.m[0][0] = m[0][0];
             m3x3.m[0][1] = m[0][1];
@@ -696,7 +697,7 @@ namespace Disorder
         }
 
 		/** Determines if this matrix involves a scaling. */
-		inline bool hasScale() const
+		inline bool HasScale() const
 		{
 			// check magnitude of column vectors (==local axes)
 			float t = m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0];
@@ -713,17 +714,17 @@ namespace Disorder
 		}
 
 		/** Determines if this matrix involves a negative scaling. */
-		inline bool hasNegativeScale() const
+		inline bool HasNegativeScale() const
 		{
-			return determinant() < 0;
+			return Determinant() < 0;
 		}
 
 		/** Extracts the rotation / scaling part as a quaternion from the Matrix.
          */
-        inline Quaternion extractQuaternion() const
+        inline Quaternion ExtractQuaternion() const
         {
           Matrix3 m3x3;
-          extract3x3Matrix(m3x3);
+          Extract3x3Matrix(m3x3);
           return Quaternion(m3x3);
         }
 
@@ -745,9 +746,9 @@ namespace Disorder
 
         
 		
-		Matrix4 adjoint() const;
-		float determinant() const;
-		Matrix4 inverse() const;
+		Matrix4 Adjoint() const;
+		float Determinant() const;
+		Matrix4 Inverse() const;
 
         /** Building a Matrix4 from orientation / scale / position.
         @remarks
@@ -755,25 +756,25 @@ namespace Disorder
             of orientation axes, scale does not affect size of translation, rotation and scaling are always
             centered on the origin.
         */
-        void makeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
+        void MakeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
 
         /** Building an inverse Matrix4 from orientation / scale / position.
         @remarks
             As makeTransform except it build the inverse given the same data as makeTransform, so
             performing -translation, -rotate, 1/scale in that order.
         */
-        void makeInverseTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
+        void MakeInverseTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
 
         /** Decompose a Matrix4 to orientation / scale / position.
         */
-        void decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const;
+        void Decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const;
 
         /** Check whether or not the matrix is affine matrix.
             @remarks
                 An affine matrix is a 4x4 matrix with row 3 equal to (0, 0, 0, 1),
                 e.g. no projective coefficients.
         */
-        inline bool isAffine(void) const
+        inline bool IsAffine(void) const
         {
             return m[3][0] == 0 && m[3][1] == 0 && m[3][2] == 0 && m[3][3] == 1;
         }
@@ -782,15 +783,15 @@ namespace Disorder
             @note
                 The matrix must be an affine matrix. @see Matrix4::isAffine.
         */
-        Matrix4 inverseAffine(void) const;
+        Matrix4 InverseAffine(void) const;
 
         /** Concatenate two affine matrices.
             @note
                 The matrices must be affine matrix. @see Matrix4::isAffine.
         */
-        inline Matrix4 concatenateAffine(const Matrix4 &m2) const
+        inline Matrix4 ConcatenateAffine(const Matrix4 &m2) const
         {
-            BOOST_ASSERT(isAffine() && m2.isAffine());
+            BOOST_ASSERT(IsAffine() && m2.IsAffine());
 
             return Matrix4(
                 m[0][0] * m2.m[0][0] + m[0][1] * m2.m[1][0] + m[0][2] * m2.m[2][0],
@@ -818,9 +819,9 @@ namespace Disorder
             @note
                 The matrix must be an affine matrix. @see Matrix4::isAffine.
         */
-        inline Vector3 transformAffine(const Vector3& v) const
+        inline Vector3 TransformAffine(const Vector3& v) const
         {
-            BOOST_ASSERT(isAffine());
+            BOOST_ASSERT(IsAffine());
 
             return Vector3(
                     m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3], 
@@ -832,9 +833,9 @@ namespace Disorder
             @note
                 The matrix must be an affine matrix. @see Matrix4::isAffine.
         */
-        inline Vector4 transformAffine(const Vector4& v) const
+        inline Vector4 TransformAffine(const Vector4& v) const
         {
-            BOOST_ASSERT(isAffine());
+            BOOST_ASSERT(IsAffine());
 
             return Vector4(
                 m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w, 

@@ -1514,7 +1514,7 @@ namespace Disorder
             m[r0][c2] * (m[r1][c0] * m[r2][c1] - m[r2][c0] * m[r1][c1]);
     }
     //-----------------------------------------------------------------------
-    Matrix4 Matrix4::adjoint() const
+    Matrix4 Matrix4::Adjoint() const
     {
         return Matrix4( MINOR(*this, 1, 2, 3, 1, 2, 3),
             -MINOR(*this, 0, 2, 3, 1, 2, 3),
@@ -1537,7 +1537,7 @@ namespace Disorder
             MINOR(*this, 0, 1, 2, 0, 1, 2));
     }
     //-----------------------------------------------------------------------
-    float Matrix4::determinant() const
+    float Matrix4::Determinant() const
     {
         return m[0][0] * MINOR(*this, 1, 2, 3, 1, 2, 3) -
             m[0][1] * MINOR(*this, 1, 2, 3, 0, 2, 3) +
@@ -1545,7 +1545,7 @@ namespace Disorder
             m[0][3] * MINOR(*this, 1, 2, 3, 0, 1, 2);
     }
     //-----------------------------------------------------------------------
-    Matrix4 Matrix4::inverse() const
+    Matrix4 Matrix4::Inverse() const
     {
         float m00 = m[0][0], m01 = m[0][1], m02 = m[0][2], m03 = m[0][3];
         float m10 = m[1][0], m11 = m[1][1], m12 = m[1][2], m13 = m[1][3];
@@ -1607,9 +1607,9 @@ namespace Disorder
             d30, d31, d32, d33);
     }
     //-----------------------------------------------------------------------
-    Matrix4 Matrix4::inverseAffine(void) const
+    Matrix4 Matrix4::InverseAffine(void) const
     {
-        BOOST_ASSERT(isAffine());
+        BOOST_ASSERT(IsAffine());
 
         float m10 = m[1][0], m11 = m[1][1], m12 = m[1][2];
         float m20 = m[2][0], m21 = m[2][1], m22 = m[2][2];
@@ -1651,7 +1651,7 @@ namespace Disorder
               0,   0,   0,   1);
     }
     //-----------------------------------------------------------------------
-    void Matrix4::makeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
+    void Matrix4::MakeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
     {
         // Ordering:
         //    1. Scale
@@ -1670,7 +1670,7 @@ namespace Disorder
         m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
     }
     //-----------------------------------------------------------------------
-    void Matrix4::makeInverseTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
+    void Matrix4::MakeInverseTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
     {
         // Invert the parameters
         Vector3 invTranslate = -position;
@@ -1695,12 +1695,12 @@ namespace Disorder
         m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
     }
     //-----------------------------------------------------------------------
-	void Matrix4::decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const
+	void Matrix4::Decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const
 	{
-		BOOST_ASSERT(isAffine());
+		BOOST_ASSERT(IsAffine());
 
 		Matrix3 m3x3;
-		extract3x3Matrix(m3x3);
+		Extract3x3Matrix(m3x3);
 
 		Matrix3 matQ;
 		Vector3 vecU;

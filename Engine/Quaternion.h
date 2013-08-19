@@ -251,7 +251,7 @@ namespace Disorder
 			if your scene relies on the timing of the rotation or assumes it will point
 			at a specific angle at a specific weight value, Slerp is a better choice.
 		*/
-        static Quaternion nlerp(float fT, const Quaternion& rkP, 
+        static Quaternion NLerp(float fT, const Quaternion& rkP, 
             const Quaternion& rkQ, bool shortestPath = false);
 
         /// Cutoff for sine near zero
@@ -264,7 +264,7 @@ namespace Disorder
 		float w, x, y, z;
 
 		/// Check whether this quaternion contains valid values
-		inline bool isNaN() const
+		inline bool IsNaN() const
 		{
 			return Math::IsNaN(x) || Math::IsNaN(y) || Math::IsNaN(z) || Math::IsNaN(w);
 		}

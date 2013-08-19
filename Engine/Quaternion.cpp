@@ -550,7 +550,7 @@ namespace Disorder
 		}
 	}
     //-----------------------------------------------------------------------
-    Quaternion Quaternion::nlerp(float fT, const Quaternion& rkP,
+    Quaternion Quaternion::NLerp(float fT, const Quaternion& rkP,
         const Quaternion& rkQ, bool shortestPath)
     {
 		Quaternion result;

@@ -10,7 +10,7 @@ namespace Disorder
 	GameObject::GameObject(std::string const& name, Vector3 const& pos,Quaternion const& rot,Vector3 const& scale)
 		:_name(name),_position(pos),_rotation(rot),_scale(scale)
 	{
-		_localMatrix.makeTransform(_position,_scale,_rotation);
+		_localMatrix.MakeTransform(_position,_scale,_rotation);
 		_worldMatrix = _localMatrix;
 	}
 
@@ -37,7 +37,7 @@ namespace Disorder
 		_position = pos;
 		_scale = scale;
 		_rotation = rot;
-		_localMatrix.makeTransform(_position,_scale,_rotation);
+		_localMatrix.MakeTransform(_position,_scale,_rotation);
 		 
 		GameObjectPtr parent = _parent.lock();
 		if(parent != NULL )
