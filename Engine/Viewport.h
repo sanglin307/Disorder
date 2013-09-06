@@ -14,7 +14,7 @@ namespace Disorder
 
 	 protected:
 		 bool _bActive;
-
+		 RenderPathType _renderPath;
 
 	 public:
 
@@ -37,6 +37,15 @@ namespace Disorder
 			 return 0;
 		 }
 
+		 void SetRenderPathType(RenderPathType type)
+		 {
+			 _renderPath = type;
+		 }
+
+		 RenderPathType GetRenderPathType()
+		 {
+			 return _renderPath;
+		 }
 		 
 
 	 };

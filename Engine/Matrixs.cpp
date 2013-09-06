@@ -1650,6 +1650,19 @@ namespace Disorder
             r20, r21, r22, r23,
               0,   0,   0,   1);
     }
+
+	void Matrix4::MakeTransform(const Vector3& position, const Vector3& scale, const Vector3& orientation)
+	{
+		Matrix3 rot3x3;
+		rot3x3.FromEulerAnglesXYZ(orientation.x,orientation.y,orientation.z);
+		 // Set up final matrix with scale, rotation and translation
+        m[0][0] = scale.x * rot3x3[0][0]; m[0][1] = scale.y * rot3x3[0][1]; m[0][2] = scale.z * rot3x3[0][2]; m[0][3] = position.x;
+        m[1][0] = scale.x * rot3x3[1][0]; m[1][1] = scale.y * rot3x3[1][1]; m[1][2] = scale.z * rot3x3[1][2]; m[1][3] = position.y;
+        m[2][0] = scale.x * rot3x3[2][0]; m[2][1] = scale.y * rot3x3[2][1]; m[2][2] = scale.z * rot3x3[2][2]; m[2][3] = position.z;
+
+        // No projection term
+        m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
+	}
     //-----------------------------------------------------------------------
     void Matrix4::MakeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation)
     {

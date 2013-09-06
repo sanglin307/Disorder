@@ -45,6 +45,24 @@ namespace Disorder
 			_mCameraObjects.insert(std::pair<std::string,CameraPtr>(camera->Name,camera));
 	}
 
+	void SceneManager::UpdateLight()
+	{
+		for( int i=0;i<_vRenderObjects.size();i++ )
+		{
+			_vRenderObjects[i]->ClearLight();
+			for(int j=0;j<_vDirectLights.size();j++)
+			{
+				_vRenderObjects[i]->AddLight(_vDirectLights[j]);
+			}
+
+			for(int k=0;k<_vNonDirectLights.size();k++)
+			{
+				if( _vNonDirectLights[k]->Touch(_vRenderObjects[i]))
+					_vRenderObjects[i]->AddLight(_vNonDirectLights[k]);
+			}
+		}
+	}
+
 	void SceneManager::AddLight(LightPtr const& light)
 	{
 		BOOST_ASSERT(light->Name != "");
@@ -53,9 +71,9 @@ namespace Disorder
 		{
 			_mLightObjects.insert(std::pair<std::string,LightPtr>(light->Name,light));
 			if( light->LType == LT_Parallel )
-				_mDirectLights.push_back(light);
+				_vDirectLights.push_back(light);
 			else
-				_mNonDirectLights.push_back(light);
+				_vNonDirectLights.push_back(light);
 		}
 	}
 
@@ -64,7 +82,10 @@ namespace Disorder
 		BOOST_ASSERT(renderer->Name != "");
 
 		if( _mRenderObjects.find(renderer->Name) == _mRenderObjects.end() )
+		{
 			_mRenderObjects.insert(std::pair<std::string,RendererPtr>(renderer->Name,renderer));
+			_vRenderObjects.push_back(renderer);
+		}
 	}
 
 	void SceneManager::Tick(float deltaSeconds)
@@ -75,56 +96,9 @@ namespace Disorder
 			iter->second->Tick(deltaSeconds);
 			iter++;
 		}
+
+		UpdateLight();
 	}
-
-	void SceneManager::Render()
-	{
-		GEngine->RenderEngine->OnDrawBegin();
-
-		CameraPtr mainCamera = _mCameraObjects.at("MainCamera");
-
-		RendererMap::const_iterator iter = _mRenderObjects.begin();
-		while (iter != _mRenderObjects.end())
-		{
-			iter->second->PreDraw(mainCamera);
-
-			for( int i = 0;i<MVT_NUM_VIEW_TYPES;i++)
-			{
-				if( i == MVT_Perspective )
-				{
-					iter->second->SetDirectLightParam(_mDirectLights);
-				}
-
-				if( i != MVT_Lights )
-				{
-					iter->second->Draw((MaterialViewType)i,mainCamera);
-				}
-				else
-				{
-					for(int lightIndex=0;lightIndex<_mNonDirectLights.size();lightIndex++)
-					{
-						iter->second->SetLightParam(_mNonDirectLights[lightIndex]);
-						iter->second->Draw((MaterialViewType)i,mainCamera);
-					}
-				}
-			}
-
-			iter->second->PostDraw(mainCamera);
-			
-			iter++;
-		}
-
-		// before we call canvas draw ,we should check if we should add stat info to canvas.
-		if(GEngine->Stat.bEnable())
-		{
-			GDrawTriNumber += GEngine->GameCanvas->GetCurrentDrawTriNumber();
-			GEngine->Stat.DrawStat();
-		}
-
-		GEngine->GameCanvas->Draw(mainCamera);
-
-		GEngine->RenderEngine->OnDrawEnd();
-	}
-
+ 
 
 }

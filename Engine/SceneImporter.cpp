@@ -173,7 +173,7 @@ namespace Disorder
 	{
 		GameObjectPtr childObject = ProcessTranform(pNode);
 		ProcessContent(pNode,childObject);
-		gameObject->AddChild(childObject);
+		gameObject->GetTransform()->AddChild(childObject->GetTransform());
 		int childnum = pNode->GetChildCount();
 		for(int ic = 0;ic < childnum;ic++ )
 		{
@@ -818,9 +818,7 @@ namespace Disorder
 		Vector3 position(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
 		lTmpVector =  pNode->GetGeometricRotation(FbxNode::eSourcePivot);
 		Matrix3 rotMatrix;
-		rotMatrix.FromEulerAnglesXYZ(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
-		Quaternion rot;
-		rot.FromRotationMatrix(rotMatrix);
+		Vector3 rot(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
 		lTmpVector = pNode->GetGeometricScaling(FbxNode::eSourcePivot);
 		Vector3 scale(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
 		std::string name(pNode->GetName());

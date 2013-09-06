@@ -4,28 +4,7 @@
 
 namespace Disorder
 {
-	// fbx means...
-	enum MaterialType
-	{
-		MT_Phong,
-		MT_Lambert,
-		MT_HLSL,
-		MT_CGFX,
-		MT_MentalRay,
-		MT_None
-	};
-
-	 
-
-	enum MaterialViewType
-	{
-		MVT_Perspective = 0,
-		MVT_Depth_Normal,
-		MVT_GBuffer,
-		MVT_Lights,
-        MVT_FinalPass,
-		MVT_NUM_VIEW_TYPES
-	};    
+	
 
 	class MaterialParam
 	{
@@ -421,7 +400,7 @@ namespace Disorder
 	    MaterialParamVector3Ptr LightColor;
 
 		//effect
-		RenderEffectPtr Effect[MVT_NUM_VIEW_TYPES];
+		RenderEffectPtr Effect[RPT_MaxRenderPath][MaxMaterialPassNumber];
  
 		std::string Name;
  

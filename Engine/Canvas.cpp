@@ -18,7 +18,7 @@ namespace Disorder
 		_renderEffect->PrepareRenderParam();
 	}
 
-	void CanvasBatchElement::Draw(MaterialViewType view,CameraPtr const& camera)
+	void CanvasBatchElement::Draw(RenderPathType pathType,int pass,CameraPtr const& camera)
 	{
 		BOOST_ASSERT(_vertexs.size()%4==0);
 
@@ -134,7 +134,7 @@ namespace Disorder
 
 	void Canvas::Draw(CameraPtr const& camera)
 	{
-		_stringElement.Draw(MVT_Perspective,camera);
+		_stringElement.Draw(RPT_ForwardMultiPassLight,0,camera);
 	}
 
 	unsigned int Canvas::GetCurrentDrawTriNumber()

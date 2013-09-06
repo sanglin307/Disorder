@@ -757,7 +757,7 @@ namespace Disorder
             centered on the origin.
         */
         void MakeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
-
+		void MakeTransform(const Vector3& position, const Vector3& scale, const Vector3& orientation);
         /** Building an inverse Matrix4 from orientation / scale / position.
         @remarks
             As makeTransform except it build the inverse given the same data as makeTransform, so

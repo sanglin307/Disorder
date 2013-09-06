@@ -37,12 +37,12 @@ namespace Disorder
 	   Stat.Tick(deltaSeconds);
 	   //Client first
 	   GameClient->Tick(deltaSeconds);
+ 
+	   //GWorld
+	   GWorld->Tick(deltaSeconds);
 
 	   //tick camera here
 	   GSceneManager->Tick(deltaSeconds);
-
-	   //GWorld
-	   GWorld->Tick(deltaSeconds);
 
 	   //Draw Evertything~
 	   GameClient->GetViewport(0)->Draw();

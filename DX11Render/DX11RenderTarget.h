@@ -9,7 +9,7 @@ namespace Disorder
 	{
 
 	public:
-		 
+		 DX11RenderTarget();
 	 
 	};
 }

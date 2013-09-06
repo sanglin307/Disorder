@@ -106,6 +106,7 @@
     <ClCompile Include="DX11RenderResourceManager.cpp" />
     <ClCompile Include="DX11RenderState.cpp" />
     <ClCompile Include="DX11RenderEffect.cpp" />
+    <ClCompile Include="DX11RenderTarget.cpp" />
     <ClCompile Include="DX11RenderView.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

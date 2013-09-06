@@ -21,7 +21,9 @@ namespace Disorder
 		float     SpotAngle;
 		float     Range;
 
-		Vector3 GetDirect();
+		Vector3 GetDirection();
+
+		bool Touch(RendererPtr renderObject);
 
 		static Vector3 DefaultLightDirection;
 	};

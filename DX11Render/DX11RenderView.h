@@ -4,11 +4,8 @@
 
 namespace Disorder
 {
-	class DX11RenderView : public RenderView
-	{
-	};
-
-	class DX11RenderTargetView : public DX11RenderView
+ 
+	class DX11RenderTargetView : public RenderView
 	{
 	public:
 		virtual void* GetLowInterface()
@@ -20,7 +17,7 @@ namespace Disorder
 		ID3D11RenderTargetViewPtr D3DInterface;
 	};
 
-	class DX11DepthStencilView : public DX11RenderView
+	class DX11DepthStencilView : public RenderView
 	{
 	public:
 		virtual void* GetLowInterface()
@@ -32,7 +29,7 @@ namespace Disorder
 		ID3D11DepthStencilViewPtr D3DInterface;
 	};
 
-	class DX11ShaderResourceView : public DX11RenderView
+	class DX11ShaderResourceView : public RenderView
 	{
 	public:
 		virtual void* GetLowInterface()

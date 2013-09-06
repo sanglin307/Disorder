@@ -6,6 +6,7 @@ namespace Disorder
 	class RenderTarget
 	{
 	public:
+
 		inline void SetRenderTargetView(RenderViewPtr const& renderTargetView)
 		{
 			_renderTargets.push_back(renderTargetView);

@@ -1,8 +1,6 @@
 #ifndef _DISORDER_RENDERER_H_
 #define _DISORDER_RENDERER_H_
 
-
-
 namespace Disorder
 {
 	class Renderer : public Component
@@ -12,19 +10,16 @@ namespace Disorder
 		virtual ~Renderer(){};
 
 		virtual void PreDraw(CameraPtr const& camera){};
-		virtual void Draw(MaterialViewType view,CameraPtr const& camera) = 0;
+		virtual void Draw(RenderPathType pathType,int pass,CameraPtr const& camera) = 0;
 		virtual void PostDraw(CameraPtr const& camera){};
 
-
-		virtual void SetDirectLightParam(std::vector<LightPtr> const& lightArray){;}
-		virtual void SetLightParam(LightPtr const& light){;}
-	 
-		 
+		virtual void AddLight(LightPtr & light);
+		virtual void ClearLight();
+ 
 	protected:
 		RenderEffectPtr _renderEffect;
 		RenderLayoutPtr _renderLayout;
-
- 
+		std::vector<LightPtr> _vLightArray;
 	};
 
 
@@ -36,14 +31,20 @@ namespace Disorder
 	      MaterialPtr _material;
 
 	private:
-		  void BuildRenderResource();
+		  void BindRenderResource();
+
+		    // for forward render
+		  void SetBaseLightPass();
+		  void SetDynamicLightPass(LightPtr const& light);
+
+		  void _Draw();
 	public:
 		 
-          void SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat); 
-		  virtual void SetLightParam(LightPtr const& light);
-		  virtual void SetDirectLightParam(std::vector<LightPtr> const& lightArray);
+          void SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat);
+		
+
 		  virtual void PreDraw(CameraPtr const& camera);
-		  virtual void Draw(MaterialViewType view,CameraPtr const& camera);
+		  virtual void Draw(RenderPathType pathType,int pass,CameraPtr const& camera);
 		  virtual void PostDraw(CameraPtr const& camera);
 	};
 }

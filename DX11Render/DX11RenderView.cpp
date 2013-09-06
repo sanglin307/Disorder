@@ -4,8 +4,8 @@ namespace Disorder
 {
 	bool DX11ShaderResourceView::CreateTexture2DView(RenderTexture2DPtr const& textureResource)
 	{
-		_width = textureResource->Width;
-		_height = textureResource->Height;
+		//_width = textureResource->Width;
+		//_height = textureResource->Height;
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
         ZeroMemory( &SRVDesc, sizeof( SRVDesc ) );

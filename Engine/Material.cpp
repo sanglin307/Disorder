@@ -4,10 +4,7 @@ namespace Disorder
 {
 	Material::Material()
 	{
-		for(int i=0;i<MVT_NUM_VIEW_TYPES;i++)
-		{
-			Effect[i] = 0;
-		}
+	    memset(Effect,0,sizeof(Effect)); 
 	}
 
  
@@ -69,7 +66,7 @@ namespace Disorder
 
 	void Material::UpdateMaterialParameters(GameObjectPtr const& gameObject,CameraPtr const& camera)
 	{
-		Matrix4 worldMat = gameObject->GetWorldMatrix();
+		Matrix4 worldMat = gameObject->GetTransform()->GetWorldMatrix();
 		Matrix4 viewMat = camera->ViewMatrix;
 		Matrix4 projMat = camera->ProjectMatrix;
 		Matrix4 wvpMat = projMat*viewMat*worldMat;
@@ -84,7 +81,7 @@ namespace Disorder
 		if(CameraPosition != NULL)
 		{
 			GameObjectPtr goCamera = camera->GetBase();
-			CameraPosition->SetValue(goCamera->GetPosition());
+			CameraPosition->SetValue(goCamera->GetTransform()->GetWorldPosition());
 		}
 
 		//material colors parameters
@@ -153,7 +150,7 @@ namespace Disorder
 		mat->LightColorArray = parameterManager->GetVector3Parameter("LightColorArray");
 
 		baseEffect->PrepareRenderParam();
-		mat->Effect[MVT_Perspective] = baseEffect;
+		mat->Effect[RPT_ForwardMultiPassLight][FRP_BaseLight] = baseEffect;
  
 		RenderEffectPtr lightEffect =  resourceManager->CreateRenderEffect("LightPass.fx",SM_4_0,"VS","PS");
 	 
@@ -174,7 +171,7 @@ namespace Disorder
 		mat->LightPos =  parameterManager->GetVector3Parameter("LightPos");
 	    mat->LightColor = parameterManager->GetVector3Parameter("LightColor");
 		lightEffect->PrepareRenderParam();
-		mat->Effect[MVT_Lights] = lightEffect;
+		mat->Effect[RPT_ForwardMultiPassLight][FRP_DynamicLight] = lightEffect;
 
 		return mat;
 	}
@@ -211,7 +208,7 @@ namespace Disorder
 		mat->LightColorArray = parameterManager->GetVector3Parameter("LightColorArray");
 
 		baseEffect->PrepareRenderParam();
-		mat->Effect[MVT_Perspective] = baseEffect;
+		mat->Effect[RPT_ForwardMultiPassLight][FRP_BaseLight] = baseEffect;
 
 
 		RenderEffectPtr lightEffect =  resourceManager->CreateRenderEffect("LightPass.fx",SM_4_0,"VS","PS");
@@ -233,7 +230,7 @@ namespace Disorder
 		mat->LightPos =  parameterManager->GetVector3Parameter("LightPos");
 	    mat->LightColor = parameterManager->GetVector3Parameter("LightColor");
 		lightEffect->PrepareRenderParam();
-		mat->Effect[MVT_Lights] = lightEffect;
+		mat->Effect[RPT_ForwardMultiPassLight][FRP_DynamicLight] = lightEffect;
 
 		return mat;
 

@@ -17,14 +17,41 @@ namespace Disorder
 		Range = 10.0f;
 	}
 
-	Vector3 Light::GetDirect()
+	Vector3 Light::GetDirection()
 	{
-		if( Type == LT_Parallel )
+		if( Type == LT_Parallel || Type == LT_Spot )
 		{
 			GameObjectPtr go = GetBase();
-			return go->GetRotation() * Light::DefaultLightDirection;
+			return go->GetTransform()->GetWorldMatrix() * Light::DefaultLightDirection;
 		}
 		else
 			return Vector3::ZERO;
+	}
+
+	bool Light::Touch(RendererPtr renderObject)
+	{
+		if( LType == LT_Parallel )
+			return true;
+
+		GameObjectPtr lightGo = GetBase();
+		GameObjectPtr renderGo = renderObject->GetBase();
+		if( LType == LT_Point )
+		{
+			return Range * Range > lightGo->GetTransform()->GetWorldPosition().SquaredDistance(renderGo->GetTransform()->GetWorldPosition());
+		}
+		
+		if( LType == LT_Spot )
+		{
+			Vector3 renderPos = renderGo->GetTransform()->GetWorldPosition();
+			Vector3 lightPos = lightGo->GetTransform()->GetWorldPosition();
+			bool bRange = Range * Range > lightPos.SquaredDistance(renderPos);
+			if( bRange == false )
+				return false;
+
+			float angle = GetDirection().AngleBetween(renderPos - lightPos);
+			return angle * Math::fRad2Deg < SpotAngle;
+		}
+
+		return false;
 	}
 }

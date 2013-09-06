@@ -39,8 +39,6 @@ namespace Disorder
 	typedef boost::shared_ptr<DX11RenderTarget> DX11RenderTargetPtr;
 	class DX11ShaderObject;
 	typedef boost::shared_ptr<DX11ShaderObject> DX11ShaderObjectPtr;
-	class DX11RenderView;
-	typedef boost::shared_ptr<DX11RenderView> DX11RenderViewPtr;
 	class DX11RenderTargetView;
 	typedef boost::shared_ptr<DX11RenderTargetView> DX11RenderTargetViewPtr;
 	class DX11DepthStencilView;

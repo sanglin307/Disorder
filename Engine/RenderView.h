@@ -8,10 +8,19 @@ namespace Disorder
 	{
 	public:
 		virtual void* GetLowInterface(){ return 0;}
-		virtual void Bind() {}
+
+		void SetTexture(RenderTexture2DPtr texture)
+		{
+			_targetTexture = texture;
+		}
+
+		const RenderTexture2DPtr GetTexture() const
+		{
+			return _targetTexture;
+		}
+
 	protected:
-		unsigned int _width;
-		unsigned int _height;
+		RenderTexture2DPtr _targetTexture;
 
 	};
 }

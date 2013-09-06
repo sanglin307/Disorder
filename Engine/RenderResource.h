@@ -3,38 +3,6 @@
 
 namespace Disorder
 {
-	typedef struct _BufferInitData
-	{
-		void const *Data;
-		unsigned int RowPitch;
-		unsigned int SlicePitch;
-	} BufferInitData;
-
-	enum BufferAccessHint
-	{
-		BAH_CPU_Read = 1UL << 0,
-		BAH_CPU_Write = 1UL << 1,
-		BAH_GPU_Read = 1UL << 2,
-		BAH_GPU_Write = 1UL << 3,
-		BAH_GPU_Unordered = 1UL << 4,
-		BAH_GPU_Structured = 1UL << 5,
-		BAH_Generate_Mips = 1UL << 6,
-		BAH_Immutable = 1UL << 7
-	};
-
-	enum BufferAccess
-	{
-		BA_Read_Only,
-		BA_Write_Only,
-		BA_Read_Write
-	};
-
-    enum RenderBufferType
-	{
-		RBT_Vertex,
-		RBT_Index,
-		RBT_Constant
-	};
 
 	class RenderResource
 	{
@@ -56,6 +24,7 @@ namespace Disorder
 
 		virtual void Resize(unsigned int size) = 0;
 		virtual void * GetLowInterface(){ return 0;}
+
 	protected:
 		unsigned int _accessHint;
 		unsigned int _bindFlags;

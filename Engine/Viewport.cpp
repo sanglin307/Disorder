@@ -5,12 +5,13 @@ namespace Disorder
 	Viewport::Viewport(int x,int y,int sizeX,int sizeY)
 		:X(x),Y(y),SizeX(sizeX),SizeY(sizeY)
 	{
+		_renderPath = RPT_ForwardMultiPassLight;
 		_bActive = true;
 	}
 
 	void Viewport::Draw()
 	{
-		GSceneManager->Render();
+		RenderPath::Render(_renderPath);
 	}
 
 	

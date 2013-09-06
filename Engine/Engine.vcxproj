@@ -115,7 +115,9 @@
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RenderInclude.h" />
     <ClInclude Include="RenderLayout.h" />
+    <ClInclude Include="RenderPath.h" />
     <ClInclude Include="RenderResource.h" />
     <ClInclude Include="RenderResourceManager.h" />
     <ClInclude Include="RenderState.h" />
@@ -131,6 +133,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="Vectors.h" />
     <ClInclude Include="Viewport.h" />
     <ClInclude Include="World.h" />
@@ -165,15 +168,18 @@
     <ClCompile Include="RenderEffect.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderLayout.cpp" />
+    <ClCompile Include="RenderPath.cpp" />
     <ClCompile Include="RenderResource.cpp" />
     <ClCompile Include="RenderResourceManager.cpp" />
     <ClCompile Include="RenderState.cpp" />
+    <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="RenderUtil.cpp" />
     <ClCompile Include="SceneImporter.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="SceneObjectGenerator.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Vectors.cpp" />
     <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="World.cpp" />

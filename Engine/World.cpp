@@ -14,10 +14,9 @@ namespace Disorder
 		 //camera
 		 GameObjectPtr camera = SceneObjectGenerator::CreateCamera("MainCamera");
 		 level->AddGameObject(camera);
-		// GEngine->GameClient->AddInputListener(camera->AddComponent
 
 		 GameObjectPtr go = boost::make_shared<GameObject>("test",Vector3(4.0f,0,0));
-		 go->LocalRotation(30,30,0);
+		 go->GetTransform()->SetLocalRotation(30,30,0);
 		 light->Color = Vector3(1.0f,1.0f,1.0f);
 		 light->Name = "light";
 		 light->LType = LT_Parallel;
@@ -56,15 +55,7 @@ namespace Disorder
 		 go4->AddComponent(light4);
 		 level->AddGameObject(go4);
 
-		// LevelPtr level = boost::make_shared<Level>();
-		// Vector3 position = Vector3(0.0f);
-		/* GameObjectPtr gameObject = boost::make_shared<GameObject>("",position);
-		 GeometryPtr cube = GeometryGenerator::CreateCube(1.5);
-		 GeometryRendererPtr cuberender = boost::make_shared<GeometryRenderer>(gameObject);
-		 MaterialPtr mat = MaterialGenerator::GenerateLambert();
-		 cuberender->SetGeometry(cube,mat);
-		 gameObject->AddComponent(cuberender);
-		 level->AddGameObject(gameObject);*/
+		 
 		 Levels.push_back(level);
 	 }
 

@@ -68,6 +68,8 @@ namespace Disorder
 	typedef boost::shared_ptr<VertexElement> VertexElementPtr;
 	class Geometry;
 	typedef boost::shared_ptr<Geometry> GeometryPtr;
+	class Transform;
+	typedef boost::shared_ptr<Transform> TransformPtr;
 	class GameObject;
 	typedef boost::shared_ptr<GameObject> GameObjectPtr;
 	class Level;
@@ -164,14 +166,15 @@ namespace Disorder
 #include "Plane.h"
 #include "Matrixs.h"
 #include "Bounds.h"
+#include "Transform.h"
 #include "FileSystem.h"
 #include "MainLoop.h"
-
-
 #include "InputManager.h"
 #include "Component.h"
 #include "Camera.h"
 #include "Light.h"
+
+#include "RenderInclude.h"
 #include "Texture.h"
 #include "RenderUtil.h"
 #include "RenderResource.h"
@@ -189,6 +192,7 @@ namespace Disorder
 #include "RenderResourceManager.h"
 #include "RenderEffect.h"
 #include "RenderEngine.h"
+#include "RenderPath.h"
 #include "Viewport.h"
 #include "SceneImporter.h"
 #include "SceneManager.h"

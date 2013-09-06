@@ -17,7 +17,7 @@ namespace Disorder
 		void SetTexture(RenderTexture2DPtr const& texture);
 		 
 		void AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord);
-		virtual void Draw(MaterialViewType view,CameraPtr const& camera);
+		virtual void Draw(RenderPathType pathType,int pass,CameraPtr const& camera);
 
 		unsigned int GetCurrentDrawTriNumber();
 

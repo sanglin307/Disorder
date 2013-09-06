@@ -7,15 +7,25 @@ namespace Disorder
 	{
 		Type = CT_Renderer;
 	}
+ 
+	void Renderer::AddLight(LightPtr & light)
+	{
+		_vLightArray.push_back(light);
+	}
 
-	void GeometryRenderer::BuildRenderResource()
+	void Renderer::ClearLight()
+	{
+		_vLightArray.clear();
+	}
+
+	void GeometryRenderer::BindRenderResource()
 	{
 		BOOST_ASSERT(_geometryObject != NULL && _material != NULL);
 
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
  
 		//compile shader
-		ShaderObjectPtr vertexShader = _material->Effect[MVT_Perspective]->GetVertexShader();
+		ShaderObjectPtr vertexShader = _material->Effect[RPT_ForwardMultiPassLight][FRP_BaseLight]->GetVertexShader();
 		 
 	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList,false);
  
@@ -25,11 +35,7 @@ namespace Disorder
 		{
 		    _renderLayout->BindVertexBuffer(vertexBufferArray[index]);
 		}
-
-		//RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,BAH_GPU_Read,_geometryObject,vertexShader);
-		//_renderLayout->BindVertexBuffer(vertexBuffer);
-
-
+	 
 		RenderBufferPtr indexBuffer = resourceManager->CreateRenderBuffer(RBT_Index,BAH_GPU_Read,_geometryObject,vertexShader);
 		_renderLayout->BindIndexBuffer(indexBuffer);
  
@@ -41,7 +47,7 @@ namespace Disorder
 		_geometryObject = geometry;
 		_material = mat;
 
-		BuildRenderResource();
+		BindRenderResource();
 	}
 
 	 void GeometryRenderer::PreDraw(CameraPtr const& camera)
@@ -57,40 +63,41 @@ namespace Disorder
 	 {
 
 	 }
-
-	void GeometryRenderer::SetDirectLightParam(std::vector<LightPtr> const& lightArray)
+ 
+	void GeometryRenderer::SetBaseLightPass()
 	{
-		int lightNumber = lightArray.size();
-	
-		if(lightNumber == 0)
+		if( _vLightArray.size() == 0 )
 			return;
 
-		if( lightNumber > _material->LightColorArray->MaxElementNumber )
-			lightNumber = _material->LightColorArray->MaxElementNumber;
-
-		_material->LightNumber->SetValue(lightNumber);
+		int lightNumber = 0;
 		Vector4 intensityVec(0.0f);
 		std::vector<Vector3> dirVec;
 		std::vector<Vector3> colorVec;
-		for(int i=0;i<lightArray.size();i++)
+		for(int i=0;i<_vLightArray.size();i++)
 		{
-			intensityVec[i] = lightArray[i]->Intensity;
-			dirVec.push_back(lightArray[i]->GetDirect());
-			colorVec.push_back(lightArray[i]->Color);
+			if( _vLightArray[i]->LType == LT_Parallel )
+			{
+			   intensityVec[lightNumber] = _vLightArray[i]->Intensity;
+			   dirVec.push_back(_vLightArray[i]->GetDirection());
+			   colorVec.push_back(_vLightArray[i]->Color);
+			   lightNumber++;
+
+			   if( lightNumber >= _material->LightColorArray->MaxElementNumber )
+				   break;
+			}
 		}
 
+		if( lightNumber == 0 )
+			return;
+ 
+		_material->LightNumber->SetValue(lightNumber);
 		_material->LightIntensityPack->SetValue(intensityVec);
 		_material->LightDirArray->SetValueArray(dirVec);
 		_material->LightColorArray->SetValueArray(colorVec);
-
-
 	}
 
-	void GeometryRenderer::SetLightParam(LightPtr const& light)
+	void GeometryRenderer::SetDynamicLightPass(LightPtr const& light)
 	{
-		if( _material->Effect[MVT_Lights] == 0 )
-			return;
-
 		BOOST_ASSERT(light->Type != LT_Parallel);
 
 		_material->LightType->SetValue((int)(light->Type));
@@ -98,20 +105,43 @@ namespace Disorder
 		GameObjectPtr go = light->GetBase();
 		if( light->Type == LT_Point )
 		{
-			_material->LightPos->SetValue(go->GetPosition());
+			_material->LightPos->SetValue(go->GetTransform()->GetWorldPosition());
 		}
 
 		_material->LightColor->SetValue(light->Color);
 	}
 
-	 void GeometryRenderer::Draw(MaterialViewType view,CameraPtr const& camera)
+	void GeometryRenderer::Draw(RenderPathType pathType,int pass,CameraPtr const& camera)
 	{
 		BOOST_ASSERT(_renderLayout != NULL);
 
-		_renderEffect = _material->Effect[view];
+		_renderEffect = _material->Effect[pathType][pass];
 		if( _renderEffect == NULL )
 			return;
 
+		if( pathType == RPT_ForwardMultiPassLight )
+		{
+			if( pass == FRP_BaseLight )
+			{
+				SetBaseLightPass();
+				_Draw();
+			}
+			else if( pass == FRP_DynamicLight )
+			{
+				for( int i=0;i< _vLightArray.size();i++)
+				{
+					if( _vLightArray[i]->LType != LT_Parallel )
+					{
+						SetDynamicLightPass(_vLightArray[i]);
+						_Draw();
+					}
+				}
+			}
+		}
+	}
+
+	void GeometryRenderer::_Draw()
+	{
 		GameObjectPtr gameObject = _baseObject.lock();
 		RenderEnginePtr renderEngine = GEngine->RenderEngine;
 		renderEngine->SetRenderLayout(_renderLayout);
@@ -119,4 +149,6 @@ namespace Disorder
 		renderEngine->SetEffect(_renderEffect);
 		renderEngine->DrawIndexed(_geometryObject->Indices.size(),0,0);
 	}
+
+	
 }
