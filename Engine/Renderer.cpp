@@ -105,7 +105,7 @@ namespace Disorder
 		GameObjectPtr go = light->GetBase();
 		if( light->Type == LT_Point )
 		{
-			_material->LightPos->SetValue(go->GetTransform()->GetWorldPosition());
+			_material->LightPos->SetValue(go->GetWorldPosition());
 		}
 
 		_material->LightColor->SetValue(light->Color);

@@ -27,7 +27,7 @@ namespace Disorder
 		_viewMatrixInvalid = true;
 		_projectMatrixInvalid = true;
 
- 
+	 
 	}
 
     void Camera::Tick(float delta)

@@ -66,7 +66,7 @@ namespace Disorder
 
 	void Material::UpdateMaterialParameters(GameObjectPtr const& gameObject,CameraPtr const& camera)
 	{
-		Matrix4 worldMat = gameObject->GetTransform()->GetWorldMatrix();
+		Matrix4 worldMat = gameObject->GetWorldMatrix();
 		Matrix4 viewMat = camera->ViewMatrix;
 		Matrix4 projMat = camera->ProjectMatrix;
 		Matrix4 wvpMat = projMat*viewMat*worldMat;
@@ -81,7 +81,7 @@ namespace Disorder
 		if(CameraPosition != NULL)
 		{
 			GameObjectPtr goCamera = camera->GetBase();
-			CameraPosition->SetValue(goCamera->GetTransform()->GetWorldPosition());
+			CameraPosition->SetValue(goCamera->GetWorldPosition());
 		}
 
 		//material colors parameters

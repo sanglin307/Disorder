@@ -22,7 +22,7 @@ namespace Disorder
 		if( Type == LT_Parallel || Type == LT_Spot )
 		{
 			GameObjectPtr go = GetBase();
-			return go->GetTransform()->GetWorldMatrix() * Light::DefaultLightDirection;
+			return go->GetWorldRotation() * Light::DefaultLightDirection;
 		}
 		else
 			return Vector3::ZERO;
@@ -37,13 +37,13 @@ namespace Disorder
 		GameObjectPtr renderGo = renderObject->GetBase();
 		if( LType == LT_Point )
 		{
-			return Range * Range > lightGo->GetTransform()->GetWorldPosition().SquaredDistance(renderGo->GetTransform()->GetWorldPosition());
+			return Range * Range > lightGo->GetWorldPosition().SquaredDistance(renderGo->GetWorldPosition());
 		}
 		
 		if( LType == LT_Spot )
 		{
-			Vector3 renderPos = renderGo->GetTransform()->GetWorldPosition();
-			Vector3 lightPos = lightGo->GetTransform()->GetWorldPosition();
+			Vector3 renderPos = renderGo->GetWorldPosition();
+			Vector3 lightPos = lightGo->GetWorldPosition();
 			bool bRange = Range * Range > lightPos.SquaredDistance(renderPos);
 			if( bRange == false )
 				return false;

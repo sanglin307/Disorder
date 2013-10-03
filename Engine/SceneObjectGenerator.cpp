@@ -10,8 +10,9 @@ namespace Disorder
 	   sceneCamera->Name = name;
 	   sceneCamera->LookAt(position,lookAt,upVec);
 	   sceneCamera->ProjCalculate(FOV,aspect,nearPlane,farPlane);
+	   GEngine->GameClient->AddInputListener(sceneCamera);
 	   go->AddComponent(sceneCamera);
-	  
+	   
 	   return go;
 
 	}

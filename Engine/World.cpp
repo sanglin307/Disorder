@@ -16,7 +16,7 @@ namespace Disorder
 		 level->AddGameObject(camera);
 
 		 GameObjectPtr go = boost::make_shared<GameObject>("test",Vector3(4.0f,0,0));
-		 go->GetTransform()->SetLocalRotation(30,30,0);
+		 
 		 light->Color = Vector3(1.0f,1.0f,1.0f);
 		 light->Name = "light";
 		 light->LType = LT_Parallel;

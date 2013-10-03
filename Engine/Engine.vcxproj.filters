@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Utility">
       <UniqueIdentifier>{0e09a6ee-acd9-47fe-999b-5e7a3a47e71e}</UniqueIdentifier>
     </Filter>
@@ -23,26 +19,30 @@
     <Filter Include="GameEngine">
       <UniqueIdentifier>{3448d376-cabb-4f64-bbba-c828fa086795}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
     <None Include="..\Resource\FX\2DFX.fx">
-      <Filter>Resource Files</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="..\Resource\FX\DiffuseTex.fx">
-      <Filter>Resource Files</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="..\Resource\FX\BaseLightPass.fx">
-      <Filter>Resource Files</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="..\Resource\FX\LightPass.fx">
-      <Filter>Resource Files</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="..\Resource\FX\BasePassPhong.fx">
-      <Filter>Resource Files</Filter>
+      <Filter>Shaders</Filter>
     </None>
     <None Include="..\Resource\FX\LightPassPhong.fx">
-      <Filter>Resource Files</Filter>
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -183,9 +183,6 @@
     <ClInclude Include="RenderInclude.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>GameEngine</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -305,9 +302,6 @@
     </ClCompile>
     <ClCompile Include="RenderPath.cpp">
       <Filter>RenderSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>GameEngine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
