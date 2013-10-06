@@ -12,7 +12,7 @@ namespace Disorder
 		virtual void* GetData() = 0;
 		virtual int GetElementNumber() = 0;
 
-		int MaxElementNumber;
+		unsigned int MaxElementNumber;
 	};
 
 	class MaterialParamInt : public MaterialParam

@@ -247,7 +247,7 @@ namespace Disorder
 	}
 
 
-	RenderTargetPtr DX11RenderEngine::CreateRenderTarget(RenderConfig const& renderConfig,void *hWnd)
+	RenderTargetPtr DX11RenderEngine::CreateRenderTarget(void *hWnd)
 	{
 
 		HRESULT hr = S_OK;
@@ -277,16 +277,16 @@ namespace Disorder
 		DXGI_SWAP_CHAIN_DESC sd;
 		ZeroMemory( &sd, sizeof( sd ) );
 		sd.BufferCount = 1;
-		sd.BufferDesc.Width = renderConfig.SizeX;
-		sd.BufferDesc.Height = renderConfig.SizeY;
-		sd.BufferDesc.Format = (DXGI_FORMAT)GPixelFormats[ renderConfig.ColorFormat ].PlatformFormat;
+		sd.BufferDesc.Width = GConfig->pRenderConfig->SizeX;
+		sd.BufferDesc.Height = GConfig->pRenderConfig->SizeY;
+		sd.BufferDesc.Format = (DXGI_FORMAT)GPixelFormats[ GConfig->pRenderConfig->ColorFormat ].PlatformFormat;
 		sd.BufferDesc.RefreshRate.Numerator = 60;
 		sd.BufferDesc.RefreshRate.Denominator = 1;
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		sd.OutputWindow = (HWND)hWnd;
 		sd.SampleDesc.Count = 1;
 		sd.SampleDesc.Quality = 0;
-		sd.Windowed = !renderConfig.FullScreen;
+		sd.Windowed = !GConfig->pRenderConfig->FullScreen;
 
 		ID3D11Device*         pd3dDevice;
 		ID3D11DeviceContext*  pImmediateContext;
@@ -322,8 +322,8 @@ namespace Disorder
 		ID3D11DepthStencilView* pDepthStencilView = NULL;
 		D3D11_TEXTURE2D_DESC descDepth;
 		ZeroMemory( &descDepth, sizeof(descDepth) );
-		descDepth.Width = renderConfig.SizeX;
-		descDepth.Height = renderConfig.SizeY;
+		descDepth.Width = GConfig->pRenderConfig->SizeX;
+		descDepth.Height = GConfig->pRenderConfig->SizeY;
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
 		descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -359,8 +359,8 @@ namespace Disorder
 
 		// Setup the viewport
 		D3D11_VIEWPORT vp;
-		vp.Width = (FLOAT)renderConfig.SizeX;
-		vp.Height = (FLOAT)renderConfig.SizeY;
+		vp.Width = (FLOAT)GConfig->pRenderConfig->SizeX;
+		vp.Height = (FLOAT)GConfig->pRenderConfig->SizeY;
 		vp.MinDepth = 0.0f;
 		vp.MaxDepth = 1.0f;
 		vp.TopLeftX = 0;

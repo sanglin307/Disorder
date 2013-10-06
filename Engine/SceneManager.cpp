@@ -47,15 +47,15 @@ namespace Disorder
 
 	void SceneManager::UpdateLight()
 	{
-		for( int i=0;i<_vRenderObjects.size();i++ )
+		for(unsigned int i=0;i<_vRenderObjects.size();i++ )
 		{
 			_vRenderObjects[i]->ClearLight();
-			for(int j=0;j<_vDirectLights.size();j++)
+			for(unsigned int j=0;j<_vDirectLights.size();j++)
 			{
 				_vRenderObjects[i]->AddLight(_vDirectLights[j]);
 			}
 
-			for(int k=0;k<_vNonDirectLights.size();k++)
+			for(unsigned int k=0;k<_vNonDirectLights.size();k++)
 			{
 				if( _vNonDirectLights[k]->Touch(_vRenderObjects[i]))
 					_vRenderObjects[i]->AddLight(_vNonDirectLights[k]);

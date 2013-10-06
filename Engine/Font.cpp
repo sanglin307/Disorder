@@ -2,7 +2,7 @@
 
 namespace Disorder
 {
-	Font::Font(float fontSize,float fontRevolution)
+	Font::Font(float fontSize,unsigned int fontRevolution)
 		:_fontSize(fontSize),_fontRevolution(fontRevolution),_fontMaxBearingY(0)
 		,_characterSpacer(5),_antialiasColor(false)
 	{

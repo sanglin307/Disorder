@@ -33,7 +33,7 @@ namespace Disorder
 
 	LevelPtr FbxSceneImporter::Import(std::string const& fileName)
 	{
-		std::string fbxFile = Disorder::GConfig->sRunningDictioary + "\\Resource\\Fbx\\" + fileName;
+		std::string fbxFile = GConfig->sResourceFBXPath + fileName;
 		int lFileMajor, lFileMinor, lFileRevision;
 		int lSDKMajor,  lSDKMinor,  lSDKRevision;	 
 		bool lStatus = false;
@@ -67,9 +67,6 @@ namespace Disorder
 			{
 				std::stringstream stream;
 				stream << "FBX file format version for this FBX SDK is " << lSDKMajor <<"," << lSDKMinor<<","<< lSDKRevision;
-				GLogger->Error(stream.str());
-				stream.clear();
-				stream << "FBX file format version for file " << fileName << " is "<< lFileMajor<<","<< lFileMinor<<","<< lFileRevision;
 				GLogger->Error(stream.str());
 			}
 
@@ -534,12 +531,12 @@ namespace Disorder
 			 BOOST_ASSERT(0);
 		 }
 
-		 lightObj->Color.x = lLight->Color.Get()[0];
-		 lightObj->Color.y = lLight->Color.Get()[1];
-		 lightObj->Color.z = lLight->Color.Get()[2];
+		 lightObj->Color.x = (float)lLight->Color.Get()[0];
+		 lightObj->Color.y = (float)lLight->Color.Get()[1];
+		 lightObj->Color.z = (float)lLight->Color.Get()[2];
 
-		 lightObj->Intensity = lLight->Intensity.Get();
-		 lightObj->Range = lLight->InnerAngle.Get();
+		 lightObj->Intensity = (float)lLight->Intensity.Get();
+		 lightObj->Range = (float)lLight->InnerAngle.Get();
 
 		 gameObject->AddComponent(lightObj);
 	}
@@ -717,33 +714,33 @@ namespace Disorder
 					// Display the Ambient Color
 					material->Type = MT_Phong;
 					FbxSurfacePhong* lPhoneMaterial = (FbxSurfacePhong *) lMaterial;
-					material->AmbientColor.x = lPhoneMaterial->Ambient.Get()[0];
-					material->AmbientColor.y = lPhoneMaterial->Ambient.Get()[1];
-					material->AmbientColor.z = lPhoneMaterial->Ambient.Get()[2];
+					material->AmbientColor.x = (float)lPhoneMaterial->Ambient.Get()[0];
+					material->AmbientColor.y = (float)lPhoneMaterial->Ambient.Get()[1];
+					material->AmbientColor.z = (float)lPhoneMaterial->Ambient.Get()[2];
 
 					// Display the Diffuse Color
-					material->DiffuseColor.x = lPhoneMaterial->Diffuse.Get()[0];
-					material->DiffuseColor.y = lPhoneMaterial->Diffuse.Get()[1];
-					material->DiffuseColor.z = lPhoneMaterial->Diffuse.Get()[2];
+					material->DiffuseColor.x = (float)lPhoneMaterial->Diffuse.Get()[0];
+					material->DiffuseColor.y = (float)lPhoneMaterial->Diffuse.Get()[1];
+					material->DiffuseColor.z = (float)lPhoneMaterial->Diffuse.Get()[2];
 
 					// Display the Specular Color (unique to Phong materials)
-					material->SpecularColor.x = lPhoneMaterial->Specular.Get()[0];
-					material->SpecularColor.y = lPhoneMaterial->Specular.Get()[1];
-					material->SpecularColor.z = lPhoneMaterial->Specular.Get()[2];
+					material->SpecularColor.x = (float)lPhoneMaterial->Specular.Get()[0];
+					material->SpecularColor.y = (float)lPhoneMaterial->Specular.Get()[1];
+					material->SpecularColor.z = (float)lPhoneMaterial->Specular.Get()[2];
 
 					// Display the Emissive Color
-					material->EmissiveColor.x = lPhoneMaterial->Emissive.Get()[0];
-					material->EmissiveColor.y = lPhoneMaterial->Emissive.Get()[1];
-					material->EmissiveColor.z = lPhoneMaterial->Emissive.Get()[2];
+					material->EmissiveColor.x = (float)lPhoneMaterial->Emissive.Get()[0];
+					material->EmissiveColor.y = (float)lPhoneMaterial->Emissive.Get()[1];
+					material->EmissiveColor.z = (float)lPhoneMaterial->Emissive.Get()[2];
 
 					//Opacity is Transparency factor now
-					material->Opacity = 1.0-lPhoneMaterial->TransparencyFactor.Get();
+					material->Opacity = (float)(1.0-lPhoneMaterial->TransparencyFactor.Get());
 
 					// Display the Shininess
-					material->Shininess = lPhoneMaterial->Shininess.Get();
+					material->Shininess = (float)lPhoneMaterial->Shininess.Get();
 
 					// Display the Reflectivity
-					material->Reflectivity =  lPhoneMaterial->ReflectionFactor.Get();
+					material->Reflectivity =  (float)lPhoneMaterial->ReflectionFactor.Get();
 				}
 				else if(lMaterial->GetClassId().Is(FbxSurfaceLambert::ClassId) )
 				{
@@ -751,22 +748,22 @@ namespace Disorder
 					// Display the Ambient Color
 					material->Type = MT_Lambert;
 					FbxSurfaceLambert* lLambertMaterial = (FbxSurfaceLambert *)lMaterial;
-					material->AmbientColor.x = lLambertMaterial->Ambient.Get()[0];
-					material->AmbientColor.y = lLambertMaterial->Ambient.Get()[1];
-					material->AmbientColor.z = lLambertMaterial->Ambient.Get()[2];
+					material->AmbientColor.x = (float)lLambertMaterial->Ambient.Get()[0];
+					material->AmbientColor.y = (float)lLambertMaterial->Ambient.Get()[1];
+					material->AmbientColor.z = (float)lLambertMaterial->Ambient.Get()[2];
 
 					// Display the Diffuse Color
-					material->DiffuseColor.x = lLambertMaterial->Diffuse.Get()[0];
-					material->DiffuseColor.y = lLambertMaterial->Diffuse.Get()[1];
-					material->DiffuseColor.z = lLambertMaterial->Diffuse.Get()[2];
+					material->DiffuseColor.x = (float)lLambertMaterial->Diffuse.Get()[0];
+					material->DiffuseColor.y = (float)lLambertMaterial->Diffuse.Get()[1];
+					material->DiffuseColor.z = (float)lLambertMaterial->Diffuse.Get()[2];
 
 					// Display the Emissive
-					material->EmissiveColor.x = lLambertMaterial->Emissive.Get()[0];
-					material->EmissiveColor.y = lLambertMaterial->Emissive.Get()[1];
-					material->EmissiveColor.z = lLambertMaterial->Emissive.Get()[2];
+					material->EmissiveColor.x = (float)lLambertMaterial->Emissive.Get()[0];
+					material->EmissiveColor.y = (float)lLambertMaterial->Emissive.Get()[1];
+					material->EmissiveColor.z = (float)lLambertMaterial->Emissive.Get()[2];
 
 					// Display the Opacity
-					material->Opacity = 1.0 - lLambertMaterial->TransparencyFactor.Get();
+					material->Opacity = (float)(1.0 - lLambertMaterial->TransparencyFactor.Get());
 				}
                 else
 				{
@@ -818,7 +815,7 @@ namespace Disorder
 		Vector3 position(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
 		lTmpVector =  pNode->GetGeometricRotation(FbxNode::eSourcePivot);
 		Matrix3 rotMatrix;
-		rotMatrix.FromEulerAnglesXYZ(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
+		rotMatrix.FromEulerAnglesXYZ((float)lTmpVector[0],(float)lTmpVector[1],(float)lTmpVector[2]);
 		Quaternion rot;
 		rot.FromRotationMatrix(rotMatrix);
 		lTmpVector = pNode->GetGeometricScaling(FbxNode::eSourcePivot);

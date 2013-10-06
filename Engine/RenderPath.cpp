@@ -18,7 +18,7 @@ namespace Disorder
 			return;
 
 		std::vector<RendererPtr> rendererList = GSceneManager->GetRendererList(mainCamera);
-		for( int i=0;i< rendererList.size(); i++ )
+		for(unsigned int i=0;i< rendererList.size(); i++ )
 		{
 			RendererPtr obj = rendererList[i];
 			obj->PreDraw(mainCamera);

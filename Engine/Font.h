@@ -25,7 +25,7 @@ namespace Disorder
 
 		typedef boost::unordered_map<UINT, GlyphInfo> CodePointMap;
 
-		Font(float fontSize,float fontRevolution);
+		Font(float fontSize,unsigned int fontRevolution);
 
 		void LoadFontFromFile(std::string const& fontName);
 
@@ -98,7 +98,7 @@ namespace Disorder
 	protected:
 
 		float _fontSize; // in pixel.
-		float _fontRevolution;
+		unsigned int _fontRevolution;
 		/// Max distance to baseline of this (truetype) font
 		int   _fontMaxBearingY;
 

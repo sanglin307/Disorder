@@ -4,9 +4,6 @@
 
 namespace Disorder
 {
-
-	
-
 	struct PixelFormatInfo
 	{
 		const TCHAR*	Name;
@@ -24,41 +21,6 @@ namespace Disorder
 	};
 
 	extern PixelFormatInfo GPixelFormats[];
-
-
-	struct RenderConfig
-	{
-		bool	FullScreen;
-		int		X;
-		int		Y;
-		int		SizeX;
-		int		SizeY;
-		PixelFormat ColorFormat;
-		//EPixelFormat DepthStencilFormat;
-		unsigned int SampleCount;
-		unsigned int SampleQuality;
-		unsigned int SyncInterval;
-		unsigned int MotionFrames;
-		bool HDR;
-		bool Gamma;
-
-		RenderConfig::RenderConfig()
-		{
-			FullScreen = false;
-			X = 0;
-			Y = 0;
-			SizeX = 640;
-			SizeY = 480;
-			ColorFormat = PF_R8G8B8A8;
-			//DepthStencilFormat = PF_DepthStencil;
-			SampleCount = 0;
-			SampleQuality = 0;
-			SyncInterval = 0;
-			MotionFrames = 0;
-			HDR = false;
-			Gamma = true;
-		};
-	};
  
 
 }

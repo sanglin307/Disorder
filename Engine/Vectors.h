@@ -13,6 +13,12 @@ namespace Disorder
         {
         }
 
+		inline Vector2(const double fX, const double fY )
+		{
+			x = (float)fX;
+			y = (float)fY;
+		}
+
         inline Vector2(const float fX, const float fY )
             : x( fX ), y( fY )
         {
@@ -449,6 +455,14 @@ namespace Disorder
         inline Vector3()
         {
         }
+
+		 
+		inline Vector3( const double dX, const double dY, const double dZ )
+		{
+			x = (float)dX;
+			y = (float)dY;
+			z = (float)dZ;
+		}
 
         inline Vector3( const float fX, const float fY, const float fZ )
             : x( fX ), y( fY ), z( fZ )
@@ -1004,6 +1018,14 @@ namespace Disorder
             : x( fX ), y( fY ), z( fZ ), w( fW)
         {
         }
+
+		inline Vector4( const double dX, const double dY, const double dZ, const double dW )
+		{
+			x = (float)dX;
+			y = (float)dY;
+			z = (float)dZ;
+			w = (float)dW;
+		}
 
         inline explicit Vector4( const float afCoordinate[4] )
             : x( afCoordinate[0] ),

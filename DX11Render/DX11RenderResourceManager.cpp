@@ -9,7 +9,7 @@ namespace Disorder
 		if( _effectMap.find(fileName) != _effectMap.end() )
 			return _effectMap.at(fileName);
  
-		std::string strFilePath = GConfig->sRunningDictioary + "\\Resource\\FX\\" + fileName;
+		std::string strFilePath = GConfig->sResourceFXPath + fileName;
 		RenderEffectPtr technique = boost::make_shared<DX11RenderEffect>(shaderModel); 
 	    technique->LoadShaderFromFile(strFilePath,entryPointVS,ST_VertexShader);
 		technique->LoadShaderFromFile(strFilePath,entryPointPS,ST_PixelShader);
@@ -73,7 +73,7 @@ namespace Disorder
 	void DX11RenderResourceManager::CreateVertexBufferArray(GeometryPtr const& data, unsigned int accessHint,ShaderObjectPtr const& vertexShader,std::vector<RenderBufferPtr> & bufferArray )
 	{		 
 		DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
-		for(int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
+		for(unsigned int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
 		{
 			RenderBufferPtr renderBuffer = boost::make_shared<DX11RenderBuffer>();
 			renderBuffer->CreateVertexBuffer(data,shader->ShaderReflect->InputSignatureParameters[i].SemanticName,accessHint,vertexShader);
@@ -92,7 +92,7 @@ namespace Disorder
 	RenderViewPtr DX11RenderResourceManager::CreateTexture2DViewFromFile(std::string const& fileName)
 	{
 		DX11ShaderResourceViewPtr shaderView = boost::make_shared<DX11ShaderResourceView>();
-		std::string path =  GConfig->sRunningDictioary + "\\Resource\\Texture\\" + fileName;
+		std::string path =  GConfig->sResourceTexPath + fileName;
 		shaderView->CreateTexture2DViewFromFile(path);
 
 		return shaderView;

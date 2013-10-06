@@ -8,7 +8,7 @@ namespace Disorder
 	{
 		if( ShaderReflect->ConstantBuffers.size() > 0 && CachedConstBuffer.size() == 0)
 		{
-			for(int i=0;i<ShaderReflect->ConstantBuffers.size();i++)
+			for(unsigned int i=0;i<ShaderReflect->ConstantBuffers.size();i++)
 			{
 				MaterialParamCBufferPtr cbuff = ShaderReflect->ConstantBuffers[i].BufferParamRef;
 				if( cbuff == NULL || cbuff->GetValue() == NULL)
@@ -24,7 +24,7 @@ namespace Disorder
 
 		if( ShaderReflect->ResourceBindings.size() > 0 && CachedSamplerState.size() == 0 && CachedShaderResourceView.size() == 0)
 		{
-			for( int i=0;i<ShaderReflect->ResourceBindings.size();++i)
+			for(unsigned  int i=0;i<ShaderReflect->ResourceBindings.size();++i)
 			{
 				if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_TEXTURE )
 				{
@@ -60,12 +60,12 @@ namespace Disorder
 		if(ShaderReflect->ConstantBuffers.size())
 		{
 			RenderEnginePtr renderEngine = GEngine->RenderEngine;
-			for(int i=0;i<ShaderReflect->ConstantBuffers.size();i++)
+			for(unsigned int i=0;i<ShaderReflect->ConstantBuffers.size();i++)
 			{
 				//void *pDest = renderEngine->Map(ShaderReflect->ConstantBuffers[i].BufferParamRef->GetValue(),BA_Write_Only);
 				BYTE* pData = new BYTE[ShaderReflect->ConstantBuffers[i].CBSize];
 				BYTE* pDest = pData;
-				for( int j=0;j<ShaderReflect->ConstantBuffers[i].Parameters.size();j++)
+				for(unsigned int j=0;j<ShaderReflect->ConstantBuffers[i].Parameters.size();j++)
 				{
 					ShaderVariableDesc vaDesc = ShaderReflect->ConstantBuffers[i].Variables[j];
 					ShaderTypeDesc taDesc = ShaderReflect->ConstantBuffers[i].Types[j];

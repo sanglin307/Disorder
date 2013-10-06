@@ -142,20 +142,24 @@ namespace Disorder
 		return _stringElement.GetCurrentDrawTriNumber();
 	}
 
-	void Canvas::DrawString(float xPos,float yPos,float size,Vector4 const& color,std::string const& str)
+	void DrawStringNomalize(float xPos,float yPos,float size,Vector4 const& color,std::string const& str)
+	{
+	}
+
+	void Canvas::DrawString(int xPos,int yPos,int size,Vector4 const& color,std::string const& str)
 	{
 		 //draw string x[-1.0,1.0] and y[-1.0,1.0] z = 0.0
-		float xbegin = (xPos - _width / 2 )*2/_width;
-		float ybegin = (yPos - _height / 2 )*(-2)/_height;
+		float xbegin = (xPos - _width / 2.0f )*2.0f/_width;
+		float ybegin = (yPos - _height / 2.0f )*(-2.0f)/_height;
 		float z = 0.0f;
-		float charSize = 2*size / _height;
+		float charSize = 2.0f * size / _height;
 
 		// we draw char one by one
-		for(int index=0;index<str.length();index++)
+		for(unsigned int index=0;index<str.length();index++)
 		{
 			UINT c = str[index];
 
-			if( c== 0x20) // Space
+			if( c == 0x20) // Space
 			{
 				xbegin += charSize/4;
 				continue;

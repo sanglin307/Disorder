@@ -27,7 +27,7 @@ namespace Disorder
 
 		void PrepareRenderParam(RenderEffectPtr const& technique);
 
-		virtual RenderTargetPtr CreateRenderTarget(RenderConfig const& renderConfig,void *hWnd);
+		virtual RenderTargetPtr CreateRenderTarget(void *hWnd);
 
 		ID3D11DevicePtr const & DX11RenderEngine::D3DDevice() const
 		{

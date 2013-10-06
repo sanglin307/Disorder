@@ -13,7 +13,7 @@ namespace Disorder
 		FontManager();
 		~FontManager();
 
-		FontPtr CreateFontFromFile(std::string const& fontName,float fontSize,float fontResolution);
+		FontPtr CreateFontFromFile(std::string const& fontName,float fontSize,unsigned int fontResolution);
 
 	protected:
 		FontMap _fontMap;

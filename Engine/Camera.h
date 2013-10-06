@@ -25,8 +25,8 @@ namespace Disorder
 
 		void Update(float delta);
 		
-		int _moveSpeed;
-		int _rotateSpeed;
+		float _moveSpeed;
+		float _rotateSpeed;
 
 		Vector3 _eyePos;
 

@@ -2,7 +2,7 @@
 
 namespace Disorder
 {
-	Vector3 Light::DefaultLightDirection(0,0,-1);
+	Vector3 Light::DefaultLightDirection(0.0f,0.0f,-1.0f);
 
 	Light::Light()
 	{

@@ -6,7 +6,6 @@
 #pragma once
 
 #ifdef WIN32
-#include "targetver.h"
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 #include <Windows.h>
 #endif
@@ -32,8 +31,8 @@
 #include <boost/smart_ptr/enable_shared_from_this.hpp>
 #include <boost/assert.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
+//#include <boost/uuid/uuid.hpp>
+//#include <boost/uuid/uuid_generators.hpp>
 #include <boost/array.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/pool/pool.hpp>

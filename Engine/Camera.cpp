@@ -17,12 +17,12 @@ namespace Disorder
 
 		_rotation.FromAxes(_xAxis,_upVec,_viewVec);
 
-		_nearPlane = 1.0f;
-		_farPlane = 1000.0f;
-		_FOV = Math::PI / 2;
+		_nearPlane = GConfig->pCameraConfig->NearClip;
+		_farPlane = GConfig->pCameraConfig->FarClip;
+		_FOV = GConfig->pCameraConfig->FOV * Math::fDeg2Rad;
 
-		_moveSpeed = 5;
-		_rotateSpeed = 5;
+		_moveSpeed = GConfig->pCameraConfig->mFreeMode.MoveSpeed;
+		_rotateSpeed = GConfig->pCameraConfig->mFreeMode.RotateSpeed;
 
 		_viewMatrixInvalid = true;
 		_projectMatrixInvalid = true;

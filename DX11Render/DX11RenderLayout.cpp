@@ -23,7 +23,7 @@ namespace Disorder
 
 		int inputSlot = 0;
 
-		for(int index=0;index<shaderReflection->InputSignatureParameters.size();index++)
+		for(unsigned int index=0;index<shaderReflection->InputSignatureParameters.size();index++)
 		{
 			D3D11_INPUT_ELEMENT_DESC desc;
 			desc.SemanticName = shaderReflection->InputSignatureParameters[index].SemanticName.c_str();

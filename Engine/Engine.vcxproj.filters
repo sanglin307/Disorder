@@ -25,7 +25,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
     <None Include="..\Resource\FX\2DFX.fx">
       <Filter>Shaders</Filter>
     </None>
@@ -44,6 +43,7 @@
     <None Include="..\Resource\FX\LightPassPhong.fx">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="TodoList.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrixs.h">
@@ -155,7 +155,6 @@
       <Filter>Mathematics</Filter>
     </ClInclude>
     <ClInclude Include="EngineInclude.h" />
-    <ClInclude Include="targetver.h" />
     <ClInclude Include="Material.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>

@@ -21,13 +21,18 @@ void PeekMessage()
 	std::wstring fstr(TEXT("disorder"));
 	int pos = fullPath.find(fstr);
 	fullPath = fullPath.substr(0,pos+fstr.size());	
-	Disorder::GConfig->sRunningDictioary = boost::locale::conv::from_utf(fullPath,"UTF-8");
+	Disorder::GConfig->sRootPath = boost::locale::conv::from_utf(fullPath,"UTF-8");
+	Disorder::GConfig->sConfigPath = Disorder::GConfig->sRootPath + "\\Config\\";
+	Disorder::GConfig->sResourceFBXPath = Disorder::GConfig->sRootPath + "\\Resource\\Fbx\\";
+	Disorder::GConfig->sResourceFXPath = Disorder::GConfig->sRootPath + "\\Resource\\FX\\";
+	Disorder::GConfig->sResourceTexPath = Disorder::GConfig->sRootPath + "\\Resource\\Texture\\";
+	Disorder::GConfig->Load();
  
+
 	Disorder::GEngine->GameClient = boost::make_shared<Disorder::WinClient>();
 	Disorder::GEngine->RenderEngine = boost::make_shared<Disorder::DX11RenderEngine>();
 	Disorder::GEngine->FileManager = boost::make_shared<Disorder::WinFileSystem>();
 	Disorder::GEngine->SceneImporter = boost::make_shared<Disorder::FbxSceneImporter>();
-
 
 	Disorder::GMainLoop->Init();
 

@@ -15,7 +15,7 @@ namespace Disorder
 
 		virtual void AdjustProjMatrix(Matrix4 &matrix){};
 
-		virtual RenderTargetPtr CreateRenderTarget(RenderConfig const& renderConfig,void *hWnd) = 0;
+		virtual RenderTargetPtr CreateRenderTarget(void *hWnd) = 0;
 
 		
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout) = 0;

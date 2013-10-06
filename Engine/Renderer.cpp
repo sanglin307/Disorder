@@ -31,7 +31,7 @@ namespace Disorder
  
 		std::vector<RenderBufferPtr> vertexBufferArray;
 		resourceManager->CreateVertexBufferArray(_geometryObject,BAH_GPU_Read,vertexShader,vertexBufferArray);
-		for(int index=0;index<vertexBufferArray.size();index++)
+		for(unsigned int index = 0;index<vertexBufferArray.size();index++)
 		{
 		    _renderLayout->BindVertexBuffer(vertexBufferArray[index]);
 		}
@@ -69,11 +69,11 @@ namespace Disorder
 		if( _vLightArray.size() == 0 )
 			return;
 
-		int lightNumber = 0;
+		unsigned int lightNumber = 0;
 		Vector4 intensityVec(0.0f);
 		std::vector<Vector3> dirVec;
 		std::vector<Vector3> colorVec;
-		for(int i=0;i<_vLightArray.size();i++)
+		for(unsigned int i=0;i<_vLightArray.size();i++)
 		{
 			if( _vLightArray[i]->LType == LT_Parallel )
 			{
@@ -128,7 +128,7 @@ namespace Disorder
 			}
 			else if( pass == FRP_DynamicLight )
 			{
-				for( int i=0;i< _vLightArray.size();i++)
+				for(unsigned int i=0;i< _vLightArray.size();i++)
 				{
 					if( _vLightArray[i]->LType != LT_Parallel )
 					{

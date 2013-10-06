@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CameraConfig>
+  <NearClip>1</NearClip>
+  <FarClip>1000</FarClip>
+  <FOV>60</FOV>
+  <FreeMode>
+    <MoveSpeed>10</MoveSpeed>
+    <RotateSpeed>4</RotateSpeed>
+  </FreeMode>
+</CameraConfig>

@@ -35,7 +35,8 @@ namespace Disorder
 
 		Canvas(unsigned int width,unsigned int height);
 
-		void DrawString(float xPos,float yPos, float size, Vector4 const& color,std::string const& str);
+		void DrawString(int xPos,int yPos, int size, Vector4 const& color,std::string const& str);
+		void DrawStringNomalize(float xPos,float yPos,float size,Vector4 const& color,std::string const& str);
 
 		void Draw(CameraPtr const& camera);
 

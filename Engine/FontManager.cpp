@@ -14,7 +14,7 @@ namespace Disorder
 	
 	}
 
-	FontPtr FontManager::CreateFontFromFile(std::string const& fontName,float fontSize,float fontResolution)
+	FontPtr FontManager::CreateFontFromFile(std::string const& fontName,float fontSize,unsigned int fontResolution)
 	{
 		if( _fontMap.find(fontName) != _fontMap.end() )
 			return _fontMap.at(fontName);

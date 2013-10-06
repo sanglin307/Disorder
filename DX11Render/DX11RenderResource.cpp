@@ -98,7 +98,7 @@ namespace Disorder
 		std::vector<float> vData;
   
 		DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
-		for(int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
+		for(unsigned int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
 		{
 			if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(sematic) == 0 )
 			{
@@ -116,7 +116,7 @@ namespace Disorder
 		if(sematic.compare(RenderLayout::POSITION)==0)
 		{
 			_bufferSize = _elementSize*data->Positions.size();
-			for(int index=0;index<data->Positions.size();++index)
+			for(unsigned int index=0;index<data->Positions.size();++index)
 			{
 				Vector3 vec = data->ControllPositions[data->Positions[index]];
 				vData.push_back(vec.x);
@@ -127,7 +127,7 @@ namespace Disorder
 		else if(sematic.compare(RenderLayout::COLOR)==0)
 		{
 			_bufferSize = _elementSize*data->Colors.size();
-			for(int index=0;index<data->Colors.size();++index)
+			for(unsigned int index=0;index<data->Colors.size();++index)
 			{
 				Vector4 vec = data->Colors[index];
 				vData.push_back(vec.x);
@@ -139,7 +139,7 @@ namespace Disorder
 		else if(sematic.compare(RenderLayout::NORMAL) == 0 )
 		{
 			_bufferSize = _elementSize*data->Normals.size();
-			for(int index=0;index<data->Normals.size();++index)
+			for(unsigned int index=0;index<data->Normals.size();++index)
 			{
 				Vector3 vec = data->Normals[index];
 				vData.push_back(vec.x);
@@ -150,7 +150,7 @@ namespace Disorder
 		else if(sematic.compare(RenderLayout::TEXCOORD) == 0 )
 		{
 			_bufferSize = _elementSize*data->Texcoords.size();
-			for(int index=0;index<data->Texcoords.size();++index)
+			for(unsigned int index=0;index<data->Texcoords.size();++index)
 			{
 				Vector2 vec = data->Texcoords[index];
 				vData.push_back(vec.x);
@@ -184,7 +184,7 @@ namespace Disorder
 			int normalElement = 0;
 			int texcoodElement = 0;
 			DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
-			for(int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
+			for(unsigned int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
 			{
 				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(RenderLayout::POSITION) == 0 )
 				{
@@ -231,7 +231,7 @@ namespace Disorder
 			//data
 			if(positionElement > 0 && data->Positions.size() > 0 )
 			{
-				for(int index=0;index<data->Positions.size();++index)
+				for(unsigned int index=0;index<data->Positions.size();++index)
 				{
 					Vector3 vec = data->ControllPositions[data->Positions[index]];
 					vData.push_back(vec.x);

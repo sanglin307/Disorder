@@ -43,8 +43,8 @@ namespace Disorder
 		// Obtain width and height of primary monitor.
 		INT ScreenWidth  = ::GetSystemMetrics( SM_CXSCREEN );
 		INT ScreenHeight = ::GetSystemMetrics( SM_CYSCREEN );
-		INT WindowWidth  = ScreenWidth / 2;
-		INT WindowHeight = ScreenHeight / 2;
+		INT WindowWidth  = GConfig->pRenderConfig->SizeX;
+		INT WindowHeight = GConfig->pRenderConfig->SizeY;
 		INT WindowPosX = (ScreenWidth - WindowWidth ) / 2;
 		INT WindowPosY = (ScreenHeight - WindowHeight ) / 2;
  
@@ -57,11 +57,9 @@ namespace Disorder
 		UpdateWindow(windows);
 
 		//Update RenderConfig
-		GConfig->sRenderConfig.X = WindowPosX;
-		GConfig->sRenderConfig.Y = WindowPosY;
-		GConfig->sRenderConfig.SizeX = WindowWidth;
-		GConfig->sRenderConfig.SizeY = WindowHeight;
-
+		GConfig->pRenderConfig->X = WindowPosX;
+		GConfig->pRenderConfig->Y = WindowPosY;
+	 
 		// Create viewport
 		CreateViewport(WindowPosX,WindowPosY,WindowWidth,WindowHeight,windows);
 
