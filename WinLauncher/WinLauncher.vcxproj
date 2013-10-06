@@ -43,7 +43,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
-    <IncludePath>$(DXSDK_DIR)\Include;..\Engine;$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(DXSDK_DIR)\Include;..\Engine;$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;..\..\External\oiio\src\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(DXSDK_DIR)\Lib\x86;..\..\External\ois-v1-3\lib;..\..\External\freetype-2.4.10\objs\win32\vc2010;$(FBXSDK)\lib\vs2010\x86;$(BOOST_ROOT)\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

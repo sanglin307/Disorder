@@ -142,17 +142,43 @@ namespace Disorder
 		return _stringElement.GetCurrentDrawTriNumber();
 	}
 
-	void DrawStringNomalize(float xPos,float yPos,float size,Vector4 const& color,std::string const& str)
+	int Canvas::GetStringLength(int hsize,std::string const& str)
 	{
+		return (int)(GetStringLengthNormalize(hsize*1.0f/_height,str)*_width);
 	}
 
-	void Canvas::DrawString(int xPos,int yPos,int size,Vector4 const& color,std::string const& str)
+	float Canvas::GetStringLengthNormalize(float hsize,std::string const& str)
+	{
+		float length = 0.f;
+		// we draw char one by one
+		for(unsigned int index=0;index<str.length();index++)
+		{
+			UINT c = str[index];
+			if( c == 0x20) // Space
+			{
+				length += hsize/10;
+				continue;
+			}
+			const Font::GlyphInfo& rect = _font->GetGlyphInfo(c);
+			length += hsize * rect.aspectRatio;
+		}
+
+		// map to [-1,1] of rasterize space , so we should divide 2
+		return length/2;
+	}
+
+	void Canvas::DrawStringNormalize(float xPos,float yPos,float hsize,Vector4 const& color,std::string const& str)
+	{
+		DrawString((int)(xPos*_width),(int)(yPos*_height),(int)(hsize*_height),color,str);
+	}
+
+	void Canvas::DrawString(int xPos,int yPos,int hsize,Vector4 const& color,std::string const& str)
 	{
 		 //draw string x[-1.0,1.0] and y[-1.0,1.0] z = 0.0
 		float xbegin = (xPos - _width / 2.0f )*2.0f/_width;
 		float ybegin = (yPos - _height / 2.0f )*(-2.0f)/_height;
 		float z = 0.0f;
-		float charSize = 2.0f * size / _height;
+		float charSize = 1.0f * hsize / _height;
 
 		// we draw char one by one
 		for(unsigned int index=0;index<str.length();index++)
@@ -161,12 +187,13 @@ namespace Disorder
 
 			if( c == 0x20) // Space
 			{
-				xbegin += charSize/4;
+				xbegin += charSize/10;
 				continue;
 			}
 
 			const Font::GlyphInfo& rect = _font->GetGlyphInfo(c);
 			 
+			// clockwise
 			float drawSizeX = charSize * rect.aspectRatio ;
 			_stringElement.AddVertex(Vector3(xbegin,ybegin,z),color,Vector2(rect.uvRect.left,rect.uvRect.top));
 			_stringElement.AddVertex(Vector3(xbegin+drawSizeX,ybegin,z),color,Vector2(rect.uvRect.right,rect.uvRect.top));

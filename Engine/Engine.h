@@ -13,6 +13,7 @@ namespace Disorder
 		EngineStat()
 		{
 			_bEnable = true;
+			_iDrawSize = 32;
 		}
 
 		void OnOff()
@@ -31,6 +32,7 @@ namespace Disorder
 
 	private:
 		bool _bEnable;
+		int _iDrawSize;
 	};
 
 

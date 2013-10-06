@@ -63,6 +63,8 @@ namespace Disorder
 	typedef boost::shared_ptr<WindowsClient> WindowsClientPtr;
 	class Viewport;
 	typedef boost::shared_ptr<Viewport> ViewportPtr;
+	class Image;
+	typedef boost::shared_ptr<Image> ImagePtr;
 	class VertexElement;
 	typedef boost::shared_ptr<VertexElement> VertexElementPtr;
 	class Geometry;
@@ -166,6 +168,7 @@ namespace Disorder
 #include "FileSystem.h"
 #include "MainLoop.h"
 #include "InputManager.h"
+#include "Image.h"
 #include "Component.h"
 #include "Camera.h"
 #include "Light.h"

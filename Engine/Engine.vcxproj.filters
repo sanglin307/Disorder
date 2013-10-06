@@ -182,6 +182,9 @@
     <ClInclude Include="RenderInclude.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>GameEngine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -301,6 +304,9 @@
     </ClCompile>
     <ClCompile Include="RenderPath.cpp">
       <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>GameEngine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

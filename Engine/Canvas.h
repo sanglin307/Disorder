@@ -35,12 +35,24 @@ namespace Disorder
 
 		Canvas(unsigned int width,unsigned int height);
 
+		int GetStringLength(int hsize,std::string const& str);
+		float GetStringLengthNormalize(float hsize,std::string const& str);
 		void DrawString(int xPos,int yPos, int size, Vector4 const& color,std::string const& str);
-		void DrawStringNomalize(float xPos,float yPos,float size,Vector4 const& color,std::string const& str);
+		void DrawStringNormalize(float xPos,float yPos,float size,Vector4 const& color,std::string const& str);
 
 		void Draw(CameraPtr const& camera);
 
 		unsigned int GetCurrentDrawTriNumber();
+
+		const unsigned int GetWidth() const
+		{
+			return _width;
+		}
+
+		const unsigned int GetHeight() const
+		{
+			return _height;
+		}
 
 	protected:
 		CanvasBatchElement _stringElement;

@@ -65,16 +65,15 @@ namespace Disorder
    {
 		if( !_bEnable )
 			return;
-
-		int x = 450;
-		int y = 10;
-		int charSize = 16;
+ 
 		Vector4 color(1.0f);
 		CanvasPtr canvas = GEngine->GameCanvas;
 
 		std::stringstream strstream;
 		strstream << "Drawed triangle num:" << GDrawTriNumber;
-		canvas->DrawString(x,y,charSize,color,strstream.str());
+		std::string drawstr = strstream.str();
+		int length = canvas->GetStringLength(_iDrawSize,drawstr);
+		canvas->DrawString(canvas->GetWidth() - length - 5 ,10,_iDrawSize,color,drawstr);
    }
 
    void EngineStat::Tick(float deltaSeconds)
@@ -91,7 +90,6 @@ namespace Disorder
 	   CanvasPtr canvas = GEngine->GameCanvas;
 	   int x = 10;
 	   int y = 10;
-	   int charSize = 16;
 	   Vector4 color(1.0f);
 
 	   static int fps = (int)(1/deltaSeconds);
@@ -104,7 +102,7 @@ namespace Disorder
 
 	    std::stringstream strstream;
 		strstream << "Fps:" << fps;
-		canvas->DrawString(x,y,charSize,color,strstream.str());
+		canvas->DrawString(x,y,_iDrawSize,color,strstream.str());
 		strstream.clear();
 
    }
