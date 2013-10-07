@@ -46,6 +46,7 @@ namespace Disorder
 	{
 	public:
 		virtual bool Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,BufferInitData const* pData) = 0;
+		virtual bool Create(PixelFormat pixelFormat,ImagePtr const& image) = 0;
        
 
 	public:

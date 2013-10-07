@@ -128,7 +128,7 @@ namespace Disorder
 	Canvas::Canvas(unsigned int width,unsigned int height)
 		:_width(width),_height(height)
 	{
-		_font = GFontManager->CreateFontFromFile("calibri.ttf",20,96);
+		_font = GFontManager->CreateFontFromTrueTypeFile("calibri",20,96);
 		_stringElement.SetTexture(_font->GetGlyphTexture());
 	}
 

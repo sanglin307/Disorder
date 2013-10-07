@@ -67,6 +67,7 @@ namespace Disorder
 		static std::string sResourceFBXPath;
 		static std::string sResourceFXPath;
 		static std::string sResourceTexPath;
+		static std::string sResourceFontPath;
 
 
 		RenderConfig* pRenderConfig; 

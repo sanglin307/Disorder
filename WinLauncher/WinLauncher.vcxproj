@@ -44,7 +44,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
     <IncludePath>$(DXSDK_DIR)\Include;..\Engine;$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;..\..\External\oiio\src\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(DXSDK_DIR)\Lib\x86;..\..\External\ois-v1-3\lib;..\..\External\freetype-2.4.10\objs\win32\vc2010;$(FBXSDK)\lib\vs2010\x86;$(BOOST_ROOT)\stage\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(DXSDK_DIR)\Lib\x86;..\..\External\ois-v1-3\lib;..\..\External\freetype-2.4.10\objs\win32\vc2010;..\..\External\oiio\build\libOpenImageIO\Debug;$(FBXSDK)\lib\vs2010\x86;$(BOOST_ROOT)\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -64,7 +64,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3dcompiler.lib;D3D11.lib;d3dx11d.lib;ois_static_d.lib;xinput.lib;freetype2410MT_D.lib;fbxsdk-2013.2-mdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3dcompiler.lib;D3D11.lib;ois_static_d.lib;xinput.lib;freetype2410MT_D.lib;fbxsdk-2013.2-mdd.lib;OpenImageIO.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImportLibrary>
       </ImportLibrary>
       <IgnoreSpecificDefaultLibraries>LIBCMTD</IgnoreSpecificDefaultLibraries>

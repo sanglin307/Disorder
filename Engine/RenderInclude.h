@@ -181,9 +181,9 @@ namespace Disorder
 		PF_Unknown              =0,
 		PF_R32G32B32A32F        =1,
 		PF_R32G32B32F           =2,
-		PF_R8G8B8A8             =3,
+		PF_R8G8B8A8             =3,  // unsigned int resolve to float evenly [0,1]
 		PF_R32G32F              =4,
-		PF_R8G8                 =5,
+		PF_R8G8                 =5,  // unsigned int resolve to float evenly [0,1]
 		PF_MAX                  =6
 	};
 

@@ -10,13 +10,13 @@ namespace Disorder
 
 	}
 	
-	void Font::LoadFontFromFile(std::string const& fontName)
+	void Font::LoadFontFromTrueTypeFile(std::string const& fontName)
 	{
 		FT_Library  ft_library;
 		FT_Error error = FT_Init_FreeType( &ft_library );
 		BOOST_ASSERT(!error);
 
-		std::string strFilePath = "..\\Resource\\Font\\" + fontName;
+		std::string strFilePath = GConfig->sResourceFontPath + "ttf\\" + fontName + ".ttf";
 		FT_Face face;
 	    error = FT_New_Face( ft_library,strFilePath.c_str(),0,&face );
 		BOOST_ASSERT(!error);
@@ -162,18 +162,20 @@ namespace Disorder
 			}
 		}
 
-		SamplerStatePtr sampler = GEngine->RenderEngine->ResourceManager->CreateSamplerState(SF_Linear,TAM_Clamp,0);
-		BufferInitData initData;
-		initData.Data = imageData;
-		initData.RowPitch = 0;
-		initData.SlicePitch = 0;
-		_glyphsTexture = GEngine->RenderEngine->ResourceManager->CreateRenderTexture2D(sampler,PF_R8G8,finalWidth,finalHeight,false,&initData);
-   
-		
-
 		if( ft_library )
 			FT_Done_FreeType(ft_library);
- 
+
+		// save it to image 
+		ImagePtr fontImage = boost::make_shared<Image>(finalWidth,finalHeight,2,imageData);
+		GImageManager->Add(fontName,fontImage);
+		//std::string strImageFileName = fontName + ".tif";
+		//GImageManager->Save(strImageFileName,fontImage);
+
+		SamplerStatePtr sampler = GEngine->RenderEngine->ResourceManager->CreateSamplerState(SF_Linear,TAM_Clamp,0);
+		PixelFormat pixelFormat = PF_R8G8;
+		_glyphsTexture = GEngine->RenderEngine->ResourceManager->CreateRenderTexture2D(sampler,pixelFormat,fontImage);
+   
+		delete imageData;
 	}
 
 

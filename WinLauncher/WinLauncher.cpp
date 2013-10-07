@@ -26,6 +26,7 @@ void PeekMessage()
 	Disorder::GConfig->sResourceFBXPath = Disorder::GConfig->sRootPath + "\\Resource\\Fbx\\";
 	Disorder::GConfig->sResourceFXPath = Disorder::GConfig->sRootPath + "\\Resource\\FX\\";
 	Disorder::GConfig->sResourceTexPath = Disorder::GConfig->sRootPath + "\\Resource\\Texture\\";
+	Disorder::GConfig->sResourceFontPath = Disorder::GConfig->sRootPath + "\\Resource\\Font\\";
 	Disorder::GConfig->Load();
  
 

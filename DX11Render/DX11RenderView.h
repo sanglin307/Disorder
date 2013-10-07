@@ -38,7 +38,7 @@ namespace Disorder
 		}
 
 	    bool CreateTexture2DView(RenderTexture2DPtr const& textureResource);
-		bool CreateTexture2DViewFromFile(std::string const& fileName);
+	 
 
 	public:
 		ID3D11ShaderResourceViewPtr D3DInterface;

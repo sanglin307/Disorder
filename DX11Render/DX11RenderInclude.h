@@ -5,15 +5,13 @@
 
 #pragma once
 
-#include "targetver.h"
-
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 
 
 //system related
 #include <D3D11.h>
 #include <D3Dcompiler.h>
-#include <D3DX11.h>
+//#include <D3DX11.h>
 
 
 

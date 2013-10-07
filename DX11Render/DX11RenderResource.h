@@ -26,6 +26,7 @@ namespace Disorder
 	{
 	public:
 		virtual bool Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,BufferInitData const* pData);
+		virtual bool Create(PixelFormat pixelFormat,ImagePtr const& image);
 	
 		virtual void * GetLowInterface();
 

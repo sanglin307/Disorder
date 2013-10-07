@@ -13,7 +13,8 @@ namespace Disorder
 		virtual RenderBufferPtr CreateRenderBuffer(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData);
 		virtual RenderBufferPtr CreateConstBuffer(unsigned int size, unsigned int accessHint);
 		virtual RenderTexture2DPtr CreateRenderTexture2D(SamplerStatePtr const& sampler,PixelFormat pixelFormat,unsigned int width,unsigned int hight,bool bMipmap,BufferInitData const* pData);
-		virtual RenderViewPtr CreateTexture2DViewFromFile(std::string const& fileName);
+		virtual RenderTexture2DPtr CreateRenderTexture2D(SamplerStatePtr const& sampler,PixelFormat pixelFormat,ImagePtr image);
+ 
 		virtual SamplerStatePtr CreateSamplerState(SamplerFilter filter,TextureAddressMode addressUVW,UINT maxAnisotropy = 16);
 		virtual RasterizeStatePtr CreateRasterizeState(RasterizeDesc *pDesc);
 		virtual DepthStencilStatePtr CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef);

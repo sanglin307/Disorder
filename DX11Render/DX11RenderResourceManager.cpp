@@ -88,14 +88,13 @@ namespace Disorder
 
 		return renderBuffer;
 	}
-
-	RenderViewPtr DX11RenderResourceManager::CreateTexture2DViewFromFile(std::string const& fileName)
+ 
+	RenderTexture2DPtr DX11RenderResourceManager::CreateRenderTexture2D(SamplerStatePtr const& sampler,PixelFormat pixelFormat,ImagePtr image)
 	{
-		DX11ShaderResourceViewPtr shaderView = boost::make_shared<DX11ShaderResourceView>();
-		std::string path =  GConfig->sResourceTexPath + fileName;
-		shaderView->CreateTexture2DViewFromFile(path);
-
-		return shaderView;
+		RenderTexture2DPtr texture = boost::make_shared<DX11RenderTexture2D>();
+		texture->Create(pixelFormat,image);
+		texture->Sampler = sampler;
+		return texture;
 	}
 
 	RenderTexture2DPtr DX11RenderResourceManager::CreateRenderTexture2D(SamplerStatePtr const& sampler,PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,BufferInitData const* pData)

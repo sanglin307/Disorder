@@ -22,16 +22,6 @@ namespace Disorder
 
 		return true;
 	}
-
-	bool DX11ShaderResourceView::CreateTexture2DViewFromFile(std::string const& fileName)
-	{
-		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
-		ID3D11ShaderResourceView* pShaderView;
-		D3DX11CreateShaderResourceViewFromFileA( renderEngine->D3DDevice().get(), fileName.c_str(), NULL, NULL, &pShaderView, NULL );
-		D3DInterface = MakeComPtr<ID3D11ShaderResourceView>(pShaderView);
-
-		return true;
-
-	}
+ 
 	 
 }

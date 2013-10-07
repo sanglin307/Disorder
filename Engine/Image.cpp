@@ -35,6 +35,20 @@ namespace Disorder
 		 return imagePtr;
 	}
 
+	void ImageManager::Add(std::string const& imageName,ImagePtr const& image)
+	{
+		_mapImages[imageName] = image;
+	}
+
+	ImagePtr ImageManager::Find(std::string const& imageName)
+	{
+		std::map<std::string,ImagePtr>::iterator iter = _mapImages.find(imageName);
+		if( iter != _mapImages.end() )
+			return iter->second;
+
+		return NULL;
+	}
+
 	void ImageManager::Save(std::string const& fileName,ImagePtr const& image)
 	{
 		std::string imageFile = GConfig->sResourceTexPath + fileName;
@@ -53,10 +67,12 @@ namespace Disorder
 		delete imageOut;
 	}
 
-	Image::Image(int width,int height,int channels,std::vector<unsigned char> const& pixels)
-		:_vPixels(pixels)
+	Image::Image(int width,int height,int channels,unsigned char* pixels)
 	{
 		_imageSpec = ImageSpec(width,height,channels,TypeDesc::UINT8);
+		int size = width*height*channels;
+		_vPixels.resize(size);
+		memcpy(&_vPixels[0],pixels,size*sizeof(unsigned char));
 	}
 
 	Image::Image(ImageSpec const& spec,std::vector<unsigned char> const& pixels)

@@ -352,6 +352,15 @@ namespace Disorder
 		}
 	}
 
+	bool DX11RenderTexture2D::Create(PixelFormat pixelFormat,ImagePtr const& image)
+	{
+		const ImageSpec &spec = image->GetSpec();
+		_BufferInitData data;
+		data.Data = image->GetImageData();
+		data.RowPitch = GPixelFormats[pixelFormat].BlockBytes * spec.width;
+		data.SlicePitch = 0;
+		return Create(pixelFormat,spec.width,spec.height,false,&data);
+	}
 
 	bool DX11RenderTexture2D::Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,BufferInitData const* pData)
 	{
@@ -391,8 +400,8 @@ namespace Disorder
 			D3D11_SUBRESOURCE_DATA InitData;
 			ZeroMemory( &InitData, sizeof(InitData) );
 			InitData.pSysMem = pData->Data;
-			InitData.SysMemPitch = GPixelFormats[pixelFormat].BlockBytes * Width;
-			InitData.SysMemSlicePitch = 0;
+			InitData.SysMemPitch = pData->RowPitch;
+			InitData.SysMemSlicePitch = pData->SlicePitch;
 			HRESULT hr = renderEngine->D3DDevice()->CreateTexture2D( &desc, &InitData, &pTex2D );
 			BOOST_ASSERT(hr==S_OK);
 		}
@@ -403,10 +412,7 @@ namespace Disorder
 		}
 
 		D3DInterface = MakeComPtr<ID3D11Texture2D>(pTex2D);
-
-		//save it and test
-		D3DX11SaveTextureToFile(renderEngine->D3DImmediateContext().get(),pTex2D,D3DX11_IFF_DDS,L"..\\Resource\\Font\\test.dds");
-
+ 
 		return true;
 
 	}

@@ -12,7 +12,7 @@ namespace Disorder
 	public:
 
 		Image(ImageSpec const& spec,std::vector<unsigned char> const& pixels);
-		Image(int width,int height,int channels,std::vector<unsigned char> const& pixels);
+		Image(int width,int height,int channels,unsigned char* pixels);
 		
 
 		const ImageSpec& GetSpec() const
@@ -37,6 +37,8 @@ namespace Disorder
 	public:
 		ImagePtr Load(std::string const& fileName,bool reloadIfExist = false);
 		void Save(std::string const& fileName,ImagePtr const& image);
+		void Add(std::string const& imageName,ImagePtr const& image);
+		ImagePtr Find(std::string const& imageName);
 
 	private:
 		std::map<std::string,ImagePtr> _mapImages;

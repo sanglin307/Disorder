@@ -27,7 +27,7 @@ namespace Disorder
 
 		Font(float fontSize,unsigned int fontRevolution);
 
-		void LoadFontFromFile(std::string const& fontName);
+		void LoadFontFromTrueTypeFile(std::string const& fontName);
 
 		RenderTexture2DPtr const& GetGlyphTexture() const
 		{

@@ -12,6 +12,7 @@ namespace Disorder
 	std::string Config::sResourceFBXPath = "";
     std::string Config::sResourceFXPath = "";
     std::string Config::sResourceTexPath = "";
+	std::string Config::sResourceFontPath = "";
 
 
 	Config::Config()

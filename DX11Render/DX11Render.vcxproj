@@ -95,7 +95,6 @@
     <ClInclude Include="DX11RenderTarget.h" />
     <ClInclude Include="DX11RenderEffect.h" />
     <ClInclude Include="DX11RenderView.h" />
-    <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DX11RenderEngine.cpp" />
