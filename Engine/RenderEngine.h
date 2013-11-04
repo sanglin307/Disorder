@@ -15,9 +15,11 @@ namespace Disorder
 
 		virtual void AdjustProjMatrix(Matrix4 &matrix){};
 
-		virtual RenderTargetPtr CreateRenderTarget(void *hWnd) = 0;
+		virtual void CreateViewport(void *hWnd) = 0;
 
-		
+		virtual void ClearRenderTarget(const RenderSurfacePtr& renderTarget,const Vector4& color ) = 0;
+		virtual void ClearDepthStencil(const RenderSurfacePtr& depthBuffer,bool bClearDepth,float depth,bool bClearStencil,unsigned char stencil) = 0;
+		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil) = 0;
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout) = 0;
 		
 		virtual void SetEffect(RenderEffectPtr const& effect) = 0;

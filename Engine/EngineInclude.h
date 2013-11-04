@@ -91,8 +91,6 @@ namespace Disorder
 	typedef boost::shared_ptr<MaterialParamShaderRes> MaterialParamShaderResPtr;
 	class MaterialParamSamplerState;
 	typedef boost::shared_ptr<MaterialParamSamplerState> MaterialParamSamplerStatePtr;
-	class MaterialParamUnordered;
-	typedef boost::shared_ptr<MaterialParamUnordered> MaterialParamUnorderedPtr;
 	class MaterialParameterManager;
 	typedef boost::shared_ptr<MaterialParameterManager> MaterialParameterManagerPtr;
 	class Material;
@@ -105,10 +103,6 @@ namespace Disorder
 	typedef boost::shared_ptr<Renderer> RendererPtr;
 	class GeometryRenderer;
 	typedef boost::shared_ptr<GeometryRenderer> GeometryRendererPtr;
-	class RenderView;
-	typedef boost::shared_ptr<RenderView> RenderViewPtr;
-	class RenderTarget;
-	typedef boost::shared_ptr<RenderTarget> RenderTargetPtr;
 	class RenderLayout;
 	typedef boost::shared_ptr<RenderLayout> RenderLayoutPtr;
 	class RenderEffect;
@@ -127,6 +121,11 @@ namespace Disorder
 	typedef boost::shared_ptr<RenderTexture1D> RenderTexture1DPtr;
 	class RenderTexture2D;
 	typedef boost::shared_ptr<RenderTexture2D> RenderTexture2DPtr;
+	class RenderTexture3D;
+	typedef boost::shared_ptr<RenderTexture3D> RenderTexture3DPtr;
+	class RenderSurface;
+	typedef boost::shared_ptr<RenderSurface> RenderSurfacePtr;
+	class RenderSurfaceManager;
 	class FontManager;
 	typedef boost::shared_ptr<FontManager> FontManagerPtr;
 	class Font;
@@ -178,11 +177,11 @@ namespace Disorder
 #include "RenderUtil.h"
 #include "RenderResource.h"
 #include "RenderState.h"
-#include "RenderView.h"
+#include "RenderSurface.h"
 #include "Material.h"
 #include "Font.h"
 #include "FontManager.h"
-#include "RenderTarget.h"
+
 #include "RenderLayout.h"
 #include "Geometry.h"
 #include "SceneObjectGenerator.h"

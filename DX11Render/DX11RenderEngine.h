@@ -14,8 +14,11 @@ namespace Disorder
 		virtual void OnDrawBegin();
 		virtual void OnDrawEnd();
 
+		virtual void ClearRenderTarget(const RenderSurfacePtr& renderTarget,const Vector4& color );
+		virtual void ClearDepthStencil(const RenderSurfacePtr& depthBuffer,bool bClearDepth,float depth,bool bClearStencil,unsigned char stencil);
+
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
-		
+		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil);
 
 		//virtual void UpdateMVPMatrix(RenderEffectPtr const& technique, Matrix4 const& worldMatrix,Matrix4 const& viewMatrix,Matrix4 const& projMatrix);
 		virtual void SetEffect(RenderEffectPtr const& technique);
@@ -27,7 +30,7 @@ namespace Disorder
 
 		void PrepareRenderParam(RenderEffectPtr const& technique);
 
-		virtual RenderTargetPtr CreateRenderTarget(void *hWnd);
+		virtual void CreateViewport(void *hWnd);
 
 		ID3D11DevicePtr const & DX11RenderEngine::D3DDevice() const
 		{
@@ -38,8 +41,11 @@ namespace Disorder
 		{
 			return _pImmediateContext;
 		};
-
+ 
 	protected:
+
+		void EnumAdapters();
+		void CreateDevice();
 
 		virtual void SetBlendState(BlendStatePtr const& blendState);
 		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState);
@@ -49,12 +55,14 @@ namespace Disorder
 
 		D3D_DRIVER_TYPE                         _driverType;
 		D3D_FEATURE_LEVEL                       _featureLevel;
+
+		IDXGIFactoryPtr                         _pDXGIFactory;
+		std::vector<IDXGIAdapterPtr>            _vDXGIAdapter;
+
 		ID3D11DevicePtr                         _pd3dDevice;
 		ID3D11DeviceContextPtr                  _pImmediateContext;
 		IDXGISwapChainPtr                       _pSwapChain;
-
-		DX11RenderTargetPtr                     _pRenderTarget;
-
+ 
 	 
 
 	};

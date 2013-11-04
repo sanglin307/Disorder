@@ -26,7 +26,7 @@ namespace Disorder
 		int		SizeX;
 		int		SizeY;
 		PixelFormat ColorFormat;
-		//EPixelFormat DepthStencilFormat;
+		PixelFormat DepthStencilFormat;
 		unsigned int SampleCount;
 		unsigned int SampleQuality;
 		unsigned int SyncInterval;
@@ -41,8 +41,8 @@ namespace Disorder
 			Y = 0;
 			SizeX = 640;
 			SizeY = 480;
-			ColorFormat = PF_R8G8B8A8;
-			//DepthStencilFormat = PF_DepthStencil;
+			ColorFormat = PF_R10G10B10A2;//PF_R8G8B8A8;
+			DepthStencilFormat = PF_D24S8;
 			SampleCount = 0;
 			SampleQuality = 0;
 			SyncInterval = 0;

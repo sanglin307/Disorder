@@ -2,18 +2,17 @@
 
 namespace Disorder
 {
-	void CanvasBatchElement::SetTexture(RenderTexture2DPtr const& texture)
+	void CanvasBatchElement::SetTexture(RenderSurfacePtr const& texture)
 	{
 		_texture = texture;
 		
 		ShaderObjectPtr pixelShader = _renderEffect->GetPixelShader();
-		RenderViewPtr renderView = GEngine->RenderEngine->ResourceManager->CreateTexture2DView(texture);
- 
+	 
 		MaterialParamShaderResPtr shaderres = _renderEffect->GetShaderResourceParameter("DiffuseTexture");
-		shaderres->SetValue(renderView);
+		shaderres->SetValue(texture);
 	  
 		MaterialParamSamplerStatePtr msampler = _renderEffect->GetSamplerStateParameter("LinearSampler");
-		msampler->SetValue(texture->Sampler);
+		msampler->SetValue(texture->Tex2DResource->Sampler);
 
 		_renderEffect->PrepareRenderParam();
 	}

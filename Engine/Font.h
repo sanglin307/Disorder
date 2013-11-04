@@ -29,7 +29,7 @@ namespace Disorder
 
 		void LoadFontFromTrueTypeFile(std::string const& fontName);
 
-		RenderTexture2DPtr const& GetGlyphTexture() const
+		RenderSurfacePtr const& GetGlyphTexture() const
 		{
 			return _glyphsTexture;
 		}
@@ -108,7 +108,7 @@ namespace Disorder
 
 		bool _antialiasColor;
 
-		RenderTexture2DPtr _glyphsTexture;
+		RenderSurfacePtr _glyphsTexture;
 
 		std::vector<CodePointRange> _codePointRangeList;
 

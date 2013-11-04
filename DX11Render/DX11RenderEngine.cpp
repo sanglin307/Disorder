@@ -11,15 +11,178 @@ namespace Disorder
 		GPixelFormats[ PF_R32G32B32F	].PlatformFormat	= DXGI_FORMAT_R32G32B32_FLOAT;
 		GPixelFormats[ PF_R8G8B8A8		].PlatformFormat	= DXGI_FORMAT_R8G8B8A8_UNORM;
 		GPixelFormats[ PF_R32G32F       ].PlatformFormat    = DXGI_FORMAT_R32G32_FLOAT;
-		GPixelFormats[ PF_R8G8          ].PlatformFormat    =  DXGI_FORMAT_R8G8_UNORM;
+		GPixelFormats[ PF_R8G8          ].PlatformFormat    = DXGI_FORMAT_R8G8_UNORM;
+		GPixelFormats[ PF_R10G10B10A2   ].PlatformFormat    = DXGI_FORMAT_R10G10B10A2_UNORM; 
+		GPixelFormats[ PF_D24S8 ].PlatformFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
 		_driverType = D3D_DRIVER_TYPE_NULL;
 		_featureLevel = D3D_FEATURE_LEVEL_11_0;
 
 		ResourceManager = boost::make_shared<DX11RenderResourceManager>();
 		ParameterManager = boost::make_shared<MaterialParameterManager>();
- 
+
+		IDXGIFactory * pFactory;
+        HRESULT hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)(&pFactory) );
+		BOOST_ASSERT(SUCCEEDED(hr));
+
+		_pDXGIFactory = MakeComPtr<IDXGIFactory>(pFactory); 
+
+		EnumAdapters();
+
+		CreateDevice();
+	 }
+
+	 void DX11RenderEngine::EnumAdapters()
+	 {
+		 BOOST_ASSERT(_pDXGIFactory != NULL );
+
+		 _vDXGIAdapter.clear();
+		 IDXGIAdapter * pAdapter; 
+		 
+		 UINT i =0;
+		 while(_pDXGIFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND) 
+		 { 
+			 _vDXGIAdapter.push_back(MakeComPtr<IDXGIAdapter>(pAdapter));
+			 i++;
+		 } 
 	 }
  
+	 void DX11RenderEngine::CreateDevice()
+	 {
+		 BOOST_ASSERT(_vDXGIAdapter.size() > 0);
+		 UINT DeviceCreationFlags = D3D11_CREATE_DEVICE_SINGLETHREADED;
+		 D3D_DRIVER_TYPE DriverType = D3D_DRIVER_TYPE_HARDWARE;
+ 
+	 #ifdef _DEBUG
+		 DeviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+	 #endif
+  
+		 D3D_FEATURE_LEVEL FeatureLevels[] =
+		 {
+			D3D_FEATURE_LEVEL_11_0,
+			D3D_FEATURE_LEVEL_10_1,
+			D3D_FEATURE_LEVEL_10_0,
+		 };
+
+		 UINT numFeatureLevels = ARRAYSIZE( FeatureLevels );
+		 ID3D11Device*         pd3dDevice;
+		 ID3D11DeviceContext*  pImmediateContext;
+ 
+		 HRESULT Hr = D3D11CreateDevice( NULL, DriverType, NULL, DeviceCreationFlags, FeatureLevels, numFeatureLevels, D3D11_SDK_VERSION, &pd3dDevice, &_featureLevel, &pImmediateContext );
+		 BOOST_ASSERT( SUCCEEDED(Hr) );
+
+		 _pd3dDevice = MakeComPtr<ID3D11Device>(pd3dDevice);
+		 _pImmediateContext = MakeComPtr<ID3D11DeviceContext>(pImmediateContext);
+		 
+	 }
+
+	 void DX11RenderEngine::CreateViewport(void *hWnd)
+	{
+		HRESULT hr = S_OK;
+	
+		DXGI_SWAP_CHAIN_DESC sd;
+		ZeroMemory( &sd, sizeof( sd ) );
+
+		sd.BufferCount = 1;
+		sd.BufferDesc.Width = GConfig->pRenderConfig->SizeX;
+		sd.BufferDesc.Height = GConfig->pRenderConfig->SizeY;
+		sd.BufferDesc.Format = (DXGI_FORMAT)GPixelFormats[GConfig->pRenderConfig->ColorFormat].PlatformFormat; 
+		sd.BufferDesc.RefreshRate.Numerator = 60;
+		sd.BufferDesc.RefreshRate.Denominator = 1;
+		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
+		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+		sd.OutputWindow = (HWND)hWnd;
+		sd.SampleDesc.Count = 1;
+		sd.SampleDesc.Quality = 0;
+		sd.Windowed = !GConfig->pRenderConfig->FullScreen;
+
+		
+		IDXGISwapChain*       pSwapChain;
+		hr = _pDXGIFactory->CreateSwapChain(_pd3dDevice.get(),&sd,&pSwapChain);
+		BOOST_ASSERT(SUCCEEDED(hr));
+		_pSwapChain = MakeComPtr<IDXGISwapChain>(pSwapChain);
+
+		hr = _pDXGIFactory->MakeWindowAssociation((HWND)hWnd,DXGI_MWA_NO_WINDOW_CHANGES);
+		BOOST_ASSERT(SUCCEEDED(hr));
+
+		// Create a render target view
+		ID3D11Texture2D* pBackBuffer = NULL;
+		hr = _pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&pBackBuffer );
+		BOOST_ASSERT(SUCCEEDED(hr));
+		DX11RenderTexture2DPtr BackBufferTex = boost::make_shared<DX11RenderTexture2D>(GConfig->pRenderConfig->ColorFormat,sd.BufferDesc.Width,sd.BufferDesc.Height,MakeComPtr<ID3D11Texture2D>(pBackBuffer));
+ 
+		ID3D11RenderTargetView* pRenderTargetView = NULL;
+		D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
+	    RTVDesc.Format = (DXGI_FORMAT)GPixelFormats[GConfig->pRenderConfig->ColorFormat].PlatformFormat;
+	    RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	    RTVDesc.Texture2D.MipSlice = 0;
+		hr = _pd3dDevice->CreateRenderTargetView( pBackBuffer, &RTVDesc, &pRenderTargetView );
+		BOOST_ASSERT(SUCCEEDED(hr));
+
+		ID3D11ShaderResourceView* pShaderResourceView = NULL;
+		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
+		SRVDesc.Format = (DXGI_FORMAT)GPixelFormats[GConfig->pRenderConfig->ColorFormat].PlatformFormat;
+		SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		SRVDesc.Texture2D.MostDetailedMip = 0;
+		SRVDesc.Texture2D.MipLevels = 1;
+		hr = _pd3dDevice->CreateShaderResourceView( pBackBuffer,&SRVDesc,&pShaderResourceView );
+		BOOST_ASSERT(SUCCEEDED(hr));
+
+		DX11RenderSurfacePtr RenderTarget = boost::make_shared<DX11RenderSurface>();
+		RenderTarget->Tex2DResource = BackBufferTex;
+		RenderTarget->RenderTargetView = MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView);
+		RenderTarget->ShaderResourceView = MakeComPtr<ID3D11ShaderResourceView>(pShaderResourceView);
+		GRenderSurface.RenderTarget = RenderTarget;
+
+		//Create a stencil & depth buffer.
+		ID3D11Texture2D* pDepthStencil = NULL;
+		ID3D11DepthStencilView* pDepthStencilView = NULL;
+		D3D11_TEXTURE2D_DESC descDepth;
+		ZeroMemory( &descDepth, sizeof(descDepth) );
+		descDepth.Width = GConfig->pRenderConfig->SizeX;
+		descDepth.Height = GConfig->pRenderConfig->SizeY;
+		descDepth.MipLevels = 1;
+		descDepth.ArraySize = 1;
+		descDepth.Format = (DXGI_FORMAT)GPixelFormats[GConfig->pRenderConfig->DepthStencilFormat].PlatformFormat;
+		descDepth.SampleDesc.Count = 1;
+		descDepth.SampleDesc.Quality = 0;
+		descDepth.Usage = D3D11_USAGE_DEFAULT;
+		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		descDepth.CPUAccessFlags = 0;
+		descDepth.MiscFlags = 0;
+		hr = _pd3dDevice->CreateTexture2D( &descDepth, NULL, &pDepthStencil );
+		DX11RenderTexture2DPtr DepthBufferTex = boost::make_shared<DX11RenderTexture2D>(GConfig->pRenderConfig->DepthStencilFormat,descDepth.Width,descDepth.Height,MakeComPtr<ID3D11Texture2D>(pDepthStencil));
+ 
+		BOOST_ASSERT(SUCCEEDED(hr));
+
+		// Create the depth stencil view
+		D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+		ZeroMemory( &descDSV, sizeof(descDSV) );
+		descDSV.Format = descDepth.Format;
+		descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		descDSV.Texture2D.MipSlice = 0;
+		hr = _pd3dDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &pDepthStencilView );
+		BOOST_ASSERT(SUCCEEDED(hr));
+
+		DX11RenderSurfacePtr DepthStencilBuffer = boost::make_shared<DX11RenderSurface>();
+		DepthStencilBuffer->Tex2DResource = DepthBufferTex;
+		DepthStencilBuffer->DepthStencilView = MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView);
+		GRenderSurface.DepthStencilBuffer = DepthStencilBuffer;
+ 
+		// Setup the viewport
+		D3D11_VIEWPORT vp;
+		vp.Width = (FLOAT)GConfig->pRenderConfig->SizeX;
+		vp.Height = (FLOAT)GConfig->pRenderConfig->SizeY;
+		vp.MinDepth = 0.0f;
+		vp.MaxDepth = 1.0f;
+		vp.TopLeftX = 0;
+		vp.TopLeftY = 0;
+		_pImmediateContext->RSSetViewports( 1, &vp );
+
+	}
+
+
+
 	void DX11RenderEngine::Init()
 	{
 	}
@@ -31,7 +194,6 @@ namespace Disorder
 			 _pImmediateContext->ClearState();
 		 }
 
-		 _pRenderTarget.reset();
 		 _pImmediateContext.reset();
 		 _pSwapChain.reset();
 		 _pd3dDevice.reset();
@@ -230,145 +392,50 @@ namespace Disorder
 		}
 	}
 
+	void DX11RenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil)
+	{
+		DX11RenderSurfacePtr dxRenderTarget = renderTarget == NULL ? NULL : boost::dynamic_pointer_cast<DX11RenderSurface>(renderTarget);
+		DX11RenderSurfacePtr dxDepthStencil = depthStencil == NULL ? NULL : boost::dynamic_pointer_cast<DX11RenderSurface>(depthStencil);
+
+		ID3D11RenderTargetView* pView = dxRenderTarget->RenderTargetView.get();
+		_pImmediateContext->OMSetRenderTargets(1,&pView,dxDepthStencil->DepthStencilView.get());
+	}
+
+	void DX11RenderEngine::ClearRenderTarget(const RenderSurfacePtr& renderTarget,const Vector4& color )
+	{
+		DX11RenderSurfacePtr dxRenderTarget = boost::dynamic_pointer_cast<DX11RenderSurface>(renderTarget);
+		_pImmediateContext->ClearRenderTargetView(dxRenderTarget->RenderTargetView.get(), color.Ptr() );
+	}
+
+	void DX11RenderEngine::ClearDepthStencil(const RenderSurfacePtr& depthBuffer,bool bClearDepth,float depth,bool bClearStencil,unsigned char stencil)
+	{
+		DX11RenderSurfacePtr dxDepthBuffer = boost::dynamic_pointer_cast<DX11RenderSurface>(depthBuffer);
+		unsigned int flag = 0;
+		if( bClearDepth )
+			flag |= D3D11_CLEAR_DEPTH;
+
+		if( bClearStencil )
+			flag |= D3D11_CLEAR_STENCIL;
+
+		_pImmediateContext->ClearDepthStencilView(dxDepthBuffer->DepthStencilView.get(), flag,depth, stencil );
+	}
+
 	void DX11RenderEngine::OnDrawBegin()
 	{
 		GDrawTriNumber = 0;
 
 		// Clear the back buffer 
-		float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; // red,green,blue,alpha
-		_pImmediateContext->ClearRenderTargetView( (ID3D11RenderTargetView*)(_pRenderTarget->GetRenderTargetView(0)->GetLowInterface()), ClearColor );
-		_pImmediateContext->ClearDepthStencilView( (ID3D11DepthStencilView*)(_pRenderTarget->GetDepthStencilView()->GetLowInterface()), D3D11_CLEAR_DEPTH, 1.0f, 0 );
+ 
+		
 	}
 
     void DX11RenderEngine::OnDrawEnd()
 	{
-		// Present the information rendered to the back buffer to the front buffer (the screen)
 		_pSwapChain->Present( 0, 0 );
 	}
 
 
-	RenderTargetPtr DX11RenderEngine::CreateRenderTarget(void *hWnd)
-	{
-
-		HRESULT hr = S_OK;
-		UINT createDeviceFlags = 0;
-	#ifdef _DEBUG
-		createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-	#endif
-
-		D3D_DRIVER_TYPE driverTypes[] =
-		{
-			D3D_DRIVER_TYPE_HARDWARE,
-			D3D_DRIVER_TYPE_WARP,
-			D3D_DRIVER_TYPE_REFERENCE,
-		};
-
-		UINT numDriverTypes = ARRAYSIZE( driverTypes );
-
-		D3D_FEATURE_LEVEL featureLevels[] =
-		{
-			D3D_FEATURE_LEVEL_11_0,
-			D3D_FEATURE_LEVEL_10_1,
-			D3D_FEATURE_LEVEL_10_0,
-		};
-
-		UINT numFeatureLevels = ARRAYSIZE( featureLevels );
-
-		DXGI_SWAP_CHAIN_DESC sd;
-		ZeroMemory( &sd, sizeof( sd ) );
-		sd.BufferCount = 1;
-		sd.BufferDesc.Width = GConfig->pRenderConfig->SizeX;
-		sd.BufferDesc.Height = GConfig->pRenderConfig->SizeY;
-		sd.BufferDesc.Format = (DXGI_FORMAT)GPixelFormats[ GConfig->pRenderConfig->ColorFormat ].PlatformFormat;
-		sd.BufferDesc.RefreshRate.Numerator = 60;
-		sd.BufferDesc.RefreshRate.Denominator = 1;
-		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		sd.OutputWindow = (HWND)hWnd;
-		sd.SampleDesc.Count = 1;
-		sd.SampleDesc.Quality = 0;
-		sd.Windowed = !GConfig->pRenderConfig->FullScreen;
-
-		ID3D11Device*         pd3dDevice;
-		ID3D11DeviceContext*  pImmediateContext;
-		IDXGISwapChain*       pSwapChain;
-
-		for( UINT driverTypeIndex = 0; driverTypeIndex < numDriverTypes; driverTypeIndex++ )
-		{
-			_driverType = driverTypes[driverTypeIndex];
-			hr = D3D11CreateDeviceAndSwapChain( NULL, _driverType, NULL, createDeviceFlags, featureLevels, numFeatureLevels,
-												D3D11_SDK_VERSION, &sd, &pSwapChain, &pd3dDevice, &_featureLevel, &pImmediateContext );
-			if( SUCCEEDED( hr ) )
-				break;
-		}
-
-		BOOST_ASSERT(hr>=0);
-
-		_pd3dDevice = MakeComPtr<ID3D11Device>(pd3dDevice);
-		_pImmediateContext = MakeComPtr<ID3D11DeviceContext>(pImmediateContext);
-		_pSwapChain = MakeComPtr<IDXGISwapChain>(pSwapChain);
-
-		// Create a render target view
-		ID3D11Texture2D* pBackBuffer = NULL;
-		hr = _pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&pBackBuffer );
-		BOOST_ASSERT(hr>= 0);
-
-		ID3D11RenderTargetView* pRenderTargetView = NULL;
-		hr = _pd3dDevice->CreateRenderTargetView( pBackBuffer, NULL, &pRenderTargetView );
-		pBackBuffer->Release();
-		BOOST_ASSERT(hr>=0);
-
-		//Create a stencil & depth buffer.
-		ID3D11Texture2D* pDepthStencil = NULL;
-		ID3D11DepthStencilView* pDepthStencilView = NULL;
-		D3D11_TEXTURE2D_DESC descDepth;
-		ZeroMemory( &descDepth, sizeof(descDepth) );
-		descDepth.Width = GConfig->pRenderConfig->SizeX;
-		descDepth.Height = GConfig->pRenderConfig->SizeY;
-		descDepth.MipLevels = 1;
-		descDepth.ArraySize = 1;
-		descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		descDepth.SampleDesc.Count = 1;
-		descDepth.SampleDesc.Quality = 0;
-		descDepth.Usage = D3D11_USAGE_DEFAULT;
-		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		descDepth.CPUAccessFlags = 0;
-		descDepth.MiscFlags = 0;
-		hr = _pd3dDevice->CreateTexture2D( &descDepth, NULL, &pDepthStencil );
-		BOOST_ASSERT(hr>=0);
-
-		// Create the depth stencil view
-		D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-		ZeroMemory( &descDSV, sizeof(descDSV) );
-		descDSV.Format = descDepth.Format;
-		descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		descDSV.Texture2D.MipSlice = 0;
-		hr = _pd3dDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &pDepthStencilView );
-		BOOST_ASSERT(hr>=0);
-		pDepthStencil->Release();
-		_pImmediateContext->OMSetRenderTargets( 1, &pRenderTargetView, pDepthStencilView );
-
-		
-		_pRenderTarget = boost::make_shared<DX11RenderTarget>();
-
-		DX11RenderTargetViewPtr pRenderView = boost::make_shared<DX11RenderTargetView>(); 
-		pRenderView->D3DInterface = MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView);
-		DX11DepthStencilViewPtr pDepthView = boost::make_shared<DX11DepthStencilView>();
-		pDepthView->D3DInterface = MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView);
-		_pRenderTarget->SetRenderTargetView(pRenderView);
-		_pRenderTarget->SetDepthStencilView(pDepthView);
-
-		// Setup the viewport
-		D3D11_VIEWPORT vp;
-		vp.Width = (FLOAT)GConfig->pRenderConfig->SizeX;
-		vp.Height = (FLOAT)GConfig->pRenderConfig->SizeY;
-		vp.MinDepth = 0.0f;
-		vp.MaxDepth = 1.0f;
-		vp.TopLeftX = 0;
-		vp.TopLeftY = 0;
-		_pImmediateContext->RSSetViewports( 1, &vp );
- 
-		return _pRenderTarget;
-	}
+	
 
  
 

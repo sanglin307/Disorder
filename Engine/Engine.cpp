@@ -22,7 +22,7 @@ namespace Disorder
 	   RenderEngine->Init();   
 
 	   ViewportPtr const& viewport = GameClient->GetViewport(0);
-	   RenderTargetPtr renderTarget = RenderEngine->CreateRenderTarget(viewport->GetWindow());
+	   RenderEngine->CreateViewport(viewport->GetWindow());
 	   RenderEngine->ResourceManager->Init();
 	   GameCanvas = boost::make_shared<Canvas>(viewport->SizeX,viewport->SizeY);
 

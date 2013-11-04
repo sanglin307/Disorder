@@ -24,9 +24,6 @@
     <ClInclude Include="DX11RenderInclude.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DX11RenderTarget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DX11RenderLayout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -36,13 +33,13 @@
     <ClInclude Include="DX11RenderResourceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DX11RenderView.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DX11RenderState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DX11RenderEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11RenderSurface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,13 +62,10 @@
     <ClCompile Include="DX11RenderState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DX11RenderView.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DX11RenderEffect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DX11RenderTarget.cpp">
+    <ClCompile Include="DX11RenderSurface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

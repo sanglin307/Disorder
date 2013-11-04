@@ -11,7 +11,6 @@
 //system related
 #include <D3D11.h>
 #include <D3Dcompiler.h>
-//#include <D3DX11.h>
 
 
 
@@ -33,21 +32,17 @@ namespace Disorder
 	typedef boost::shared_ptr<DX11RenderTexture2D> DX11RenderTexture2DPtr;
 	class DX11RenderResourceManager;
 	typedef boost::shared_ptr<DX11RenderResourceManager> DX11RenderResourceManagerPtr;
-	class DX11RenderTarget;
-	typedef boost::shared_ptr<DX11RenderTarget> DX11RenderTargetPtr;
+	class DX11RenderSurface;
+	typedef boost::shared_ptr<DX11RenderSurface> DX11RenderSurfacePtr;
 	class DX11ShaderObject;
 	typedef boost::shared_ptr<DX11ShaderObject> DX11ShaderObjectPtr;
-	class DX11RenderTargetView;
-	typedef boost::shared_ptr<DX11RenderTargetView> DX11RenderTargetViewPtr;
-	class DX11DepthStencilView;
-	typedef boost::shared_ptr<DX11DepthStencilView> DX11DepthStencilViewPtr;
-	class DX11ShaderResourceView;
-	typedef boost::shared_ptr<DX11ShaderResourceView> DX11ShaderResourceViewPtr;
 	class DX11BlendState;
 	typedef boost::shared_ptr<DX11BlendState> DX11BlendStatePtr;
 	class DX11ShaderReflection;
 	typedef boost::shared_ptr<DX11ShaderReflection> DX11ShaderReflectionPtr;
 
+	typedef boost::shared_ptr<IDXGIFactory> IDXGIFactoryPtr;
+	typedef boost::shared_ptr<IDXGIAdapter> IDXGIAdapterPtr;
 	typedef boost::shared_ptr<ID3D11Device> ID3D11DevicePtr;
 	typedef boost::shared_ptr<ID3D11DeviceContext> ID3D11DeviceContextPtr;
 	typedef boost::shared_ptr<IDXGISwapChain>  IDXGISwapChainPtr;
@@ -74,8 +69,7 @@ namespace Disorder
 #include "DX11RenderState.h"
 #include "DX11RenderResource.h"
 #include "DX11RenderEffect.h"
-#include "DX11RenderView.h"
-#include "DX11RenderTarget.h"
+#include "DX11RenderSurface.h"
 #include "DX11RenderLayout.h"
 #include "DX11RenderEngine.h"
 #include "DX11RenderResourceManager.h"

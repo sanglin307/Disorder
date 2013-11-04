@@ -36,14 +36,5 @@ namespace Disorder
 		return ss;
 	}
 
-	MaterialParamUnorderedPtr RenderEffect::GetUnorderedAccessParameter(std::string const& name)
-	{
-		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return boost::dynamic_pointer_cast<MaterialParamUnordered>(_materialParamMap.at(name));
 
-		MaterialParamUnorderedPtr ua = boost::make_shared<MaterialParamUnordered>();
-		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,ua));
-
-		return ua;
-	}
 }

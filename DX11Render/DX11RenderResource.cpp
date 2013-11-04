@@ -424,6 +424,12 @@ namespace Disorder
 		return D3DInterface.get();
 	}
 
-
+	DX11RenderTexture2D::DX11RenderTexture2D(PixelFormat pixelFormat,unsigned int width,unsigned int height,ID3D11Texture2DPtr DXInterface)
+	{
+		Width = width;
+		Height = height;
+		Format = pixelFormat;
+		D3DInterface = DXInterface;
+	}
 	
 }

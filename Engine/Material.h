@@ -9,7 +9,7 @@ namespace Disorder
 	class MaterialParam
 	{
 	public :
-		virtual void* GetData() = 0;
+		virtual void* GetData(){ return 0; }
 		virtual int GetElementNumber() = 0;
 
 		unsigned int MaxElementNumber;
@@ -43,10 +43,11 @@ namespace Disorder
 			return _value.size();
 		}
  
-        virtual void* GetData()
+         virtual void* GetData()
         {
-			return (void*)(_value.data());
+		   return (void*)(_value.data());
         }
+
 
 	private:
 		std::vector<int> _value;
@@ -79,10 +80,10 @@ namespace Disorder
 		{
 			return _value.size();
 		}
- 
-        virtual void* GetData()
+  
+		 virtual void* GetData()
         {
-			return (void*)(_value.data());
+		   return (void*)(_value.data());
         }
 
 	private:
@@ -119,8 +120,9 @@ namespace Disorder
  
         virtual void* GetData()
         {
-			return (void*)(_vec.data());
+		   return (void*)(_vec.data());
         }
+
 
 	private:
 		std::vector<Vector4> _vec;
@@ -157,7 +159,7 @@ namespace Disorder
  
         virtual void* GetData()
         {
-			return (void*)(_vec.data());
+		   return (void*)(_vec.data());
         }
 
 	private:
@@ -191,12 +193,14 @@ namespace Disorder
 		{
 			return _mat.size();
 		}
-        
+
         virtual void* GetData()
         {
-			return (void*)(_mat.data());
+ 			return (void*)(_mat.data());
         }
+ 
 
+       
 	private:
 		std::vector<Matrix4> _mat;
 	};
@@ -225,7 +229,7 @@ namespace Disorder
 		{
 			return 1;
 		}
-
+ 
         virtual void* GetData()
         {
             return _constBuffer->GetLowInterface();
@@ -245,14 +249,14 @@ namespace Disorder
 		}
 
 
-		void SetValue(RenderViewPtr const& view)
+		void SetValue(RenderSurfacePtr const& surface)
 		{
-			_renderView = view;
+			_renderSurface = surface;
 		}
 
-		RenderViewPtr GetValue()
+		RenderSurfacePtr GetValue()
 		{
-			return _renderView;
+			return _renderSurface;
 		}
 
 		virtual int GetElementNumber()
@@ -260,12 +264,13 @@ namespace Disorder
 			return 1;
 		}
 
-        virtual void* GetData()
-        {
-            return _renderView->GetLowInterface();
-        }
+		 virtual void* GetData()
+		 {
+			 return _renderSurface->GetLowInterface(RSU_ShaderResource);
+		 }
+        
 	private :
-		RenderViewPtr _renderView;
+		RenderSurfacePtr _renderSurface;
 	};
 
 	class MaterialParamSamplerState : public MaterialParam
@@ -293,45 +298,16 @@ namespace Disorder
 		}
 
         virtual void* GetData()
-        {
+       {
             return _sampler->GetLowInterface();
-        }
+       }
+
+ 
 	private:
 		SamplerStatePtr _sampler;
 	};
 
-	class MaterialParamUnordered : public MaterialParam  // Unordered view
-	{
-	public:
-
-		MaterialParamUnordered()
-		{
-			MaxElementNumber = 1;
-		}
-
-		void SetValue(RenderViewPtr const& view)
-		{
-			_renderView = view;
-		}
-
-		RenderViewPtr GetValue()
-		{
-			return _renderView;
-		}
-
-		virtual int GetElementNumber()
-		{
-			return 1;
-		}
-        
-        virtual void* GetData()
-        {
-            return _renderView->GetLowInterface();
-        }
-
-	private :
-		RenderViewPtr _renderView;
-	};
+	 
 
 	class MaterialParameterManager
 	{

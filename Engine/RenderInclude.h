@@ -184,7 +184,9 @@ namespace Disorder
 		PF_R8G8B8A8             =3,  // unsigned int resolve to float evenly [0,1]
 		PF_R32G32F              =4,
 		PF_R8G8                 =5,  // unsigned int resolve to float evenly [0,1]
-		PF_MAX                  =6
+		PF_R10G10B10A2          =6,
+		PF_D24S8                =7,
+		PF_MAX                  =8
 	};
 
 	enum TopologyType

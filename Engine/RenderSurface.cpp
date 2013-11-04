@@ -2,5 +2,6 @@
 
 namespace Disorder
 {
-	 
+	 RenderSurfaceManager GRenderSurface;
+
 }

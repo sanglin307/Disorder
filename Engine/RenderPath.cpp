@@ -10,6 +10,9 @@ namespace Disorder
 
 	void RenderPath::_ForwardMultiPassLight()
 	{
+		GEngine->RenderEngine->SetRenderTarget(GRenderSurface.RenderTarget,GRenderSurface.DepthStencilBuffer);
+		GEngine->RenderEngine->ClearRenderTarget(GRenderSurface.RenderTarget,Vector4(0.1f,0.3f,0.8f,1.0f));
+		GEngine->RenderEngine->ClearDepthStencil(GRenderSurface.DepthStencilBuffer,true,1.0f,false,0);
 		GEngine->RenderEngine->OnDrawBegin();
 
 		CameraPtr mainCamera = GSceneManager->GetCamera("MainCamera");

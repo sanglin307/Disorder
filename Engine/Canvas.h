@@ -14,7 +14,7 @@ namespace Disorder
 		} CanvasVertex;
 	public:
 		CanvasBatchElement();
-		void SetTexture(RenderTexture2DPtr const& texture);
+		void SetTexture(RenderSurfacePtr const& texture);
 		 
 		void AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord);
 		virtual void Draw(RenderPathType pathType,int pass,CameraPtr const& camera);
@@ -26,7 +26,7 @@ namespace Disorder
 		std::vector<WORD> _indexs;
 		unsigned int _savedVertexBufferSize;
 		unsigned int _savedIndexBufferSize;
-		RenderTexture2DPtr _texture;
+		RenderSurfacePtr _texture;
 	};
 
 	class Canvas

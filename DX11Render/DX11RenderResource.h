@@ -25,9 +25,11 @@ namespace Disorder
 	class DX11RenderTexture2D : public RenderTexture2D
 	{
 	public:
+		DX11RenderTexture2D(){};
+		DX11RenderTexture2D(PixelFormat pixelFormat,unsigned int width,unsigned int height,ID3D11Texture2DPtr DXInterface);
 		virtual bool Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,BufferInitData const* pData);
 		virtual bool Create(PixelFormat pixelFormat,ImagePtr const& image);
-	
+	 
 		virtual void * GetLowInterface();
 
 	public:

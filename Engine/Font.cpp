@@ -173,8 +173,8 @@ namespace Disorder
 
 		SamplerStatePtr sampler = GEngine->RenderEngine->ResourceManager->CreateSamplerState(SF_Linear,TAM_Clamp,0);
 		PixelFormat pixelFormat = PF_R8G8;
-		_glyphsTexture = GEngine->RenderEngine->ResourceManager->CreateRenderTexture2D(sampler,pixelFormat,fontImage);
-   
+		RenderTexture2DPtr fontTexture = GEngine->RenderEngine->ResourceManager->CreateRenderTexture2D(sampler,pixelFormat,fontImage);
+		_glyphsTexture = GEngine->RenderEngine->ResourceManager->CreateRenderSurface(fontTexture,RSU_ShaderResource);
 		delete imageData;
 	}
 

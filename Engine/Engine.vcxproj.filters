@@ -58,13 +58,7 @@
     <ClInclude Include="GameObject.h">
       <Filter>GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="RenderView.h">
-      <Filter>RenderSystem</Filter>
-    </ClInclude>
     <ClInclude Include="RenderUtil.h">
-      <Filter>RenderSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderTarget.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
     <ClInclude Include="RenderState.h">
@@ -185,6 +179,9 @@
     <ClInclude Include="Image.h">
       <Filter>GameEngine</Filter>
     </ClInclude>
+    <ClInclude Include="RenderSurface.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -299,14 +296,14 @@
     <ClCompile Include="Plane.cpp">
       <Filter>Mathematics</Filter>
     </ClCompile>
-    <ClCompile Include="RenderTarget.cpp">
-      <Filter>RenderSystem</Filter>
-    </ClCompile>
     <ClCompile Include="RenderPath.cpp">
       <Filter>RenderSystem</Filter>
     </ClCompile>
     <ClCompile Include="Image.cpp">
       <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderSurface.cpp">
+      <Filter>RenderSystem</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

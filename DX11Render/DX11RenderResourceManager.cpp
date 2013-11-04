@@ -89,6 +89,14 @@ namespace Disorder
 		return renderBuffer;
 	}
  
+	RenderSurfacePtr DX11RenderResourceManager::CreateRenderSurface(RenderTexture2DPtr const& texture,unsigned int usage)
+	{
+		RenderSurfacePtr surface = boost::make_shared<RenderSurface>();
+		surface->Create(texture,usage);
+		return surface;
+
+	}
+
 	RenderTexture2DPtr DX11RenderResourceManager::CreateRenderTexture2D(SamplerStatePtr const& sampler,PixelFormat pixelFormat,ImagePtr image)
 	{
 		RenderTexture2DPtr texture = boost::make_shared<DX11RenderTexture2D>();
@@ -114,17 +122,7 @@ namespace Disorder
 		return sampler;
 	}
 
-	RenderViewPtr DX11RenderResourceManager::CreateTexture2DView(RenderTexture2DPtr const& textureResource)
-	{
-		DX11ShaderResourceViewPtr shaderView = boost::make_shared<DX11ShaderResourceView>();
-		bool result = shaderView->CreateTexture2DView(textureResource);
-
-		if( result )
-			return shaderView;
-
-		return RenderViewPtr();
-
-	}
+	 
 
 	BlendStatePtr DX11RenderResourceManager::CreateBlendState(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable,bool IndependentBlendEnable)
 	{

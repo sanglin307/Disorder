@@ -7,6 +7,7 @@ namespace Disorder
 	class RenderResource
 	{
 	public:
+
 		virtual void * GetLowInterface(){ return 0;}
 	};
 
@@ -57,6 +58,9 @@ namespace Disorder
 		SamplerStatePtr Sampler;
 	};
  
+	class RenderTexture3D: public RenderTexture
+	{
+	};
 }
 
 

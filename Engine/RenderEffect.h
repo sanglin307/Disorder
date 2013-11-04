@@ -52,7 +52,7 @@ namespace Disorder
 	    MaterialParamCBufferPtr GetConstantBufferParameter(std::string const& name);
 		MaterialParamShaderResPtr GetShaderResourceParameter(std::string const& name);
 		MaterialParamSamplerStatePtr GetSamplerStateParameter(std::string const& name);
-		MaterialParamUnorderedPtr GetUnorderedAccessParameter(std::string const& name);
+	 
 
 		virtual ShaderObjectPtr LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType) = 0;
 	 
