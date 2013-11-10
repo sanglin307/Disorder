@@ -70,7 +70,7 @@ namespace Disorder
 		if( _mLightObjects.find(light->Name) == _mLightObjects.end() )
 		{
 			_mLightObjects.insert(std::pair<std::string,LightPtr>(light->Name,light));
-			if( light->LType == LT_Parallel )
+			if( light->LightType == LT_Parallel )
 				_vDirectLights.push_back(light);
 			else
 				_vNonDirectLights.push_back(light);

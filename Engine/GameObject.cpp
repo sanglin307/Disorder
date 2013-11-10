@@ -24,7 +24,7 @@ namespace Disorder
 	{
 		_vComponents.push_back(component);
 		component->SetBase(shared_from_this());
-		if( component->Type == CT_Renderer )
+		if( component->ComponentType == CT_Renderer )
 		{
 			RendererPtr renderer = boost::dynamic_pointer_cast<Renderer>(component);
 			if( renderer != NULL )
@@ -32,7 +32,7 @@ namespace Disorder
 			else
 				BOOST_ASSERT(0);
 		}
-		else if( component->Type == CT_Light )
+		else if( component->ComponentType == CT_Light )
 		{
 			LightPtr light = boost::dynamic_pointer_cast<Light>(component);
 			if( light != NULL )
@@ -40,7 +40,7 @@ namespace Disorder
 			else
 				BOOST_ASSERT(0);
 		}
-		else if( component->Type == CT_Camera )
+		else if( component->ComponentType == CT_Camera )
 		{
 			CameraPtr camera = boost::dynamic_pointer_cast<Camera>(component);
 			if( camera != NULL )

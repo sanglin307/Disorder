@@ -12,7 +12,7 @@ namespace Disorder
 
 
 	private:
-		static void _ForwardMultiPassLight();
+		static void _ForwardLighting();
 
 	};
 }

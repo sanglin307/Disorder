@@ -4,14 +4,14 @@ namespace Disorder
 {
 	void RenderPath::Render(RenderPathType type)
 	{
-		if( type == RPT_ForwardMultiPassLight )
-			_ForwardMultiPassLight();
+		if( type == RPT_ForwardLighting )
+			_ForwardLighting();
 	}
 
-	void RenderPath::_ForwardMultiPassLight()
+	void RenderPath::_ForwardLighting()
 	{
 		GEngine->RenderEngine->SetRenderTarget(GRenderSurface.RenderTarget,GRenderSurface.DepthStencilBuffer);
-		GEngine->RenderEngine->ClearRenderTarget(GRenderSurface.RenderTarget,Vector4(0.1f,0.3f,0.8f,1.0f));
+		GEngine->RenderEngine->ClearRenderTarget(GRenderSurface.RenderTarget,Vector4(0.1f,0.2f,0.6f,1.0f));
 		GEngine->RenderEngine->ClearDepthStencil(GRenderSurface.DepthStencilBuffer,true,1.0f,false,0);
 		GEngine->RenderEngine->OnDrawBegin();
 
@@ -28,7 +28,7 @@ namespace Disorder
 
 			for( int j=0;j< FRP_Max;j++ )
 			{
-				obj->Draw(RPT_ForwardMultiPassLight,j,mainCamera);
+				obj->Draw(RPT_ForwardLighting,j,mainCamera);
 			}
 
 			obj->PostDraw(mainCamera);

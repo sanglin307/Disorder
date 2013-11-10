@@ -5,7 +5,7 @@ namespace Disorder
  
 	Renderer::Renderer()
 	{
-		Type = CT_Renderer;
+		ComponentType = CT_Renderer;
 	}
  
 	void Renderer::AddLight(LightPtr & light)
@@ -25,7 +25,7 @@ namespace Disorder
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
  
 		//compile shader
-		ShaderObjectPtr vertexShader = _material->Effect[RPT_ForwardMultiPassLight][FRP_BaseLight]->GetVertexShader();
+		ShaderObjectPtr vertexShader = _material->Effect[RPT_ForwardLighting][FRP_BaseLight]->GetVertexShader();
 		 
 	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList,false);
  
@@ -75,7 +75,7 @@ namespace Disorder
 		std::vector<Vector3> colorVec;
 		for(unsigned int i=0;i<_vLightArray.size();i++)
 		{
-			if( _vLightArray[i]->LType == LT_Parallel )
+			if( _vLightArray[i]->LightType == LT_Parallel )
 			{
 			   intensityVec[lightNumber] = _vLightArray[i]->Intensity;
 			   dirVec.push_back(_vLightArray[i]->GetDirection());
@@ -98,12 +98,12 @@ namespace Disorder
 
 	void GeometryRenderer::SetDynamicLightPass(LightPtr const& light)
 	{
-		BOOST_ASSERT(light->Type != LT_Parallel);
+		BOOST_ASSERT(light->LightType != LT_Parallel);
 
-		_material->LightType->SetValue((int)(light->Type));
+		_material->LightType->SetValue((int)(light->LightType));
 		_material->LightIntensity->SetValue((float)(light->Intensity));
 		GameObjectPtr go = light->GetBase();
-		if( light->Type == LT_Point )
+		if( light->LightType == LT_Point )
 		{
 			_material->LightPos->SetValue(go->GetWorldPosition());
 		}
@@ -119,7 +119,7 @@ namespace Disorder
 		if( _renderEffect == NULL )
 			return;
 
-		if( pathType == RPT_ForwardMultiPassLight )
+		if( pathType == RPT_ForwardLighting )
 		{
 			if( pass == FRP_BaseLight )
 			{
@@ -130,7 +130,7 @@ namespace Disorder
 			{
 				for(unsigned int i=0;i< _vLightArray.size();i++)
 				{
-					if( _vLightArray[i]->LType != LT_Parallel )
+					if( _vLightArray[i]->LightType != LT_Parallel )
 					{
 						SetDynamicLightPass(_vLightArray[i]);
 						_Draw();

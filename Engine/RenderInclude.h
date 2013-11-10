@@ -19,7 +19,7 @@ namespace Disorder
 
 	enum RenderPathType
 	{
-		RPT_ForwardMultiPassLight,
+		RPT_ForwardLighting,
 		RPT_MaxRenderPath
 	};
 

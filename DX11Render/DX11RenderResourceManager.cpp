@@ -91,7 +91,7 @@ namespace Disorder
  
 	RenderSurfacePtr DX11RenderResourceManager::CreateRenderSurface(RenderTexture2DPtr const& texture,unsigned int usage)
 	{
-		RenderSurfacePtr surface = boost::make_shared<RenderSurface>();
+		RenderSurfacePtr surface = boost::make_shared<DX11RenderSurface>();
 		surface->Create(texture,usage);
 		return surface;
 

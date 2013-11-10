@@ -5,7 +5,7 @@
 namespace Disorder
 {
  
-	enum ComponentType
+	enum EComponentType
 	{
 		CT_Camera = 0,
 		CT_Light = 1,
@@ -29,7 +29,7 @@ namespace Disorder
 	   }
 
 	   std::string Name;
-	   ComponentType Type;
+	   EComponentType ComponentType;
 
 	protected:
 		boost::weak_ptr<GameObject> _baseObject;

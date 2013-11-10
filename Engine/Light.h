@@ -4,7 +4,7 @@
 namespace Disorder
 {
 
-	enum LightType
+	enum ELightType
 	{
 		LT_Parallel = 0,
 		LT_Point,
@@ -15,7 +15,7 @@ namespace Disorder
 	{
 	public:
 		Light();
-		LightType LType;
+		ELightType LightType;
 		Vector3   Color;
 		float     Intensity; 
 		float     SpotAngle;

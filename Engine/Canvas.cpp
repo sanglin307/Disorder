@@ -133,7 +133,7 @@ namespace Disorder
 
 	void Canvas::Draw(CameraPtr const& camera)
 	{
-		_stringElement.Draw(RPT_ForwardMultiPassLight,0,camera);
+		_stringElement.Draw(RPT_ForwardLighting,0,camera);
 	}
 
 	unsigned int Canvas::GetCurrentDrawTriNumber()

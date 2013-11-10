@@ -150,7 +150,7 @@ namespace Disorder
 		mat->LightColorArray = parameterManager->GetVector3Parameter("LightColorArray");
 
 		baseEffect->PrepareRenderParam();
-		mat->Effect[RPT_ForwardMultiPassLight][FRP_BaseLight] = baseEffect;
+		mat->Effect[RPT_ForwardLighting][FRP_BaseLight] = baseEffect;
  
 		RenderEffectPtr lightEffect =  resourceManager->CreateRenderEffect("LightPass.fx",SM_4_0,"VS","PS");
 	 
@@ -171,7 +171,7 @@ namespace Disorder
 		mat->LightPos =  parameterManager->GetVector3Parameter("LightPos");
 	    mat->LightColor = parameterManager->GetVector3Parameter("LightColor");
 		lightEffect->PrepareRenderParam();
-		mat->Effect[RPT_ForwardMultiPassLight][FRP_DynamicLight] = lightEffect;
+		mat->Effect[RPT_ForwardLighting][FRP_DynamicLight] = lightEffect;
 
 		return mat;
 	}
@@ -208,7 +208,7 @@ namespace Disorder
 		mat->LightColorArray = parameterManager->GetVector3Parameter("LightColorArray");
 
 		baseEffect->PrepareRenderParam();
-		mat->Effect[RPT_ForwardMultiPassLight][FRP_BaseLight] = baseEffect;
+		mat->Effect[RPT_ForwardLighting][FRP_BaseLight] = baseEffect;
 
 
 		RenderEffectPtr lightEffect =  resourceManager->CreateRenderEffect("LightPass.fx",SM_4_0,"VS","PS");
@@ -230,7 +230,7 @@ namespace Disorder
 		mat->LightPos =  parameterManager->GetVector3Parameter("LightPos");
 	    mat->LightColor = parameterManager->GetVector3Parameter("LightColor");
 		lightEffect->PrepareRenderParam();
-		mat->Effect[RPT_ForwardMultiPassLight][FRP_DynamicLight] = lightEffect;
+		mat->Effect[RPT_ForwardLighting][FRP_DynamicLight] = lightEffect;
 
 		return mat;
 

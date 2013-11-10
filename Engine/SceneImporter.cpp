@@ -520,11 +520,11 @@ namespace Disorder
 		 LightPtr lightObj = boost::make_shared<Light>();
 		
 		 if(lLight->LightType.Get() == FbxLight::ePoint )
-			 lightObj->LType = LT_Point;
+			 lightObj->LightType = LT_Point;
 		 else if(lLight->LightType.Get() == FbxLight::eDirectional )
-			 lightObj->LType = LT_Parallel;
+			 lightObj->LightType = LT_Parallel;
 		 else if(lLight->LightType.Get() == FbxLight::eSpot )
-			 lightObj->LType = LT_Spot;
+			 lightObj->LightType = LT_Spot;
 		 else
 		 {
 			 GLogger->Error("Not supported light Type!");

@@ -5,7 +5,7 @@ namespace Disorder
 {
 	Camera::Camera()
 	{
-		Type = CT_Camera;
+		ComponentType = CT_Camera;
 		_eyePos = Vector3(0.0f,1.0f,-10.0f);
 		_upVec =  Vector3(0.0f,1.0f,0.0f);
 
