@@ -15,7 +15,7 @@ namespace Disorder
 		GEngine->RenderEngine->ClearDepthStencil(GRenderSurface.DepthStencilBuffer,true,1.0f,false,0);
 		GEngine->RenderEngine->OnDrawBegin();
 
-		CameraPtr mainCamera = GSceneManager->GetCamera("MainCamera");
+		CameraPtr mainCamera = GSceneManager->GetDefaultCamera();
 
 		if( mainCamera == NULL )
 			return;

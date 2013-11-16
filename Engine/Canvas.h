@@ -13,7 +13,8 @@ namespace Disorder
 			Vector2 texcoord;
 		} CanvasVertex;
 	public:
-		CanvasBatchElement();
+		CanvasBatchElement(std::string const& name);
+
 		void SetTexture(RenderSurfacePtr const& texture);
 		 
 		void AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord);

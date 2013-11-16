@@ -6,7 +6,7 @@ namespace Disorder
 	class Renderer : public Component
 	{
 	public:
-		Renderer();
+		Renderer(std::string const& name);
 		virtual ~Renderer(){};
 
 		virtual void PreDraw(CameraPtr const& camera){};
@@ -40,6 +40,7 @@ namespace Disorder
 		  void _Draw();
 	public:
 		 
+		  GeometryRenderer(std::string const& name);
           void SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat);
 		
 

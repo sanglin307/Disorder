@@ -13,6 +13,16 @@ namespace Disorder
 	{
 	}
 
+	void SceneManager::CreateDefaultCamera()
+	{
+		BOOST_ASSERT(_mDefaultCamera == NULL);
+
+		GameObjectPtr camera = SceneObjectGenerator::CreateCamera("DefaultCamera");
+		GWorld->GetLevel()->AddGameObject(camera);
+		_mDefaultCamera = boost::dynamic_pointer_cast<Camera>(camera->GetComponent("DefaultCamera"));
+		AddCamera(_mDefaultCamera);
+	}
+
 	RendererPtr SceneManager::GetRenderer(std::string const& name)
 	{
 		if( _mRenderObjects.find(name) != _mRenderObjects.end() )
@@ -50,15 +60,15 @@ namespace Disorder
 		for(unsigned int i=0;i<_vRenderObjects.size();i++ )
 		{
 			_vRenderObjects[i]->ClearLight();
-			for(unsigned int j=0;j<_vDirectLights.size();j++)
+			for(unsigned int j=0;j<_vDirectionalLights.size();j++)
 			{
-				_vRenderObjects[i]->AddLight(_vDirectLights[j]);
+				_vRenderObjects[i]->AddLight(_vDirectionalLights[j]);
 			}
 
-			for(unsigned int k=0;k<_vNonDirectLights.size();k++)
+			for(unsigned int k=0;k<_vNonDirectionalLights.size();k++)
 			{
-				if( _vNonDirectLights[k]->Touch(_vRenderObjects[i]))
-					_vRenderObjects[i]->AddLight(_vNonDirectLights[k]);
+				if( _vNonDirectionalLights[k]->Touch(_vRenderObjects[i]))
+					_vRenderObjects[i]->AddLight(_vNonDirectionalLights[k]);
 			}
 		}
 	}
@@ -70,10 +80,10 @@ namespace Disorder
 		if( _mLightObjects.find(light->Name) == _mLightObjects.end() )
 		{
 			_mLightObjects.insert(std::pair<std::string,LightPtr>(light->Name,light));
-			if( light->LightType == LT_Parallel )
-				_vDirectLights.push_back(light);
+			if( light->LightType == LT_Directional )
+				_vDirectionalLights.push_back(light);
 			else
-				_vNonDirectLights.push_back(light);
+				_vNonDirectionalLights.push_back(light);
 		}
 	}
 

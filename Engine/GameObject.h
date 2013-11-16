@@ -8,20 +8,13 @@ namespace Disorder
 	{
 	public:
  
+		std::string Name;
+
 		GameObject(std::string const& name, Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::IDENTITY,Vector3 const& scale = Vector3::UNIT_SCALE);
 		~GameObject();
  
 		void AddComponent(ComponentPtr const& component);
- 
-		void SetName(std::string const& name)
-		{
-			_name = name;
-		}
-
-		const std::string & GetName() const
-		{
-			return _name;
-		}
+        ComponentPtr GetComponent(std::string const& name) const;
  
 		void Tick(float deltaSeconds);
 
@@ -79,7 +72,7 @@ namespace Disorder
 
 	private:
 
-		std::string _name;
+		
 		std::vector<ComponentPtr> _vComponents;
 
 		boost::weak_ptr<GameObject> _parent;

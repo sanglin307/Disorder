@@ -51,7 +51,7 @@ namespace Disorder
 	 {
 		 BOOST_ASSERT(_vDXGIAdapter.size() > 0);
 		 UINT DeviceCreationFlags = D3D11_CREATE_DEVICE_SINGLETHREADED;
-		 D3D_DRIVER_TYPE DriverType = D3D_DRIVER_TYPE_HARDWARE;
+		 D3D_DRIVER_TYPE DriverType = D3D_DRIVER_TYPE_UNKNOWN;//D3D_DRIVER_TYPE_HARDWARE;
  
 	 #ifdef _DEBUG
 		 DeviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -68,9 +68,10 @@ namespace Disorder
 		 ID3D11Device*         pd3dDevice;
 		 ID3D11DeviceContext*  pImmediateContext;
  
-		 HRESULT Hr = D3D11CreateDevice( NULL, DriverType, NULL, DeviceCreationFlags, FeatureLevels, numFeatureLevels, D3D11_SDK_VERSION, &pd3dDevice, &_featureLevel, &pImmediateContext );
+		 HRESULT Hr = D3D11CreateDevice( _vDXGIAdapter[0].get(), DriverType, NULL, DeviceCreationFlags, FeatureLevels, numFeatureLevels, D3D11_SDK_VERSION, &pd3dDevice, &_featureLevel, &pImmediateContext );
 		 BOOST_ASSERT( SUCCEEDED(Hr) );
 
+ 
 		 _pd3dDevice = MakeComPtr<ID3D11Device>(pd3dDevice);
 		 _pImmediateContext = MakeComPtr<ID3D11DeviceContext>(pImmediateContext);
 		 

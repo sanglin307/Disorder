@@ -8,7 +8,8 @@ namespace Disorder
 		_vGameObjects.push_back(gameObject);
 	}
 
-	Level::Level()
+	Level::Level(std::string const& levelName)
+		:Name(levelName)
 	{
 		_vAmbientColor = Vector4(0.0f,0.0f,0.0f,1.0f);
 	}

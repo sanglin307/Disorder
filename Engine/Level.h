@@ -7,8 +7,7 @@ namespace Disorder
 	{
 		typedef std::list<GameObjectPtr> GameObjectContainer;
 	public:
-	
-
+ 
 		void AddGameObject(GameObjectPtr const& gameObject);
 
 		void Init();
@@ -20,17 +19,20 @@ namespace Disorder
 			_vAmbientColor = color;
 		}
 
-		Vector4 GetAmbientColor()
+		const Vector4& GetAmbientColor() const
 		{
 			return _vAmbientColor;
 		}
-
-		 Level();
+ 
+		 Level(std::string const& levelName);
 		~Level();
+
+		std::string Name;
 
 	private:
 		GameObjectContainer _vGameObjects;
 		Vector4     _vAmbientColor;
+ 
 	};
 }
 

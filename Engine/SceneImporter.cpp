@@ -41,7 +41,9 @@ namespace Disorder
 		FbxManager::GetFileFormatVersion(lSDKMajor, lSDKMinor, lSDKRevision);
 
 		//Create an FBX scene. This object holds most objects imported/exported from/to files.
-		FbxScene* lscene = FbxScene::Create(_sdkManager, "Disorder Scene");
+		size_t dotPos = fileName.find_first_of('.');
+		std::string sceneName = dotPos == std::string::npos ? fileName : fileName.substr(0,dotPos);
+		FbxScene* lscene = FbxScene::Create(_sdkManager, sceneName.c_str());
 		
 		BOOST_ASSERT(lscene);
 
@@ -120,16 +122,17 @@ namespace Disorder
 			}*/
 		}
 
-		LevelPtr level = boost::make_shared<Level>();
+		LevelPtr level = boost::make_shared<Level>(sceneName);
 
 		ProcessGlobalSetting(lscene,level);
  
 		ProcessHierarchy(lscene,level);
-
-
-
+ 
 		// Destroy the importer.
 		lImporter->Destroy();
+
+		GWorld->AddLevel(level);
+
 		return level;
 	}
 
@@ -516,13 +519,15 @@ namespace Disorder
 
 	void FbxSceneImporter::ProcessLight(FbxNode* pNode,GameObjectPtr const& gameObject)
 	{
+		return ;
+
 		 FbxLight* lLight = (FbxLight*) pNode->GetNodeAttribute();
-		 LightPtr lightObj = boost::make_shared<Light>();
+		 LightPtr lightObj = boost::make_shared<Light>(gameObject->Name);
 		
 		 if(lLight->LightType.Get() == FbxLight::ePoint )
 			 lightObj->LightType = LT_Point;
 		 else if(lLight->LightType.Get() == FbxLight::eDirectional )
-			 lightObj->LightType = LT_Parallel;
+			 lightObj->LightType = LT_Directional;
 		 else if(lLight->LightType.Get() == FbxLight::eSpot )
 			 lightObj->LightType = LT_Spot;
 		 else
@@ -780,10 +785,8 @@ namespace Disorder
 	{
 		 FbxMesh* lMesh = (FbxMesh*) pNode->GetNodeAttribute ();
 		 GeometryPtr geometry = boost::make_shared<Geometry>();
-		 GeometryRendererPtr geometryRender = boost::make_shared<GeometryRenderer>();
-		 
-		 geometry->Name = pNode->GetName();
-   
+		 GeometryRendererPtr geometryRender = boost::make_shared<GeometryRenderer>(gameObject->Name);
+	 
 		 // skip meta data connections...
   
    
@@ -809,6 +812,10 @@ namespace Disorder
 		 gameObject->AddComponent(geometryRender);
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	/// The fbx transform same to maya and as follow
+	/// WorldTransform = ParentWorldTransform * T * Roff * Rp * Rpre * R * Rpost -1 * Rp -1 * Soff * Sp * S * Sp -1
+	//////////////////////////////////////////////////////////////////////////
 	GameObjectPtr FbxSceneImporter::ProcessTranform(FbxNode* pNode)
 	{
 		FbxVector4 lTmpVector = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);

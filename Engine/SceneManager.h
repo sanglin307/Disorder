@@ -15,12 +15,25 @@ namespace Disorder
 		void Init();
 		void Exit();
 	    void Tick(float deltaSeconds);
+
 		void AddRenderer(RendererPtr const& renderer);
 		void AddLight(LightPtr const& light);
 		void AddCamera(CameraPtr const& camera);
+
 		RendererPtr GetRenderer(std::string const& name);
 		LightPtr GetLight(std::string const& name);
 		CameraPtr GetCamera(std::string const& name);
+
+		void CreateDefaultCamera();
+		const CameraPtr& GetDefaultCamera() const
+		{
+			return _mDefaultCamera;
+		}
+
+		void SetDefaultCamera(CameraPtr const& camera)
+		{
+			_mDefaultCamera = camera;
+		}
 
 		void UpdateLight();
 		const std::vector<RendererPtr>& GetRendererList(CameraPtr const camera) const
@@ -29,13 +42,16 @@ namespace Disorder
 		}
 
 	private:
+
 		RendererMap _mRenderObjects;
-        LightMap    _mLightObjects;
-		std::vector<LightPtr> _vDirectLights;
-		std::vector<LightPtr> _vNonDirectLights;
+        LightMap    _mLightObjects;	
+		CameraMap   _mCameraObjects;
+		CameraPtr   _mDefaultCamera;
+
+		std::vector<LightPtr> _vDirectionalLights;
+		std::vector<LightPtr> _vNonDirectionalLights;
 		std::vector<RendererPtr> _vRenderObjects;
 
-		CameraMap   _mCameraObjects;
 
 		SceneImporterPtr _sceneImporter;
 

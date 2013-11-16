@@ -12,10 +12,15 @@ namespace Disorder
 	public:
 		void Init();
 		void Exit();
-
 		void Tick(float deltaSeconds);
 
-		LevelContainer Levels;
+		void AddLevel(LevelPtr const& level);
+		LevelPtr GetLevel(); // the top level;
+		LevelPtr GetLevel(std::string const& name);
+
+	private:
+
+		LevelContainer _Levels;
 	};
 
     #define GWorld World::GetSingleton()

@@ -4,10 +4,10 @@ namespace Disorder
 {
 	Vector3 Light::DefaultLightDirection(0.0f,-1.0f,-1.0f);
 
-	Light::Light()
+	Light::Light(std::string const& name)
+		:Component(name,CT_Light)
 	{
-		ComponentType = CT_Light;
-		LightType = LT_Parallel;
+		LightType = LT_Directional;
 		Color.x = 1.0f;
 		Color.y = 1.0f;
 		Color.z = 1.0f;
@@ -15,11 +15,15 @@ namespace Disorder
 		Intensity = 0.8f; 
 		SpotAngle = 30;
 		Range = 10.0f;
+
+		CastShadows = false;
+		ShadowColor = Vector3::ZERO;
+
 	}
 
 	Vector3 Light::GetDirection()
 	{
-		if( LightType == LT_Parallel || LightType == LT_Spot )
+		if( LightType == LT_Directional || LightType == LT_Spot )
 		{
 			GameObjectPtr go = GetBase();
 			return go->GetWorldRotation() * Light::DefaultLightDirection;
@@ -30,7 +34,7 @@ namespace Disorder
 
 	bool Light::Touch(RendererPtr renderObject)
 	{
-		if( LightType == LT_Parallel )
+		if( LightType == LT_Directional )
 			return true;
 
 		GameObjectPtr lightGo = GetBase();

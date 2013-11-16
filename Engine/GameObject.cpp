@@ -8,7 +8,7 @@ namespace Disorder
 	}
 
 	GameObject::GameObject(std::string const& name, Vector3 const& pos,Quaternion const& rot,Vector3 const& scale)
-		:_name(name)
+		:Name(name)
 	{
 		_locPos = pos;
 		_locRot = rot;
@@ -19,6 +19,17 @@ namespace Disorder
 
 		_worldMatrix.MakeTransform(_wldPos,_wldScale,_wldRot);
 	}
+
+	 ComponentPtr GameObject::GetComponent(std::string const& name) const
+	 {
+		 for(size_t i=0;i<_vComponents.size();i++)
+		 {
+			 if( _vComponents[i]->Name == name )
+				 return _vComponents[i];
+		 }
+
+		 return NULL;
+	 }
  
 	void GameObject::AddComponent(ComponentPtr const& component)
 	{
@@ -238,7 +249,7 @@ namespace Disorder
 		child->SetLocalPosition(pos);
 		child->SetLocalRotation(rot);
 		child->SetLocalScale(scale);
-		_mapChildren[child->GetName()] = child;
+		_mapChildren[child->Name] = child;
 	}
 	
 }

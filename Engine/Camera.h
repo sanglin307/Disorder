@@ -7,7 +7,8 @@ namespace Disorder
 	class Camera : public InputListener,public Component
 	{
 	public:
-		Camera();
+ 
+		Camera(std::string const& name);
 		
 		void LookAt(Vector3 const& eyePos,Vector3 const& lookAt,Vector3 const& upVec);
 	    void ProjCalculate(float FOV, float aspect, float nearPlane,float farPlane);

@@ -17,6 +17,8 @@ namespace Disorder
 	class Component
 	{
 	public:
+		Component(std::string const& name,EComponentType componentType);
+
 		virtual ~Component(){};
 	   inline void SetBase(GameObjectPtr const& base)
 	   {
@@ -33,6 +35,11 @@ namespace Disorder
 
 	protected:
 		boost::weak_ptr<GameObject> _baseObject;
+
+		// offset transform to gameobject , when using instance, set it to identity
+		Vector3 _vPos;
+		Quaternion _vRot;
+		Vector3 _vScale;
 	};
 }
 

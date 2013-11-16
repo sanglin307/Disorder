@@ -40,6 +40,7 @@ namespace Disorder
 
 	void Logger::Error(std::string const& error)
 	{
+		BOOST_ASSERT(0);
 		boost::mutex::scoped_lock lock(_errorMutex);
 		LogObj log;
 		strncpy_s(log.content,error.c_str(),Min<unsigned int>(error.size() , LogObj::StringMaxLengh));

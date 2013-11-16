@@ -3,9 +3,9 @@
 namespace Disorder
 {
  
-	Renderer::Renderer()
+	Renderer::Renderer(std::string const& name)
+		:Component(name,CT_Renderer)
 	{
-		ComponentType = CT_Renderer;
 	}
  
 	void Renderer::AddLight(LightPtr & light)
@@ -16,6 +16,12 @@ namespace Disorder
 	void Renderer::ClearLight()
 	{
 		_vLightArray.clear();
+	}
+
+	GeometryRenderer::GeometryRenderer(std::string const& name)
+		:Renderer(name)
+	{
+
 	}
 
 	void GeometryRenderer::BindRenderResource()
@@ -43,7 +49,6 @@ namespace Disorder
 
 	void GeometryRenderer::SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat)
 	{
-		Name = geometry->Name;
 		_geometryObject = geometry;
 		_material = mat;
 
@@ -75,7 +80,7 @@ namespace Disorder
 		std::vector<Vector3> colorVec;
 		for(unsigned int i=0;i<_vLightArray.size();i++)
 		{
-			if( _vLightArray[i]->LightType == LT_Parallel )
+			if( _vLightArray[i]->LightType == LT_Directional )
 			{
 			   intensityVec[lightNumber] = _vLightArray[i]->Intensity;
 			   dirVec.push_back(_vLightArray[i]->GetDirection());
@@ -98,7 +103,7 @@ namespace Disorder
 
 	void GeometryRenderer::SetDynamicLightPass(LightPtr const& light)
 	{
-		BOOST_ASSERT(light->LightType != LT_Parallel);
+		BOOST_ASSERT(light->LightType != LT_Directional);
 
 		_material->LightType->SetValue((int)(light->LightType));
 		_material->LightIntensity->SetValue((float)(light->Intensity));
@@ -130,7 +135,7 @@ namespace Disorder
 			{
 				for(unsigned int i=0;i< _vLightArray.size();i++)
 				{
-					if( _vLightArray[i]->LightType != LT_Parallel )
+					if( _vLightArray[i]->LightType != LT_Directional )
 					{
 						SetDynamicLightPass(_vLightArray[i]);
 						_Draw();

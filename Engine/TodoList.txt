@@ -1,2 +1,5 @@
-1. Configure data ( boost property tree )
-2. Octree
+. Component offset transform
+. FbxNode transform limit & constraint.
+. Animiation (FBX : ConvertPivotAnimationRecursive)
+. camera , spot and direction light can set target to fbxNode(fbxMaker) ( Node Target Management of fbx)
+. Octree

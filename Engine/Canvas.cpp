@@ -90,7 +90,8 @@ namespace Disorder
 
 	}
 
-	CanvasBatchElement::CanvasBatchElement()
+	CanvasBatchElement::CanvasBatchElement(std::string const& name)
+		:Renderer(name)
 	{
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
 		_renderEffect =  resourceManager->CreateRenderEffect("2DFX.fx",SM_4_0,"VS","PS");
@@ -125,7 +126,7 @@ namespace Disorder
 
 
 	Canvas::Canvas(unsigned int width,unsigned int height)
-		:_width(width),_height(height)
+		:_width(width),_height(height),_stringElement("CanvasString"),_tileElement("CanvasTile")
 	{
 		_font = GFontManager->CreateFontFromTrueTypeFile("calibri",20,96);
 		_stringElement.SetTexture(_font->GetGlyphTexture());
