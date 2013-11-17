@@ -124,10 +124,12 @@ namespace Disorder
 
 		LevelPtr level = boost::make_shared<Level>(sceneName);
 
-		ProcessGlobalSetting(lscene,level);
+	
  
 		ProcessHierarchy(lscene,level);
  
+
+		ProcessGlobalSetting(lscene,level);
 		// Destroy the importer.
 		lImporter->Destroy();
 
@@ -142,6 +144,16 @@ namespace Disorder
 		FbxColor ambient = rGlobalSetting.GetAmbientColor();
 		level->SetAmbientColor(Vector4(ambient.mRed,ambient.mGreen,ambient.mBlue,ambient.mAlpha));
 
+		FbxString& defaultCamera = rGlobalSetting.GetDefaultCamera();
+		if( !defaultCamera.IsEmpty())
+		{
+			std::string strCamera = defaultCamera.Buffer();
+			CameraPtr cameraPtr = GSceneManager->GetCamera(strCamera);
+			if(cameraPtr != NULL )
+			{
+				GSceneManager->SetDefaultCamera(cameraPtr);
+			}
+		}
 	}
 
 	 
@@ -217,8 +229,7 @@ namespace Disorder
             break;
 
         case FbxNodeAttribute::eCamera:    
-            //DisplayCamera(pNode);
-			GLogger->Info("Node has Camera info!");
+            ProcessCamera(pNode,gameObject);
             break;
 
         case FbxNodeAttribute::eLight:     
@@ -233,6 +244,23 @@ namespace Disorder
 
 
     
+	}
+
+	void FbxSceneImporter::ProcessCamera(FbxNode* pNode,GameObjectPtr const& gameObject)
+	{
+		FbxCamera *pCamera = (FbxCamera*)pNode->GetNodeAttribute();
+		BOOST_ASSERT(pCamera);
+
+		CameraPtr cameraPtr = boost::make_shared<Camera>(pNode->GetName());
+		BOOST_ASSERT(pNode->GetTarget() == NULL); // don't process target node now.
+		FbxDouble3& position = pCamera->Position.Get();
+		FbxDouble3& target = pCamera->InterestPosition.Get();
+		FbxDouble3& upVec = pCamera->UpVector.Get();
+
+		cameraPtr->LookAt(Vector3(position[0],position[1],position[2]),Vector3(target[0],target[1],target[2]),Vector3(upVec[0],upVec[1],upVec[2]));
+		cameraPtr->ProjCalculate((float)pCamera->FieldOfView.Get(),(float)pCamera->NearPlane.Get(),(float)pCamera->FarPlane.Get());
+		gameObject->AddComponent(cameraPtr);
+		
 	}
 
 	void FbxSceneImporter::ProcessGeometry(FbxMesh *pMesh,GeometryPtr const& geometry)

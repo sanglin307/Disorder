@@ -23,4 +23,5 @@ namespace Disorder
 
 	//----------------------------------------------
 	 const Vector4 Vector4::ZERO( 0.f, 0.f, 0.f, 0.f );
+	 const Vector4 Vector4::ONE( 1.f, 1.f, 1.f, 1.f );
 }

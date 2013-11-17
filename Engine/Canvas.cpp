@@ -130,11 +130,20 @@ namespace Disorder
 	{
 		_font = GFontManager->CreateFontFromTrueTypeFile("calibri",20,96);
 		_stringElement.SetTexture(_font->GetGlyphTexture());
+
+		_xPosDebug = 0;
+		_yPosDebug = 0;
+		_sizeDebug = 10;
+		_colorDebug = Vector4::ONE;
 	}
+
 
 	void Canvas::Draw(CameraPtr const& camera)
 	{
 		_stringElement.Draw(RPT_ForwardLighting,0,camera);
+
+		_xPosDebug = 0;
+		_yPosDebug = 0;
 	}
 
 	unsigned int Canvas::GetCurrentDrawTriNumber()
@@ -203,9 +212,10 @@ namespace Disorder
 			xbegin += drawSizeX;
 
 		}
+	}
 
-
-
+	void Canvas::DrawDebugString(std::string const& str)
+	{
 
 	}
 }

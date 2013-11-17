@@ -30,10 +30,7 @@ namespace Disorder
 			return _mDefaultCamera;
 		}
 
-		void SetDefaultCamera(CameraPtr const& camera)
-		{
-			_mDefaultCamera = camera;
-		}
+		void SetDefaultCamera(CameraPtr const& camera);
 
 		void UpdateLight();
 		const std::vector<RendererPtr>& GetRendererList(CameraPtr const camera) const

@@ -21,6 +21,20 @@ namespace Disorder
 		GWorld->GetLevel()->AddGameObject(camera);
 		_mDefaultCamera = boost::dynamic_pointer_cast<Camera>(camera->GetComponent("DefaultCamera"));
 		AddCamera(_mDefaultCamera);
+		GEngine->GameClient->AddInputListener(_mDefaultCamera);
+	}
+
+	void SceneManager::SetDefaultCamera(CameraPtr const& camera)
+	{
+		if( _mDefaultCamera != NULL )
+		{
+			GEngine->GameClient->ReleaseInputListener(_mDefaultCamera);
+			
+		}
+
+		GEngine->GameClient->AddInputListener(camera);
+	   _mDefaultCamera = camera;
+
 	}
 
 	RendererPtr SceneManager::GetRenderer(std::string const& name)

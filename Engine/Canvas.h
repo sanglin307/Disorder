@@ -40,6 +40,8 @@ namespace Disorder
 		float GetStringLengthNormalize(float hsize,std::string const& str);
 		void DrawString(int xPos,int yPos, int size, Vector4 const& color,std::string const& str);
 		void DrawStringNormalize(float xPos,float yPos,float size,Vector4 const& color,std::string const& str);
+		
+		void DrawDebugString(std::string const& str);
 
 		void Draw(CameraPtr const& camera);
 
@@ -63,6 +65,11 @@ namespace Disorder
 		unsigned int _height;
 
 		FontPtr _font;
+
+		int _xPosDebug;
+		int _yPosDebug;
+		float _sizeDebug;
+		Vector4 _colorDebug;
 	};
 }
 

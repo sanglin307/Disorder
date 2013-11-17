@@ -120,6 +120,11 @@ namespace Disorder
 	{
 		BOOST_ASSERT(_renderLayout != NULL);
 
+		std::stringstream strstream;
+		Vector3 pos = GetBase()->GetWorldPosition();
+		strstream << "geometry:" << pos.x << "  " << pos.y << " " << pos.z;
+		GEngine->GameCanvas->DrawString(10,400,30,Vector4::ONE,strstream.str());
+
 		_renderEffect = _material->Effect[pathType][pass];
 		if( _renderEffect == NULL )
 			return;

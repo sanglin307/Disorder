@@ -22,6 +22,7 @@ namespace Disorder
 		_nearPlane = GConfig->pCameraConfig->NearClip;
 		_farPlane = GConfig->pCameraConfig->FarClip;
 		_FOV = GConfig->pCameraConfig->FOV * Math::fDeg2Rad;
+		_aspectRatio = GConfig->pRenderConfig->SizeX*1.0f/GConfig->pRenderConfig->SizeY;
 
 		_moveSpeed = GConfig->pCameraConfig->mFreeMode.MoveSpeed;
 		_rotateSpeed = GConfig->pCameraConfig->mFreeMode.RotateSpeed;
@@ -85,6 +86,7 @@ namespace Disorder
 
 	bool Camera::KeyboardEvent(OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds)
 	{
+ 
 		return true;
 	}
 
@@ -114,6 +116,13 @@ namespace Disorder
 
 	void Camera::Update(float delta)
 	{
+		std::stringstream strstream;
+		strstream << "camera:" << _eyePos.x << "  " << _eyePos.y << " " << _eyePos.z << "   " << _viewVec.x << "  "<< _viewVec.y << "   " << _viewVec.z;
+		GEngine->GameCanvas->DrawString(10,300,30,Vector4::ONE,strstream.str());
+
+		if( GSceneManager->GetDefaultCamera().get() != this )
+			return;
+
 		const InputManagerPtr inputManager = GEngine->GameClient->GetInputManager();
 		if( inputManager->IsKeyDown(OIS::KC_W) )
 		{
@@ -166,10 +175,10 @@ namespace Disorder
 		 _viewMatrixInvalid = true;
 	}
 
-	void Camera::ProjCalculate(float FOV, float aspect, float nearPlane,float farPlane)
+	void Camera::ProjCalculate(float FOV,  float nearPlane,float farPlane)
 	{
 		_FOV		 = FOV;
-		_aspectRatio = aspect;
+ 
 		_nearPlane	 = nearPlane;
 		_farPlane	 = farPlane;
 

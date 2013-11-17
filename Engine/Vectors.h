@@ -1359,6 +1359,7 @@ namespace Disorder
         
         // special
         static const Vector4 ZERO;
+		static const Vector4 ONE;
     };
  }
 #endif

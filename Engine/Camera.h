@@ -11,7 +11,7 @@ namespace Disorder
 		Camera(std::string const& name);
 		
 		void LookAt(Vector3 const& eyePos,Vector3 const& lookAt,Vector3 const& upVec);
-	    void ProjCalculate(float FOV, float aspect, float nearPlane,float farPlane);
+	    void ProjCalculate(float FOV,  float nearPlane,float farPlane);
 
 		bool KeyboardEvent(OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds);
 		bool MouseEvent(MouseInputEvent const& mouseEvent,float deltaSeconds);
