@@ -25,9 +25,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Resource\FX\2DFX.fx">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\Resource\FX\DiffuseTex.fx">
       <Filter>Shaders</Filter>
     </None>
@@ -44,6 +41,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="TodoList.txt" />
+    <None Include="..\Resource\FX\2DTiles.fx">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Resource\FX\BatchLines.fx">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrixs.h">
@@ -180,6 +183,9 @@
       <Filter>GameEngine</Filter>
     </ClInclude>
     <ClInclude Include="RenderSurface.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexFormat.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
   </ItemGroup>

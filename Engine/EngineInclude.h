@@ -173,6 +173,7 @@ namespace Disorder
 #include "Light.h"
 
 #include "RenderInclude.h"
+#include "VertexFormat.h"
 #include "Texture.h"
 #include "RenderUtil.h"
 #include "RenderResource.h"

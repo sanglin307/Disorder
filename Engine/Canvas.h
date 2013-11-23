@@ -3,33 +3,7 @@
 
 namespace Disorder
 {
-	//Batch element foreach texture.
-	class CanvasBatchElement : public Renderer
-	{
-	    typedef struct _CanvasVertex
-		{
-			Vector3 position;
-			Vector4 color;
-			Vector2 texcoord;
-		} CanvasVertex;
-	public:
-		CanvasBatchElement(std::string const& name);
-
-		void SetTexture(RenderSurfacePtr const& texture);
-		 
-		void AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord);
-		virtual void Draw(RenderPathType pathType,int pass,CameraPtr const& camera);
-
-		unsigned int GetCurrentDrawTriNumber();
-
-	protected:
-		std::vector<CanvasVertex> _vertexs;
-		std::vector<WORD> _indexs;
-		unsigned int _savedVertexBufferSize;
-		unsigned int _savedIndexBufferSize;
-		RenderSurfacePtr _texture;
-	};
-
+ 
 	class Canvas
 	{
 	public:
@@ -41,8 +15,10 @@ namespace Disorder
 		void DrawString(int xPos,int yPos, int size, Vector4 const& color,std::string const& str);
 		void DrawStringNormalize(float xPos,float yPos,float size,Vector4 const& color,std::string const& str);
 		
-		void DrawDebugString(std::string const& str);
+		void DrawStringDeviceSpace(float xPos,float yPos,int size,Vector4 const& color,std::string const& str); // ( -1,-1,-1) --- (1,1,1)
 
+		void DrawLine(Vector3 const& beginPos,Vector4 const& beginColor,Vector3 const& endPos,Vector4 const& endColor);
+	 
 		void Draw(CameraPtr const& camera);
 
 		unsigned int GetCurrentDrawTriNumber();
@@ -58,18 +34,17 @@ namespace Disorder
 		}
 
 	protected:
-		CanvasBatchElement _stringElement;
-		CanvasBatchElement _tileElement;
+		BatchScreenTiles _stringElement;
+		BatchScreenTiles _tileElement;
+
+		BatchLines _lineElement;
 
 		unsigned int _width;
 		unsigned int _height;
 
 		FontPtr _font;
 
-		int _xPosDebug;
-		int _yPosDebug;
-		float _sizeDebug;
-		Vector4 _colorDebug;
+		 
 	};
 }
 

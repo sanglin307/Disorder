@@ -255,6 +255,8 @@ namespace Disorder
 		TopologyType topology = renderLayout->GetTopology();
 		if(topology == TT_TriangleList )
 			_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		else if( topology == TT_LineList )
+			_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 		else
 			BOOST_ASSERT(0);
 
@@ -290,6 +292,11 @@ namespace Disorder
 		GDrawTriNumber += indexCount / 3;
 
 		_pImmediateContext->DrawIndexed(indexCount,startIndexLocation,baseVertexLocation);
+	}
+
+	void DX11RenderEngine::Draw(unsigned int vertexCount,unsigned int startVertexLocation)
+	{
+		_pImmediateContext->Draw(vertexCount,startVertexLocation);
 	}
  
 	void DX11RenderEngine::SetEffect(RenderEffectPtr const& effect)

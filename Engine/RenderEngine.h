@@ -24,6 +24,8 @@ namespace Disorder
 		
 		virtual void SetEffect(RenderEffectPtr const& effect) = 0;
 		virtual void DrawIndexed(unsigned int indexCount,unsigned int startIndexLocation,int baseVertexLocation) = 0;
+		virtual void Draw(unsigned int vertexCount,unsigned int startVertexLocation) = 0;
+
 		virtual void* Map(RenderBufferPtr const& buffer,BufferAccess bufferAccess) = 0;
 		virtual void UnMap(RenderBufferPtr const& buffer) = 0;
 		virtual void UpdateSubresource(RenderBufferPtr const& buffer,void* pSrcData,unsigned int srcDataSize) = 0;

@@ -2,148 +2,24 @@
 
 namespace Disorder
 {
-	void CanvasBatchElement::SetTexture(RenderSurfacePtr const& texture)
-	{
-		_texture = texture;
-		
-		ShaderObjectPtr pixelShader = _renderEffect->GetPixelShader();
-	 
-		MaterialParamShaderResPtr shaderres = _renderEffect->GetShaderResourceParameter("DiffuseTexture");
-		shaderres->SetValue(texture);
-	  
-		MaterialParamSamplerStatePtr msampler = _renderEffect->GetSamplerStateParameter("LinearSampler");
-		msampler->SetValue(texture->Tex2DResource->Sampler);
-
-		_renderEffect->PrepareRenderParam();
-	}
-
-	void CanvasBatchElement::Draw(RenderPathType pathType,int pass,CameraPtr const& camera)
-	{
-		BOOST_ASSERT(_vertexs.size()%4==0);
-
-		if( _vertexs.size() == 0 )
-			return;
  
-		RenderEnginePtr renderEngine = GEngine->RenderEngine;
-
-
-		const RenderBufferPtr & vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
-		void* vertexBuffer = renderEngine->Map(vertexRenderBuffer,BA_Write_Only);
-		memcpy(vertexBuffer,_vertexs.data(),_vertexs.size()*sizeof(CanvasVertex));
-		renderEngine->UnMap(vertexRenderBuffer);
-
-		const RenderBufferPtr & indexRenderBuffer = _renderLayout->GetIndexBuffer();
-		void* indexBuffer = renderEngine->Map(indexRenderBuffer,BA_Write_Only);
-		memcpy(indexBuffer,_indexs.data(),_indexs.size()*sizeof(WORD));
-		renderEngine->UnMap(indexRenderBuffer);
-
-		renderEngine->SetRenderLayout(_renderLayout);
-	
-		renderEngine->SetEffect(_renderEffect);
-		renderEngine->DrawIndexed(_indexs.size(),0,0);
-
-		_indexs.clear();
-		_vertexs.clear();
-	}
-
-	unsigned int CanvasBatchElement::GetCurrentDrawTriNumber()
-	{
-		return _indexs.size() /3;
-	}
-
-	void CanvasBatchElement::AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord)
-	{
-		if( _vertexs.size() >= _savedVertexBufferSize )
-		{
-			_savedVertexBufferSize *= 2;
-			const RenderBufferPtr & vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
-			vertexRenderBuffer->Resize(sizeof(CanvasVertex) * _savedVertexBufferSize);
-		}
-
-		if( _indexs.size() >= _savedIndexBufferSize )
-		{
-			_savedIndexBufferSize *= 2;
-			const RenderBufferPtr & indexRenderBuffer = _renderLayout->GetIndexBuffer();
-			indexRenderBuffer->Resize(sizeof(WORD) * _savedIndexBufferSize);
-		}
-
-	
-
-		CanvasVertex vertex;
-		vertex.position = position;
-		vertex.color = color;
-		vertex.texcoord = texcoord;
-
-		_vertexs.push_back(vertex);
-		
-		if(_vertexs.size() % 4 == 0 )
-		{
-			WORD index = _vertexs.size() - 4;
-			_indexs.push_back(index);
-			_indexs.push_back(index+1);
-			_indexs.push_back(index+2);
-			_indexs.push_back(index+2);
-			_indexs.push_back(index+1);
-			_indexs.push_back(index+3);
-		}
-
-
-	}
-
-	CanvasBatchElement::CanvasBatchElement(std::string const& name)
-		:Renderer(name)
-	{
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
-		_renderEffect =  resourceManager->CreateRenderEffect("2DFX.fx",SM_4_0,"VS","PS");
-
-		ShaderObjectPtr vertexShader = _renderEffect->GetVertexShader();
-		//ShaderObjectPtr pixelShader = _renderEffect->GetPixelShader();
- 
-		BlendDesc blendDesc;
-		blendDesc.BlendEnable = true;
-		blendDesc.SrcBlend = BLEND_SRC_ALPHA;
-		blendDesc.DestBlend = BLEND_INV_SRC_ALPHA;
-		blendDesc.BlendOp = BLEND_OP_ADD;
-		 
-		BlendStatePtr blendState = resourceManager->CreateBlendState(&blendDesc,1);
-		_renderEffect->BindBlendState(blendState);
-
-	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList,true);
-	 
-		_savedVertexBufferSize = 2048;
-		_savedIndexBufferSize = (UINT)(_savedVertexBufferSize * 1.5f);
- 
-		RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,BAH_GPU_Read | BAH_CPU_Write,sizeof(CanvasVertex),sizeof(CanvasVertex)*_savedVertexBufferSize,NULL);
-		_renderLayout->BindVertexBuffer(vertexBuffer);
-
-		//Index buffer
-		RenderBufferPtr indexBuffer = resourceManager->CreateRenderBuffer(RBT_Index,BAH_GPU_Read | BAH_CPU_Write,sizeof(WORD),sizeof(WORD)*_savedIndexBufferSize,NULL);
-		_renderLayout->BindIndexBuffer(indexBuffer);
-
-	
- 
-	}
-
-
 	Canvas::Canvas(unsigned int width,unsigned int height)
-		:_width(width),_height(height),_stringElement("CanvasString"),_tileElement("CanvasTile")
+		:_width(width),_height(height),_stringElement("CanvasString"),_tileElement("CanvasTile"),_lineElement("BatchLines")
 	{
 		_font = GFontManager->CreateFontFromTrueTypeFile("calibri",20,96);
 		_stringElement.SetTexture(_font->GetGlyphTexture());
-
-		_xPosDebug = 0;
-		_yPosDebug = 0;
-		_sizeDebug = 10;
-		_colorDebug = Vector4::ONE;
+ 
 	}
 
+	void Canvas::DrawLine(Vector3 const& beginPos,Vector4 const& beginColor,Vector3 const& endPos,Vector4 const& endColor)
+	{
+		_lineElement.AddLine(beginPos,beginColor,endPos,endColor);
+	}
 
 	void Canvas::Draw(CameraPtr const& camera)
 	{
 		_stringElement.Draw(RPT_ForwardLighting,0,camera);
-
-		_xPosDebug = 0;
-		_yPosDebug = 0;
+		_lineElement.Draw(RPT_ForwardLighting,0,camera);
 	}
 
 	unsigned int Canvas::GetCurrentDrawTriNumber()
@@ -181,13 +57,11 @@ namespace Disorder
 		DrawString((int)(xPos*_width),(int)(yPos*_height),(int)(hsize*_height),color,str);
 	}
 
-	void Canvas::DrawString(int xPos,int yPos,int hsize,Vector4 const& color,std::string const& str)
+	void Canvas::DrawStringDeviceSpace(float xPos,float yPos,int size,Vector4 const& color,std::string const& str)
 	{
-		 //draw string x[-1.0,1.0] and y[-1.0,1.0] z = 0.0
-		float xbegin = (xPos - _width / 2.0f )*2.0f/_width;
-		float ybegin = (yPos - _height / 2.0f )*(-2.0f)/_height;
+		//draw string x[-1.0,1.0] and y[-1.0,1.0] z = 0.0
 		float z = 0.0f;
-		float charSize = 1.0f * hsize / _height;
+		float charSize = 1.0f * size / _height;
 
 		// we draw char one by one
 		for(unsigned int index=0;index<str.length();index++)
@@ -196,7 +70,7 @@ namespace Disorder
 
 			if( c == 0x20) // Space
 			{
-				xbegin += charSize/10;
+				xPos += charSize/10;
 				continue;
 			}
 
@@ -204,18 +78,22 @@ namespace Disorder
 			 
 			// clockwise
 			float drawSizeX = charSize * rect.aspectRatio ;
-			_stringElement.AddVertex(Vector3(xbegin,ybegin,z),color,Vector2(rect.uvRect.left,rect.uvRect.top));
-			_stringElement.AddVertex(Vector3(xbegin+drawSizeX,ybegin,z),color,Vector2(rect.uvRect.right,rect.uvRect.top));
-			_stringElement.AddVertex(Vector3(xbegin,ybegin-charSize,z),color,Vector2(rect.uvRect.left,rect.uvRect.bottom));
-			_stringElement.AddVertex(Vector3(xbegin+drawSizeX,ybegin - charSize,z),color,Vector2(rect.uvRect.right,rect.uvRect.bottom));
+			_stringElement.AddVertex(Vector3(xPos,yPos,z),color,Vector2(rect.uvRect.left,rect.uvRect.top));
+			_stringElement.AddVertex(Vector3(xPos+drawSizeX,yPos,z),color,Vector2(rect.uvRect.right,rect.uvRect.top));
+			_stringElement.AddVertex(Vector3(xPos,yPos-charSize,z),color,Vector2(rect.uvRect.left,rect.uvRect.bottom));
+			_stringElement.AddVertex(Vector3(xPos+drawSizeX,yPos - charSize,z),color,Vector2(rect.uvRect.right,rect.uvRect.bottom));
 
-			xbegin += drawSizeX;
+			xPos += drawSizeX;
 
 		}
 	}
 
-	void Canvas::DrawDebugString(std::string const& str)
+	void Canvas::DrawString(int xPos,int yPos,int hsize,Vector4 const& color,std::string const& str)
 	{
-
+		 //draw string x[-1.0,1.0] and y[-1.0,1.0] z = 0.0
+		float xbegin = (xPos - _width / 2.0f )*2.0f/_width;
+		float ybegin = (yPos - _height / 2.0f )*(-2.0f)/_height;
+		DrawStringDeviceSpace(xbegin,ybegin,hsize,color,str);
 	}
+ 
 }

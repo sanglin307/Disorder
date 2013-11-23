@@ -125,11 +125,11 @@ namespace Disorder
 		LevelPtr level = boost::make_shared<Level>(sceneName);
 
 	
+		PreProcessGlobalSetting(lscene,level);
  
 		ProcessHierarchy(lscene,level);
- 
 
-		ProcessGlobalSetting(lscene,level);
+		PostProcessGlobalSetting(lscene,level);
 		// Destroy the importer.
 		lImporter->Destroy();
 
@@ -138,11 +138,27 @@ namespace Disorder
 		return level;
 	}
 
-	void FbxSceneImporter::ProcessGlobalSetting(FbxScene* lscene,LevelPtr const& level)
+	void FbxSceneImporter::PreProcessGlobalSetting(FbxScene* lscene,LevelPtr const& level)
 	{
 		FbxGlobalSettings &rGlobalSetting =  lscene->GetGlobalSettings();
+
+		//
+		FbxAxisSystem &rAxisSystem = rGlobalSetting.GetAxisSystem();
+		FbxAxisSystem::ECoordSystem coordSystem = rAxisSystem.GetCoorSystem();
+
+		int upSign = 1;
+		int frontSign = 1;
+		FbxAxisSystem::EUpVector upVec = rAxisSystem.GetUpVector(upSign);
+		FbxAxisSystem::EFrontVector frontVec = rAxisSystem.GetFrontVector(frontSign);
+
 		FbxColor ambient = rGlobalSetting.GetAmbientColor();
 		level->SetAmbientColor(Vector4(ambient.mRed,ambient.mGreen,ambient.mBlue,ambient.mAlpha));
+ 
+	}
+
+	void FbxSceneImporter::PostProcessGlobalSetting(FbxScene* lscene,LevelPtr const& level)
+	{
+		FbxGlobalSettings &rGlobalSetting =  lscene->GetGlobalSettings();
 
 		FbxString& defaultCamera = rGlobalSetting.GetDefaultCamera();
 		if( !defaultCamera.IsEmpty())
@@ -154,8 +170,8 @@ namespace Disorder
 				GSceneManager->SetDefaultCamera(cameraPtr);
 			}
 		}
-	}
 
+	}
 	 
 
     void FbxSceneImporter::ProcessHierarchy(FbxScene* lscene,LevelPtr const& level)
@@ -275,6 +291,9 @@ namespace Disorder
 			geometry->ControllPositions.push_back(Vector3(lControlPoints[i][0],lControlPoints[i][1],lControlPoints[i][2]));
 		}
  
+		// calculate bounding box
+		geometry->BoundingBox = BoxSphereBounds(geometry->ControllPositions.data(),geometry->ControllPositions.size());
+
 		unsigned int vertexId = 0;
 		for (int i = 0; i < lPolygonCount; i++)
 		{

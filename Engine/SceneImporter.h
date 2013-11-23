@@ -23,7 +23,8 @@ namespace Disorder
 
 	private:
 
-		void ProcessGlobalSetting(FbxScene* lscene,LevelPtr const& level);
+		void PreProcessGlobalSetting(FbxScene* lscene,LevelPtr const& level);
+		void PostProcessGlobalSetting(FbxScene* lscene,LevelPtr const& level);
 	 
 		void ProcessHierarchy(FbxScene* lscene,LevelPtr const& level);
 		void ProcessHierarchy(FbxNode* pNode,GameObjectPtr const& gameObject);

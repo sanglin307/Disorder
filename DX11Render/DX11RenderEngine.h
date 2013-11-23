@@ -23,6 +23,7 @@ namespace Disorder
 		//virtual void UpdateMVPMatrix(RenderEffectPtr const& technique, Matrix4 const& worldMatrix,Matrix4 const& viewMatrix,Matrix4 const& projMatrix);
 		virtual void SetEffect(RenderEffectPtr const& technique);
 		virtual void DrawIndexed(unsigned int indexCount,unsigned int startIndexLocation,int baseVertexLocation);
+		virtual void Draw(unsigned int vertexCount,unsigned int startVertexLocation);
 
 		virtual void* Map(RenderBufferPtr const& buffer,BufferAccess bufferAccess);
 		virtual void UnMap(RenderBufferPtr const& buffer);

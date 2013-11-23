@@ -251,7 +251,7 @@ namespace Disorder
 			// Find an axis aligned bounding box for the points.
 			BoxBounds BoundingBox;
 			for(unsigned int PointIndex = 0;PointIndex < NumPoints;PointIndex++)
-				BoundingBox.Union(Points[PointIndex]);
+				BoundingBox = BoundingBox.Union(Points[PointIndex]);
 			BoundingBox.GetCenterAndExtents(Origin,BoxExtent);
 
 			// Using the center of the bounding box as the origin of the sphere, find the radius of the bounding sphere.

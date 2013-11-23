@@ -116,13 +116,10 @@ namespace Disorder
 
 	void Camera::Update(float delta)
 	{
-		std::stringstream strstream;
-		strstream << "camera:" << _eyePos.x << "  " << _eyePos.y << " " << _eyePos.z << "   " << _viewVec.x << "  "<< _viewVec.y << "   " << _viewVec.z;
-		GEngine->GameCanvas->DrawString(10,300,30,Vector4::ONE,strstream.str());
-
+ 
 		if( GSceneManager->GetDefaultCamera().get() != this )
 			return;
-
+ 
 		const InputManagerPtr inputManager = GEngine->GameClient->GetInputManager();
 		if( inputManager->IsKeyDown(OIS::KC_W) )
 		{
@@ -159,6 +156,11 @@ namespace Disorder
 			_eyePos = _eyePos - _upVec * _moveSpeed * delta;
 			_viewMatrixInvalid = true;
 		}
+
+		// debug draw
+		std::stringstream strstream;
+		strstream << "camera: [eyePos](" << _eyePos.x << "; " << _eyePos.y << "; " << _eyePos.z << ")     [Focus At](" << _viewVec.x << ";  "<< _viewVec.y << ";  " << _viewVec.z << ")";
+		GEngine->GameCanvas->DrawString(5,GConfig->pRenderConfig->SizeY - 20,30,Vector4::ONE,strstream.str());
 	}
 
 	void Camera::LookAt(Vector3 const& eyePos,Vector3 const& lookAt,Vector3 const& upVec)
@@ -168,16 +170,18 @@ namespace Disorder
 
 		 _viewVec = lookAt - eyePos;
 		 _viewVec.Normalise();
-
+ 
 		 _xAxis = _upVec.Cross(_viewVec);
 		 _xAxis.Normalise();
+
+		 _rotation.FromAxes(_xAxis,_upVec,_viewVec);
 
 		 _viewMatrixInvalid = true;
 	}
 
 	void Camera::ProjCalculate(float FOV,  float nearPlane,float farPlane)
 	{
-		_FOV		 = FOV;
+		_FOV		 = FOV * Math::fDeg2Rad;
  
 		_nearPlane	 = nearPlane;
 		_farPlane	 = farPlane;

@@ -16,6 +16,7 @@ namespace Disorder
 		std::vector<Vector2>                    Texcoords;   
 		std::vector<unsigned int>				Indices;     // conterclock
 
+		BoxSphereBounds                         BoundingBox;
 
 		TopologyType PrimitiveType;
 	};
