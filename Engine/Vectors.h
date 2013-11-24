@@ -463,7 +463,7 @@ namespace Disorder
 			y = (float)dY;
 			z = (float)dZ;
 		}
-
+ 
         inline Vector3( const float fX, const float fY, const float fZ )
             : x( fX ), y( fY ), z( fZ )
         {

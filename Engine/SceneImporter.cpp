@@ -434,8 +434,8 @@ namespace Disorder
 				for(int l = 0; l < pMesh->GetElementNormalCount(); ++l)
 				{
 					FbxGeometryElementNormal* leNormal = pMesh->GetElementNormal( l);
-					 
-					if(leNormal->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+					FbxGeometryElement::EMappingMode NormalMapMode = leNormal->GetMappingMode();
+					if( NormalMapMode == FbxGeometryElement::eByPolygonVertex)
 					{
 						switch (leNormal->GetReferenceMode())
 						{
@@ -458,6 +458,31 @@ namespace Disorder
 							break;
 						default:
 							break; // other reference modes not shown here!
+						}
+					}
+					else if( NormalMapMode == FbxGeometryElement::eByControlPoint)
+					{
+						switch (leNormal->GetReferenceMode())
+						{
+							case FbxGeometryElement::eDirect:
+								{
+									FbxVector4 normal = leNormal->GetDirectArray().GetAt(lControlPointIndex);
+									normal.Normalize();
+								    Vector3 vNormal(normal[0],normal[1],normal[2]);
+								    geometry->Normals.push_back(vNormal);
+								}
+								break;
+							case FbxGeometryElement::eIndexToDirect:
+								{
+									int id = leNormal->GetIndexArray().GetAt(lControlPointIndex);
+									FbxVector4 normal = leNormal->GetDirectArray().GetAt(id);
+									normal.Normalize();
+									Vector3 vNormal(normal[0],normal[1],normal[2]);
+									geometry->Normals.push_back(vNormal);
+								}
+								break;
+							default:
+								break;
 						}
 					}
 				}
@@ -865,14 +890,16 @@ namespace Disorder
 	//////////////////////////////////////////////////////////////////////////
 	GameObjectPtr FbxSceneImporter::ProcessTranform(FbxNode* pNode)
 	{
-		FbxVector4 lTmpVector = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);
+		// now we don't take care of pose information
+		FbxVector4 lGeometryPostion = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);
+		FbxVector4 lTmpVector = pNode->EvaluateLocalTranslation();
 		Vector3 position(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
-		lTmpVector =  pNode->GetGeometricRotation(FbxNode::eSourcePivot);
+		lTmpVector =  pNode->EvaluateLocalRotation();
 		Matrix3 rotMatrix;
 		rotMatrix.FromEulerAnglesXYZ((float)lTmpVector[0],(float)lTmpVector[1],(float)lTmpVector[2]);
 		Quaternion rot;
 		rot.FromRotationMatrix(rotMatrix);
-		lTmpVector = pNode->GetGeometricScaling(FbxNode::eSourcePivot);
+		lTmpVector = pNode->EvaluateLocalScaling();
 		Vector3 scale(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
 		std::string name(pNode->GetName());
 		GameObjectPtr gameObject = boost::make_shared<GameObject>(name,position,rot,scale);

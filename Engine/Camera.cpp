@@ -33,55 +33,68 @@ namespace Disorder
 	 
 	}
 
+	void Camera::UpdateViewMatrix()
+	{
+		if( !_viewMatrixInvalid )
+			return;
+
+		_rotation.ToAxes(_xAxis,_upVec,_viewVec);
+			 
+
+		Vector3 yAxis = _viewVec.Cross(_xAxis);
+		//yAxis.Normalise();
+		 
+	   /* ViewMatrix = Matrix4(xAxis.x,                   yAxis.x,	                 _viewVec.x,	               0,
+							xAxis.y,                   yAxis.y,	                 _viewVec.y,	               0,
+							xAxis.z,                   yAxis.z,	                 _viewVec.z,                   0,
+							-xAxis.dotProduct(_eyePos),-yAxis.dotProduct(_eyePos), -_viewVec.dotProduct(_eyePos),1);*/
+		 
+		ViewMatrix = Matrix4(_xAxis.x,           _xAxis.y,	                  _xAxis.z,	       -_xAxis.Dot(_eyePos),
+				            yAxis.x,            yAxis.y,	                  yAxis.z,	       -yAxis.Dot(_eyePos),
+							_viewVec.x,         _viewVec.y,	              _viewVec.z,      -_viewVec.Dot(_eyePos),
+							0,                  0,                          0,               1 );
+
+		_viewMatrixInvalid = false;
+
+	}
+
+	void Camera::UpdateProjectMatrix()
+	{
+		if( !_projectMatrixInvalid )
+			return;
+
+		float h = 1.0f / Math::Tan(_FOV / 2);
+		float w = h / _aspectRatio;
+		float q = _farPlane / (_farPlane - _nearPlane);
+
+		/*ProjectMatrix = Matrix4(
+				w,		0,		0,				0,
+				0,		h,		0,				0,
+				0,		0,		q,				1,
+				0,		0,		-nearPlane * q, 0 );*/
+
+		ProjectMatrix = Matrix4(
+				w,		0,		0,				0,
+				0,		h,		0,				0,
+				0,		0,		q,				-_nearPlane * q,
+				0,		0,		1,              0 );
+
+		GEngine->RenderEngine->AdjustProjMatrix(ProjectMatrix);
+
+		_projectMatrixInvalid = false;
+
+	}
+
     void Camera::Tick(float delta)
 	{ 
 
 		//Update Camera 
 		Update(delta);
 
-		if( _viewMatrixInvalid )
-		{
-			_rotation.ToAxes(_xAxis,_upVec,_viewVec);
-			 
+		UpdateViewMatrix();
 
-			 Vector3 yAxis = _viewVec.Cross(_xAxis);
-			// yAxis.normalise();
-		 
-			/* ViewMatrix = Matrix4(xAxis.x,                   yAxis.x,	                 _viewVec.x,	               0,
-								  xAxis.y,                   yAxis.y,	                 _viewVec.y,	               0,
-								  xAxis.z,                   yAxis.z,	                 _viewVec.z,                   0,
-								  -xAxis.dotProduct(_eyePos),-yAxis.dotProduct(_eyePos), -_viewVec.dotProduct(_eyePos),1);*/
-		 
-			 ViewMatrix = Matrix4(_xAxis.x,           _xAxis.y,	                  _xAxis.z,	       -_xAxis.Dot(_eyePos),
-				                  yAxis.x,            yAxis.y,	                  yAxis.z,	       -yAxis.Dot(_eyePos),
-								  _viewVec.x,         _viewVec.y,	              _viewVec.z,      -_viewVec.Dot(_eyePos),
-								  0,                  0,                          0,               1 );
+		UpdateProjectMatrix();
 
-			 _viewMatrixInvalid = false;
-		}
-
-		if( _projectMatrixInvalid )
-		{
-			float h = 1.0f / Math::Tan(_FOV / 2);
-			float w = h / _aspectRatio;
-			float q = _farPlane / (_farPlane - _nearPlane);
-
-			/*ProjectMatrix = Matrix4(
-					w,		0,		0,				0,
-					0,		h,		0,				0,
-					0,		0,		q,				1,
-					0,		0,		-nearPlane * q, 0 );*/
-
-			ProjectMatrix = Matrix4(
-					w,		0,		0,				0,
-					0,		h,		0,				0,
-					0,		0,		q,				-_nearPlane * q,
-					0,		0,		1,              0 );
-
-			GEngine->RenderEngine->AdjustProjMatrix(ProjectMatrix);
-
-			_projectMatrixInvalid = false;
-		}
 	}
 
 	bool Camera::KeyboardEvent(OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds)
@@ -108,10 +121,24 @@ namespace Disorder
 			    _viewMatrixInvalid = true;
 			}
 
-			
-
 		}
+		else if( mouseEvent.buttonDown(OIS::MB_Right) )
+		{
+			if( mouseEvent.RelativeX != 0 )
+			{
+				Quaternion q(mouseEvent.RelativeX * _rotateSpeed * deltaSeconds,Vector3::UNIT_Z);
+				_rotation = _rotation * q;
+			    _viewMatrixInvalid = true;
+			}
+ 
+		}
+
 		return true;
+	}
+
+	void Camera::DrawAxis()
+	{
+
 	}
 
 	void Camera::Update(float delta)
@@ -160,7 +187,7 @@ namespace Disorder
 		// debug draw
 		std::stringstream strstream;
 		strstream << "camera: [eyePos](" << _eyePos.x << "; " << _eyePos.y << "; " << _eyePos.z << ")     [Focus At](" << _viewVec.x << ";  "<< _viewVec.y << ";  " << _viewVec.z << ")";
-		GEngine->GameCanvas->DrawString(5,GConfig->pRenderConfig->SizeY - 20,30,Vector4::ONE,strstream.str());
+		GEngine->GameCanvas->DrawString(Vector3(5.0f,GConfig->pRenderConfig->SizeY - 20.f,0.f),30,Vector4::ONE,strstream.str());
 	}
 
 	void Camera::LookAt(Vector3 const& eyePos,Vector3 const& lookAt,Vector3 const& upVec)

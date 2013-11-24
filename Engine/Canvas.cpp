@@ -18,8 +18,9 @@ namespace Disorder
 
 	void Canvas::Draw(CameraPtr const& camera)
 	{
-		_stringElement.Draw(RPT_ForwardLighting,0,camera);
 		_lineElement.Draw(RPT_ForwardLighting,0,camera);
+		_stringElement.Draw(RPT_ForwardLighting,0,camera);
+		
 	}
 
 	unsigned int Canvas::GetCurrentDrawTriNumber()
@@ -52,15 +53,14 @@ namespace Disorder
 		return length/2;
 	}
 
-	void Canvas::DrawStringNormalize(float xPos,float yPos,float hsize,Vector4 const& color,std::string const& str)
+	void Canvas::DrawStringNormalize(Vector3 pos,float hsize,Vector4 const& color,std::string const& str)
 	{
-		DrawString((int)(xPos*_width),(int)(yPos*_height),(int)(hsize*_height),color,str);
+		DrawString( Vector3(pos.x * _width,pos.y *_height,pos.z),(int)(hsize*_height),color,str);
 	}
 
-	void Canvas::DrawStringDeviceSpace(float xPos,float yPos,int size,Vector4 const& color,std::string const& str)
+	void Canvas::DrawStringDeviceSpace(Vector3  pos,int size,Vector4 const& color,std::string const& str)
 	{
 		//draw string x[-1.0,1.0] and y[-1.0,1.0] z = 0.0
-		float z = 0.0f;
 		float charSize = 1.0f * size / _height;
 
 		// we draw char one by one
@@ -70,7 +70,7 @@ namespace Disorder
 
 			if( c == 0x20) // Space
 			{
-				xPos += charSize/10;
+				pos.x += charSize/10;
 				continue;
 			}
 
@@ -78,22 +78,22 @@ namespace Disorder
 			 
 			// clockwise
 			float drawSizeX = charSize * rect.aspectRatio ;
-			_stringElement.AddVertex(Vector3(xPos,yPos,z),color,Vector2(rect.uvRect.left,rect.uvRect.top));
-			_stringElement.AddVertex(Vector3(xPos+drawSizeX,yPos,z),color,Vector2(rect.uvRect.right,rect.uvRect.top));
-			_stringElement.AddVertex(Vector3(xPos,yPos-charSize,z),color,Vector2(rect.uvRect.left,rect.uvRect.bottom));
-			_stringElement.AddVertex(Vector3(xPos+drawSizeX,yPos - charSize,z),color,Vector2(rect.uvRect.right,rect.uvRect.bottom));
+			_stringElement.AddVertex(pos,color,Vector2(rect.uvRect.left,rect.uvRect.top));
+			_stringElement.AddVertex(Vector3(pos.x+drawSizeX,pos.y,pos.z),color,Vector2(rect.uvRect.right,rect.uvRect.top));
+			_stringElement.AddVertex(Vector3(pos.x,pos.y-charSize,pos.z),color,Vector2(rect.uvRect.left,rect.uvRect.bottom));
+			_stringElement.AddVertex(Vector3(pos.x+drawSizeX,pos.y - charSize,pos.z),color,Vector2(rect.uvRect.right,rect.uvRect.bottom));
 
-			xPos += drawSizeX;
+			pos.x += drawSizeX;
 
 		}
 	}
 
-	void Canvas::DrawString(int xPos,int yPos,int hsize,Vector4 const& color,std::string const& str)
+	void Canvas::DrawString(Vector3 pos,int hsize,Vector4 const& color,std::string const& str)
 	{
 		 //draw string x[-1.0,1.0] and y[-1.0,1.0] z = 0.0
-		float xbegin = (xPos - _width / 2.0f )*2.0f/_width;
-		float ybegin = (yPos - _height / 2.0f )*(-2.0f)/_height;
-		DrawStringDeviceSpace(xbegin,ybegin,hsize,color,str);
+		pos.x = (pos.x - _width / 2.0f )*2.0f/_width;
+		pos.y = (pos.y - _height / 2.0f )*(-2.0f)/_height;
+		DrawStringDeviceSpace(pos,hsize,color,str);
 	}
  
 }

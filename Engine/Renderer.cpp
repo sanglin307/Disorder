@@ -322,9 +322,9 @@ namespace Disorder
 		 yAxis = ProjectViewMatrix * yAxis;
 		 zAxis = ProjectViewMatrix * zAxis;
 
-		 GEngine->GameCanvas->DrawStringDeviceSpace(xAxis.x,xAxis.y,35,Vector4(1.0f,0,0,1.0f),std::string("X"));
-		 GEngine->GameCanvas->DrawStringDeviceSpace(yAxis.x,yAxis.y,35,Vector4(0,1.0f,0,1.0f),std::string("Y"));
-		 GEngine->GameCanvas->DrawStringDeviceSpace(zAxis.x,zAxis.y,35,Vector4(0,0,1.0f,1.0f),std::string("Z"));
+		 GEngine->GameCanvas->DrawStringDeviceSpace(xAxis,35,Vector4(1.0f,0,0,1.0f),std::string("X"));
+		 GEngine->GameCanvas->DrawStringDeviceSpace(yAxis,35,Vector4(0,1.0f,0,1.0f),std::string("Y"));
+		 GEngine->GameCanvas->DrawStringDeviceSpace(zAxis,35,Vector4(0,0,1.0f,1.0f),std::string("Z"));
 
 	  }
 

@@ -21,11 +21,14 @@ namespace Disorder
 		Matrix4 ViewMatrix;
 		Matrix4 ProjectMatrix;
 
+		void DrawAxis();
 
 	private:
 
 		void Update(float delta);
-		
+		void UpdateViewMatrix();
+		void UpdateProjectMatrix();
+
 		float _moveSpeed;
 		float _rotateSpeed;
 

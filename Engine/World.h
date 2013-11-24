@@ -17,7 +17,7 @@ namespace Disorder
 		void AddLevel(LevelPtr const& level);
 		LevelPtr GetLevel(); // the top level;
 		LevelPtr GetLevel(std::string const& name);
-
+	 
 	private:
 
 		LevelContainer _Levels;

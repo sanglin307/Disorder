@@ -12,10 +12,10 @@ namespace Disorder
 
 		int GetStringLength(int hsize,std::string const& str);
 		float GetStringLengthNormalize(float hsize,std::string const& str);
-		void DrawString(int xPos,int yPos, int size, Vector4 const& color,std::string const& str);
-		void DrawStringNormalize(float xPos,float yPos,float size,Vector4 const& color,std::string const& str);
+		void DrawString(Vector3 pos, int size, Vector4 const& color,std::string const& str);
+		void DrawStringNormalize(Vector3 pos,float size,Vector4 const& color,std::string const& str);
 		
-		void DrawStringDeviceSpace(float xPos,float yPos,int size,Vector4 const& color,std::string const& str); // ( -1,-1,-1) --- (1,1,1)
+		void DrawStringDeviceSpace(Vector3 pos,int size,Vector4 const& color,std::string const& str); // ( -1,-1,-1) --- (1,1,1)
 
 		void DrawLine(Vector3 const& beginPos,Vector4 const& beginColor,Vector3 const& endPos,Vector4 const& endColor);
 	 

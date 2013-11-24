@@ -34,6 +34,8 @@ namespace Disorder
 			obj->PostDraw(mainCamera);
 		}
 
+		mainCamera->DrawAxis();
+
 		// before we call canvas draw ,we should check if we should add stat info to canvas.
 		if(GEngine->Stat.bEnable())
 		{

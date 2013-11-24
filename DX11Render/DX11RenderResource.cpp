@@ -113,7 +113,7 @@ namespace Disorder
 			return ;
 		}
 
-		if(sematic.compare(RenderLayout::POSITION)==0)
+		if(sematic.compare(RenderLayout::POSITION) == 0 )
 		{
 			_bufferSize = _elementSize*data->Positions.size();
 			for(unsigned int index=0;index<data->Positions.size();++index)
@@ -124,7 +124,7 @@ namespace Disorder
 				vData.push_back(vec.z);
 			}
 		}
-		else if(sematic.compare(RenderLayout::COLOR)==0)
+		else if(sematic.compare(RenderLayout::COLOR) == 0 )
 		{
 			_bufferSize = _elementSize*data->Colors.size();
 			for(unsigned int index=0;index<data->Colors.size();++index)
