@@ -7,21 +7,23 @@ namespace Disorder
 		return D3DInterface.get();
 	}
 
-	bool DX11SamplerState::Create(SamplerFilter filter,TextureAddressMode addressUVW,UINT maxAnisotropy)
+	DX11SamplerStatePtr DX11SamplerState::Create(SamplerFilter filter,TextureAddressMode addressUVW,UINT maxAnisotropy)
 	{
-		_filter = filter;
-		_AddressU = _AddressV = _AddressW = addressUVW;
-		_maxAnisotropy = maxAnisotropy;
+		DX11SamplerState *pSampler = new DX11SamplerState;
+
+		pSampler->_filter = filter;
+		pSampler->_AddressU = pSampler->_AddressV = pSampler->_AddressW = addressUVW;
+		pSampler->_maxAnisotropy = maxAnisotropy;
 
 		D3D11_SAMPLER_DESC samDesc;
         ZeroMemory( &samDesc, sizeof(samDesc) );
 
 		samDesc.MaxAnisotropy = maxAnisotropy;
-		if( _filter == SF_Point )
+		if( pSampler->_filter == SF_Point )
 			samDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-		else if( _filter == SF_Linear )
+		else if( pSampler->_filter == SF_Linear )
 			samDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		else if( _filter == SF_Anisotropic )
+		else if( pSampler->_filter == SF_Anisotropic )
 		{
 			samDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 			samDesc.MaxAnisotropy = maxAnisotropy;
@@ -53,9 +55,9 @@ namespace Disorder
 		HRESULT hr = renderEngine->D3DDevice()->CreateSamplerState( &samDesc, &pSamplerState );
 		BOOST_ASSERT(hr==S_OK);
 
-		D3DInterface = MakeComPtr<ID3D11SamplerState>(pSamplerState);
+		pSampler->D3DInterface = MakeComPtr<ID3D11SamplerState>(pSamplerState);
 
-		return true;
+		return DX11SamplerStatePtr(pSampler);
 
 	}
 
@@ -66,8 +68,10 @@ namespace Disorder
 		return D3DInterface.get();
 	}
 
-	bool DX11RasterizeState::Create(RasterizeDesc *pDesc)
+	DX11RasterizeStatePtr DX11RasterizeState::Create(RasterizeDesc *pDesc)
 	{
+		DX11RasterizeState *pRasterizeState = new DX11RasterizeState;
+
 		D3D11_RASTERIZER_DESC desc;
 		ZeroMemory(&desc,sizeof(desc));
 		desc.AntialiasedLineEnable = pDesc->AntialiasedLineEnable;
@@ -97,10 +101,10 @@ namespace Disorder
 		HRESULT hr = renderEngine->D3DDevice()->CreateRasterizerState(&desc,&pState);
 		BOOST_ASSERT(hr==S_OK);
 
-		D3DInterface = MakeComPtr<ID3D11RasterizerState>(pState);
+		pRasterizeState->D3DInterface = MakeComPtr<ID3D11RasterizerState>(pState);
 
 
-		return true;
+		return DX11RasterizeStatePtr(pRasterizeState);
 
 	}
 	//==================================================================
@@ -110,8 +114,10 @@ namespace Disorder
 		return D3DInterface.get();
 	}
 
-	bool DX11DepthStencilState::Create(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef)
+	DX11DepthStencilStatePtr DX11DepthStencilState::Create(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef)
 	{
+		DX11DepthStencilState *pDepthStencilState = new DX11DepthStencilState;
+
 		D3D11_DEPTH_STENCIL_DESC desc;
 		ZeroMemory(&desc,sizeof(desc));
 
@@ -120,39 +126,41 @@ namespace Disorder
 			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		else
 			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-		desc.DepthFunc = GetD3DComparisonFunc(pDepthStencilDesc->DepthFunc);
+		desc.DepthFunc = pDepthStencilState->GetD3DComparisonFunc(pDepthStencilDesc->DepthFunc);
 
 		desc.StencilEnable = pDepthStencilDesc->StencilEnable;
 		desc.StencilReadMask = pDepthStencilDesc->StencilReadMask;
 		desc.StencilWriteMask = pDepthStencilDesc->StencilWriteMask;
 
-		desc.FrontFace.StencilDepthFailOp = GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilDepthFailOp);
-		desc.FrontFace.StencilFailOp = GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilFailOp);
-		desc.FrontFace.StencilPassOp = GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilPassOp);
-		desc.FrontFace.StencilFunc = GetD3DComparisonFunc(pDepthStencilDesc->FrontFaceStencilFunc);
+		desc.FrontFace.StencilDepthFailOp = pDepthStencilState->GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilDepthFailOp);
+		desc.FrontFace.StencilFailOp = pDepthStencilState->GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilFailOp);
+		desc.FrontFace.StencilPassOp = pDepthStencilState->GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilPassOp);
+		desc.FrontFace.StencilFunc = pDepthStencilState->GetD3DComparisonFunc(pDepthStencilDesc->FrontFaceStencilFunc);
 
-		desc.BackFace.StencilDepthFailOp = GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilDepthFailOp);
-		desc.BackFace.StencilFailOp = GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilFailOp);
-		desc.BackFace.StencilPassOp = GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilPassOp);
-		desc.BackFace.StencilFunc = GetD3DComparisonFunc(pDepthStencilDesc->BackFaceStencilFunc);
+		desc.BackFace.StencilDepthFailOp = pDepthStencilState->GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilDepthFailOp);
+		desc.BackFace.StencilFailOp = pDepthStencilState->GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilFailOp);
+		desc.BackFace.StencilPassOp = pDepthStencilState->GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilPassOp);
+		desc.BackFace.StencilFunc = pDepthStencilState->GetD3DComparisonFunc(pDepthStencilDesc->BackFaceStencilFunc);
 
 		ID3D11DepthStencilState *pState;
 		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
 		HRESULT hr = renderEngine->D3DDevice()->CreateDepthStencilState(&desc,&pState);
 		BOOST_ASSERT(hr==S_OK);
 
-		StencilRef = stencilRef;
-		D3DInterface = MakeComPtr<ID3D11DepthStencilState>(pState);
+		pDepthStencilState->StencilRef = stencilRef;
+		pDepthStencilState->D3DInterface = MakeComPtr<ID3D11DepthStencilState>(pState);
 
-		return true;
+		return DX11DepthStencilStatePtr(pDepthStencilState);
 
 	}
 
 
 	// ===================================================================
-	bool DX11BlendState::Create(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable,bool IndependentBlendEnable)
+	DX11BlendStatePtr DX11BlendState::Create(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable,bool IndependentBlendEnable)
 	{
 		BOOST_ASSERT(BlendArraySize <= 8 );
+
+		DX11BlendState *pState = new DX11BlendState;
 
 		D3D11_BLEND_DESC desc;
 		ZeroMemory(&desc,sizeof(desc));
@@ -164,24 +172,24 @@ namespace Disorder
 			unsigned int TargetIndex = pBlendDescArray[index].TargetIndex ;
 			BOOST_ASSERT( TargetIndex < 8 );
 			desc.RenderTarget[TargetIndex].BlendEnable = pBlendDescArray[index].BlendEnable;
-			desc.RenderTarget[TargetIndex].DestBlend = GetD3DBlendDesc(pBlendDescArray[index].DestBlend);
-			desc.RenderTarget[TargetIndex].DestBlendAlpha = GetD3DBlendDesc(pBlendDescArray[index].DestBlendAlpha);
-			desc.RenderTarget[TargetIndex].SrcBlend = GetD3DBlendDesc(pBlendDescArray[index].SrcBlend);
-			desc.RenderTarget[TargetIndex].SrcBlendAlpha = GetD3DBlendDesc(pBlendDescArray[index].SrcBlendAlpha);
+			desc.RenderTarget[TargetIndex].DestBlend = pState->GetD3DBlendDesc(pBlendDescArray[index].DestBlend);
+			desc.RenderTarget[TargetIndex].DestBlendAlpha = pState->GetD3DBlendDesc(pBlendDescArray[index].DestBlendAlpha);
+			desc.RenderTarget[TargetIndex].SrcBlend = pState->GetD3DBlendDesc(pBlendDescArray[index].SrcBlend);
+			desc.RenderTarget[TargetIndex].SrcBlendAlpha = pState->GetD3DBlendDesc(pBlendDescArray[index].SrcBlendAlpha);
 			desc.RenderTarget[TargetIndex].RenderTargetWriteMask = pBlendDescArray[index].RenderTargetWriteMask;
-			desc.RenderTarget[TargetIndex].BlendOp = GetD3DBlendOp(pBlendDescArray[index].BlendOp);
-			desc.RenderTarget[TargetIndex].BlendOpAlpha = GetD3DBlendOp(pBlendDescArray[index].BlendOpAlpha);
+			desc.RenderTarget[TargetIndex].BlendOp = pState->GetD3DBlendOp(pBlendDescArray[index].BlendOp);
+			desc.RenderTarget[TargetIndex].BlendOpAlpha = pState->GetD3DBlendOp(pBlendDescArray[index].BlendOpAlpha);
 		}
 
 		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine);
-		ID3D11BlendState* pState;
-		HRESULT hr = renderEngine->D3DDevice()->CreateBlendState(&desc,&pState);
+		ID3D11BlendState* pBlendState;
+		HRESULT hr = renderEngine->D3DDevice()->CreateBlendState(&desc,&pBlendState);
 
 		BOOST_ASSERT(hr==S_OK);
 
-		D3DInterface = MakeComPtr<ID3D11BlendState>(pState);
+		pState->D3DInterface = MakeComPtr<ID3D11BlendState>(pBlendState);
 
-		return true;
+		return DX11BlendStatePtr(pState);
 
 	}
 

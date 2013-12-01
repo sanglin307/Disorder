@@ -4,6 +4,12 @@
 namespace Disorder
 {
 
+	DX11RenderEnginePtr DX11RenderEngine::Create()
+	{
+		DX11RenderEngine *pEngine = new DX11RenderEngine;
+		return DX11RenderEnginePtr(pEngine);
+	}
+
 	 DX11RenderEngine::DX11RenderEngine()
 	 {
 		GPixelFormats[ PF_Unknown		].PlatformFormat	= DXGI_FORMAT_UNKNOWN;
@@ -17,10 +23,7 @@ namespace Disorder
 
 		_driverType = D3D_DRIVER_TYPE_NULL;
 		_featureLevel = D3D_FEATURE_LEVEL_11_0;
-
-		ResourceManager = boost::make_shared<DX11RenderResourceManager>();
-		ParameterManager = boost::make_shared<MaterialParameterManager>();
-
+ 
 		IDXGIFactory * pFactory;
         HRESULT hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)(&pFactory) );
 		BOOST_ASSERT(SUCCEEDED(hr));
@@ -110,7 +113,7 @@ namespace Disorder
 		ID3D11Texture2D* pBackBuffer = NULL;
 		hr = _pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&pBackBuffer );
 		BOOST_ASSERT(SUCCEEDED(hr));
-		DX11RenderTexture2DPtr BackBufferTex = boost::make_shared<DX11RenderTexture2D>(GConfig->pRenderConfig->ColorFormat,sd.BufferDesc.Width,sd.BufferDesc.Height,MakeComPtr<ID3D11Texture2D>(pBackBuffer));
+		DX11RenderTexture2DPtr BackBufferTex = DX11RenderTexture2D::Create(GConfig->pRenderConfig->ColorFormat,sd.BufferDesc.Width,sd.BufferDesc.Height,MakeComPtr<ID3D11Texture2D>(pBackBuffer));
  
 		ID3D11RenderTargetView* pRenderTargetView = NULL;
 		D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
@@ -129,11 +132,7 @@ namespace Disorder
 		hr = _pd3dDevice->CreateShaderResourceView( pBackBuffer,&SRVDesc,&pShaderResourceView );
 		BOOST_ASSERT(SUCCEEDED(hr));
 
-		DX11RenderSurfacePtr RenderTarget = boost::make_shared<DX11RenderSurface>();
-		RenderTarget->Tex2DResource = BackBufferTex;
-		RenderTarget->RenderTargetView = MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView);
-		RenderTarget->ShaderResourceView = MakeComPtr<ID3D11ShaderResourceView>(pShaderResourceView);
-		GRenderSurface.RenderTarget = RenderTarget;
+		GRenderSurface.RenderTarget = DX11RenderSurface::Create(BackBufferTex,MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView),MakeComPtr<ID3D11ShaderResourceView>(pShaderResourceView),NULL);
 
 		//Create a stencil & depth buffer.
 		ID3D11Texture2D* pDepthStencil = NULL;
@@ -152,7 +151,7 @@ namespace Disorder
 		descDepth.CPUAccessFlags = 0;
 		descDepth.MiscFlags = 0;
 		hr = _pd3dDevice->CreateTexture2D( &descDepth, NULL, &pDepthStencil );
-		DX11RenderTexture2DPtr DepthBufferTex = boost::make_shared<DX11RenderTexture2D>(GConfig->pRenderConfig->DepthStencilFormat,descDepth.Width,descDepth.Height,MakeComPtr<ID3D11Texture2D>(pDepthStencil));
+		DX11RenderTexture2DPtr DepthBufferTex = DX11RenderTexture2D::Create(GConfig->pRenderConfig->DepthStencilFormat,descDepth.Width,descDepth.Height,MakeComPtr<ID3D11Texture2D>(pDepthStencil));
  
 		BOOST_ASSERT(SUCCEEDED(hr));
 
@@ -165,10 +164,7 @@ namespace Disorder
 		hr = _pd3dDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &pDepthStencilView );
 		BOOST_ASSERT(SUCCEEDED(hr));
 
-		DX11RenderSurfacePtr DepthStencilBuffer = boost::make_shared<DX11RenderSurface>();
-		DepthStencilBuffer->Tex2DResource = DepthBufferTex;
-		DepthStencilBuffer->DepthStencilView = MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView);
-		GRenderSurface.DepthStencilBuffer = DepthStencilBuffer;
+		GRenderSurface.DepthStencilBuffer = DX11RenderSurface::Create(DepthBufferTex,NULL,NULL,MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView));
  
 		// Setup the viewport
 		D3D11_VIEWPORT vp;
@@ -301,13 +297,12 @@ namespace Disorder
  
 	void DX11RenderEngine::SetEffect(RenderEffectPtr const& effect)
 	{
-
 		// render State
         SetBlendState(effect->GetBlendState());
 		SetRasterizeState(effect->GetRasterizeState());
 		SetDepthStencilState(effect->GetDepthStencilState());
 
-		effect->UpdateRenderParam();
+		effect->UpdateShaderParameter();
 
 		ShaderObjectPtr vertexShader = effect->GetVertexShader();
 		if( vertexShader != NULL )

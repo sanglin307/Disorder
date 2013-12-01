@@ -38,8 +38,14 @@ namespace Disorder
 	typedef boost::shared_ptr<DX11ShaderObject> DX11ShaderObjectPtr;
 	class DX11BlendState;
 	typedef boost::shared_ptr<DX11BlendState> DX11BlendStatePtr;
+	class DX11RasterizeState;
+	typedef boost::shared_ptr<DX11RasterizeState> DX11RasterizeStatePtr;
+	class DX11DepthStencilState;
+	typedef boost::shared_ptr<DX11DepthStencilState> DX11DepthStencilStatePtr;
 	class DX11ShaderReflection;
 	typedef boost::shared_ptr<DX11ShaderReflection> DX11ShaderReflectionPtr;
+	class DX11RenderEffect;
+	typedef boost::shared_ptr<DX11RenderEffect> DX11RenderEffectPtr;
 
 	typedef boost::shared_ptr<IDXGIFactory> IDXGIFactoryPtr;
 	typedef boost::shared_ptr<IDXGIAdapter> IDXGIAdapterPtr;

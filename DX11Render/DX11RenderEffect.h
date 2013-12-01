@@ -61,8 +61,8 @@ namespace Disorder
          UINT                    CBuFlags;         // Buffer description flags
 		std::vector<ShaderVariableDesc>	        Variables;
 		std::vector<ShaderTypeDesc>		        Types;
-		std::vector<MaterialParamPtr>		    Parameters;
-		MaterialParamCBufferPtr					BufferParamRef;
+		std::vector<ShaderPropertyPtr>		    Parameters;
+		ShaderPropertyPtr					    BufferParamRef;
 	};
 
 	struct ShaderInputBindDesc
@@ -101,7 +101,7 @@ namespace Disorder
 		D3D11_RESOURCE_RETURN_TYPE ReturnType;
 		D3D_SRV_DIMENSION Dimension;
 		UINT NumSamples;
-		MaterialParamPtr ParamRef;
+		ShaderPropertyPtr ParamRef;
 	};
 
 	struct ShaderSignatureDesc
@@ -144,26 +144,26 @@ namespace Disorder
 		std::vector<ShaderSignatureDesc>		        OutputSignatureParameters;
 		std::vector<ConstantBufferDesc>				    ConstantBuffers;
 		std::vector<ShaderInputBindDesc>				ResourceBindings;
+
+		static DX11ShaderReflectionPtr Create(); 
+
+	private:
+		DX11ShaderReflection(){}
 	};
 
 	class DX11ShaderObject : public ShaderObject
 	{
 	public:
  
-		explicit DX11ShaderObject(std::string const& effectName,std::string const& entryPoint,ShaderType shaderType)
-		{
-			_effectName = effectName;
-			_entryPoint = entryPoint;
-			_type = shaderType;
-
-		}
-
-		virtual void PrepareRenderParam();
-		virtual void UpdateRenderParam();
+		virtual void UpdateShaderParameter();
+		virtual bool LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType); 
+		virtual void ShaderReflection();
 
 		virtual void* GetLowInterface();
 		virtual void* GetDataInterface();
 		
+		static DX11ShaderObjectPtr Create(std::string const& effectName,std::string const& entryPoint,ShaderType shaderType,ShaderModel shaderMode);
+
 	public:
 		DX11ShaderReflectionPtr  ShaderReflect;
 		ID3D11VertexShaderPtr VertexShaderInterface;
@@ -173,13 +173,18 @@ namespace Disorder
 		std::vector<ID3D11SamplerState*> CachedSamplerState;
 		std::vector<ID3D11ShaderResourceView*> CachedShaderResourceView;
 
-		
-	};
- 
-	class DX11RenderEffect : public RenderEffect
-	{
 	private:
+
 		HRESULT CompileShaderFromFile(std::string const& fileName, std::string const& entryPoint, std::string const& shaderModel, ID3DBlob** ppBlobOut);
+
+		explicit DX11ShaderObject(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType,ShaderModel shaderModel)
+		{
+			_fileName = fileName;
+			_entryPoint = entryPoint;
+			_type = shaderType;
+			_shaderModel = shaderModel;
+
+		}
 
 		inline std::string GetShaderModelDes(ShaderType type)
 		{
@@ -195,25 +200,8 @@ namespace Disorder
 
 			return "";
 		};
-
-		 
-
-	public:
-
-		DX11RenderEffect(ShaderModel shaderModel):
-		  RenderEffect(shaderModel)
-		{
-			 
-		};
-
-		virtual ShaderObjectPtr LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType);
-	 
-		virtual void ShaderReflection(ShaderObjectPtr const& shader);
-		virtual void UpdateRenderParam();
-		virtual void PrepareRenderParam();
-	
-
 	};
+ 
 }
 
 #endif

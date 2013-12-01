@@ -16,7 +16,20 @@ namespace Disorder
 		
 	}
 
+	WindowsViewportPtr WindowsViewport::Create(int x,int y,int sizeX,int sizeY,void* hWnd)
+	{
+		WindowsViewport *pViewport = new WindowsViewport(x,y,sizeX,sizeY,hWnd);
+		return WindowsViewportPtr(pViewport);
+	}
+
 	//==========================WindowsClient=================================
+
+	WinClientPtr WinClient::Create()
+	{
+		WinClient* pClient = new WinClient;
+		return WinClientPtr(pClient);
+	}
+
 	void WinClient::Init()
 	{
 
@@ -30,7 +43,7 @@ namespace Disorder
 		Cls.lpfnWndProc		= StaticWndProc;
 		Cls.hInstance		= GAppInstance;		 
 		Cls.lpszClassName	= winClassName;
-		Cls.hIcon			= NULL;
+		Cls.hIcon			=(HICON)LoadImage(NULL,L"Icon1.ico",IMAGE_ICON,0,0,LR_LOADFROMFILE);
 		Cls.hCursor			= ::LoadCursor(NULL, IDC_ARROW);
 		Cls.hbrBackground	= static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
 		Cls.lpszMenuName    = NULL;
@@ -64,7 +77,7 @@ namespace Disorder
 		CreateViewport(WindowPosX,WindowPosY,WindowWidth,WindowHeight,windows);
 
 		//Create InputManager
-		_inputManager = boost::make_shared<InputManager>((unsigned int)windows);
+		_inputManager = InputManager::Create((unsigned int)windows);
 
 	}
 
@@ -130,7 +143,7 @@ namespace Disorder
 	{
 		// only support one viewport now!
 		BOOST_ASSERT(_Viewports.empty());
-		_Viewports.push_back(boost::make_shared<WindowsViewport>(x,y,sizeX,sizeY,hWnd));
+		_Viewports.push_back(WindowsViewport::Create(x,y,sizeX,sizeY,hWnd));
 
 	}
 

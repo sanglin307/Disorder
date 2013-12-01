@@ -18,7 +18,7 @@ namespace Disorder
 	class Logger : public Singleton<Logger>
 	{
 		friend class LoggerRunner;
-
+		friend class Singleton<Logger>;
 	public:
 
 		struct LogObj
@@ -35,7 +35,11 @@ namespace Disorder
 		void Warning(std::string const& warning);
 		void Info(std::string const& info);
  
+	
+
 	private:
+		static LoggerPtr Create();
+		Logger(){};
 
 		void Flush();
 

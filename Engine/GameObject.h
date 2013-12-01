@@ -10,7 +10,7 @@ namespace Disorder
  
 		std::string Name;
 
-		GameObject(std::string const& name, Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::IDENTITY,Vector3 const& scale = Vector3::UNIT_SCALE);
+		
 		~GameObject();
  
 		void AddComponent(ComponentPtr const& component);
@@ -70,11 +70,14 @@ namespace Disorder
 	 
 		void RefreshWorldTransform();
 
+		void UpdateShaderProperty();
+
+		static GameObjectPtr Create(std::string const& name, Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::IDENTITY,Vector3 const& scale = Vector3::UNIT_SCALE);
 	private:
 
-		
-		std::vector<ComponentPtr> _vComponents;
+		GameObject(std::string const& name, Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::IDENTITY,Vector3 const& scale = Vector3::UNIT_SCALE);
 
+		std::vector<ComponentPtr> _vComponents;
 		boost::weak_ptr<GameObject> _parent;
 		std::map<std::string,GameObjectPtr> _mapChildren;
 		
@@ -87,6 +90,9 @@ namespace Disorder
 		Vector3 _wldScale;
 		Matrix4 _worldMatrix;
 
+		ShaderPropertyManagerPtr _propertyManager;
+		ShaderPropertyPtr _worldMatrixProperty;
+		ShaderPropertyPtr _worldNormalMatrixProperty;
  
 	};
 }

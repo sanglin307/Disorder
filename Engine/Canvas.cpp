@@ -2,7 +2,12 @@
 
 namespace Disorder
 {
- 
+	CanvasPtr Canvas::Create(unsigned int width,unsigned int height)
+	{
+		Canvas* pCanvas = new Canvas(width,height);
+		return CanvasPtr(pCanvas);
+	}
+
 	Canvas::Canvas(unsigned int width,unsigned int height)
 		:_width(width),_height(height),_stringElement("CanvasString"),_tileElement("CanvasTile"),_lineElement("BatchLines")
 	{
@@ -18,8 +23,8 @@ namespace Disorder
 
 	void Canvas::Draw(CameraPtr const& camera)
 	{
-		_lineElement.Draw(RPT_ForwardLighting,0,camera);
-		_stringElement.Draw(RPT_ForwardLighting,0,camera);
+		_lineElement.Draw(0,camera);
+		_stringElement.Draw(0,camera);
 		
 	}
 

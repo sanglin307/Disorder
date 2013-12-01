@@ -4,6 +4,17 @@
 namespace Disorder
 {
 	//===========================InputEventHandler=========================
+	InputEventHandler::InputEventHandler()
+	{
+
+	}
+
+	InputEventHandlerPtr InputEventHandler::Create()
+	{
+		InputEventHandler *pHandler = new InputEventHandler();
+		return InputEventHandlerPtr(pHandler);
+	}
+
 	bool InputEventHandler::keyPressed( const OIS::KeyEvent &arg )
 	{
 	/*	std::cout << " KeyPressed {" << arg.key
@@ -98,12 +109,18 @@ namespace Disorder
 	}
 	//================================InputManager===========================================
 
+	InputManagerPtr InputManager::Create(unsigned int hWnd)
+	{
+		InputManager *pManager = new InputManager(hWnd);
+		return InputManagerPtr(pManager);
+	}
+
 	InputManager::InputManager(unsigned int hWnd)
 	{
 		_oisInputManager = OIS::InputManager::createInputSystem(hWnd);
 		_oisInputManager->enableAddOnFactory(OIS::InputManager::AddOn_All);
 
-		_eventHandler = boost::make_shared<InputEventHandler>();;
+		_eventHandler = InputEventHandler::Create();
 
 		_oisKeyboard = (OIS::Keyboard*)_oisInputManager->createInputObject( OIS::OISKeyboard, true );
 		_oisKeyboard->setEventCallback(_eventHandler.get());

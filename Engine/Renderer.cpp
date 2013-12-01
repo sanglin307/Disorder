@@ -25,17 +25,16 @@ namespace Disorder
 		_texture = texture;
 		
 		ShaderObjectPtr pixelShader = _renderEffect->GetPixelShader();
+	    ShaderPropertyManagerPtr globalProperty = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderPropertyPtr texProperty = globalProperty->CreateProperty("DiffuseTexture",eSP_ShaderResource);
+	    texProperty->SetData(_texture);
 	 
-		MaterialParamShaderResPtr shaderres = _renderEffect->GetShaderResourceParameter("DiffuseTexture");
-		shaderres->SetValue(texture);
-	  
-		MaterialParamSamplerStatePtr msampler = _renderEffect->GetSamplerStateParameter("LinearSampler");
-		msampler->SetValue(texture->Tex2DResource->Sampler);
-
-		_renderEffect->PrepareRenderParam();
+		ShaderPropertyPtr Sampler = globalProperty->CreateProperty("LinearSampler",eSP_SampleState);
+		Sampler->SetData(texture->Tex2DResource->Sampler);
+ 
 	}
 
-	void BatchScreenTiles::Draw(RenderPathType pathType,int pass,CameraPtr const& camera)
+	void BatchScreenTiles::Draw(int pass,CameraPtr const& camera)
 	{
 		BOOST_ASSERT(_vertexs.size()%4==0);
 
@@ -110,11 +109,13 @@ namespace Disorder
 	BatchScreenTiles::BatchScreenTiles(std::string const& name)
 		:Renderer(name)
 	{
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
-		_renderEffect =  resourceManager->CreateRenderEffect("2DTiles.fx",SM_4_0,"VS","PS");
-
-		ShaderObjectPtr vertexShader = _renderEffect->GetVertexShader();
-		//ShaderObjectPtr pixelShader = _renderEffect->GetPixelShader();
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
+		_renderEffect = RenderEffect::Create(); 
+		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"2DTiles",SM_4_0,"VS");
+		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"2DTiles",SM_4_0,"PS");
+	    
+		_renderEffect->BindShader(vertexShader);
+		_renderEffect->BindShader(pixelShader);
  
 		BlendDesc blendDesc;
 		blendDesc.BlendEnable = true;
@@ -143,10 +144,13 @@ namespace Disorder
 	BatchLines::BatchLines(std::string const& name)
 		:Renderer(name)
 	{
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
-		_renderEffect =  resourceManager->CreateRenderEffect("BatchLines.fx",SM_4_0,"VS","PS");
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
+		_renderEffect =  RenderEffect::Create();
+		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"BatchLines",SM_4_0,"VS");
+		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"BatchLines",SM_4_0,"PS");
+		_renderEffect->BindShader(vertexShader);
+		_renderEffect->BindShader(pixelShader);
 
-		ShaderObjectPtr vertexShader = _renderEffect->GetVertexShader();
 	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_LineList,true);
 	 
 		_savedVertexBufferSize = 1024;
@@ -177,7 +181,7 @@ namespace Disorder
  
 	}
 
-	void BatchLines::Draw(RenderPathType pathType,int pass,CameraPtr const& camera)
+	void BatchLines::Draw(int pass,CameraPtr const& camera)
 	{
 		BOOST_ASSERT(_vertexs.size()%2==0);
 
@@ -204,33 +208,45 @@ namespace Disorder
 	GeometryRenderer::GeometryRenderer(std::string const& name)
 		:Renderer(name)
 	{
+		_propertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerLight);
 
+		_LightNumberProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sLightNumber,eSP_Int);
+		_LightIntensityPackProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sLightIntensityPack,eSP_Vector4);
+		_LightDirArrayProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sLightDirArray,eSP_Vector3);
+		_LightColorArrayProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sLightColorArray,eSP_Vector3);
 	}
 
 	void GeometryRenderer::BindRenderResource()
 	{
 		BOOST_ASSERT(_geometryObject != NULL && _material != NULL);
 
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
  
 		//compile shader
-		ShaderObjectPtr vertexShader = _material->Effect[RPT_ForwardLighting][FRP_BaseLight]->GetVertexShader();
+		ShaderObjectPtr vertexShader = _material->RenderPass[FRP_BaseLight]->GetVertexShader();
 		 
 	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList,false);
  
-		std::vector<RenderBufferPtr> vertexBufferArray;
-		resourceManager->CreateVertexBufferArray(_geometryObject,BAH_GPU_Read,vertexShader,vertexBufferArray);
-		for(unsigned int index = 0;index<vertexBufferArray.size();index++)
+		std::vector<RenderBufferPtr> bufferArray;
+		resourceManager->CreateRenderBufferArray(_geometryObject,BAH_GPU_Read,vertexShader,bufferArray);
+		for(unsigned int index = 0;index<bufferArray.size();index++)
 		{
-		    _renderLayout->BindVertexBuffer(vertexBufferArray[index]);
+			if( bufferArray[index]->GetBufferType() == RBT_Vertex )
+		        _renderLayout->BindVertexBuffer(bufferArray[index]);
+			else if(  bufferArray[index]->GetBufferType() == RBT_Index )
+				_renderLayout->BindIndexBuffer(bufferArray[index]);
 		}
 	 
-		RenderBufferPtr indexBuffer = resourceManager->CreateRenderBuffer(RBT_Index,BAH_GPU_Read,_geometryObject,vertexShader);
-		_renderLayout->BindIndexBuffer(indexBuffer);
- 
+	 
 	}
 
-	void GeometryRenderer::SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat)
+	GeometryRendererPtr GeometryRenderer::Create(std::string const& name)
+	{
+		GeometryRenderer *pRender = new GeometryRenderer(name);
+		return GeometryRendererPtr(pRender);
+	}
+
+	void GeometryRenderer::SetGeometry(GeometryPtr const& geometry,SurfaceMaterialPtr const& mat)
 	{
 		_geometryObject = geometry;
 		_material = mat;
@@ -240,11 +256,13 @@ namespace Disorder
 
 	 void GeometryRenderer::PreDraw(CameraPtr const& camera)
 	 {
+		 GetBase()->UpdateShaderProperty();
 		 if( _material != NULL )
 		 {
-			GameObjectPtr gameObject = _baseObject.lock();
-			_material->UpdateMaterialParameters(gameObject,camera);
+			_material->UpdateShaderProperty();
 		 }
+
+
 	 }
 
 	 void GeometryRenderer::DrawBoundingBox(CameraPtr const& camera)
@@ -339,75 +357,72 @@ namespace Disorder
 		if( _vLightArray.size() == 0 )
 			return;
 
-		unsigned int lightNumber = 0;
+		int lightNumber = 0;
 		Vector4 intensityVec(0.0f);
-		std::vector<Vector3> dirVec;
-		std::vector<Vector3> colorVec;
+		Vector3 dirVec;
+		Vector3 colorVec;
 		for(unsigned int i=0;i<_vLightArray.size();i++)
 		{
 			if( _vLightArray[i]->LightType == LT_Directional )
 			{
 			   intensityVec[lightNumber] = _vLightArray[i]->Intensity;
-			   dirVec.push_back(_vLightArray[i]->GetDirection());
-			   colorVec.push_back(_vLightArray[i]->Color);
+			   dirVec = _vLightArray[i]->GetDirection();
+			   colorVec = _vLightArray[i]->Color;
 			   lightNumber++;
 
-			   if( lightNumber >= _material->LightColorArray->MaxElementNumber )
-				   break;
+			   break;
 			}
 		}
 
 		if( lightNumber == 0 )
 			return;
  
-		_material->LightNumber->SetValue(lightNumber);
-		_material->LightIntensityPack->SetValue(intensityVec);
-		_material->LightDirArray->SetValueArray(dirVec);
-		_material->LightColorArray->SetValueArray(colorVec);
+		_LightNumberProperty->SetData(lightNumber);
+		_LightIntensityPackProperty->SetData(intensityVec);
+		_LightDirArrayProperty->SetData(dirVec);
+		_LightColorArrayProperty->SetData(colorVec);
 	}
 
 	void GeometryRenderer::SetDynamicLightPass(LightPtr const& light)
 	{
 		BOOST_ASSERT(light->LightType != LT_Directional);
 
-		_material->LightType->SetValue((int)(light->LightType));
-		_material->LightIntensity->SetValue((float)(light->Intensity));
+	/*	_material->LightType->SetData((int)(light->LightType));
+		_material->LightIntensity->SetData((float)(light->Intensity));
 		GameObjectPtr go = light->GetBase();
 		if( light->LightType == LT_Point )
 		{
-			_material->LightPos->SetValue(go->GetWorldPosition());
+			_material->LightPos->SetData(go->GetWorldPosition());
 		}
 
-		_material->LightColor->SetValue(light->Color);
+		_material->LightColor->SetData(light->Color);*/
 	}
 
-	void GeometryRenderer::Draw(RenderPathType pathType,int pass,CameraPtr const& camera)
+	void GeometryRenderer::Draw(int pass,CameraPtr const& camera)
 	{
 		BOOST_ASSERT(_renderLayout != NULL);
  
-		_renderEffect = _material->Effect[pathType][pass];
+		_renderEffect = _material->RenderPass[pass];
 		if( _renderEffect == NULL )
 			return;
-
-		if( pathType == RPT_ForwardLighting )
+ 
+		if( pass == FRP_BaseLight )
 		{
-			if( pass == FRP_BaseLight )
+			SetBaseLightPass();
+			_Draw();
+		}
+		else if( pass == FRP_DynamicLight )
+		{
+			for(unsigned int i=0;i< _vLightArray.size();i++)
 			{
-				SetBaseLightPass();
-				_Draw();
-			}
-			else if( pass == FRP_DynamicLight )
-			{
-				for(unsigned int i=0;i< _vLightArray.size();i++)
+				if( _vLightArray[i]->LightType != LT_Directional )
 				{
-					if( _vLightArray[i]->LightType != LT_Directional )
-					{
-						SetDynamicLightPass(_vLightArray[i]);
-						_Draw();
-					}
+					SetDynamicLightPass(_vLightArray[i]);
+					_Draw();
 				}
 			}
 		}
+		 
 	}
 
 	void GeometryRenderer::_Draw()

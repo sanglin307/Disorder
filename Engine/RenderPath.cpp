@@ -20,15 +20,18 @@ namespace Disorder
 		if( mainCamera == NULL )
 			return;
 
+		GSceneManager->UpdateShaderProperty();
+		mainCamera->UpdateShaderProperty();
+
 		std::vector<RendererPtr> rendererList = GSceneManager->GetRendererList(mainCamera);
 		for(unsigned int i=0;i< rendererList.size(); i++ )
 		{
 			RendererPtr obj = rendererList[i];
 			obj->PreDraw(mainCamera);
 
-			for( int j=0;j< FRP_Max;j++ )
+			for( unsigned int j=0;j< obj->GetPassNumber();j++ )
 			{
-				obj->Draw(RPT_ForwardLighting,j,mainCamera);
+				obj->Draw(j,mainCamera);
 			}
 
 			obj->PostDraw(mainCamera);

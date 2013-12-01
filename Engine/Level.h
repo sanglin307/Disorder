@@ -24,12 +24,15 @@ namespace Disorder
 			return _vAmbientColor;
 		}
  
-		 Level(std::string const& levelName);
+		static LevelPtr Create(std::string const& levelName);
+		
 		~Level();
 
 		std::string Name;
 
 	private:
+		Level(std::string const& levelName);
+
 		GameObjectContainer _vGameObjects;
 		Vector4     _vAmbientColor;
  

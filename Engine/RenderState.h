@@ -82,40 +82,43 @@ namespace Disorder
 	{
 	public:
 
-		virtual bool Create(RasterizeDesc *pDesc) = 0;
+	protected:
+		RasterizeState(){}
 	};
 
 	class DepthStencilState : public RenderState
 	{
 	public:
-		virtual bool Create(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef) = 0;
-		
+		 
 		unsigned int StencilRef;
+
+	protected:
+		DepthStencilState(){}
 	};
 
 	class BlendState : public RenderState
 	{
     public:
-         BlendState()
+         float BlendFactor[4];
+         unsigned int SampleMask;
+
+	protected:
+		 BlendState()
          {
              BlendFactor[0] = BlendFactor[1] = BlendFactor[2] = BlendFactor[3] = 1.0f;
              SampleMask =  0xffffffff;
          }
-
-         float BlendFactor[4];
-         unsigned int SampleMask;
-	public:
-		virtual bool Create(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable = false,bool IndependentBlendEnable = false) = 0;
 	};
 
 	class SamplerState : public RenderState
 	{
 	public:
-		virtual bool Create(SamplerFilter filter,TextureAddressMode addressUVW,UINT maxAnisotropy = 16) = 0;
-
+ 
 		static std::string GenerateMapKey(SamplerFilter filter,TextureAddressMode addressUVW,UINT maxAnisotropy);
 
 	protected:
+		SamplerState(){}
+
 		SamplerFilter _filter;
 		TextureAddressMode _AddressU;
 		TextureAddressMode _AddressV;

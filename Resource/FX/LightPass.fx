@@ -1,27 +1,27 @@
 // simple fx for render simple brush component.
 
-cbuffer Transforms
-{
-	matrix World;
-	matrix View;
-	matrix Projection;
-	matrix WorldNormal;  // translate for normal.
-}
-
-cbuffer GobalSetting
-{
-	float4 AmbientColor;
-	float4 DiffuseColor;
-}
-
-cbuffer LightSetting
-{
-	int    LightType;
-	float  LightIntensity;
-	float3 LightPos;
-	float3 LightColor;
-	
-}
+//cbuffer Transforms
+//{
+//	matrix World;
+//	matrix CameraView;
+//	matrix CameraProjection;
+//	matrix WorldNormal;  // translate for normal.
+//}
+//
+//cbuffer GobalSetting
+//{
+//	float4 AmbientColor;
+//	float4 DiffuseColor;
+//}
+//
+//cbuffer LightSetting
+//{
+//	int    LightType;
+//	float  LightIntensity;
+//	float3 LightPos;
+//	float3 LightColor;
+//	
+//}
 
 struct VS_INPUT
 {
@@ -49,8 +49,8 @@ VS_OUTPUT VS( VS_INPUT input )
     VS_OUTPUT output;
     output.Pos = mul( float4(input.Pos,1.0f),World);
 	output.PosWorld = output.Pos;
-    output.Pos = mul( output.Pos, View );
-    output.Pos = mul( output.Pos, Projection );
+    output.Pos = mul( output.Pos, CameraView );
+    output.Pos = mul( output.Pos, CameraProjection );
     output.NormWorld = mul(float4(input.Norm,1.0),WorldNormal);
 	
     return output;

@@ -30,6 +30,12 @@ namespace Disorder
 
 	}
 
+	LoggerPtr Logger::Create()
+	{
+		Logger *logger = new Logger;
+		return LoggerPtr(logger);
+	}
+
 	void Logger::Warning(std::string const& warning)
 	{
 		boost::mutex::scoped_lock lock(_warningMutex);

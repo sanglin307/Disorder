@@ -4,6 +4,12 @@ namespace Disorder
 {
 	 InitialiseSingleton(World);
 
+	 WorldPtr World::Create()
+	 {
+		 World* pWorld = new World;
+		 return WorldPtr(pWorld);
+	 }
+
 	 void World::Init()
 	 {
 		 // temp code to init a world		
@@ -14,8 +20,8 @@ namespace Disorder
 			 GSceneManager->CreateDefaultCamera();
 		 }
 
-    	 GameObjectPtr go = boost::make_shared<GameObject>("test",Vector3(0.0f,4,-4.0f));
- 		 LightPtr light = boost::make_shared<Light>("DefaultLight");
+    	 GameObjectPtr go = GameObject::Create("test",Vector3(0.0f,4,-4.0f));
+ 		 LightPtr light = Light::Create("DefaultLight");
     	 light->Color = Vector3(1.0f,1.0f,1.0f);
  		 
  		 light->LightType = LT_Directional;

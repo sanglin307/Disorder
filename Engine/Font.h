@@ -24,9 +24,7 @@ namespace Disorder
 		};
 
 		typedef boost::unordered_map<UINT, GlyphInfo> CodePointMap;
-
-		Font(float fontSize,unsigned int fontRevolution);
-
+ 
 		void LoadFontFromTrueTypeFile(std::string const& fontName);
 
 		RenderSurfacePtr const& GetGlyphTexture() const
@@ -95,7 +93,11 @@ namespace Disorder
 
         }
 
+		static FontPtr Create(float fontSize,unsigned int fontRevolution);
+
 	protected:
+
+		Font(float fontSize,unsigned int fontRevolution);
 
 		float _fontSize; // in pixel.
 		unsigned int _fontRevolution;

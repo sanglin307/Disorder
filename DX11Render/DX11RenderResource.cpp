@@ -50,237 +50,143 @@ namespace Disorder
 
 		D3DInterface = MakeComPtr<ID3D11Buffer>(pBuffer);
 	}
-
-	void DX11RenderBuffer::CreateConstBuffer(unsigned int size, unsigned int accessHint)
-	{
-		_bindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		_type = RBT_Constant;
-		_accessHint = accessHint;
-		_elementSize = size;
-		_bufferSize = size;
-		DoCreateBuffer(0);
  
-	}
-
-	void DX11RenderBuffer::CreateBuffer(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData)
+	DX11RenderBufferPtr DX11RenderBuffer::Create(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData)
 	{
-		_type = type;
-		_accessHint = accessHint;
-		_elementSize = elementSize;
-		_bufferSize = size;
-		if( _type == RBT_Vertex )
+		DX11RenderBuffer *pBuffer = new DX11RenderBuffer;
+
+		pBuffer->_type = type;
+		pBuffer->_accessHint = accessHint;
+		pBuffer->_elementSize = elementSize;
+		pBuffer->_bufferSize = size;
+
+		if( pBuffer->_type == RBT_Vertex )
 		{		
-			_bindFlags = D3D11_BIND_VERTEX_BUFFER;
- 
+			pBuffer->_bindFlags = D3D11_BIND_VERTEX_BUFFER;
 		}
-		else if( _type == RBT_Index )
+		else if( pBuffer->_type == RBT_Index )
 		{
-			_bindFlags = D3D11_BIND_INDEX_BUFFER;
+			pBuffer->_bindFlags = D3D11_BIND_INDEX_BUFFER;
+		}
+		else if( pBuffer->_type == RBT_Constant )
+		{
+			pBuffer->_bindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		}
 		else
 		{
 			BOOST_ASSERT(0);
 		}
 
-		DoCreateBuffer(pData);
+		pBuffer->DoCreateBuffer(pData);
+
+		return DX11RenderBufferPtr(pBuffer);
  
 	}
 
-	void DX11RenderBuffer::CreateVertexBuffer(GeometryPtr const& data,std::string const& sematic,unsigned int accessHint,ShaderObjectPtr const& vertexShader)
+	DX11RenderBufferPtr DX11RenderBuffer::Create(RenderBufferType type,GeometryPtr const& data,std::string const& sematic,unsigned int accessHint,ShaderObjectPtr const& vertexShader)
 	{
-		_type = RBT_Vertex;
-		_accessHint = accessHint;
-		_elementSize = 0;
-		_bufferSize = 0;
-		_bindFlags = D3D11_BIND_VERTEX_BUFFER;
-
+		DX11RenderBuffer *pBuffer = new DX11RenderBuffer;
+ 
+		pBuffer->_accessHint = accessHint;
+		pBuffer->_elementSize = 0;
+		pBuffer->_bufferSize = 0;
+		pBuffer->_type = type;
+		
 		void *pData = NULL;
 		std::vector<float> vData;
   
-		DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
-		for(unsigned int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
+		if( type == RBT_Vertex )
 		{
-			if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(sematic) == 0 )
-			{
-				_elementSize = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
-				break;
-			}		 
-		}
+			pBuffer->_bindFlags = D3D11_BIND_VERTEX_BUFFER;
 
-		if( _elementSize == 0 )
-		{
-			BOOST_ASSERT(0);
-			return ;
-		}
-
-		if(sematic.compare(RenderLayout::POSITION) == 0 )
-		{
-			_bufferSize = _elementSize*data->Positions.size();
-			for(unsigned int index=0;index<data->Positions.size();++index)
-			{
-				Vector3 vec = data->ControllPositions[data->Positions[index]];
-				vData.push_back(vec.x);
-				vData.push_back(vec.y);
-				vData.push_back(vec.z);
-			}
-		}
-		else if(sematic.compare(RenderLayout::COLOR) == 0 )
-		{
-			_bufferSize = _elementSize*data->Colors.size();
-			for(unsigned int index=0;index<data->Colors.size();++index)
-			{
-				Vector4 vec = data->Colors[index];
-				vData.push_back(vec.x);
-				vData.push_back(vec.y);
-				vData.push_back(vec.z);
-				vData.push_back(vec.w);
-			}
-		}
-		else if(sematic.compare(RenderLayout::NORMAL) == 0 )
-		{
-			_bufferSize = _elementSize*data->Normals.size();
-			for(unsigned int index=0;index<data->Normals.size();++index)
-			{
-				Vector3 vec = data->Normals[index];
-				vData.push_back(vec.x);
-				vData.push_back(vec.y);
-				vData.push_back(vec.z);
-			}
-		}
-		else if(sematic.compare(RenderLayout::TEXCOORD) == 0 )
-		{
-			_bufferSize = _elementSize*data->Texcoords.size();
-			for(unsigned int index=0;index<data->Texcoords.size();++index)
-			{
-				Vector2 vec = data->Texcoords[index];
-				vData.push_back(vec.x);
-				vData.push_back(vec.y);
-			}
-		}
-		else
-		{
-			BOOST_ASSERT(0);
-		}
-
-	    pData = vData.data();
-		DoCreateBuffer(pData);
-
-	}
-
-	void DX11RenderBuffer::CreateBuffer(RenderBufferType type,GeometryPtr const& data,unsigned int accessHint,ShaderObjectPtr const& vertexShader)
-	{
-		_type = type;
-		_accessHint = accessHint;
-		_elementSize = 0;
-		_bufferSize = 0;
- 
-		void *pData = NULL;
-		std::vector<float> vData;
-		if( _type == RBT_Vertex )
-		{		
-			_bindFlags = D3D11_BIND_VERTEX_BUFFER;
-			int positionElement = 0;
-			int colorElement = 0;
-			int normalElement = 0;
-			int texcoodElement = 0;
 			DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
 			for(unsigned int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
 			{
-				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(RenderLayout::POSITION) == 0 )
+				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(sematic) == 0 )
 				{
-					positionElement = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
-					continue;
-				}
-				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(RenderLayout::COLOR) == 0 )
-				{
-					colorElement = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
-				}
-				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(RenderLayout::NORMAL) == 0 )
-				{
-					normalElement = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
-					continue;
-				}
-				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(RenderLayout::TEXCOORD) == 0 )
-				{
-					texcoodElement = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
-					continue;
-				}
-			}
-			if(positionElement > 0 && data->Positions.size() > 0)
-			{
-				_elementSize += positionElement;
-				_bufferSize += positionElement * data->Positions.size();
-			}
-			if(colorElement > 0 && data->Colors.size() > 0 )
-			{
-				_elementSize += colorElement;
-				_bufferSize += colorElement * data->Colors.size();
-			}
-			if(normalElement > 0 && data->Normals.size() > 0)
-			{
-				_elementSize += normalElement;
-				_bufferSize += normalElement * data->Normals.size();
+					pBuffer->_elementSize = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
+					break;
+				}		 
 			}
 
-			if(texcoodElement > 0 && data->Texcoords.size() > 0)
+			if( pBuffer->_elementSize == 0 )
 			{
-				_elementSize += texcoodElement;
-				_bufferSize += texcoodElement * data->Texcoords.size();
+				BOOST_ASSERT(0);
+				delete pBuffer;
+				return NULL;
 			}
 
-			//data
-			if(positionElement > 0 && data->Positions.size() > 0 )
+			if(sematic.compare(RenderLayout::POSITION) == 0 )
 			{
+				pBuffer->_bufferSize = pBuffer->_elementSize*data->Positions.size();
 				for(unsigned int index=0;index<data->Positions.size();++index)
 				{
 					Vector3 vec = data->ControllPositions[data->Positions[index]];
 					vData.push_back(vec.x);
 					vData.push_back(vec.y);
 					vData.push_back(vec.z);
-
-					if( colorElement > 0 && data->Colors.size() > index )
-					{
-						vData.push_back(data->Colors[index].x);
-						vData.push_back(data->Colors[index].y);
-						vData.push_back(data->Colors[index].z);
-					}
-
-					if( normalElement > 0 && data->Normals.size() > index )
-					{
-						vData.push_back(data->Normals[index].x);
-						vData.push_back(data->Normals[index].y);
-						vData.push_back(data->Normals[index].z);
-					}
-					 
-					if( texcoodElement > 0 && data->Texcoords.size() > index )
-					{
-						vData.push_back(data->Texcoords[index].x);
-						vData.push_back(data->Texcoords[index].y);
-					}
-					 
 				}
-				pData = vData.data();
+			}
+			else if(sematic.compare(RenderLayout::COLOR) == 0 )
+			{
+				pBuffer->_bufferSize = pBuffer->_elementSize*data->Colors.size();
+				for(unsigned int index=0;index<data->Colors.size();++index)
+				{
+					Vector4 vec = data->Colors[index];
+					vData.push_back(vec.x);
+					vData.push_back(vec.y);
+					vData.push_back(vec.z);
+					vData.push_back(vec.w);
+				}
+			}
+			else if(sematic.compare(RenderLayout::NORMAL) == 0 )
+			{
+				pBuffer->_bufferSize = pBuffer->_elementSize*data->Normals.size();
+				for(unsigned int index=0;index<data->Normals.size();++index)
+				{
+					Vector3 vec = data->Normals[index];
+					vData.push_back(vec.x);
+					vData.push_back(vec.y);
+					vData.push_back(vec.z);
+				}
+			}
+			else if(sematic.compare(RenderLayout::TEXCOORD) == 0 )
+			{
+				pBuffer->_bufferSize = pBuffer->_elementSize*data->Texcoords.size();
+				for(unsigned int index=0;index<data->Texcoords.size();++index)
+				{
+					Vector2 vec = data->Texcoords[index];
+					vData.push_back(vec.x);
+					vData.push_back(vec.y);
+				}
+			}
+			else
+			{
+				BOOST_ASSERT(0);
 			}
 
-		}
-		else if( _type == RBT_Index )
+			  pData = vData.data();
+	    }
+		else if( pBuffer->_type == RBT_Index )
 		{
-			_bindFlags = D3D11_BIND_INDEX_BUFFER;
+			pBuffer->_bindFlags = D3D11_BIND_INDEX_BUFFER;
 			if( data->Indices.size() > 0 )
 			{
-				_elementSize = sizeof(unsigned int);
-				_bufferSize = sizeof(unsigned int) * data->Indices.size();
+				pBuffer->_elementSize = sizeof(unsigned int);
+				pBuffer->_bufferSize = sizeof(unsigned int) * data->Indices.size();
 				pData = data->Indices.data();
 			}
 		}
-		else
-		{
-			BOOST_ASSERT(0);
-		}
 
-		DoCreateBuffer(pData);
+		BOOST_ASSERT(pBuffer->_bufferSize > 0 );
+
+	  
+		pBuffer->DoCreateBuffer(pData);
+
+		return DX11RenderBufferPtr(pBuffer);
+
 	}
-
+ 
   
 
 	void DX11RenderBuffer::GetD3DFlags(D3D11_USAGE& usage, UINT& cpuAccessFlags, UINT& bindFlags, UINT& miscFlags)
@@ -352,7 +258,7 @@ namespace Disorder
 		}
 	}
 
-	bool DX11RenderTexture2D::Create(PixelFormat pixelFormat,ImagePtr const& image)
+	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat,ImagePtr const& image)
 	{
 		const ImageSpec &spec = image->GetSpec();
 		_BufferInitData data;
@@ -362,11 +268,13 @@ namespace Disorder
 		return Create(pixelFormat,spec.width,spec.height,false,&data);
 	}
 
-	bool DX11RenderTexture2D::Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,BufferInitData const* pData)
+	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,BufferInitData const* pData)
 	{
-		Format = pixelFormat;
-		Width = width;
-		Height = height;
+		DX11RenderTexture2D* pTexture = new DX11RenderTexture2D;
+
+		pTexture->Format = pixelFormat;
+		pTexture->Width = width;
+		pTexture->Height = height;
 
 
 		D3D11_TEXTURE2D_DESC desc;
@@ -376,11 +284,11 @@ namespace Disorder
 		
 		if( bMipmap )
 		{
-			desc.MipLevels = MipLevel = 0;
+			desc.MipLevels = pTexture->MipLevel = 0;
 		}
 		else 
 		{
-			desc.MipLevels = MipLevel = 1;
+			desc.MipLevels = pTexture->MipLevel = 1;
 			desc.SampleDesc.Count = 1; // just set it to 1...
 			desc.SampleDesc.Quality = 0;
 		}
@@ -411,9 +319,9 @@ namespace Disorder
 			BOOST_ASSERT(hr==S_OK);
 		}
 
-		D3DInterface = MakeComPtr<ID3D11Texture2D>(pTex2D);
+		pTexture->D3DInterface = MakeComPtr<ID3D11Texture2D>(pTex2D);
  
-		return true;
+		return DX11RenderTexture2DPtr(pTexture);
 
 	}
 	 
@@ -424,12 +332,16 @@ namespace Disorder
 		return D3DInterface.get();
 	}
 
-	DX11RenderTexture2D::DX11RenderTexture2D(PixelFormat pixelFormat,unsigned int width,unsigned int height,ID3D11Texture2DPtr DXInterface)
+	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,ID3D11Texture2DPtr DXInterface)
 	{
-		Width = width;
-		Height = height;
-		Format = pixelFormat;
-		D3DInterface = DXInterface;
+		DX11RenderTexture2D *pTex = new DX11RenderTexture2D;
+		pTex->Width = width;
+		pTex->Height = height;
+		pTex->Format = pixelFormat;
+		pTex->D3DInterface = DXInterface;
+
+		return DX11RenderTexture2DPtr(pTex);
 	}
+	 
 	
 }

@@ -23,8 +23,8 @@ namespace Disorder
 
 	   ViewportPtr const& viewport = GameClient->GetViewport(0);
 	   RenderEngine->CreateViewport(viewport->GetWindow());
-	   RenderEngine->ResourceManager->Init();
-	   GameCanvas = boost::make_shared<Canvas>(viewport->SizeX,viewport->SizeY);
+	   RenderResManager->Init();
+	   GameCanvas = Canvas::Create(viewport->SizeX,viewport->SizeY);
 
 	   GSceneManager->Init();
  
@@ -74,6 +74,12 @@ namespace Disorder
 		std::string drawstr = strstream.str();
 		int length = canvas->GetStringLength(_iDrawSize,drawstr);
 		canvas->DrawString(Vector3(canvas->GetWidth() - length - 5.f ,10.f,0.f),_iDrawSize,color,drawstr);
+   }
+
+   EnginePtr Engine::Create()
+   {
+	   Engine *pEngine = new Engine;
+	   return EnginePtr(pEngine);
    }
 
    void EngineStat::Tick(float deltaSeconds)

@@ -6,21 +6,44 @@ namespace Disorder
 
 	void SceneManager::Init()
 	{
-		_sceneImporter = boost::make_shared<FbxSceneImporter>();
+		_sceneImporter = FbxSceneImporter::Create();
+
+		_vAmbientLowerColor = Vector3(0.2f);
+		_vAmbientUpperColor = Vector3(0.8f);
+		_propertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerScene);
+		_sAmbientLowerProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientLowColor,eSP_Vector3);
+		_sAmbientUpperProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientUpperColor,eSP_Vector3);
+
 	}
 
 	void SceneManager::Exit()
 	{
 	}
 
+	SceneManagerPtr SceneManager::Create()
+	{
+		SceneManager *pManager = new SceneManager;
+		return SceneManagerPtr(pManager);
+	}
+
+	void SceneManager::UpdateShaderProperty()
+	{
+		_sAmbientLowerProperty->SetData(_vAmbientLowerColor);
+		_sAmbientUpperProperty->SetData(_vAmbientUpperColor);
+	}
+
 	void SceneManager::CreateDefaultCamera()
 	{
 		BOOST_ASSERT(_mDefaultCamera == NULL);
 
-		GameObjectPtr camera = SceneObjectGenerator::CreateCamera("DefaultCamera");
-		GWorld->GetLevel()->AddGameObject(camera);
-		_mDefaultCamera = boost::dynamic_pointer_cast<Camera>(camera->GetComponent("DefaultCamera"));
+	    GameObjectPtr go = GameObject::Create("DefaultCamera",Vector3::ZERO);
+	    CameraPtr sceneCamera = Camera::Create("DefaultCamera");
+	    go->AddComponent(sceneCamera);
+		GWorld->GetLevel()->AddGameObject(go);
+
+		_mDefaultCamera = sceneCamera;
 		AddCamera(_mDefaultCamera);
+
 		GEngine->GameClient->AddInputListener(_mDefaultCamera);
 	}
 

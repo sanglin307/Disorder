@@ -13,8 +13,6 @@ namespace Disorder
 		static std::string COLOR;
 		static std::string NORMAL;
 		static std::string TEXCOORD;
-
-		virtual bool CreateLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType,bool soloBuffer) = 0;
  
         virtual void BindVertexBuffer(RenderBufferPtr const& renderBuffer)
         {
@@ -44,6 +42,8 @@ namespace Disorder
 		virtual void * GetLowInterface(){ return 0;}
 
 	protected:
+		RenderLayout(){}
+
 		std::vector<RenderBufferPtr> _vertexBuffers;
         RenderBufferPtr _indexBuffer;
         TopologyType _topologyType;

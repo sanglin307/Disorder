@@ -7,7 +7,9 @@ namespace Disorder
 	class DX11RenderEngine : public RenderEngine
 	{
 	public:
-		DX11RenderEngine();
+		
+		static DX11RenderEnginePtr Create();
+
 		virtual void Init();
 		virtual void Exit();
 		
@@ -28,9 +30,7 @@ namespace Disorder
 		virtual void* Map(RenderBufferPtr const& buffer,BufferAccess bufferAccess);
 		virtual void UnMap(RenderBufferPtr const& buffer);
 		virtual void UpdateSubresource(RenderBufferPtr const& buffer,void* pSrcData,unsigned int srcDataSize);
-
-		void PrepareRenderParam(RenderEffectPtr const& technique);
-
+ 
 		virtual void CreateViewport(void *hWnd);
 
 		ID3D11DevicePtr const & DX11RenderEngine::D3DDevice() const
@@ -53,6 +53,7 @@ namespace Disorder
 		virtual void SetDepthStencilState(DepthStencilStatePtr const& depthStencilState);
 
 	private:
+		DX11RenderEngine();
 
 		D3D_DRIVER_TYPE                         _driverType;
 		D3D_FEATURE_LEVEL                       _featureLevel;

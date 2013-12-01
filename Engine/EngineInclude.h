@@ -57,6 +57,8 @@ namespace Disorder
 	typedef boost::shared_ptr<InputManager> InputManagerPtr;
 	class InputListener;
 	typedef boost::shared_ptr<InputListener> InputListenerPtr;
+	class Console;
+	typedef boost::shared_ptr<Console> ConsolePtr;
 	class Client;
 	typedef boost::shared_ptr<Client> ClientPtr;
 	class WindowsClient;
@@ -73,28 +75,16 @@ namespace Disorder
 	typedef boost::shared_ptr<GameObject> GameObjectPtr;
 	class Level;
 	typedef boost::shared_ptr<Level> LevelPtr;
-	class MaterialParam;
-	typedef boost::shared_ptr<MaterialParam> MaterialParamPtr;
-	class MaterialParamInt;
-	typedef boost::shared_ptr<MaterialParamInt> MaterialParamIntPtr;
-	class MaterialParamFloat;
-	typedef boost::shared_ptr<MaterialParamFloat> MaterialParamFloatPtr;
-	class MaterialParamVector3;
-	typedef boost::shared_ptr<MaterialParamVector3> MaterialParamVector3Ptr;
-	class MaterialParamVector4;
-	typedef boost::shared_ptr<MaterialParamVector4> MaterialParamVector4Ptr;
-	class MaterialParamMatrix;
-	typedef boost::shared_ptr<MaterialParamMatrix> MaterialParamMatrixPtr;
-	class MaterialParamCBuffer;
-	typedef boost::shared_ptr<MaterialParamCBuffer> MaterialParamCBufferPtr;
-	class MaterialParamShaderRes;
-	typedef boost::shared_ptr<MaterialParamShaderRes> MaterialParamShaderResPtr;
-	class MaterialParamSamplerState;
-	typedef boost::shared_ptr<MaterialParamSamplerState> MaterialParamSamplerStatePtr;
-	class MaterialParameterManager;
-	typedef boost::shared_ptr<MaterialParameterManager> MaterialParameterManagerPtr;
-	class Material;
-	typedef boost::shared_ptr<Material> MaterialPtr;
+	class ShaderProperty;
+	typedef boost::shared_ptr<ShaderProperty> ShaderPropertyPtr;
+	class ShaderPropertyManager;
+	typedef boost::shared_ptr<ShaderPropertyManager> ShaderPropertyManagerPtr;
+	class SurfaceMaterial;
+	typedef boost::shared_ptr<SurfaceMaterial> SurfaceMaterialPtr;
+	class SurfaceLambert;
+	typedef boost::shared_ptr<SurfaceLambert> SurfaceLambertPtr;
+	class SurfacePhong;
+	typedef boost::shared_ptr<SurfacePhong> SurfacePhongPtr;
 	class Texture;
 	typedef boost::shared_ptr<Texture> TexturePtr;
 	class RenderEngine;
@@ -150,6 +140,20 @@ namespace Disorder
 	typedef boost::shared_ptr<FbxSceneImporter> FbxSceneImporterPtr;
 	class Light;
 	typedef boost::shared_ptr<Light> LightPtr;
+	class Config;
+	typedef boost::shared_ptr<Config> ConfigPtr;
+	class Engine;
+	typedef boost::shared_ptr<Engine> EnginePtr;
+	class ImageManager;
+	typedef boost::shared_ptr<ImageManager> ImageManagerPtr;
+	class MainLoop;
+	typedef boost::shared_ptr<MainLoop> MainLoopPtr;
+	class SceneManager;
+	typedef boost::shared_ptr<SceneManager> SceneManagerPtr;
+	class Logger;
+	typedef boost::shared_ptr<Logger> LoggerPtr;
+	class World;
+	typedef boost::shared_ptr<World> WorldPtr;
 
 
 }
@@ -176,6 +180,7 @@ namespace Disorder
 #include "VertexFormat.h"
 #include "Texture.h"
 #include "RenderUtil.h"
+#include "ShaderProperty.h"
 #include "RenderResource.h"
 #include "RenderState.h"
 #include "RenderSurface.h"
@@ -185,7 +190,6 @@ namespace Disorder
 
 #include "RenderLayout.h"
 #include "Geometry.h"
-#include "SceneObjectGenerator.h"
 #include "Renderer.h"
 #include "Canvas.h"
 #include "RenderResourceManager.h"
@@ -198,6 +202,7 @@ namespace Disorder
 #include "GameObject.h"
 #include "Level.h"
 #include "World.h"
+#include "Console.h"
 #include "Client.h"
 #include "Engine.h"
 #include "Config.h"

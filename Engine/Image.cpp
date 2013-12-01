@@ -28,8 +28,7 @@ namespace Disorder
 		 imageInput->close();
 		 delete imageInput;
 
-		 ImagePtr imagePtr = boost::make_shared<Image>(spec,vPixels);
-
+		 ImagePtr imagePtr = Image::Create(spec,vPixels);
 		 _mapImages[fileName] = imagePtr;
 
 		 return imagePtr;
@@ -38,6 +37,12 @@ namespace Disorder
 	void ImageManager::Add(std::string const& imageName,ImagePtr const& image)
 	{
 		_mapImages[imageName] = image;
+	}
+
+	ImageManagerPtr ImageManager::Create()
+	{
+		ImageManager *pManager = new ImageManager;
+		return ImageManagerPtr(pManager);
 	}
 
 	ImagePtr ImageManager::Find(std::string const& imageName)
@@ -66,6 +71,19 @@ namespace Disorder
 		imageOut->close();
 		delete imageOut;
 	}
+
+	ImagePtr Image::Create(ImageSpec const& spec,std::vector<unsigned char> const& pixels)
+	{
+		Image *pImage = new Image(spec,pixels);
+		return ImagePtr(pImage);
+	}
+
+	ImagePtr Image::Create(int width,int height,int channels,unsigned char* pixels)
+	{
+		Image *pImage = new Image(width,height,channels,pixels);
+		return ImagePtr(pImage);
+	}
+
 
 	Image::Image(int width,int height,int channels,unsigned char* pixels)
 	{

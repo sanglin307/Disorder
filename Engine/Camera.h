@@ -8,8 +8,6 @@ namespace Disorder
 	{
 	public:
  
-		Camera(std::string const& name);
-		
 		void LookAt(Vector3 const& eyePos,Vector3 const& lookAt,Vector3 const& upVec);
 	    void ProjCalculate(float FOV,  float nearPlane,float farPlane);
 
@@ -23,7 +21,12 @@ namespace Disorder
 
 		void DrawAxis();
 
+		void UpdateShaderProperty();
+
+		static CameraPtr Create(std::string const& name);
 	private:
+
+		Camera(std::string const& name);
 
 		void Update(float delta);
 		void UpdateViewMatrix();
@@ -47,6 +50,11 @@ namespace Disorder
 
 		bool _viewMatrixInvalid;
 		bool _projectMatrixInvalid;
+
+		ShaderPropertyManagerPtr _propertyManager;
+		ShaderPropertyPtr _viewMatrixProperty;
+		ShaderPropertyPtr _projMatrixProperty;
+		ShaderPropertyPtr _positionProperty;
 
 
 	};

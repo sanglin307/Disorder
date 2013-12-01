@@ -30,11 +30,11 @@ void PeekMessage()
 	Disorder::GConfig->Load();
  
 
-	Disorder::GEngine->GameClient = boost::make_shared<Disorder::WinClient>();
-	Disorder::GEngine->RenderEngine = boost::make_shared<Disorder::DX11RenderEngine>();
-	Disorder::GEngine->FileManager = boost::make_shared<Disorder::WinFileSystem>();
-	Disorder::GEngine->SceneImporter = boost::make_shared<Disorder::FbxSceneImporter>();
-
+	Disorder::GEngine->GameClient = Disorder::WinClient::Create();
+	Disorder::GEngine->RenderEngine = Disorder::DX11RenderEngine::Create();
+	Disorder::GEngine->FileManager = Disorder::WinFileSystem::Create();
+	Disorder::GEngine->SceneImporter = Disorder::FbxSceneImporter::Create();
+	Disorder::GEngine->RenderResManager = Disorder::DX11RenderResourceManager::Create();
 	Disorder::GMainLoop->Init();
 
  }

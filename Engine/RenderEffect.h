@@ -4,13 +4,9 @@
 
 namespace Disorder
 {
-	
- 
 	class ShaderObject
 	{
 	public:
-		//virtual void Load(std::string const& entryPoint) = 0;
- 
 	    ShaderType const& GetType() const
 		{
 			return _type;
@@ -18,44 +14,27 @@ namespace Disorder
  
 		std::string GetShaderName()
 		{
-			std::string result = _effectName + ":" + _entryPoint;
+			std::string result = _fileName + ":" + _entryPoint;
 		    return result;
 		}
  
-		virtual void  PrepareRenderParam() {;}
-		virtual void  UpdateRenderParam() {;}
+		virtual void  UpdateShaderParameter() {;}
 		virtual void* GetLowInterface(){ return 0;}
 		virtual void* GetDataInterface() { return 0;}
  
-		
+		virtual bool LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType) = 0;
+		virtual void ShaderReflection() = 0;
+
 	protected:
-		std::string _effectName;
+		std::string _fileName;
 		std::string _entryPoint;
 		ShaderType _type;
+		ShaderModel _shaderModel;
 	};
  
 	class RenderEffect
 	{
-
-		typedef boost::unordered_map<std::string,MaterialParamPtr> MaterialParamMap;
-
 	public: 
-		RenderEffect(ShaderModel shaderModel)
-		{
-			_shaderModel = shaderModel;
-			_rasterizeState = RenderResourceManager::DefaultRasterizeState;
-			_blendState = RenderResourceManager::DefaultBlentState;
-			_depthStencilState = RenderResourceManager::DefaultDepthStencilState;
-
-		}
-
-	    MaterialParamCBufferPtr GetConstantBufferParameter(std::string const& name);
-		MaterialParamShaderResPtr GetShaderResourceParameter(std::string const& name);
-		MaterialParamSamplerStatePtr GetSamplerStateParameter(std::string const& name);
-	 
-
-		virtual ShaderObjectPtr LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType) = 0;
-	 
 		inline ShaderObjectPtr const& GetVertexShader() const
 		{
 			return _vertexShader;
@@ -64,6 +43,17 @@ namespace Disorder
 		inline ShaderObjectPtr const& GetPixelShader() const
 		{
 			return _pixelShader;
+		}
+
+		void BindShader(ShaderObjectPtr const& shaderObject)
+		{
+			if( shaderObject->GetType() == ST_VertexShader )
+				_vertexShader = shaderObject;
+			else if( shaderObject->GetType() == ST_PixelShader )
+				_pixelShader = shaderObject;
+			else
+			   BOOST_ASSERT(0);
+
 		}
 
 		void BindRasterizeState(RasterizeStatePtr const& rasterizeState)
@@ -95,24 +85,26 @@ namespace Disorder
 		{
 			return _depthStencilState;
 		}
+ 
+		virtual void UpdateShaderParameter();
 
-		virtual void PrepareRenderParam() = 0;
-		virtual void UpdateRenderParam() = 0;
-
-        virtual void ShaderReflection(ShaderObjectPtr const& shader) = 0;
+		static RenderEffectPtr Create(); 
 
 	protected:
-		ShaderModel _shaderModel;	
 		// shader slot!
 		ShaderObjectPtr _vertexShader;
 		ShaderObjectPtr _pixelShader;
+
 		RasterizeStatePtr _rasterizeState;
 		BlendStatePtr _blendState;
 		DepthStencilStatePtr _depthStencilState;
-
-	private:
-		MaterialParamMap _materialParamMap;
  
+		RenderEffect()
+		{
+			_rasterizeState = RenderResourceManager::DefaultRasterizeState;
+			_blendState = RenderResourceManager::DefaultBlentState;
+			_depthStencilState = RenderResourceManager::DefaultDepthStencilState;
+		}
 	};
 
 

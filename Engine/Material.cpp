@@ -2,218 +2,120 @@
 
 namespace Disorder
 {
-	Material::Material()
-	{
-	    memset(Effect,0,sizeof(Effect)); 
-	}
-
  
-	MaterialParamVector3Ptr MaterialParameterManager::GetVector3Parameter(std::string const& name)
+	//////////////////////////////////////////////////////////////////////////
+	
+	SurfaceMaterial::SurfaceMaterial(std::string const& name)
+		:Name(name)
 	{
-		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return boost::dynamic_pointer_cast<MaterialParamVector3>(_materialParamMap.at(name));
-
-		MaterialParamVector3Ptr vector = boost::make_shared<MaterialParamVector3>();
-		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,vector));
-
-		return vector;
-	}
-
-	MaterialParamVector4Ptr MaterialParameterManager::GetVector4Parameter(std::string const& name)
-	{
-		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return boost::dynamic_pointer_cast<MaterialParamVector4>(_materialParamMap.at(name));
-
-		MaterialParamVector4Ptr vector = boost::make_shared<MaterialParamVector4>();
-		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,vector));
-
-		return vector;
-	}
-
-	MaterialParamIntPtr MaterialParameterManager::GetIntParameter(std::string const& name)
-	{
-		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return boost::dynamic_pointer_cast<MaterialParamInt>(_materialParamMap.at(name));
-
-		MaterialParamIntPtr vector = boost::make_shared<MaterialParamInt>();
-		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,vector));
-
-		return vector;
-	}
-
-	MaterialParamFloatPtr MaterialParameterManager::GetFloatParameter(std::string const& name)
-	{
-		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return boost::dynamic_pointer_cast<MaterialParamFloat>(_materialParamMap.at(name));
-
-		MaterialParamFloatPtr vector = boost::make_shared<MaterialParamFloat>();
-		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,vector));
-
-		return vector;
-	}
-
-
-	MaterialParamMatrixPtr MaterialParameterManager::GetMatrixParameter(std::string const& name)
-	{
-		if( _materialParamMap.find(name) != _materialParamMap.end() )
-			return boost::dynamic_pointer_cast<MaterialParamMatrix>(_materialParamMap.at(name));
-
-		MaterialParamMatrixPtr matrix = boost::make_shared<MaterialParamMatrix>();
-		_materialParamMap.insert(std::pair<std::string,MaterialParamPtr>(name,matrix));
-
-		return matrix;
-	}
-
-	void Material::UpdateMaterialParameters(GameObjectPtr const& gameObject,CameraPtr const& camera)
-	{
-		Matrix4 worldMat = gameObject->GetWorldMatrix();
-		Matrix4 viewMat = camera->ViewMatrix;
-		Matrix4 projMat = camera->ProjectMatrix;
-		Matrix4 wvpMat = projMat*viewMat*worldMat;
-		
-		WorldMatrix->SetValue(worldMat);
-		WorldNormal->SetValue(worldMat.GetNormalMatrix());
-		ViewMatrix->SetValue(viewMat);
-		ProjMatrix->SetValue(projMat);
-		WorldViewProjMatrix->SetValue(wvpMat);
-
-
-		if(CameraPosition != NULL)
-		{
-			GameObjectPtr goCamera = camera->GetBase();
-			CameraPosition->SetValue(goCamera->GetWorldPosition());
-		}
-
-		//material colors parameters
-		if( AmbientColorParam != NULL )
-		{
-			AmbientColorParam->SetValue(Vector4(AmbientColor));
-		}
-		if( DiffuseColorParam != NULL )
-		{
-			DiffuseColorParam->SetValue(Vector4(DiffuseColor));
-		}
-		if( SpecularColorParam != NULL )
-		{
-			SpecularColorParam->SetValue(Vector4(SpecularColor));
-		}
-		if( EmissiveColorParam != NULL )
-		{
-			EmissiveColorParam->SetValue(Vector4(EmissiveColor));
-		}
-		if( OpacityParam != NULL )
-		{
-			OpacityParam->SetValue(Opacity);
-		}
-		if( ShininessParam != NULL )
-		{
-			ShininessParam->SetValue(Shininess);
-		}
-		if( RelectivityParam != NULL )
-		{
-			RelectivityParam->SetValue(Reflectivity);
-		}
-	}
-
-	MaterialPtr MaterialGenerator::GeneratePhong(Vector3 const& ambientColor,Vector3 const& diffuseColor,Vector3 const& specularColor,float shininess)
-	{
-		MaterialPtr mat = boost::make_shared<Material>();
-		mat->Type = MT_Phong;
-		mat->AmbientColor = ambientColor;
-		mat->DiffuseColor = diffuseColor;
-		mat->SpecularColor = specularColor;
-		mat->EmissiveColor = Vector3(0.0f);
-		mat->Opacity = 1.0;
-		mat->Reflectivity = 0.0;
-		mat->Shininess = shininess;
-
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
-		MaterialParameterManagerPtr parameterManager = GEngine->RenderEngine->ParameterManager;
-
-		RenderEffectPtr baseEffect =  resourceManager->CreateRenderEffect("BasePassPhong.fx",SM_4_0,"VS","PS");
-	 
-		mat->WorldViewProjMatrix = parameterManager->GetMatrixParameter("WorldViewProjMatrix");
-		mat->WorldMatrix = parameterManager->GetMatrixParameter("World");
-		mat->ViewMatrix = parameterManager->GetMatrixParameter("View");
-		mat->ProjMatrix = parameterManager->GetMatrixParameter("Projection");
-		mat->WorldNormal = parameterManager->GetMatrixParameter("WorldNormal");
-
-		mat->AmbientColorParam = parameterManager->GetVector4Parameter("AmbientColor");
-		mat->DiffuseColorParam = parameterManager->GetVector4Parameter("DiffuseColor");
-		mat->SpecularColorParam = parameterManager->GetVector4Parameter("SpecularColor");
-		mat->ShininessParam = parameterManager->GetFloatParameter("Shininess");
-		mat->CameraPosition = parameterManager->GetVector3Parameter("CameraPosition");
- 
-		mat->LightNumber = parameterManager->GetIntParameter("LightNumber");
-		mat->LightIntensityPack = parameterManager->GetVector4Parameter("LightIntensityPack");
-		mat->LightDirArray = parameterManager->GetVector3Parameter("LightDirArray");
-		mat->LightColorArray = parameterManager->GetVector3Parameter("LightColorArray");
-
-		baseEffect->PrepareRenderParam();
-		mat->Effect[RPT_ForwardLighting][FRP_BaseLight] = baseEffect;
- 
-		RenderEffectPtr lightEffect =  resourceManager->CreateRenderEffect("LightPass.fx",SM_4_0,"VS","PS");
-	 
-		DepthStencilDesc dsDesc;
-		dsDesc.DepthEnable = false;
-		DepthStencilStatePtr noDepthState = resourceManager->CreateDepthStencilState(&dsDesc,0);
-		lightEffect->BindDepthStencilState(noDepthState);
-		BlendDesc bDesc;
-		bDesc.BlendEnable = true;
-		bDesc.BlendOp = BLEND_OP_ADD;
-		bDesc.SrcBlend = BLEND_ONE;
-		bDesc.DestBlend = BLEND_ONE;
-		BlendStatePtr blendState = resourceManager->CreateBlendState(&bDesc,1);
-		lightEffect->BindBlendState(blendState);
-
-		mat->LightType = parameterManager->GetIntParameter("LightType");
-		mat->LightIntensity = parameterManager->GetFloatParameter("LightIntensity");
-		mat->LightPos =  parameterManager->GetVector3Parameter("LightPos");
-	    mat->LightColor = parameterManager->GetVector3Parameter("LightColor");
-		lightEffect->PrepareRenderParam();
-		mat->Effect[RPT_ForwardLighting][FRP_DynamicLight] = lightEffect;
-
-		return mat;
+		_propertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerMaterial);
 	}
  
-	MaterialPtr MaterialGenerator::GenerateLambert(Vector3 const& ambientColor,Vector3 const& diffuseColor)
+	//////////////////////////////////////////////////////////////////////////
+	
+	void SurfaceLambert::UpdateShaderProperty()
 	{
-		MaterialPtr mat = boost::make_shared<Material>();
+		AmbientColorProperty->SetData(AmbientColor); 
+		DiffuseColorProperty->SetData(DiffuseColor);
+		EmissiveColorProperty->SetData(EmissiveColor);
+	}
+
+	SurfaceLambert::SurfaceLambert(std::string const& name)
+		:SurfaceMaterial(name)
+	{
+
+	}
+
+	SurfaceLambertPtr SurfaceLambert::Create(std::string const& name)
+	{
+		SurfaceLambert* mat = new SurfaceLambert(name);
 		mat->Type = MT_Lambert;
-		mat->AmbientColor = ambientColor;
-		mat->DiffuseColor = diffuseColor;
-		mat->SpecularColor = Vector3(1.0f);
-		mat->EmissiveColor = Vector3(0.0f);
-		mat->Opacity = 1.0;
-		mat->Reflectivity = 0.0;
-		mat->Shininess = 1.0;
-
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderEngine->ResourceManager;
-		MaterialParameterManagerPtr parameterManager = GEngine->RenderEngine->ParameterManager;
-
-		RenderEffectPtr baseEffect =  resourceManager->CreateRenderEffect("BaseLightPass.fx",SM_4_0,"VS","PS");
-	 
-		mat->WorldViewProjMatrix = parameterManager->GetMatrixParameter("WorldViewProjMatrix");
-		mat->WorldMatrix = parameterManager->GetMatrixParameter("World");
-		mat->ViewMatrix = parameterManager->GetMatrixParameter("View");
-		mat->ProjMatrix = parameterManager->GetMatrixParameter("Projection");
-		mat->WorldNormal = parameterManager->GetMatrixParameter("WorldNormal");
-
-		mat->AmbientColorParam = parameterManager->GetVector4Parameter("AmbientColor");
-		mat->DiffuseColorParam = parameterManager->GetVector4Parameter("DiffuseColor");
-	 
-		mat->LightNumber = parameterManager->GetIntParameter("LightNumber");
-		mat->LightIntensityPack = parameterManager->GetVector4Parameter("LightIntensityPack");
-		mat->LightDirArray = parameterManager->GetVector3Parameter("LightDirArray");
-		mat->LightColorArray = parameterManager->GetVector3Parameter("LightColorArray");
-
-		baseEffect->PrepareRenderParam();
-		mat->Effect[RPT_ForwardLighting][FRP_BaseLight] = baseEffect;
+ 
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
+		ShaderPropertyManagerPtr parameterManager = mat->GetShaderPropertyManager();
 
 
-		RenderEffectPtr lightEffect =  resourceManager->CreateRenderEffect("LightPass.fx",SM_4_0,"VS","PS");
-	 
-		DepthStencilDesc dsDesc;
+		RenderEffectPtr baseEffect = RenderEffect::Create();
+		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"BaseLightPass",SM_4_0,"VS");
+		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"BaseLightPass",SM_4_0,"PS");
+		baseEffect->BindShader(vertexShader);
+		baseEffect->BindShader(pixelShader);
+ 
+		mat->AmbientColorProperty = parameterManager->CreateProperty(ShaderPropertyManager::sAmbientColor,eSP_Vector3);
+		mat->DiffuseColorProperty = parameterManager->CreateProperty(ShaderPropertyManager::sDiffuseColor,eSP_Vector3);
+		mat->EmissiveColorProperty = parameterManager->CreateProperty(ShaderPropertyManager::sEmissiveColor,eSP_Vector3);
+
+		mat->AmbientColor = Vector3(0.1f);
+		mat->DiffuseColor = Vector3(0.8f);
+		mat->EmissiveColor = Vector3::ZERO;
+ 
+		mat->RenderPass.push_back(baseEffect);
+
+
+		//RenderEffectPtr lightEffect =  resourceManager->CreateRenderEffect("LightPass.fx",SM_4_0,"VS","PS");
+	 //
+		//DepthStencilDesc dsDesc;
+		//dsDesc.DepthEnable = false;
+		//DepthStencilStatePtr noDepthState = resourceManager->CreateDepthStencilState(&dsDesc,0);
+		//lightEffect->BindDepthStencilState(noDepthState);
+		//BlendDesc bDesc;
+		//bDesc.BlendEnable = true;
+		//bDesc.BlendOp = BLEND_OP_ADD;
+		//bDesc.SrcBlend = BLEND_ONE;
+		//bDesc.DestBlend = BLEND_ONE;
+		//BlendStatePtr blendState = resourceManager->CreateBlendState(&bDesc,1);
+		//lightEffect->BindBlendState(blendState);
+
+		//mat->LightType = parameterManager->CreateProperty("LightType",eSP_Int);
+		//mat->LightIntensity = parameterManager->CreateProperty("LightIntensity",eSP_Float);
+		//mat->LightPos =  parameterManager->CreateProperty("LightPos",eSP_Vector3);
+	 //   mat->LightColor = parameterManager->CreateProperty("LightColor",eSP_Vector3);
+		//lightEffect->InitShaderParameter();
+		//mat->RenderPass.push_back(lightEffect);
+
+		return SurfaceLambertPtr(mat);
+
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	
+	SurfacePhong::SurfacePhong(std::string const& name)
+		:SurfaceLambert(name)
+	{
+	}
+
+	void SurfacePhong::UpdateShaderProperty()
+	{
+		SurfaceLambert::UpdateShaderProperty();
+		
+
+	}
+
+	SurfacePhongPtr SurfacePhong::Create(std::string const& name)
+	{
+		SurfacePhong* mat = new SurfacePhong(name);
+		mat->Type = MT_Phong;
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
+		ShaderPropertyManagerPtr parameterManager = mat->GetShaderPropertyManager();
+
+		
+		RenderEffectPtr baseEffect = RenderEffect::Create();
+		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"BaseLightPass",SM_4_0,"VS");
+		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"BaseLightPass",SM_4_0,"PS");
+		baseEffect->BindShader(vertexShader);
+		baseEffect->BindShader(pixelShader);
+
+		mat->SpecularColorProperty = parameterManager->CreateProperty(ShaderPropertyManager::sSpecularColor,eSP_Vector3);
+		mat->ReflectionColorProperty = parameterManager->CreateProperty(ShaderPropertyManager::sReflectionColor,eSP_Vector3);
+		mat->ShininessProperty = parameterManager->CreateProperty(ShaderPropertyManager::sShininess,eSP_Float);
+
+		mat->Shininess = 0.f;
+		mat->SpecularColor = Vector3(0.8f);
+		mat->ReflectionColor = Vector3(0.f);
+ 
+		mat->RenderPass.push_back(baseEffect);
+
+		/*DepthStencilDesc dsDesc;
 		dsDesc.DepthEnable = false;
 		DepthStencilStatePtr noDepthState = resourceManager->CreateDepthStencilState(&dsDesc,0);
 		lightEffect->BindDepthStencilState(noDepthState);
@@ -223,16 +125,9 @@ namespace Disorder
 		bDesc.SrcBlend = BLEND_ONE;
 		bDesc.DestBlend = BLEND_ONE;
 		BlendStatePtr blendState = resourceManager->CreateBlendState(&bDesc,1);
-		lightEffect->BindBlendState(blendState);
+		lightEffect->BindBlendState(blendState);*/
 
-		mat->LightType = parameterManager->GetIntParameter("LightType");
-		mat->LightIntensity = parameterManager->GetFloatParameter("LightIntensity");
-		mat->LightPos =  parameterManager->GetVector3Parameter("LightPos");
-	    mat->LightColor = parameterManager->GetVector3Parameter("LightColor");
-		lightEffect->PrepareRenderParam();
-		mat->Effect[RPT_ForwardLighting][FRP_DynamicLight] = lightEffect;
-
-		return mat;
-
+		return SurfacePhongPtr(mat);
 	}
+ 
 }

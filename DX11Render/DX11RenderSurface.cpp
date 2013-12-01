@@ -14,10 +14,38 @@ namespace Disorder
 		return NULL;
 	}
 
-	void DX11RenderSurface::Create(const RenderTexture2DPtr& resource,unsigned int usage)
+	DX11RenderSurfacePtr DX11RenderSurface::Create(const RenderTexture2DPtr& resource,ID3D11RenderTargetViewPtr RenerTarget,ID3D11ShaderResourceViewPtr ShaderResource,ID3D11DepthStencilViewPtr DepthStencil)
 	{
-		Tex2DResource = resource;
-		Usage = usage;
+		DX11RenderSurface *pSurface = new DX11RenderSurface;
+		pSurface->Tex2DResource = resource;
+		pSurface->Usage = 0;
+		if( RenerTarget != NULL )
+		{
+			pSurface->Usage |= RSU_RenderTarget;
+			pSurface->RenderTargetView = RenerTarget;
+		}
+
+		if( ShaderResource != NULL )
+		{
+			pSurface->Usage |= RSU_ShaderResource;
+			pSurface->ShaderResourceView = ShaderResource;
+		}
+
+		if( DepthStencil != NULL )
+		{
+			pSurface->Usage |= RSU_DepthStencil;
+			pSurface->DepthStencilView = DepthStencil;
+		}
+
+		return DX11RenderSurfacePtr(pSurface);
+
+	}
+
+	DX11RenderSurfacePtr DX11RenderSurface::Create(const RenderTexture2DPtr& resource,unsigned int usage)
+	{
+		DX11RenderSurface *pSurface = new DX11RenderSurface;
+		pSurface->Tex2DResource = resource;
+		pSurface->Usage = usage;
 
 		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
 		if( usage & RSU_RenderTarget )
@@ -28,7 +56,7 @@ namespace Disorder
 			SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 			SRVDesc.Texture2D.MipSlice = 0;
 			renderEngine->D3DDevice()->CreateRenderTargetView((ID3D11Resource *)resource->GetLowInterface(),&SRVDesc,&pRenderTargetView);
-			RenderTargetView = MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView);
+			pSurface->RenderTargetView = MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView);
 		}
 
 		if( usage & RSU_DepthStencil )
@@ -40,7 +68,7 @@ namespace Disorder
 			descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 			descDSV.Texture2D.MipSlice = 0;
 			renderEngine->D3DDevice()->CreateDepthStencilView( (ID3D11Resource *)resource->GetLowInterface(), &descDSV, &pDepthStencilView );
-			DepthStencilView = MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView);
+			pSurface->DepthStencilView = MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView);
 		}
 
 		if( usage & RSU_ShaderResource )
@@ -52,9 +80,10 @@ namespace Disorder
 			SRVDesc.Texture2D.MostDetailedMip = 0;
 			SRVDesc.Texture2D.MipLevels = 1;
 			renderEngine->D3DDevice()->CreateShaderResourceView((ID3D11Resource *)resource->GetLowInterface(),&SRVDesc,&pShaderResourceView );
-			ShaderResourceView = MakeComPtr<ID3D11ShaderResourceView>(pShaderResourceView);
+			pSurface->ShaderResourceView = MakeComPtr<ID3D11ShaderResourceView>(pShaderResourceView);
 		}
 
+		return DX11RenderSurfacePtr(pSurface);
 	}
 
 }

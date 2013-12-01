@@ -1,8 +1,7 @@
-cbuffer Transforms
+cbuffer CameraTransforms
 {
-	matrix World;
-	matrix View;
-	matrix Projection;
+	matrix CameraView;
+	matrix CameraProjection;
 }
  
 
@@ -29,8 +28,8 @@ VS_OUTPUT VS( VS_INPUT input )
     VS_OUTPUT Output;
     
 	Output.Position = float4(input.Position,1.0f);//mul( float4(input.Position,1.0f),World);
-    Output.Position = mul( Output.Position, View );
-    Output.Position = mul( Output.Position, Projection );
+    Output.Position = mul( Output.Position, CameraView );
+    Output.Position = mul( Output.Position, CameraProjection );
  
 	Output.Color = input.Color; 
     

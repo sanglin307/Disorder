@@ -18,7 +18,7 @@ namespace Disorder
 		  static boost::shared_ptr<type> const& GetSingleton( ) 
 		  {  
 			  if( !_pSingleton )
-				  _pSingleton = boost::make_shared<type>();
+				  _pSingleton = type::Create();
 			  return _pSingleton; 
 		  }
  

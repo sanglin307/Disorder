@@ -11,13 +11,15 @@ namespace Disorder
 
 	}
 
-	bool DX11RenderLayout::CreateLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType,bool soloBuffer)
+	DX11RenderLayoutPtr DX11RenderLayout::Create(ShaderObjectPtr const& vertexShader,TopologyType topologyType,bool soloBuffer)
 	{
 		 
 		DX11ShaderReflectionPtr shaderReflection = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader)->ShaderReflect;
 		BOOST_ASSERT(shaderReflection != NULL );
  
-		_topologyType = topologyType;
+		DX11RenderLayout *pLayout = new DX11RenderLayout;
+
+		pLayout->_topologyType = topologyType;
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> vElementDes;
 
@@ -29,7 +31,7 @@ namespace Disorder
 			desc.SemanticName = shaderReflection->InputSignatureParameters[index].SemanticName.c_str();
 			desc.SemanticIndex = shaderReflection->InputSignatureParameters[index].SemanticIndex;
 			desc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-			desc.Format =  GetInputFormat(shaderReflection->InputSignatureParameters[index].ComponentType,shaderReflection->InputSignatureParameters[index].Mask);
+			desc.Format =  pLayout->GetInputFormat(shaderReflection->InputSignatureParameters[index].ComponentType,shaderReflection->InputSignatureParameters[index].Mask);
 			if( soloBuffer )
 			    desc.InputSlot = 0;
 			else
@@ -55,11 +57,15 @@ namespace Disorder
 		BOOST_ASSERT(hr == S_OK);
 		
 		if( hr != S_OK )
-			return false;
+		{
+			delete pLayout;
+			return NULL;
+		}
 
-		D3DInterface = MakeComPtr<ID3D11InputLayout>(pInputLayout);
 
-		return true;
+		pLayout->D3DInterface = MakeComPtr<ID3D11InputLayout>(pInputLayout);
+
+		return DX11RenderLayoutPtr(pLayout);
 	}
 
 	DXGI_FORMAT DX11RenderLayout::GetInputFormat(D3D_REGISTER_COMPONENT_TYPE component,BYTE mask)

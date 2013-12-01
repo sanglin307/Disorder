@@ -38,6 +38,8 @@ namespace Disorder
 
 	class Engine : public Singleton<Engine>
 	{
+		friend class Singleton<Engine>;
+
 	public:
 		void Init();
 		void Exit();
@@ -45,8 +47,8 @@ namespace Disorder
 		float GetMaxTickRate(float delta) { return 200.f;}
 		void Tick(float deltaSeconds);
 
-
-		Engine();
+		
+	
 		~Engine();
 
 	public :
@@ -56,10 +58,15 @@ namespace Disorder
 
 		RenderEnginePtr RenderEngine;
 		SceneImporterPtr SceneImporter;
+		RenderResourceManagerPtr RenderResManager;
 
 	    EngineStat Stat;
 
 		FileSystemPtr FileManager;
+
+	private:
+		static EnginePtr Create();
+	    Engine();
 
 	};
 

@@ -7,6 +7,12 @@ namespace Disorder
 		_vComponents.clear();
 	}
 
+	GameObjectPtr GameObject::Create(std::string const& name, Vector3 const& pos,Quaternion const& rot,Vector3 const& scale)
+	{
+		GameObject *pGo = new GameObject(name,pos,rot,scale);
+		return GameObjectPtr(pGo);
+	}
+
 	GameObject::GameObject(std::string const& name, Vector3 const& pos,Quaternion const& rot,Vector3 const& scale)
 		:Name(name)
 	{
@@ -18,6 +24,16 @@ namespace Disorder
 		_wldScale = _locScale;
 
 		_worldMatrix.MakeTransform(_wldPos,_wldScale,_wldRot);
+
+		_propertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerObject);
+		_worldMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sObjectWorld,eSP_Matrix4);	
+		_worldNormalMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sObjectNormal,eSP_Matrix4);
+	}
+
+	void GameObject::UpdateShaderProperty()
+	{
+		_worldMatrixProperty->SetData(_worldMatrix);
+		_worldNormalMatrixProperty->SetData(_worldMatrix.GetNormalMatrix());
 	}
 
 	 ComponentPtr GameObject::GetComponent(std::string const& name) const

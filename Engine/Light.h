@@ -22,7 +22,7 @@ namespace Disorder
 	class Light : public Component
 	{
 	public:
-		Light(std::string const& name);
+		
 		ELightType LightType;
 		Vector3   Color;
 		float     Intensity; 
@@ -38,6 +38,10 @@ namespace Disorder
 		bool Touch(RendererPtr renderObject);
 
 		static Vector3 DefaultLightDirection;
+
+		 static LightPtr Create(std::string const& name);
+	protected:
+		Light(std::string const& name);
 	};
 }
 

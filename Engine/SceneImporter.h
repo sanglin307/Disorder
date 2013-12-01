@@ -21,7 +21,9 @@ namespace Disorder
 		virtual void Init();
 		virtual void Exit();
 
+		static FbxSceneImporterPtr Create();
 	private:
+		FbxSceneImporter(){}
 
 		void PreProcessGlobalSetting(FbxScene* lscene,LevelPtr const& level);
 		void PostProcessGlobalSetting(FbxScene* lscene,LevelPtr const& level);
@@ -31,7 +33,7 @@ namespace Disorder
 		void ProcessContent(FbxNode* pNode,GameObjectPtr const& gameObject);
 		void ProcessMesh(FbxNode* pNode,GameObjectPtr const& gameObject);
 		void ProcessGeometry(FbxMesh *pMesh,GeometryPtr const& geometry);
-		void ProcessMaterials(FbxMesh *pMesh,std::vector<MaterialPtr> & materials);
+		void ProcessMaterials(FbxMesh *pMesh,std::vector<SurfaceMaterialPtr> & materials,int &usedMaterial);
 		void ProcessLight(FbxNode* pNode,GameObjectPtr const& gameObject);
 		void ProcessCamera(FbxNode* pNode,GameObjectPtr const& gameObject);
 

@@ -7,7 +7,8 @@ namespace Disorder
 	 class WindowsViewport : public Viewport
 	 {
 	 public:
-		 WindowsViewport(int x,int y,int sizeX,int sizeY,void* hWnd);
+		
+		 static WindowsViewportPtr Create(int x,int y,int sizeX,int sizeY,void* hWnd);
 
 		 virtual void Draw();
 
@@ -17,8 +18,12 @@ namespace Disorder
 		 }
 
 	 private:
+
+		 WindowsViewport(int x,int y,int sizeX,int sizeY,void* hWnd);
 		 HWND _window;
 	 };
+	
+
 
 	class FinderViewport
 	{
@@ -50,10 +55,14 @@ namespace Disorder
 		virtual void Close();
 		void ProcessInput(float delta);
 
+		static WinClientPtr Create();
+
 	protected:
 		virtual void CreateViewport(int x,int y,int sizeX,int sizeY,void* hWnd);
 
 	    static LONG APIENTRY StaticWndProc( HWND hWnd, UINT Message, UINT wParam, LONG lParam );
+
+		WinClient(){}
 	
 	};
 

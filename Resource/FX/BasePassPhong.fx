@@ -1,27 +1,29 @@
-cbuffer Transforms
+cbuffer CameraTransforms
 {
-	matrix World;
-	matrix View;
-	matrix Projection;
-	matrix WorldNormal;  // translate for normal.
+	matrix CameraView;
+	matrix CameraProjection;	
 	float3 CameraPosition;
 }
 
-cbuffer GobalSetting
+cbuffer ObjectTransform
+{
+	matrix WorldTransform;
+	matrix WorldNormal;  // translate for normal.
+}
+
+cbuffer MaterialProperty
 {
 	float4 AmbientColor;
 	float4 DiffuseColor;
-	float4 SpecularColor;
-	float  Shininess;
 }
 
 // support max 4 direct lights now
-cbuffer LightSetting
+cbuffer LightProperty
 {
 	int    LightNumber;
 	float4 LightIntensityPack;
-	float3 LightDirArray[4];
-	float3 LightColorArray[4];	
+	float3 LightDirArray;
+	float3 LightColorArray;	
 }
 
 struct VS_INPUT
@@ -48,10 +50,10 @@ struct VS_OUTPUT
 VS_OUTPUT VS( VS_INPUT input )
 {
     VS_OUTPUT output;
-    output.Pos = mul( float4(input.Pos,1.0f),World);
+    output.Pos = mul( float4(input.Pos,1.0f),WorldTransform);
 	output.PosWorld = output.Pos;
-    output.Pos = mul( output.Pos, View );
-    output.Pos = mul( output.Pos, Projection );
+    output.Pos = mul( output.Pos, CameraView );
+    output.Pos = mul( output.Pos, CameraProjection );
     output.NormWorld = mul(float4(input.Norm,1.0),WorldNormal);
 	
     return output;
@@ -70,13 +72,13 @@ float4 PS( VS_OUTPUT input ) : SV_Target
 	float3 normal = normalize(input.NormWorld).xyz;
 
 	// max 4 direct lights add
-	for( int i=0;i<LightNumber;i++)
-	{
-		diffuseColor.xyz += saturate( dot(LightDirArray[i],normal) * LightColorArray[i] * LightIntensityPack[i]);
+	//for( int i=0;i<LightNumber;i++)
+	//{
+		diffuseColor.xyz += saturate( dot(LightDirArray,normal) * LightColorArray * LightIntensityPack);
 
-		reflectVector = reflect(LightDirArray[i],normal);
-		specularColor.xyz += saturate( pow(max(dot(reflectVector,cameraVector),0),Shininess) * LightColorArray[i] * LightIntensityPack[i]);
-	}
+		reflectVector = reflect(LightDirArray,normal);
+		specularColor.xyz += saturate( pow(max(dot(reflectVector,cameraVector),0),Shininess) * LightColorArray * LightIntensityPack);
+	//}
 	
 	diffuseColor.a = 1.0f;
 	specularColor.a = 1.0f;

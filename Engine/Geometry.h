@@ -19,6 +19,11 @@ namespace Disorder
 		BoxSphereBounds                         BoundingBox;
 
 		TopologyType PrimitiveType;
+
+		static GeometryPtr Create(std::string const& name);
+
+	private:
+		Geometry();
 	};
 
 	class GeometryGenerator

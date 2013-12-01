@@ -2,6 +2,12 @@
 
 namespace Disorder
 {
+	FontPtr Font::Create(float fontSize,unsigned int fontRevolution)
+	{
+		Font *pFont = new Font(fontSize,fontRevolution);
+		return FontPtr(pFont);
+	}
+
 	Font::Font(float fontSize,unsigned int fontRevolution)
 		:_fontSize(fontSize),_fontRevolution(fontRevolution),_fontMaxBearingY(0)
 		,_characterSpacer(5),_antialiasColor(false)
@@ -166,15 +172,15 @@ namespace Disorder
 			FT_Done_FreeType(ft_library);
 
 		// save it to image 
-		ImagePtr fontImage = boost::make_shared<Image>(finalWidth,finalHeight,2,imageData);
+		ImagePtr fontImage = Image::Create(finalWidth,finalHeight,2,imageData);
 		GImageManager->Add(fontName,fontImage);
 		//std::string strImageFileName = fontName + ".tif";
 		//GImageManager->Save(strImageFileName,fontImage);
 
-		SamplerStatePtr sampler = GEngine->RenderEngine->ResourceManager->CreateSamplerState(SF_Linear,TAM_Clamp,0);
+		SamplerStatePtr sampler = GEngine->RenderResManager->CreateSamplerState(SF_Linear,TAM_Clamp,0);
 		PixelFormat pixelFormat = PF_R8G8;
-		RenderTexture2DPtr fontTexture = GEngine->RenderEngine->ResourceManager->CreateRenderTexture2D(sampler,pixelFormat,fontImage);
-		_glyphsTexture = GEngine->RenderEngine->ResourceManager->CreateRenderSurface(fontTexture,RSU_ShaderResource);
+		RenderTexture2DPtr fontTexture = GEngine->RenderResManager->CreateRenderTexture2D(sampler,pixelFormat,fontImage);
+		_glyphsTexture = GEngine->RenderResManager->CreateRenderSurface(fontTexture,RSU_ShaderResource);
 		delete imageData;
 	}
 

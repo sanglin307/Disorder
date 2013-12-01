@@ -7,6 +7,8 @@ namespace Disorder
 {
 	class SceneManager : public Singleton<SceneManager>
 	{	
+		friend class Singleton<SceneManager>;
+
 		typedef boost::unordered_map<std::string,RendererPtr>  RendererMap;
 		typedef boost::unordered_map<std::string,LightPtr> LightMap;
 		typedef boost::unordered_map<std::string,CameraPtr> CameraMap;
@@ -38,7 +40,13 @@ namespace Disorder
 			return _vRenderObjects;
 		}
 
-	private:
+		void SetAmbientColor(Vector3 const& lowerColor,Vector3 const& upperColor);
+		void UpdateShaderProperty();
+		
+
+	protected:
+		static SceneManagerPtr Create();
+		SceneManager(){};
 
 		RendererMap _mRenderObjects;
         LightMap    _mLightObjects;	
@@ -49,8 +57,14 @@ namespace Disorder
 		std::vector<LightPtr> _vNonDirectionalLights;
 		std::vector<RendererPtr> _vRenderObjects;
 
-
 		SceneImporterPtr _sceneImporter;
+
+		Vector3 _vAmbientLowerColor;
+		Vector3 _vAmbientUpperColor;
+
+		ShaderPropertyPtr _sAmbientLowerProperty;
+		ShaderPropertyPtr _sAmbientUpperProperty;
+		ShaderPropertyManagerPtr _propertyManager;
 
 	};
 

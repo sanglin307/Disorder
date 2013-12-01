@@ -55,8 +55,10 @@ namespace Disorder
  
 	class Config : public Singleton<Config>
 	{
+		friend class Singleton<Config>;
+
 	public:
-		Config();
+		
 		~Config();
 
 		bool Load();
@@ -73,7 +75,11 @@ namespace Disorder
 		RenderConfig* pRenderConfig; 
 		CameraConfig* pCameraConfig;
 
+		
+
 	private:
+		static ConfigPtr Create();
+		Config();
 
 		bool LoadRenderConfig();
 		bool LoadCameraConfig();

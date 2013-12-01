@@ -15,6 +15,12 @@ namespace Disorder
 	std::string Config::sResourceFontPath = "";
 
 
+	ConfigPtr Config::Create()
+	{
+		Config *pConfig = new Config;
+		return ConfigPtr(pConfig);
+	}
+
 	Config::Config()
 	{
 		pRenderConfig = new RenderConfig;

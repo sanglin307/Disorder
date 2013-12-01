@@ -7,10 +7,12 @@ namespace Disorder
 	class DX11SamplerState : public SamplerState
 	{
 	public:
-		virtual bool Create(SamplerFilter filter,TextureAddressMode addressUVW,UINT maxAnisotropy = 16);
+		static DX11SamplerStatePtr Create(SamplerFilter filter,TextureAddressMode addressUVW,UINT maxAnisotropy = 16);
 		virtual void* GetLowInterface();
 
+
 	protected:
+		DX11SamplerState(){}
 		ID3D11SamplerStatePtr D3DInterface;
 	};
 
@@ -18,10 +20,12 @@ namespace Disorder
 	{
 	public:
 
-		virtual bool Create(RasterizeDesc *pDesc);
+		static DX11RasterizeStatePtr Create(RasterizeDesc *pDesc);
 		virtual void* GetLowInterface();
 
 	protected:
+		DX11RasterizeState(){}
+
 		ID3D11RasterizerStatePtr D3DInterface;
 
 	};
@@ -29,7 +33,7 @@ namespace Disorder
 	class DX11DepthStencilState : public DepthStencilState
 	{
 	public:
-		virtual bool Create(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef);
+		static DX11DepthStencilStatePtr Create(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef);
 		virtual void* GetLowInterface();
 
 		inline D3D11_COMPARISON_FUNC GetD3DComparisonFunc(ComparisonFunc func)
@@ -87,6 +91,8 @@ namespace Disorder
 		}
 
 	protected:
+		DX11DepthStencilState(){}
+
 		ID3D11DepthStencilStatePtr D3DInterface;
 	};
 
@@ -94,7 +100,7 @@ namespace Disorder
 	class DX11BlendState : public BlendState
 	{
 	public:
-		virtual bool Create(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable = false,bool IndependentBlendEnable = false);
+		static DX11BlendStatePtr Create(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable = false,bool IndependentBlendEnable = false);
 		virtual void* GetLowInterface();
 
 	private:
@@ -166,6 +172,8 @@ namespace Disorder
 		}
 
 	protected:
+		DX11BlendState(){}
+
 		ID3D11BlendStatePtr D3DInterface;
 	};
 }

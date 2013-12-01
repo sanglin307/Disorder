@@ -33,11 +33,7 @@ namespace Disorder
         BlendStatePtr CachedBlendState;
         RasterizeStatePtr CachedRasterizeState;
 		DepthStencilStatePtr CachedDepthStencilState;
-
-
-		RenderResourceManagerPtr ResourceManager;
-		MaterialParameterManagerPtr ParameterManager;
-
+ 
 	protected:
 		virtual void SetBlendState(BlendStatePtr const& blendState) = 0;
 		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState)=0;

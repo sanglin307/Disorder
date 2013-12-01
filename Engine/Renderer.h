@@ -10,8 +10,10 @@ namespace Disorder
 		virtual ~Renderer(){};
 
 		virtual void PreDraw(CameraPtr const& camera){};
-		virtual void Draw(RenderPathType pathType,int pass,CameraPtr const& camera) = 0;
+		virtual void Draw(int pass,CameraPtr const& camera) = 0;
 		virtual void PostDraw(CameraPtr const& camera){};
+
+		virtual unsigned int GetPassNumber() = 0;
 
 		virtual void AddLight(LightPtr & light);
 		virtual void ClearLight();
@@ -31,7 +33,12 @@ namespace Disorder
 		void SetTexture(RenderSurfacePtr const& texture);
 		 
 		void AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord);
-		virtual void Draw(RenderPathType pathType,int pass,CameraPtr const& camera);
+		virtual void Draw(int pass,CameraPtr const& camera);
+
+		virtual unsigned int GetPassNumber()
+		{
+			return 1;
+		}
 
 		unsigned int GetCurrentDrawTriNumber();
 
@@ -48,8 +55,12 @@ namespace Disorder
 	public:
 		BatchLines(std::string const& name);
 		void AddLine(Vector3 const& beginPos,Vector4 const& beginColor,Vector3 const& endPos,Vector4 const& endColor);
-		virtual void Draw(RenderPathType pathType,int pass,CameraPtr const& camera);
+		virtual void Draw(int pass,CameraPtr const& camera);
 
+		virtual unsigned int GetPassNumber()
+		{
+			return 1;
+		}
 	private:
 		std::vector<BatchLineVertex> _vertexs;
 		unsigned int _savedVertexBufferSize;
@@ -59,7 +70,7 @@ namespace Disorder
 	{
 	private:
 		  GeometryPtr _geometryObject;
-	      MaterialPtr _material;
+	      SurfaceMaterialPtr _material;
 
 	private:
 		  void BindRenderResource();
@@ -73,15 +84,37 @@ namespace Disorder
 		  void DrawAxis(CameraPtr const& camera);
 		  void DrawBoundingBox(CameraPtr const& camera);
 
+		  GeometryRenderer(std::string const& name);
+
 	public:
 		 
-		  GeometryRenderer(std::string const& name);
-          void SetGeometry(GeometryPtr const& geometry,MaterialPtr const& mat);
+		  static GeometryRendererPtr Create(std::string const& name);
+
+          void SetGeometry(GeometryPtr const& geometry,SurfaceMaterialPtr const& mat);
 		
+		  virtual unsigned int GetPassNumber()
+		  {
+			  return _material->RenderPass.size();
+		  }
 
 		  virtual void PreDraw(CameraPtr const& camera);
-		  virtual void Draw(RenderPathType pathType,int pass,CameraPtr const& camera);
+		  virtual void Draw(int pass,CameraPtr const& camera);
 		  virtual void PostDraw(CameraPtr const& camera);
+
+	protected:
+		ShaderPropertyManagerPtr _propertyManager;
+
+		// light array
+		ShaderPropertyPtr _LightNumberProperty;
+		ShaderPropertyPtr _LightIntensityPackProperty;
+		ShaderPropertyPtr _LightDirArrayProperty;
+		ShaderPropertyPtr _LightColorArrayProperty;
+ 
+		// for each light
+		ShaderPropertyPtr _LightTypeProperty;
+		ShaderPropertyPtr _LightIntensityProperty;
+		ShaderPropertyPtr _LightPosProperty;
+		ShaderPropertyPtr _LightColorProperty;
 	};
 }
 

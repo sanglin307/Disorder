@@ -10,6 +10,11 @@ namespace Disorder
 		std::string fileName;
 		std::fstream fileHandler;
 		int fileFlag;
+
+	    static FileObjectPtr Create();
+
+	private:
+		FileObject(){}
 	};
 
 	class FileSystem

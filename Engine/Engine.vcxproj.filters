@@ -47,6 +47,9 @@
     <None Include="..\Resource\FX\BatchLines.fx">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\Resource\FX\Common.fx">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrixs.h">
@@ -161,9 +164,6 @@
     <ClInclude Include="RenderEffect.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
-    <ClInclude Include="SceneObjectGenerator.h">
-      <Filter>GameEngine</Filter>
-    </ClInclude>
     <ClInclude Include="Vectors.h">
       <Filter>Mathematics</Filter>
     </ClInclude>
@@ -187,6 +187,12 @@
     </ClInclude>
     <ClInclude Include="VertexFormat.h">
       <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderProperty.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>GameEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -290,9 +296,6 @@
     <ClCompile Include="RenderEffect.cpp">
       <Filter>RenderSystem</Filter>
     </ClCompile>
-    <ClCompile Include="SceneObjectGenerator.cpp">
-      <Filter>GameEngine</Filter>
-    </ClCompile>
     <ClCompile Include="Bounds.cpp">
       <Filter>Mathematics</Filter>
     </ClCompile>
@@ -313,6 +316,12 @@
     </ClCompile>
     <ClCompile Include="Component.cpp">
       <Filter>GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderProperty.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>GameEngine</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

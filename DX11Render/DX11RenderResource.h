@@ -6,15 +6,16 @@ namespace Disorder
 	class DX11RenderBuffer : public RenderBuffer
 	{
 	public:
-		virtual void CreateVertexBuffer(GeometryPtr const& data,std::string const& sematic,unsigned int accessHint,ShaderObjectPtr const& vertexShader);
-		virtual void CreateBuffer(RenderBufferType type,GeometryPtr const& data,unsigned int accessHint,ShaderObjectPtr const& vertexShader);
-		virtual void CreateBuffer(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData);
-		virtual void CreateConstBuffer(unsigned int size, unsigned int accessHint);
-		void GetD3DFlags(D3D11_USAGE& usage, UINT& cpuAccessFlags, UINT& bindFlags, UINT& miscFlags);
+		static DX11RenderBufferPtr Create(RenderBufferType type,GeometryPtr const& data,std::string const& sematic,unsigned int accessHint,ShaderObjectPtr const& vertexShader);
+		static DX11RenderBufferPtr Create(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData);
+
 		virtual void * GetLowInterface();
 		virtual void Resize(unsigned int size);
 
 	private:
+		DX11RenderBuffer(){}
+
+		void GetD3DFlags(D3D11_USAGE& usage, UINT& cpuAccessFlags, UINT& bindFlags, UINT& miscFlags);
 		void DoCreateBuffer(void *pData);
 
 	public:
@@ -25,13 +26,14 @@ namespace Disorder
 	class DX11RenderTexture2D : public RenderTexture2D
 	{
 	public:
-		DX11RenderTexture2D(){};
-		DX11RenderTexture2D(PixelFormat pixelFormat,unsigned int width,unsigned int height,ID3D11Texture2DPtr DXInterface);
-		virtual bool Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,BufferInitData const* pData);
-		virtual bool Create(PixelFormat pixelFormat,ImagePtr const& image);
-	 
-		virtual void * GetLowInterface();
 
+		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,BufferInitData const* pData);
+		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat,ImagePtr const& image);
+	    static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,ID3D11Texture2DPtr DXInterface);
+		virtual void * GetLowInterface();
+	protected:
+		DX11RenderTexture2D(){};
+		 
 	public:
 		ID3D11Texture2DPtr D3DInterface;
 	};

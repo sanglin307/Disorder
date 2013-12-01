@@ -3,17 +3,25 @@
 namespace Disorder
 {
 	/////////////////////////////////////////////////////////////////////////
+	GeometryPtr Geometry::Create(std::string const& name)
+	{
+		Geometry *pGeometry = new Geometry();
+		pGeometry->Name = name;
+		return GeometryPtr(pGeometry);
 
+	}
 
+	Geometry::Geometry()
+	{
 
-
-
+	}
+ 
 	//////////////////////////////////////////////////////////////////////////
 	
 
 	GeometryPtr GeometryGenerator::CreateCube(float length)
 	{
-		GeometryPtr geometry = boost::make_shared<Geometry>();
+		GeometryPtr geometry = Geometry::Create("DefaultCube");
 		geometry->PrimitiveType = TT_TriangleList;
 
         //0

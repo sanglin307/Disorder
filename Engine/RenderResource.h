@@ -14,19 +14,23 @@ namespace Disorder
 	class RenderBuffer :public RenderResource
 	{
 	public:
-		virtual void CreateBuffer(RenderBufferType type,GeometryPtr const& data,unsigned int accessHint,ShaderObjectPtr const& vertexShader) = 0;
-		virtual void CreateBuffer(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData) = 0;
-		virtual void CreateVertexBuffer(GeometryPtr const& data,std::string const& sematic, unsigned int accessHint,ShaderObjectPtr const& vertexShader) = 0;
-		virtual void CreateConstBuffer(unsigned int size, unsigned int accessHint)=0;
+		 
 		unsigned int const& GetElementSize() const
 	    {
 		     return _elementSize;
+		}
+
+		RenderBufferType GetBufferType()
+		{
+			return _type;
 		}
 
 		virtual void Resize(unsigned int size) = 0;
 		virtual void * GetLowInterface(){ return 0;}
 
 	protected:
+		RenderBuffer(){}
+
 		unsigned int _accessHint;
 		unsigned int _bindFlags;
 		unsigned int _elementSize;
@@ -46,16 +50,14 @@ namespace Disorder
 	class RenderTexture2D: public RenderTexture
 	{
 	public:
-		virtual bool Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,BufferInitData const* pData) = 0;
-		virtual bool Create(PixelFormat pixelFormat,ImagePtr const& image) = 0;
-       
-
-	public:
 		UINT Width;
 		UINT Height;
 		PixelFormat Format;
         UINT MipLevel;
 		SamplerStatePtr Sampler;
+	protected:
+
+		RenderTexture2D(){}
 	};
  
 	class RenderTexture3D: public RenderTexture

@@ -30,7 +30,18 @@ namespace Disorder
 		_viewMatrixInvalid = true;
 		_projectMatrixInvalid = true;
 
+		_propertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerCamera);
+		_viewMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraView,eSP_Matrix4);
+		_projMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraProjection,eSP_Matrix4);
+		_positionProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraPosition,eSP_Vector3);
 	 
+	}
+
+	void Camera::UpdateShaderProperty()
+	{
+		_viewMatrixProperty->SetData(ViewMatrix);
+		_projMatrixProperty->SetData(ProjectMatrix);
+		_positionProperty->SetData(_eyePos);
 	}
 
 	void Camera::UpdateViewMatrix()
@@ -54,6 +65,7 @@ namespace Disorder
 							_viewVec.x,         _viewVec.y,	              _viewVec.z,      -_viewVec.Dot(_eyePos),
 							0,                  0,                          0,               1 );
 
+ 
 		_viewMatrixInvalid = false;
 
 	}
@@ -80,6 +92,7 @@ namespace Disorder
 				0,		0,		1,              0 );
 
 		GEngine->RenderEngine->AdjustProjMatrix(ProjectMatrix);
+ 
 
 		_projectMatrixInvalid = false;
 
@@ -95,6 +108,12 @@ namespace Disorder
 
 		UpdateProjectMatrix();
 
+	}
+
+	CameraPtr Camera::Create(std::string const& name)
+	{
+		Camera *pCamera = new Camera(name);
+		return CameraPtr(pCamera);
 	}
 
 	bool Camera::KeyboardEvent(OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds)
@@ -127,6 +146,13 @@ namespace Disorder
 			if( mouseEvent.RelativeX != 0 )
 			{
 				Quaternion q(mouseEvent.RelativeX * _rotateSpeed * deltaSeconds,Vector3::UNIT_Z);
+				_rotation = _rotation * q;
+			    _viewMatrixInvalid = true;
+			}
+
+			if( mouseEvent.RelativeY != 0 )
+			{
+				Quaternion q(mouseEvent.RelativeY * _rotateSpeed * deltaSeconds,Vector3::UNIT_Z);
 				_rotation = _rotation * q;
 			    _viewMatrixInvalid = true;
 			}

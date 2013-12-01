@@ -7,9 +7,7 @@ namespace Disorder
 	class Canvas
 	{
 	public:
-
-		Canvas(unsigned int width,unsigned int height);
-
+ 
 		int GetStringLength(int hsize,std::string const& str);
 		float GetStringLengthNormalize(float hsize,std::string const& str);
 		void DrawString(Vector3 pos, int size, Vector4 const& color,std::string const& str);
@@ -33,7 +31,11 @@ namespace Disorder
 			return _height;
 		}
 
+		static CanvasPtr Create(unsigned int width,unsigned int height);
 	protected:
+
+		Canvas(unsigned int width,unsigned int height);
+
 		BatchScreenTiles _stringElement;
 		BatchScreenTiles _tileElement;
 

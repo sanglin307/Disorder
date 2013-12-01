@@ -1,24 +1,35 @@
-cbuffer Transforms
+cbuffer SceneProperty
 {
-	matrix World;
-	matrix View;
-	matrix Projection;
-	matrix WorldNormal;  // translate for normal.
+	float3 AmbientLowColor;
+	float3 AmbientUpperColor;
 }
 
-cbuffer GobalSetting
+cbuffer CameraTransforms
 {
-	float4 AmbientColor;
-	float4 DiffuseColor;
+	matrix CameraView;
+	matrix CameraProjection;	
+	float3 CameraPosition;
+}
+
+cbuffer ObjectTransform
+{
+	matrix WorldTransform;
+	matrix WorldNormalTransform;  // translate for normal.
+}
+
+cbuffer MaterialProperty
+{
+	float3 AmbientColor;
+	float3 DiffuseColor;
 }
 
 // support max 4 direct lights now
-cbuffer LightSetting
+cbuffer LightProperty
 {
 	int    LightNumber;
 	float4 LightIntensityPack;
-	float3 LightDirArray[4];
-	float3 LightColorArray[4];	
+	float3 LightDirArray;
+	float3 LightColorArray;	
 }
 
 struct VS_INPUT
@@ -45,11 +56,11 @@ struct VS_OUTPUT
 VS_OUTPUT VS( VS_INPUT input )
 {
     VS_OUTPUT output;
-    output.Pos = mul( float4(input.Pos,1.0f),World);
+    output.Pos = mul( float4(input.Pos,1.0f),WorldTransform);
 	output.PosWorld = output.Pos;
-    output.Pos = mul( output.Pos, View );
-    output.Pos = mul( output.Pos, Projection );
-    output.NormWorld = mul(float4(input.Norm,1.0),WorldNormal);
+    output.Pos = mul( output.Pos, CameraView );
+    output.Pos = mul( output.Pos, CameraProjection );
+    output.NormWorld = mul(float4(input.Norm,1.0),WorldNormalTransform);
 	
     return output;
 }
@@ -58,18 +69,33 @@ VS_OUTPUT VS( VS_INPUT input )
 //--------------------------------------------------------------------------------------
 // Pixel Shader
 //--------------------------------------------------------------------------------------
+
+float3 CalculateAmbient(float3 normal, float3 color)
+{
+	// Convert from [-1, 1] to [0, 1]
+	float up = normal.y * 0.5 + 0.5;
+
+	// Calculate the ambient value
+	float3 ambient = AmbientLowColor + up * (AmbientUpperColor - AmbientLowColor);
+
+	// Apply the ambient value to the color
+	return ambient * color;
+}
+
 float4 PS( VS_OUTPUT input ) : SV_Target
 {
 	float4 diffuseColor = (float4)0;
 	float3 normal = normalize(input.NormWorld).xyz;
 
 	// max 4 direct lights add
-	for( int i=0;i<LightNumber;i++)
-	{
-		diffuseColor.xyz += saturate( max(dot(LightDirArray[i],normal),0) * LightColorArray[i] * LightIntensityPack[i]);
-	}
+	//for( int i=0;i<LightNumber;i++)
+	//{
+		diffuseColor.xyz += saturate( max(dot(LightDirArray,normal),0) * LightColorArray * LightIntensityPack.x);
+	//}
 	
+	diffuseColor.xyz += CalculateAmbient(normal,DiffuseColor);
+
 	diffuseColor.a = 1.0f;
 
-    return AmbientColor*DiffuseColor + diffuseColor * DiffuseColor;
+    return diffuseColor; //AmbientColor*DiffuseColor + diffuseColor * DiffuseColor;
 }

@@ -4,6 +4,13 @@ namespace Disorder
 {
 	Vector3 Light::DefaultLightDirection(0.0f,-1.0f,-1.0f);
 
+	LightPtr Light::Create(std::string const& name)
+	{
+		Light *pLight = new Light(name);
+		return LightPtr(pLight);
+
+	}
+
 	Light::Light(std::string const& name)
 		:Component(name,CT_Light)
 	{
@@ -18,7 +25,7 @@ namespace Disorder
 
 		CastShadows = false;
 		ShadowColor = Vector3::ZERO;
-
+ 
 	}
 
 	Vector3 Light::GetDirection()
@@ -31,6 +38,8 @@ namespace Disorder
 		else
 			return Vector3::ZERO;
 	}
+
+	 
 
 	bool Light::Touch(RendererPtr renderObject)
 	{

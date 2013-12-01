@@ -7,15 +7,21 @@ namespace Disorder
 {
 	class FontManager : public Singleton<FontManager>
 	{
+		friend class Singleton<FontManager>;
+
 		typedef boost::unordered_map<std::string,FontPtr> FontMap;
 
 	public:
-		FontManager();
+	
 		~FontManager();
 
 		FontPtr CreateFontFromTrueTypeFile(std::string const& fontName,float fontSize,unsigned int fontResolution);
 
+		
 	protected:
+		static FontManagerPtr Create();
+
+		FontManager();
 		FontMap _fontMap;
 
 

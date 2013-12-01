@@ -87,6 +87,7 @@
     <None Include="..\Resource\FX\BaseLightPass.fx" />
     <None Include="..\Resource\FX\BasePassPhong.fx" />
     <None Include="..\Resource\FX\BatchLines.fx" />
+    <None Include="..\Resource\FX\Common.fx" />
     <None Include="..\Resource\FX\LightPass.fx" />
     <None Include="..\Resource\FX\DiffuseTex.fx" />
     <None Include="..\Resource\FX\LightPassPhong.fx" />
@@ -101,6 +102,7 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="ComPtr.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="Console.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="EngineInclude.h" />
     <ClInclude Include="FileSystem.h" />
@@ -132,7 +134,7 @@
     <ClInclude Include="SceneImporter.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="MathLib.h" />
-    <ClInclude Include="SceneObjectGenerator.h" />
+    <ClInclude Include="ShaderProperty.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="Texture.h" />
@@ -148,6 +150,7 @@
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Config.cpp" />
+    <ClCompile Include="Console.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="EngineInclude.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -182,7 +185,7 @@
     <ClCompile Include="SceneImporter.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="GameTime.cpp" />
-    <ClCompile Include="SceneObjectGenerator.cpp" />
+    <ClCompile Include="ShaderProperty.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Vectors.cpp" />
     <ClCompile Include="Viewport.cpp" />
