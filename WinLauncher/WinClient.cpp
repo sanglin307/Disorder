@@ -43,7 +43,7 @@ namespace Disorder
 		Cls.lpfnWndProc		= StaticWndProc;
 		Cls.hInstance		= GAppInstance;		 
 		Cls.lpszClassName	= winClassName;
-		Cls.hIcon			=(HICON)LoadImage(NULL,L"Icon1.ico",IMAGE_ICON,0,0,LR_LOADFROMFILE);
+		Cls.hIcon			=(HICON)LoadImage(NULL,L"Icon.ico",IMAGE_ICON,0,0,LR_LOADFROMFILE);
 		Cls.hCursor			= ::LoadCursor(NULL, IDC_ARROW);
 		Cls.hbrBackground	= static_cast<HBRUSH>(::GetStockObject(BLACK_BRUSH));
 		Cls.lpszMenuName    = NULL;
