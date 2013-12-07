@@ -4,6 +4,7 @@
 
 namespace Disorder
 {
+
 	class ShaderObject
 	{
 	public:
@@ -25,11 +26,18 @@ namespace Disorder
 		virtual bool LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType) = 0;
 		virtual void ShaderReflection() = 0;
 
+		void SetShaderMacro(std::string const& name,std::string const& value);
+		void RemoveShaderMacro(std::string const& name);
+
+		static std::map<std::string,std::string> sMapIncludeFiles; // key: filename, value: content. 
+
 	protected:
 		std::string _fileName;
 		std::string _entryPoint;
 		ShaderType _type;
 		ShaderModel _shaderModel;
+		std::map<std::string,std::string> _mapShaderMacro;       // key: name, value : definition.
+		
 	};
  
 	class RenderEffect

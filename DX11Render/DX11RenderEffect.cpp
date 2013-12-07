@@ -3,6 +3,7 @@
 
 namespace Disorder
 {
+ 
 	//=============================Shader object=========================================
  
 	void DX11ShaderObject::UpdateShaderParameter()
@@ -146,7 +147,7 @@ namespace Disorder
 	{
 		HRESULT hr = S_OK;
 
-		FileObjectPtr fileptr = GEngine->FileManager->OpenFile(fileName,std::ios::in);
+		FileObjectPtr fileptr = GEngine->FileManager->OpenFile(fileName,"rt");
 		std::string shaderContent = GEngine->FileManager->ReadFile(fileptr);
 
 		DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
@@ -160,7 +161,8 @@ namespace Disorder
 
 	 
 		ID3DBlob* pErrorBlob;
-		hr = D3DCompile(shaderContent.c_str(),shaderContent.size(),"",NULL,NULL,entryPoint.c_str(),shaderModel.c_str(),dwShaderFlags, 0,ppBlobOut, &pErrorBlob);
+		DX11ShaderInclude ShaderInclude;
+		hr = D3DCompile(shaderContent.c_str(),shaderContent.size(),"",NULL,&ShaderInclude,entryPoint.c_str(),shaderModel.c_str(),dwShaderFlags, 0,ppBlobOut, &pErrorBlob);
 	 
 		if( FAILED(hr) )
 		{

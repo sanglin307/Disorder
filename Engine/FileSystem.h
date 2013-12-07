@@ -7,20 +7,23 @@ namespace Disorder
 	class FileObject
 	{
 	public:
-		std::string fileName;
-		std::fstream fileHandler;
-		int fileFlag;
+		std::string FileName;
+		FILE *FileHandler;
+		std::string FileFlag;
 
-	    static FileObjectPtr Create();
+	    static FileObjectPtr Create(std::string const& fileName,std::string const& fileFlag);
+
+		~FileObject();
 
 	private:
 		FileObject(){}
+		
 	};
 
 	class FileSystem
 	{
 	public:
-		virtual FileObjectPtr OpenFile(std::string const& fileName,int flag) = 0;
+		virtual FileObjectPtr OpenFile(std::string const& fileName,std::string const& fileFlag) = 0;
 		virtual void WriteFile(FileObjectPtr const& fileHandler,std::string const& content) = 0;
 		virtual std::string ReadFile(FileObjectPtr const& fileHandler) = 0;
 

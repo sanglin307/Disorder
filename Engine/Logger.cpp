@@ -8,17 +8,14 @@ namespace Disorder
 	void Logger::Init()
 	{
 		_thread =  boost::thread(LoggerRunner());
-		_errorFile = GEngine->FileManager->OpenFile("..\\Log\\Error.log",std::ios::out|std::ios::trunc);
-		_warningFile = GEngine->FileManager->OpenFile("..\\Log\\Warning.log",std::ios::out|std::ios::trunc);
-		_infoFile = GEngine->FileManager->OpenFile("..\\Log\\Info.log",std::ios::out|std::ios::trunc);
+		_errorFile = GEngine->FileManager->OpenFile("..\\Log\\Error.log","wt");
+		_warningFile = GEngine->FileManager->OpenFile("..\\Log\\Warning.log","wt");
+		_infoFile = GEngine->FileManager->OpenFile("..\\Log\\Info.log","wt");
 	}
 
 	void Logger::Exit()
 	{
 		_thread.join();
-		_errorFile->fileHandler.close();
-		_warningFile->fileHandler.close();
-		_infoFile->fileHandler.close();
 	}
 
 	void Logger::Info(std::string const& info)

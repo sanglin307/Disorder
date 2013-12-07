@@ -151,6 +151,48 @@ namespace Disorder
 		DX11ShaderReflection(){}
 	};
 
+	class DX11ShaderInclude : public ID3DInclude
+	{
+	public:
+		STDMETHOD(Open)(THIS_ D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
+		{
+			char* pData = NULL;
+			int length = 0;
+			if( ShaderObject::sMapIncludeFiles.find(pFileName) != ShaderObject::sMapIncludeFiles.end() )
+			{
+				std::string& content = ShaderObject::sMapIncludeFiles[pFileName];
+				length = content.length();
+				pData = new char[length + 1];
+				memcpy(pData,content.c_str(),sizeof(char)*length);
+				pData[length] = '\0';
+			}
+			else
+			{
+				std::string strFilePath = GConfig->sResourceFXPath + std::string(pFileName);
+				FileObjectPtr fileptr = GEngine->FileManager->OpenFile(strFilePath,"rt");
+		        std::string shaderContent = GEngine->FileManager->ReadFile(fileptr);
+				ShaderObject::sMapIncludeFiles.insert(std::pair<std::string,std::string>(pFileName,shaderContent));
+				length = shaderContent.length();
+				pData = new char[shaderContent.length() + 1];
+				memcpy(pData,shaderContent.c_str(),sizeof(char)*length);
+				pData[length] = '\0';
+			}
+ 
+			*ppData = (LPCVOID)(pData);
+			*pBytes = length;
+
+			return S_OK;
+		}
+
+		STDMETHOD(Close)(THIS_ LPCVOID pData)
+		{
+			if( pData )
+				delete (char*)pData;
+
+			return S_OK;
+		}
+	};
+
 	class DX11ShaderObject : public ShaderObject
 	{
 	public:

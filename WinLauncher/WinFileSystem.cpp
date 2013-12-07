@@ -3,11 +3,9 @@
 
 namespace Disorder
 {
-	FileObjectPtr WinFileSystem::OpenFile(std::string const& fileName,int flag)
-	{
-		FileObjectPtr filePtr = FileObject::Create();
-		filePtr->fileName = fileName;
-		filePtr->fileHandler.open(fileName.c_str(),flag);
+	FileObjectPtr WinFileSystem::OpenFile(std::string const& fileName,std::string const& fileFlag)
+	{ 
+		FileObjectPtr filePtr = FileObject::Create(fileName,fileFlag);
 		return filePtr;
 	}
 
@@ -19,14 +17,21 @@ namespace Disorder
 
 	void WinFileSystem::WriteFile(FileObjectPtr const& fileHandler,std::string const& content)
 	{
-		fileHandler->fileHandler << content << std::endl;
+		BOOST_ASSERT(fileHandler != NULL && fileHandler->FileHandler != NULL );
+		fputs(content.c_str(),fileHandler->FileHandler);
 	}
 
 	std::string WinFileSystem::ReadFile(FileObjectPtr const& fileHandler)
 	{
-		std::ostringstream tmp; 
-        tmp << fileHandler->fileHandler.rdbuf(); 
-        std::string content = tmp.str();
-		return content;
+		BOOST_ASSERT(fileHandler != NULL && fileHandler->FileHandler != NULL );
+
+		char buff[65535];
+		std::string result;
+		while(fgets(buff,65535,fileHandler->FileHandler) != NULL )
+		{
+			result += buff;
+		}
+	 
+		return result;
 	}
 }

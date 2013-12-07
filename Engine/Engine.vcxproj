@@ -83,14 +83,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\Resource\FX\2DTiles.fx" />
-    <None Include="..\Resource\FX\BaseLightPass.fx" />
-    <None Include="..\Resource\FX\BasePassPhong.fx" />
-    <None Include="..\Resource\FX\BatchLines.fx" />
-    <None Include="..\Resource\FX\Common.fx" />
-    <None Include="..\Resource\FX\LightPass.fx" />
-    <None Include="..\Resource\FX\DiffuseTex.fx" />
-    <None Include="..\Resource\FX\LightPassPhong.fx" />
+    <None Include="..\Resource\FX\2DTiles.dsf" />
+    <None Include="..\Resource\FX\BaseLightPass.dsf" />
+    <None Include="..\Resource\FX\BasePassPhong.dsf" />
+    <None Include="..\Resource\FX\BatchLines.dsf" />
+    <None Include="..\Resource\FX\Common.dsf" />
+    <None Include="..\Resource\FX\LightPass.dsf" />
+    <None Include="..\Resource\FX\DiffuseTex.dsf" />
+    <None Include="..\Resource\FX\LightPassPhong.dsf" />
     <None Include="TodoList.txt" />
   </ItemGroup>
   <ItemGroup>

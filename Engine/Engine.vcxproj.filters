@@ -25,29 +25,29 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Resource\FX\DiffuseTex.fx">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Resource\FX\BaseLightPass.fx">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Resource\FX\LightPass.fx">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Resource\FX\BasePassPhong.fx">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Resource\FX\LightPassPhong.fx">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="TodoList.txt" />
-    <None Include="..\Resource\FX\2DTiles.fx">
+    <None Include="..\Resource\FX\2DTiles.dsf">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\Resource\FX\BatchLines.fx">
+    <None Include="..\Resource\FX\BaseLightPass.dsf">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\Resource\FX\Common.fx">
+    <None Include="..\Resource\FX\BasePassPhong.dsf">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Resource\FX\BatchLines.dsf">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Resource\FX\Common.dsf">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Resource\FX\DiffuseTex.dsf">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Resource\FX\LightPass.dsf">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Resource\FX\LightPassPhong.dsf">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

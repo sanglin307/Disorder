@@ -1,3 +1,10 @@
+//shader common
+cbuffer SceneProperty
+{
+	float3 AmbientLowColor;
+	float3 AmbientUpperColor;
+}
+
 cbuffer CameraTransforms
 {
 	matrix CameraView;
@@ -7,14 +14,14 @@ cbuffer CameraTransforms
 
 cbuffer ObjectTransform
 {
-	matrix World;
-	matrix WorldNormal;  // translate for normal.
+	matrix WorldTransform;
+	matrix WorldNormalTransform;  // translate for normal.
 }
 
 cbuffer MaterialProperty
 {
-	float4 AmbientColor;
-	float4 DiffuseColor;
+	float3 AmbientColor;
+	float3 DiffuseColor;
 }
 
 // support max 4 direct lights now
@@ -24,4 +31,4 @@ cbuffer LightProperty
 	float4 LightIntensityPack;
 	float3 LightDirArray;
 	float3 LightColorArray;	
-}
+} 
