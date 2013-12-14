@@ -1,9 +1,4 @@
-cbuffer CameraTransforms
-{
-	matrix CameraView;
-	matrix CameraProjection;
-}
- 
+#include "Common.dsf"
 
 //--------------------------------------------------------------------------------------
 // shader input/output structure

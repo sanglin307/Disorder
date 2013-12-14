@@ -69,9 +69,8 @@ namespace Disorder
         static const std::string sManagerMaterial;
         static const std::string sManagerLight;
 		static const std::string sManagerScene;
-        static const std::string sManagerGlobal;
+        static const std::string sManagerGlobal; // used to save global constant buffer,sampler,texture
 		
-
         // for CameraTransforms
         static const std::string sCameraView;
         static const std::string sCameraProjection;
@@ -89,7 +88,6 @@ namespace Disorder
 		static const std::string sReflectionColor;
 		static const std::string sShininess;
 
-
         // LightProperty
         static const std::string sLightNumber;
         static const std::string sLightIntensityPack;
@@ -100,15 +98,20 @@ namespace Disorder
 		static const std::string sAmbientLowColor;
 		static const std::string sAmbientUpperColor;
 
+		//for global property
+		static const std::string sTileTexture;
+		static const std::string sTileSampler;
 
 	public:
 		std::string Name;
-      
-		static ShaderPropertyManagerPtr Create(std::string name);
-
+ 
+		virtual void UpdateShaderProperty() = 0;
+		 
 		ShaderPropertyPtr GetProperty(std::string const& name);
 		ShaderPropertyPtr CreateProperty(std::string const& name,EShaderProperty type);
-	private:
+
+		virtual void DumpContent();
+	protected:
 		ShaderPropertyManager(std::string name):Name(name){}
 		ShaderPropertyMap _shaderPropertyMap;
        

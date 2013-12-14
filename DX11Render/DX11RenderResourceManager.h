@@ -23,6 +23,7 @@ namespace Disorder
 		virtual DepthStencilStatePtr CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef);
 		virtual BlendStatePtr CreateBlendState(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable = false,bool IndependentBlendEnable = false);
 
+		virtual void RegisterPropertyManager(std::string const& name);
 		static DX11RenderResourceManagerPtr Create();
 
 	private:

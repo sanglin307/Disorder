@@ -113,5 +113,12 @@ namespace Disorder
 		return blendState;
 	}
 
-	
+	void DX11RenderResourceManager::RegisterPropertyManager(std::string const& name)
+	{
+		if( _propertyManagerMap.find(name) != _propertyManagerMap.end() )
+			return;
+
+		ShaderPropertyManagerPtr manger = DX11ShaderPropertyManager::Create(name);
+		_propertyManagerMap.insert(std::pair<std::string,ShaderPropertyManagerPtr>(name,manger));
+	}
 }

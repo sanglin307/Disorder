@@ -34,4 +34,9 @@ namespace Disorder
 	 
 		return result;
 	}
+
+	void WinFileSystem::Flush(FileObjectPtr const& fileHandler)
+	{
+		fflush(fileHandler->FileHandler);
+	}
 }

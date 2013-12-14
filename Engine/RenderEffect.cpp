@@ -1,4 +1,5 @@
 #include "EngineInclude.h"
+#include "Logger.h"
 
 namespace Disorder
 {
@@ -13,6 +14,11 @@ namespace Disorder
 	{
 		if( _mapShaderMacro.find(name) != _mapShaderMacro.end() )
 			_mapShaderMacro.erase(name);
+	}
+
+	void ShaderObject::DumpContent()
+	{
+		GLogger->Info("Shader Object :" + GetShaderName() );
 	}
 
 	void RenderEffect::UpdateShaderParameter()

@@ -31,6 +31,8 @@ namespace Disorder
 
 		static std::map<std::string,std::string> sMapIncludeFiles; // key: filename, value: content. 
 
+		virtual void DumpContent();
+
 	protected:
 		std::string _fileName;
 		std::string _entryPoint;

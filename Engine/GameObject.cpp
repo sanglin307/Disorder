@@ -34,6 +34,7 @@ namespace Disorder
 	{
 		_worldMatrixProperty->SetData(_worldMatrix);
 		_worldNormalMatrixProperty->SetData(_worldMatrix.GetNormalMatrix());
+		_propertyManager->UpdateShaderProperty();
 	}
 
 	 ComponentPtr GameObject::GetComponent(std::string const& name) const

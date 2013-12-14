@@ -23,13 +23,12 @@ namespace Disorder
 	void BatchScreenTiles::SetTexture(RenderSurfacePtr const& texture)
 	{
 		_texture = texture;
-		
-		ShaderObjectPtr pixelShader = _renderEffect->GetPixelShader();
+ 
 	    ShaderPropertyManagerPtr globalProperty = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
-		ShaderPropertyPtr texProperty = globalProperty->CreateProperty("DiffuseTexture",eSP_ShaderResource);
+		ShaderPropertyPtr texProperty = globalProperty->CreateProperty(ShaderPropertyManager::sTileTexture,eSP_ShaderResource);
 	    texProperty->SetData(_texture);
 	 
-		ShaderPropertyPtr Sampler = globalProperty->CreateProperty("LinearSampler",eSP_SampleState);
+		ShaderPropertyPtr Sampler = globalProperty->CreateProperty(ShaderPropertyManager::sTileSampler,eSP_SampleState);
 		Sampler->SetData(texture->Tex2DResource->Sampler);
  
 	}
@@ -208,12 +207,12 @@ namespace Disorder
 	GeometryRenderer::GeometryRenderer(std::string const& name)
 		:Renderer(name)
 	{
-		_propertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerLight);
+		_LightPropertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerLight);
 
-		_LightNumberProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sLightNumber,eSP_Int);
-		_LightIntensityPackProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sLightIntensityPack,eSP_Vector4);
-		_LightDirArrayProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sLightDirArray,eSP_Vector3);
-		_LightColorArrayProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sLightColorArray,eSP_Vector3);
+		_LightNumberProperty = _LightPropertyManager->CreateProperty(ShaderPropertyManager::sLightNumber,eSP_Int);
+		_LightIntensityPackProperty = _LightPropertyManager->CreateProperty(ShaderPropertyManager::sLightIntensityPack,eSP_Vector4);
+		_LightDirArrayProperty = _LightPropertyManager->CreateProperty(ShaderPropertyManager::sLightDirArray,eSP_Vector3);
+		_LightColorArrayProperty = _LightPropertyManager->CreateProperty(ShaderPropertyManager::sLightColorArray,eSP_Vector3);
 	}
 
 	void GeometryRenderer::BindRenderResource()
@@ -381,6 +380,7 @@ namespace Disorder
 		_LightIntensityPackProperty->SetData(intensityVec);
 		_LightDirArrayProperty->SetData(dirVec);
 		_LightColorArrayProperty->SetData(colorVec);
+		_LightPropertyManager->UpdateShaderProperty();
 	}
 
 	void GeometryRenderer::SetDynamicLightPass(LightPtr const& light)

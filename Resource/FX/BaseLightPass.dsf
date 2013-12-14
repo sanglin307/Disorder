@@ -1,9 +1,5 @@
 #include "Common.dsf"
 
-//
-
-
-
 struct VS_INPUT
 {
     float3 Pos  : POSITION;

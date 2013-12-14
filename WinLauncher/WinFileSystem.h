@@ -12,6 +12,7 @@ namespace Disorder
 		virtual FileObjectPtr OpenFile(std::string const& fileName,std::string const& fileFlag);
 		virtual void WriteFile(FileObjectPtr const& fileHandler,std::string const& content);
 		virtual std::string ReadFile(FileObjectPtr const& fileHandler);
+		virtual void Flush(FileObjectPtr const& fileHandler);
 
 		static WinFileSystemPtr Create();
 

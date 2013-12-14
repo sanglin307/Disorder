@@ -102,7 +102,7 @@ namespace Disorder
 		  virtual void PostDraw(CameraPtr const& camera);
 
 	protected:
-		ShaderPropertyManagerPtr _propertyManager;
+		ShaderPropertyManagerPtr _LightPropertyManager;
 
 		// light array
 		ShaderPropertyPtr _LightNumberProperty;

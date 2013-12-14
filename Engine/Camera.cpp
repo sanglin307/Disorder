@@ -42,6 +42,7 @@ namespace Disorder
 		_viewMatrixProperty->SetData(ViewMatrix);
 		_projMatrixProperty->SetData(ProjectMatrix);
 		_positionProperty->SetData(_eyePos);
+		_propertyManager->UpdateShaderProperty();
 	}
 
 	void Camera::UpdateViewMatrix()

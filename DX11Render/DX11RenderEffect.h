@@ -243,6 +243,23 @@ namespace Disorder
 			return "";
 		};
 	};
+
+	class DX11ShaderPropertyManager : public ShaderPropertyManager
+	{
+	public:
+		~DX11ShaderPropertyManager();
+		virtual void UpdateShaderProperty();
+		bool Validate(ConstantBufferDesc *pConstBuffer);
+		static DX11ShaderPropertyManagerPtr Create(std::string name);
+
+		ConstantBufferDesc* ConstantBuffer;
+
+	protected:
+		DX11ShaderPropertyManager(std::string name);
+		
+
+		
+	};
  
 }
 

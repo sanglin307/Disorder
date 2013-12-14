@@ -30,6 +30,7 @@ namespace Disorder
 	{
 		_sAmbientLowerProperty->SetData(_vAmbientLowerColor);
 		_sAmbientUpperProperty->SetData(_vAmbientUpperColor);
+		_propertyManager->UpdateShaderProperty();
 	}
 
 	void SceneManager::CreateDefaultCamera()

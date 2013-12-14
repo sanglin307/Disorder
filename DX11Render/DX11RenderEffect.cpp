@@ -11,78 +11,23 @@ namespace Disorder
 		CachedShaderResourceView.clear();
 		CachedConstBuffer.clear();
 		CachedSamplerState.clear();
-
-		if(ShaderReflect->ConstantBuffers.size())
+ 
+		for(unsigned  int i=0;i<ShaderReflect->ResourceBindings.size();++i)
 		{
-			RenderEnginePtr renderEngine = GEngine->RenderEngine;
-			 
-			for(unsigned int i=0;i<ShaderReflect->ConstantBuffers.size();i++)
+			ShaderPropertyPtr res = ShaderReflect->ResourceBindings[i].ParamRef;
+			if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_CBUFFER )
 			{
-				ShaderPropertyPtr cbuff = ShaderReflect->ConstantBuffers[i].BufferParamRef;
-				if( cbuff == NULL || cbuff->GetDataAsConstBuffer() == NULL)
+				if( res == NULL || res->GetDataAsConstBuffer() == NULL)
 				{
 					std::stringstream stream;
 					stream << "vertex shader's constant buffer is null "<< GetShaderName() <<"," << ShaderReflect->ConstantBuffers[i].CBName;
 					GLogger->Error(stream.str());
 					continue;
 				}
-				CachedConstBuffer.push_back((ID3D11Buffer*)(cbuff->GetDataAsConstBuffer()->GetLowInterface()));
-
-				BYTE* pData = new BYTE[ShaderReflect->ConstantBuffers[i].CBSize];
-				BYTE* pDest = pData;
-				for(unsigned int j=0;j<ShaderReflect->ConstantBuffers[i].Parameters.size();j++)
-				{
-					ShaderVariableDesc vaDesc = ShaderReflect->ConstantBuffers[i].Variables[j];
-					ShaderTypeDesc taDesc = ShaderReflect->ConstantBuffers[i].Types[j];
-					pDest = pData + ShaderReflect->ConstantBuffers[i].Variables[j].StartOffset;
-				
-					if( ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_SCALAR && ShaderReflect->ConstantBuffers[i].Types[j].Type == D3D_SVT_INT)
-					{
-						void *pSrc = ShaderReflect->ConstantBuffers[i].Parameters[j]->GetData();					
-						memcpy(pDest,pSrc,sizeof(int));
-					}
-					else if(ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_SCALAR && ShaderReflect->ConstantBuffers[i].Types[j].Type == D3D_SVT_FLOAT)
-					{
-						void *pSrc = ShaderReflect->ConstantBuffers[i].Parameters[j]->GetData();
-						memcpy(pDest,pSrc,sizeof(float));
-					}
-
-					if(ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_VECTOR)
-					{
-						BYTE *pSrc = (BYTE*)(ShaderReflect->ConstantBuffers[i].Parameters[j]->GetData());
-						if( ShaderReflect->ConstantBuffers[i].Types[j].Columns == 3 ) // 128bit pack
-						{
-							//for( int n = 0;n<elementNumber;n++)
-							//{
-								memcpy(pDest,pSrc,sizeof(Vector3));
-								//pDest += sizeof(Vector4);
-								//pSrc += sizeof(Vector3);
-							//}
-						}
-						else if( ShaderReflect->ConstantBuffers[i].Types[j].Columns == 4 )
-						{
-							memcpy(pDest,pSrc,sizeof(Vector4));
-						}
-					}
-					if(ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_MATRIX_ROWS ||
-					   ShaderReflect->ConstantBuffers[i].Types[j].Class == D3D_SVC_MATRIX_COLUMNS)
-					{
-						void *pSrc = ShaderReflect->ConstantBuffers[i].Parameters[j]->GetData();
-						memcpy(pDest,pSrc,sizeof(Matrix4));
-					}
-				}
-				
-				renderEngine->UpdateSubresource(ShaderReflect->ConstantBuffers[i].BufferParamRef->GetDataAsConstBuffer(),pData,ShaderReflect->ConstantBuffers[i].CBSize);
-				delete pData;
-
+				CachedConstBuffer.push_back((ID3D11Buffer*)(res->GetDataAsConstBuffer()->GetLowInterface()));
 			}
-		}
-
-		for(unsigned  int i=0;i<ShaderReflect->ResourceBindings.size();++i)
-		{
-			if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_TEXTURE )
-			{
-				ShaderPropertyPtr res = ShaderReflect->ResourceBindings[i].ParamRef;
+			else if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_TEXTURE )
+			{			
 				if( res == NULL || res->GetDataAsShaderResource() == NULL)
 				{
 					std::stringstream stream;
@@ -92,10 +37,8 @@ namespace Disorder
 				}
 				CachedShaderResourceView.push_back((ID3D11ShaderResourceView*)(res->GetDataAsShaderResource()->GetLowInterface(RSU_ShaderResource)));
 			}
-
-			if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_SAMPLER )
+			else if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_SAMPLER )
 			{
-				ShaderPropertyPtr res = ShaderReflect->ResourceBindings[i].ParamRef;
 				if( res == NULL || res->GetDataAsSampler() == NULL)
 				{
 					std::stringstream stream;
@@ -276,7 +219,8 @@ namespace Disorder
 			pReflector->GetOutputParameterDesc( i, &output_desc );
 			pReflection->OutputSignatureParameters.push_back( ShaderSignatureDesc(output_desc) );
 		}
- 
+  
+		ShaderPropertyManagerPtr GlobalPropertyManager = resourceManager->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 	    //constant buffer information 
 		for ( UINT i = 0; i < desc.ConstantBuffers; i++ )
 		{
@@ -293,10 +237,17 @@ namespace Disorder
 				constantBuffer.CBType = bufferDesc.Type;
 				constantBuffer.CBuFlags = bufferDesc.uFlags;
 				constantBuffer.CBVariables = bufferDesc.Variables;
-                ShaderPropertyManagerPtr propertyManager = resourceManager->GetPropertyManager(constantBuffer.CBName);
+				DX11ShaderPropertyManagerPtr propertyManager = boost::dynamic_pointer_cast<DX11ShaderPropertyManager>(resourceManager->GetPropertyManager(constantBuffer.CBName));		 
 				BOOST_ASSERT(propertyManager->Name != ShaderPropertyManager::sManagerGlobal);
-				constantBuffer.BufferParamRef = propertyManager->CreateProperty(constantBuffer.CBName,eSP_ConstBuffer);
-			 
+
+				constantBuffer.BufferParamRef = GlobalPropertyManager->GetProperty(constantBuffer.CBName);
+				if( constantBuffer.BufferParamRef == NULL )
+				{
+					RenderBufferPtr constBuffer = resourceManager->CreateRenderBuffer(RBT_Constant,BAH_GPU_Read,bufferDesc.Size,bufferDesc.Size,NULL);
+					constantBuffer.BufferParamRef = GlobalPropertyManager->CreateProperty(constantBuffer.CBName,eSP_ConstBuffer); 
+					constantBuffer.BufferParamRef->SetData(constBuffer);
+				}
+
 				// Load the description of each variable for use later on when binding a buffer
 				for ( UINT j = 0; j < bufferDesc.Variables; j++ )
 				{
@@ -365,16 +316,20 @@ namespace Disorder
 					 
 				}
 				
-				RenderBufferPtr constBuffer = resourceManager->CreateRenderBuffer(RBT_Constant,BAH_GPU_Read,bufferDesc.Size,bufferDesc.Size,NULL);
-				constantBuffer.BufferParamRef->SetData(constBuffer);
-				 
+				bool result = propertyManager->Validate(&constantBuffer);
+				if( !result )
+				{
+					std::ostringstream error;
+					error << "Const buffer : " << constantBuffer.CBName << " have multi-defination ! in file : " <<  _fileName;
+					GLogger->Error(error.str());
+					return;
+				}
 
-				pReflection->ConstantBuffers.push_back( constantBuffer );
+				pReflection->ConstantBuffers.push_back( *propertyManager->ConstantBuffer );
 			}
 		}
-
-
-		 ShaderPropertyManagerPtr GlobalPropertyManager = resourceManager->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+ 
+		
 		// Get the overall resource binding information for this shader.
 		for ( UINT i = 0; i < desc.BoundResources; i++ )
 		{
@@ -406,13 +361,134 @@ namespace Disorder
 
 			pReflection->ResourceBindings.push_back( binddesc );
 		}
-
-
 		// Release the shader reflection interface
 		pReflector->Release();
 
 		ShaderReflect = pReflection;
 		return;
+	}
+
+	void DX11ShaderPropertyManager::UpdateShaderProperty()
+	{
+		BYTE* pData = new BYTE[ConstantBuffer->CBSize];
+		BYTE* pDest = pData;
+		for(unsigned int j=0;j<ConstantBuffer->Parameters.size();j++)
+		{
+			ShaderVariableDesc &vaDesc = ConstantBuffer->Variables[j];
+			ShaderTypeDesc &taDesc = ConstantBuffer->Types[j];
+			ShaderPropertyPtr &paDesc =  ConstantBuffer->Parameters[j];
+			pDest = pData + vaDesc.StartOffset;
+				
+			if( taDesc.Class == D3D_SVC_SCALAR && taDesc.Type == D3D_SVT_INT)
+			{
+				void *pSrc = paDesc->GetData();					
+				memcpy(pDest,pSrc,sizeof(int));
+			}
+			else if(taDesc.Class == D3D_SVC_SCALAR && taDesc.Type == D3D_SVT_FLOAT)
+			{
+				void *pSrc = paDesc->GetData();
+				memcpy(pDest,pSrc,sizeof(float));
+			}
+
+			if(taDesc.Class == D3D_SVC_VECTOR)
+			{
+				BYTE *pSrc = (BYTE*)(paDesc->GetData());
+				if( taDesc.Columns == 3 ) // 128bit pack
+				{
+					//for( int n = 0;n<elementNumber;n++)
+					//{
+						memcpy(pDest,pSrc,sizeof(Vector3));
+						//pDest += sizeof(Vector4);
+						//pSrc += sizeof(Vector3);
+					//}
+				}
+				else if( taDesc.Columns == 4 )
+				{
+					memcpy(pDest,pSrc,sizeof(Vector4));
+				}
+			}
+			if(taDesc.Class == D3D_SVC_MATRIX_ROWS ||
+				taDesc.Class == D3D_SVC_MATRIX_COLUMNS)
+			{
+				void *pSrc = paDesc->GetData();
+				memcpy(pDest,pSrc,sizeof(Matrix4));
+			}
+		}
+				
+		GEngine->RenderEngine->UpdateSubresource(ConstantBuffer->BufferParamRef->GetDataAsConstBuffer(),pData,ConstantBuffer->CBSize);
+		delete pData;
+	}
+
+	DX11ShaderPropertyManager::DX11ShaderPropertyManager(std::string name)
+		:ShaderPropertyManager(name)
+	{
+		ConstantBuffer = NULL;
+	}
+
+	DX11ShaderPropertyManager::~DX11ShaderPropertyManager()
+	{
+		if( ConstantBuffer )
+			delete ConstantBuffer;
+		ConstantBuffer = NULL;
+	}
+
+	DX11ShaderPropertyManagerPtr DX11ShaderPropertyManager::Create(std::string name)
+	{
+		DX11ShaderPropertyManager *pManager = new DX11ShaderPropertyManager(name);
+		return DX11ShaderPropertyManagerPtr(pManager);
+	}
+
+	bool DX11ShaderPropertyManager::Validate(ConstantBufferDesc *pConstBuffer)
+	{
+		BOOST_ASSERT(pConstBuffer != NULL);
+
+		if( ConstantBuffer == NULL )
+		{
+			ConstantBuffer = new ConstantBufferDesc;
+			ConstantBuffer->CBName = pConstBuffer->CBName;
+			ConstantBuffer->CBSize = pConstBuffer->CBSize;
+			ConstantBuffer->CBType = pConstBuffer->CBType;
+			ConstantBuffer->CBuFlags = pConstBuffer->CBuFlags;
+			ConstantBuffer->CBVariables = pConstBuffer->CBVariables;
+			ConstantBuffer->BufferParamRef = pConstBuffer->BufferParamRef;
+			ConstantBuffer->Parameters.assign(pConstBuffer->Parameters.begin(),pConstBuffer->Parameters.end());
+			ConstantBuffer->Types.assign(pConstBuffer->Types.begin(),pConstBuffer->Types.end());
+			ConstantBuffer->Variables.assign(pConstBuffer->Variables.begin(),pConstBuffer->Variables.end());
+			return true;
+		}
+		else
+		{
+			if(ConstantBuffer->CBName != pConstBuffer->CBName )
+				return false;
+			if(ConstantBuffer->CBSize != pConstBuffer->CBSize )
+				return false;
+			if( ConstantBuffer->CBType != pConstBuffer->CBType )
+				return false;
+			if( ConstantBuffer->CBVariables != pConstBuffer->CBVariables )
+				return false;
+
+			if( ConstantBuffer->Variables.size() != pConstBuffer->Variables.size() )
+				return false;
+
+			for(size_t i=0;i<pConstBuffer->Variables.size();i++)
+			{
+				bool found = false;
+				for( size_t j=0;j<ConstantBuffer->Variables.size();j++)
+				{
+					if( pConstBuffer->Variables[i].Name == ConstantBuffer->Variables[j].Name &&
+						pConstBuffer->Variables[i].Size == ConstantBuffer->Variables[j].Size )
+					{
+						found = true;
+						break;
+					}
+				}
+
+				if( !found )
+					return false;
+			}
+
+			return true;
+		}
 	}
  
 }

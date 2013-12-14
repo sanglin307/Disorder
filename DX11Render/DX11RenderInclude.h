@@ -46,6 +46,8 @@ namespace Disorder
 	typedef boost::shared_ptr<DX11ShaderReflection> DX11ShaderReflectionPtr;
 	class DX11RenderEffect;
 	typedef boost::shared_ptr<DX11RenderEffect> DX11RenderEffectPtr;
+	class DX11ShaderPropertyManager;
+	typedef boost::shared_ptr<DX11ShaderPropertyManager> DX11ShaderPropertyManagerPtr;
 
 	typedef boost::shared_ptr<IDXGIFactory> IDXGIFactoryPtr;
 	typedef boost::shared_ptr<IDXGIAdapter> IDXGIAdapterPtr;

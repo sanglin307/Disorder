@@ -18,6 +18,7 @@ namespace Disorder
 		AmbientColorProperty->SetData(AmbientColor); 
 		DiffuseColorProperty->SetData(DiffuseColor);
 		EmissiveColorProperty->SetData(EmissiveColor);
+		_propertyManager->UpdateShaderProperty();
 	}
 
 	SurfaceLambert::SurfaceLambert(std::string const& name)

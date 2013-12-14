@@ -1,4 +1,5 @@
 #include "EngineInclude.h"
+#include "Logger.h"
 
 namespace Disorder
 {
@@ -254,6 +255,10 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sAmbientLowColor = "AmbientLowColor";
 	const std::string ShaderPropertyManager::sAmbientUpperColor = "AmbientUpperColor";
 
+	// Global 
+	const std::string ShaderPropertyManager::sTileTexture = "TileTexture";
+    const std::string ShaderPropertyManager::sTileSampler = "TileSampler";
+
 	ShaderPropertyPtr ShaderPropertyManager::GetProperty(std::string const& name)
 	{
 		if( _shaderPropertyMap.find(name) != _shaderPropertyMap.end() )
@@ -274,10 +279,15 @@ namespace Disorder
 		return shaderProperty;
 	}
 
-	ShaderPropertyManagerPtr ShaderPropertyManager::Create(std::string name)
+	void ShaderPropertyManager::DumpContent()
 	{
-		ShaderPropertyManager *pManager = new ShaderPropertyManager(name);
-		return ShaderPropertyManagerPtr(pManager);
+		GLogger->Info("Shader Property Manager Name :" + Name);
+		ShaderPropertyMap::const_iterator iter = _shaderPropertyMap.begin();
+		while( iter != _shaderPropertyMap.end() )
+		{
+			GLogger->Info(" ****** Shader Property :" + iter->first);
+			++iter;
+		}
 	}
-
+ 
 }

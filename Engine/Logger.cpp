@@ -7,10 +7,10 @@ namespace Disorder
 
 	void Logger::Init()
 	{
-		_thread =  boost::thread(LoggerRunner());
 		_errorFile = GEngine->FileManager->OpenFile("..\\Log\\Error.log","wt");
 		_warningFile = GEngine->FileManager->OpenFile("..\\Log\\Warning.log","wt");
 		_infoFile = GEngine->FileManager->OpenFile("..\\Log\\Info.log","wt");
+		_thread =  boost::thread(LoggerRunner());
 	}
 
 	void Logger::Exit()
@@ -37,7 +37,8 @@ namespace Disorder
 	{
 		boost::mutex::scoped_lock lock(_warningMutex);
 		LogObj log;
-		strncpy_s(log.content,warning.c_str(),Min<unsigned int>(warning.size() , LogObj::StringMaxLengh));
+		unsigned int length = Min<unsigned int>(warning.size() , LogObj::StringMaxLengh);
+		strncpy_s(log.content,warning.c_str(),length);
 		_warningCache.push_back(log);
 	}
 
@@ -57,27 +58,33 @@ namespace Disorder
 		while(iter != _errorCache.end())
 		{
 			GEngine->FileManager->WriteFile(_errorFile,iter->content);
+			GEngine->FileManager->WriteFile(_errorFile,"\n");
 			iter++;
 		}
 		_errorCache.clear();
+		GEngine->FileManager->Flush(_errorFile);
 
 		boost::mutex::scoped_lock warninglock(_warningMutex);
 		iter = _warningCache.begin();
 		while(iter != _warningCache.end())
 		{
 			GEngine->FileManager->WriteFile(_warningFile,iter->content);
+			GEngine->FileManager->WriteFile(_warningFile,"\n");
 			iter++;
 		}
 		_warningCache.clear();
+		GEngine->FileManager->Flush(_warningFile);
 
 		boost::mutex::scoped_lock infolock(_infoMutex);
 		iter = _infoCache.begin();
 		while(iter != _infoCache.end())
 		{
 			GEngine->FileManager->WriteFile(_infoFile,iter->content);
+			GEngine->FileManager->WriteFile(_infoFile,"\n");
 			iter++;
 		}
 		_infoCache.clear();
+		GEngine->FileManager->Flush(_infoFile);
 
 	}
 

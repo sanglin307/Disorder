@@ -31,6 +31,7 @@ namespace Disorder
 
  		 level->AddGameObject(go);
 
+		 GEngine->RenderResManager->DumpContent();
 	 }
 
 	 void World::Exit()

@@ -26,9 +26,10 @@ namespace Disorder
 		virtual DepthStencilStatePtr CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef) = 0;
 		virtual BlendStatePtr CreateBlendState(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable = false,bool IndependentBlendEnable = false) = 0;
 
-		void RegisterPropertyManager(std::string const& name);
+		virtual void RegisterPropertyManager(std::string const& name) = 0;
 		ShaderPropertyManagerPtr GetPropertyManager(std::string const& name);
 
+		void DumpContent();
 	public:
 		static RasterizeStatePtr DefaultRasterizeState;
 		static BlendStatePtr DefaultBlentState;

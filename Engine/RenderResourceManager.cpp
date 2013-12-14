@@ -25,21 +25,29 @@ namespace Disorder
 		RegisterPropertyManager(ShaderPropertyManager::sManagerScene);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerGlobal);
 	}
-
-	void RenderResourceManager::RegisterPropertyManager(std::string const& name)
-	{
-		if( _propertyManagerMap.find(name) != _propertyManagerMap.end() )
-			return;
-
-		ShaderPropertyManagerPtr manger = ShaderPropertyManager::Create(name);
-		_propertyManagerMap.insert(std::pair<std::string,ShaderPropertyManagerPtr>(name,manger));
-	}
-
+ 
 	ShaderPropertyManagerPtr RenderResourceManager::GetPropertyManager(std::string const& name)
 	{
 		if( _propertyManagerMap.find(name) != _propertyManagerMap.end() )
 			return _propertyManagerMap.at(name);
 
 		return _propertyManagerMap.at(ShaderPropertyManager::sManagerGlobal);
+	}
+
+	void RenderResourceManager::DumpContent()
+	{
+		ShaderMap::const_iterator shaderIter = _shaderMap.begin();
+		while (shaderIter != _shaderMap.end() )
+		{
+			shaderIter->second->DumpContent();
+			++shaderIter;
+		}
+
+		ShaderPropertyManagerMap::const_iterator iter = _propertyManagerMap.begin();
+		while (iter != _propertyManagerMap.end() )
+		{
+			iter->second->DumpContent();
+			++iter;
+		}
 	}
 }
