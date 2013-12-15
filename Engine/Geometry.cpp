@@ -15,6 +15,14 @@ namespace Disorder
 	{
 
 	}
+
+	void Geometry::CalculateBounding()
+	{
+		if( ControllPositions.size() == 0 )
+			return;
+
+		BoundingBox = BoxSphereBounds(ControllPositions.data(),ControllPositions.size());
+	}
  
 	//////////////////////////////////////////////////////////////////////////
 	

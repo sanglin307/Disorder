@@ -43,6 +43,7 @@ namespace Disorder
 		_projMatrixProperty->SetData(ProjectMatrix);
 		_positionProperty->SetData(_eyePos);
 		_propertyManager->UpdateShaderProperty();
+
 	}
 
 	void Camera::UpdateViewMatrix()
@@ -67,6 +68,7 @@ namespace Disorder
 							0,                  0,                          0,               1 );
 
  
+		CameraFrustrum.Construct(ViewMatrix,ProjectMatrix);
 		_viewMatrixInvalid = false;
 
 	}
@@ -94,7 +96,7 @@ namespace Disorder
 
 		GEngine->RenderEngine->AdjustProjMatrix(ProjectMatrix);
  
-
+		CameraFrustrum.Construct(ViewMatrix,ProjectMatrix);
 		_projectMatrixInvalid = false;
 
 	}

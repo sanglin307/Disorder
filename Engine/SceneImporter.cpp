@@ -298,7 +298,7 @@ namespace Disorder
 		}
  
 		// calculate bounding box
-		geometry->BoundingBox = BoxSphereBounds(geometry->ControllPositions.data(),geometry->ControllPositions.size());
+		geometry->CalculateBounding();
 
 		unsigned int vertexId = 0;
 		for (int i = 0; i < lPolygonCount; i++)

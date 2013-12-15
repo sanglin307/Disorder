@@ -20,6 +20,8 @@ namespace Disorder
 
 		TopologyType PrimitiveType;
 
+		void CalculateBounding();
+
 		static GeometryPtr Create(std::string const& name);
 
 	private:

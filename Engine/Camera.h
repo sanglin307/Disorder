@@ -18,6 +18,7 @@ namespace Disorder
 
 		Matrix4 ViewMatrix;
 		Matrix4 ProjectMatrix;
+		Frustrum CameraFrustrum;
 
 		void DrawAxis();
 
@@ -31,6 +32,8 @@ namespace Disorder
 		void Update(float delta);
 		void UpdateViewMatrix();
 		void UpdateProjectMatrix();
+
+		
 
 		float _moveSpeed;
 		float _rotateSpeed;

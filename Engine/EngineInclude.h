@@ -168,6 +168,7 @@ namespace Disorder
 #include "Plane.h"
 #include "Matrixs.h"
 #include "Bounds.h"
+#include "Frustrum.h"
 #include "FileSystem.h"
 #include "MainLoop.h"
 #include "InputManager.h"

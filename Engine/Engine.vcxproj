@@ -83,6 +83,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="..\Config\CameraConfig.xml" />
+    <None Include="..\Config\RenderConfig.xml" />
     <None Include="..\Resource\FX\2DTiles.dsf" />
     <None Include="..\Resource\FX\BaseLightPass.dsf" />
     <None Include="..\Resource\FX\BasePassPhong.dsf" />
@@ -108,6 +110,7 @@
     <ClInclude Include="FileSystem.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FontManager.h" />
+    <ClInclude Include="Frustrum.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="Image.h" />
@@ -159,6 +162,7 @@
     <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FontManager.cpp" />
+    <ClCompile Include="Frustrum.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Geometry.cpp" />

@@ -23,6 +23,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Config">
+      <UniqueIdentifier>{4d13d33c-ec17-465b-a46f-30f8be891dc0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="TodoList.txt" />
@@ -49,6 +52,12 @@
     </None>
     <None Include="..\Resource\FX\LightPassPhong.dsf">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Config\CameraConfig.xml">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\Config\RenderConfig.xml">
+      <Filter>Config</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -194,6 +203,9 @@
     <ClInclude Include="Console.h">
       <Filter>GameEngine</Filter>
     </ClInclude>
+    <ClInclude Include="Frustrum.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -322,6 +334,9 @@
     </ClCompile>
     <ClCompile Include="Console.cpp">
       <Filter>GameEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Frustrum.cpp">
+      <Filter>Mathematics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

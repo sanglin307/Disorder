@@ -4,7 +4,7 @@
   <FarClip>1000</FarClip>
   <FOV>60</FOV>
   <FreeMode>
-    <MoveSpeed>10</MoveSpeed>
-    <RotateSpeed>4</RotateSpeed>
+    <MoveSpeed>4</MoveSpeed>
+    <RotateSpeed>1</RotateSpeed>
   </FreeMode>
 </CameraConfig>
