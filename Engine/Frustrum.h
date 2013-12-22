@@ -20,6 +20,11 @@ namespace Disorder
 		Frustrum();
 		void Construct(const Matrix4& viewMatrix,const Matrix4& projMatrix);
 
+		bool Overlaps(BoxBounds const& bounds) const;
+		bool Overlaps(SphereBounds const& bounds) const;
+
+		bool Inside(SphereBounds const& bounds) const;
+		bool Inside(BoxBounds const& bounds) const;
 		void Draw();
 	private:
 		Plane _Planes[6];

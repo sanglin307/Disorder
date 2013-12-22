@@ -51,7 +51,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FBXSDK_NEW_API;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>EngineInclude.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Zm120 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Zm140 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -85,7 +85,7 @@
   <ItemGroup>
     <None Include="..\Config\CameraConfig.xml" />
     <None Include="..\Config\RenderConfig.xml" />
-    <None Include="..\Resource\FX\2DTiles.dsf" />
+    <None Include="..\Resource\FX\2DFont.dsf" />
     <None Include="..\Resource\FX\BaseLightPass.dsf" />
     <None Include="..\Resource\FX\BasePassPhong.dsf" />
     <None Include="..\Resource\FX\BatchLines.dsf" />
@@ -93,6 +93,7 @@
     <None Include="..\Resource\FX\LightPass.dsf" />
     <None Include="..\Resource\FX\DiffuseTex.dsf" />
     <None Include="..\Resource\FX\LightPassPhong.dsf" />
+    <None Include="..\Resource\FX\ScreenTiles.dsf" />
     <None Include="TodoList.txt" />
   </ItemGroup>
   <ItemGroup>

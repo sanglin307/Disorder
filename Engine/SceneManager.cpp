@@ -20,6 +20,19 @@ namespace Disorder
 	{
 	}
 
+	void SceneManager::GetRendererList(CameraPtr const camera,std::vector<RendererPtr>& renderObjList) const
+	{
+		if( _vRenderObjects.size() == 0 )
+			return;
+
+		renderObjList.reserve(_vRenderObjects.size());
+		for(size_t i=0;i<_vRenderObjects.size();i++)
+		{
+			if(_vRenderObjects[i]->Overlaps(camera->CameraFrustrum))
+				renderObjList.push_back(_vRenderObjects[i]);
+		}
+	}
+
 	SceneManagerPtr SceneManager::Create()
 	{
 		SceneManager *pManager = new SceneManager;

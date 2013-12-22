@@ -79,6 +79,7 @@ namespace Disorder
 		//Create InputManager
 		_inputManager = InputManager::Create((unsigned int)windows);
 
+	 
 	}
 
 
@@ -185,8 +186,8 @@ namespace Disorder
 			}
 			break;
 
-		case WM_ERASEBKGND:
-			return 1;
+	/*	case WM_ERASEBKGND:
+			return 1;*/
 
 		case WM_PAINT:
 			(*viewportIter)->Draw();

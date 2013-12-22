@@ -49,7 +49,7 @@ namespace Disorder
             NEGATIVE_SIDE,
             BOTH_SIDE
         };
-
+		 
         Side GetSide (const Vector3& rkPoint) const;
 
         /**
@@ -68,6 +68,8 @@ namespace Disorder
             and BOTH_SIDE if the box intersects the plane.
         */
         Side GetSide (const Vector3& centre, const Vector3& halfSize) const;
+
+		Side GetSide (const Vector3& centre, float fRadius) const;
 
         /** This is a pseudodistance. The sign of the return value is
             positive if the point is on the positive side of the plane,

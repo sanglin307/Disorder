@@ -1,6 +1,8 @@
 #ifndef _DISORDER_VECTOR_H_
 #define _DISORDER_VECTOR_H_
  
+ 
+
 namespace Disorder
 {
     class  Vector2

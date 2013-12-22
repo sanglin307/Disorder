@@ -66,6 +66,18 @@ namespace Disorder
         return GetSide(box.GetCenter(), box.GetExtent());
 	}
     //-----------------------------------------------------------------------
+	Plane::Side Plane::GetSide (const Vector3& centre, float fRadius) const
+	{
+		 float dist = GetDistance(centre);
+		 if( dist >= fRadius )
+			 return Plane::POSITIVE_SIDE;
+
+		 if( dist <= 0-fRadius )
+			 return Plane::NEGATIVE_SIDE;
+
+		 return Plane::BOTH_SIDE;
+	}
+
     Plane::Side Plane::GetSide (const Vector3& centre, const Vector3& halfSize) const
     {
         // Calculate the distance between box centre and the plane

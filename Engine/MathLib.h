@@ -3,6 +3,7 @@
 
 namespace Disorder
 {
+	class Vector3;
 
 	template< class T > inline T Abs( const T A )
 	{
@@ -52,7 +53,7 @@ namespace Disorder
             @note 0 and 1 are powers of two, so 
                 firstPO2From(0)==0 and firstPO2From(1)==1.
         */
-        static inline unsigned int firstPO2From(unsigned int n)
+        static inline unsigned int FirstPO2From(unsigned int n)
         {
             --n;            
             n |= n >> 16;
@@ -68,7 +69,7 @@ namespace Disorder
             @note 0 and 1 are tread as power of two.
         */
         template<typename T>
-        static inline bool isPO2(T n)
+        static inline bool IsPO2(T n)
         {
             return (n & (n-1)) == 0;
         }
@@ -136,6 +137,9 @@ namespace Disorder
 			return float(rand()) / (float)RAND_MAX;
 		}
  
+		static  void ConvertToSphericalCoord(const Vector3& pos,const Vector3& origin,float &radius,float &yAngle,float &zAngle);	
+		static  void ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const Vector3& origin,Vector3& pos);
+		
 
 		static const float Math::POS_INFINITY;
         static const float Math::NEG_INFINITY;

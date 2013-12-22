@@ -13,6 +13,11 @@ namespace Disorder
 		virtual void Draw(int pass,CameraPtr const& camera) = 0;
 		virtual void PostDraw(CameraPtr const& camera){};
 
+		virtual bool Overlaps(const Frustrum& frustrum)
+		{
+			return true;
+		}
+
 		virtual unsigned int GetPassNumber() = 0;
 
 		virtual void AddLight(LightPtr & light);
@@ -24,11 +29,11 @@ namespace Disorder
 		std::vector<LightPtr> _vLightArray;
 	};
  
-	class BatchScreenTiles : public Renderer
+	class BatchScreenString : public Renderer
 	{
 	   
 	public:
-		BatchScreenTiles(std::string const& name);
+		BatchScreenString(std::string const& name);
 
 		void SetTexture(RenderSurfacePtr const& texture);
 		 
@@ -43,6 +48,34 @@ namespace Disorder
 		unsigned int GetCurrentDrawTriNumber();
 
 	protected:
+		std::vector<BatchTileVertex> _vertexs;
+		std::vector<WORD> _indexs;
+		unsigned int _savedVertexBufferSize;
+		unsigned int _savedIndexBufferSize;
+		RenderSurfacePtr _texture;
+	};
+
+	class BatchScreenTiles : public Renderer
+	{
+	   
+	public:
+		
+		static BatchScreenTilesPtr Create(std::string const& name);
+
+		void SetTexture(RenderSurfacePtr const& texture);
+		 
+		void AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord);
+		virtual void Draw(int pass,CameraPtr const& camera);
+
+		virtual unsigned int GetPassNumber()
+		{
+			return 1;
+		}
+
+		unsigned int GetCurrentDrawTriNumber();
+
+	protected:
+		BatchScreenTiles(std::string const& name);
 		std::vector<BatchTileVertex> _vertexs;
 		std::vector<WORD> _indexs;
 		unsigned int _savedVertexBufferSize;
@@ -97,6 +130,8 @@ namespace Disorder
 			  return _material->RenderPass.size();
 		  }
 
+		  virtual bool Overlaps(const Frustrum& frustrum);
+		 
 		  virtual void PreDraw(CameraPtr const& camera);
 		  virtual void Draw(int pass,CameraPtr const& camera);
 		  virtual void PostDraw(CameraPtr const& camera);

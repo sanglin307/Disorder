@@ -1,5 +1,5 @@
 #include "DX11RenderInclude.h"
-#include "../Engine/Logger.h"
+ 
 
 namespace Disorder
 {
@@ -54,7 +54,7 @@ namespace Disorder
 	 {
 		 BOOST_ASSERT(_vDXGIAdapter.size() > 0);
 		 UINT DeviceCreationFlags = D3D11_CREATE_DEVICE_SINGLETHREADED;
-		 D3D_DRIVER_TYPE DriverType = D3D_DRIVER_TYPE_UNKNOWN;//D3D_DRIVER_TYPE_HARDWARE;
+		 D3D_DRIVER_TYPE DriverType = D3D_DRIVER_TYPE_UNKNOWN;
  
 	 #ifdef _DEBUG
 		 DeviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;

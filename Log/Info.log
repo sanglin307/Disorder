@@ -1,18 +1,18 @@
 FBX file format version for file MiniGun_CameraLight.fbx is 7,3,0
-Shader Object :BaseLightPass:PS
 Shader Object :BaseLightPass:VS
 Shader Object :BatchLines:PS
 Shader Object :BatchLines:VS
-Shader Object :2DTiles:PS
-Shader Object :2DTiles:VS
+Shader Object :2DFont:PS
+Shader Object :BaseLightPass:PS
+Shader Object :2DFont:VS
 Shader Property Manager Name :Global
  ****** Shader Property :LightProperty
  ****** Shader Property :MaterialProperty
  ****** Shader Property :SceneProperty
- ****** Shader Property :ObjectTransform
  ****** Shader Property :CameraTransforms
- ****** Shader Property :TileTexture
- ****** Shader Property :TileSampler
+ ****** Shader Property :FontTexture
+ ****** Shader Property :ObjectTransform
+ ****** Shader Property :FontSampler
 Shader Property Manager Name :SceneProperty
  ****** Shader Property :AmbientUpperColor
  ****** Shader Property :AmbientLowColor

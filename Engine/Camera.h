@@ -4,8 +4,80 @@
 
 namespace Disorder
 {
+	enum ECameraUpdateStrategy
+	{
+		eFirstPersonMode,
+		eSphericalTargetMode,
+	};
+
+	class CameraUpdateStrategy
+	{
+	public:
+
+		virtual bool KeyboardEvent(Camera *pCamera ,OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds)
+		{
+			return true;
+		}
+
+		virtual bool MouseEvent(Camera *pCamera,MouseInputEvent const& mouseEvent,float deltaSeconds)
+		{
+			return true;
+		}
+
+		virtual bool Update(Camera *pCamera, float deltaSeconds)
+		{
+			return true;
+		}
+
+		virtual void SetTarget(Camera *pCamera,const Vector3& target)
+		{
+			return;
+		}
+
+	protected:
+		CameraUpdateStrategy(){};
+ 
+
+	};
+
+	class CameraFirstPersonUpdate : public CameraUpdateStrategy
+	{
+	public:
+		virtual bool KeyboardEvent(Camera *pCamera,OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds);
+		virtual bool MouseEvent(Camera *pCamera,MouseInputEvent const& mouseEvent,float deltaSeconds);
+		virtual bool Update(Camera *pCamera, float deltaSeconds);
+		 
+		static CameraFirstPersonUpdatePtr Create();
+	protected:
+		CameraFirstPersonUpdate(){};
+
+	};
+
+	class CameraSphereTargetUpdate : public CameraUpdateStrategy
+	{
+	public:
+		virtual bool KeyboardEvent(Camera *pCamera,OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds);
+		virtual bool MouseEvent(Camera *pCamera,MouseInputEvent const& mouseEvent,float deltaSeconds);
+		virtual bool Update(Camera *pCamera, float deltaSeconds);
+		 
+		static CameraSphereTargetUpdatePtr Create(float fRadius,const Vector3& target);
+		
+		virtual void SetTarget(Camera *pCamera,const Vector3& target);
+
+	protected:
+		CameraSphereTargetUpdate(float radius,const Vector3& target)
+			:_radius(radius),_target(target)
+		{};
+
+		float _radius;
+		Vector3 _target;
+	};
+
 	class Camera : public InputListener,public Component
 	{
+		friend class CameraUpdateStrategy;
+		friend class CameraSphereTargetUpdate;
+		friend class CameraFirstPersonUpdate;
 	public:
  
 		void LookAt(Vector3 const& eyePos,Vector3 const& lookAt,Vector3 const& upVec);
@@ -20,6 +92,7 @@ namespace Disorder
 		Matrix4 ProjectMatrix;
 		Frustrum CameraFrustrum;
 
+		void SetUpdateStrategy(ECameraUpdateStrategy mode);
 		void DrawAxis();
 
 		void UpdateShaderProperty();
@@ -28,6 +101,8 @@ namespace Disorder
 	private:
 
 		Camera(std::string const& name);
+
+		void LookAt_(Vector3 const& eyePos,Vector3 const& lookAt,Vector3 const& upVec);
 
 		void Update(float delta);
 		void UpdateViewMatrix();
@@ -53,6 +128,9 @@ namespace Disorder
 
 		bool _viewMatrixInvalid;
 		bool _projectMatrixInvalid;
+
+		ECameraUpdateStrategy _updateMode;
+		CameraUpdateStrategyPtr _updateStrategy;
 
 		ShaderPropertyManagerPtr _propertyManager;
 		ShaderPropertyPtr _viewMatrixProperty;

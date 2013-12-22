@@ -61,10 +61,13 @@ namespace Disorder
 		mouseEvent.AbsoluteY = s.Y.abs;
 		mouseEvent.RelativeX = s.X.rel;
 		mouseEvent.RelativeY = s.Y.rel;
+		mouseEvent.AbsoluteZ = s.Z.abs;
+		mouseEvent.RelativeZ = s.Z.rel;
+
 		mouseEvent.buttons = s.buttons;
 
 		GEngine->GameClient->AddMouseEvent(mouseEvent);
-
+ 
 		return true;
 	}
 
@@ -81,6 +84,8 @@ namespace Disorder
 		mouseEvent.AbsoluteY = s.Y.abs;
 		mouseEvent.RelativeX = s.X.rel;
 		mouseEvent.RelativeY = s.Y.rel;
+		mouseEvent.AbsoluteZ = s.Z.abs;
+		mouseEvent.RelativeZ = s.Z.rel;
 		mouseEvent.buttons = s.buttons;
 
 		GEngine->GameClient->AddMouseEvent(mouseEvent);
@@ -101,6 +106,8 @@ namespace Disorder
 		mouseEvent.AbsoluteY = s.Y.abs;
 		mouseEvent.RelativeX = s.X.rel;
 		mouseEvent.RelativeY = s.Y.rel;
+		mouseEvent.AbsoluteZ = s.Z.abs;
+		mouseEvent.RelativeZ = s.Z.rel;
 		mouseEvent.buttons = s.buttons;
 
 		GEngine->GameClient->AddMouseEvent(mouseEvent);
@@ -117,7 +124,14 @@ namespace Disorder
 
 	InputManager::InputManager(unsigned int hWnd)
 	{
-		_oisInputManager = OIS::InputManager::createInputSystem(hWnd);
+		std::multimap<std::string,std::string> paramList;
+		//paramList.insert(std::pair<std::string,std::string>("w32_mouse","DISCL_FOREGROUND"));
+		//paramList.insert(std::pair<std::string,std::string>("w32_mouse", "DISCL_NONEXCLUSIVE"));
+		std::stringstream stream;
+		stream << hWnd;
+		paramList.insert(std::pair<std::string,std::string>("WINDOW",stream.str()));
+
+		_oisInputManager = OIS::InputManager::createInputSystem(paramList);
 		_oisInputManager->enableAddOnFactory(OIS::InputManager::AddOn_All);
 
 		_eventHandler = InputEventHandler::Create();

@@ -30,6 +30,8 @@ namespace Disorder
 		int AbsoluteY;
 		int RelativeX;
 		int RelativeY;
+		int AbsoluteZ;
+		int RelativeZ;
 
 		//! Button down test
 		inline bool buttonDown( OIS::MouseButtonID button ) const

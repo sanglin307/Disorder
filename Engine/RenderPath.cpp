@@ -23,7 +23,8 @@ namespace Disorder
 		GSceneManager->UpdateShaderProperty();
 		mainCamera->UpdateShaderProperty();
 
-		std::vector<RendererPtr> rendererList = GSceneManager->GetRendererList(mainCamera);
+		std::vector<RendererPtr> rendererList;
+		GSceneManager->GetRendererList(mainCamera,rendererList);
 		for(unsigned int i=0;i< rendererList.size(); i++ )
 		{
 			RendererPtr obj = rendererList[i];

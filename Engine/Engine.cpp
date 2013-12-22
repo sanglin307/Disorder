@@ -1,5 +1,5 @@
 #include "EngineInclude.h"
-#include "Logger.h"
+ 
 
 namespace Disorder
 {
@@ -73,7 +73,7 @@ namespace Disorder
 		strstream << "Drawed triangle num:" << GDrawTriNumber;
 		std::string drawstr = strstream.str();
 		int length = canvas->GetStringLength(_iDrawSize,drawstr);
-		canvas->DrawString(Vector3(canvas->GetWidth() - length - 5.f ,10.f,0.f),_iDrawSize,color,drawstr);
+		canvas->DrawString(Vector2(canvas->GetWidth() - length - 5.f ,10.f),_iDrawSize,color,drawstr);
    }
 
    EnginePtr Engine::Create()
@@ -96,7 +96,7 @@ namespace Disorder
 	   CanvasPtr canvas = GEngine->GameCanvas;
 	   float x = 10.f;
 	   float y = 10.f;
-	   Vector4 color(1.0f);
+	   Vector4 color(1.0f,0,0,1.0f);
 
 	   static int fps = (int)(1/deltaSeconds);
 	   if( timeDelta > 1 )
@@ -108,7 +108,7 @@ namespace Disorder
 
 	    std::stringstream strstream;
 		strstream << "Fps:" << fps;
-		canvas->DrawString(Vector3(x,y,0.f),_iDrawSize,color,strstream.str());
+		canvas->DrawString(Vector2(x,y),_iDrawSize,color,strstream.str());
 		strstream.clear();
 
    }

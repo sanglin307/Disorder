@@ -1,5 +1,5 @@
 #include "EngineInclude.h"
-#include "Logger.h"
+ 
 
 namespace Disorder
 {
@@ -256,8 +256,11 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sAmbientUpperColor = "AmbientUpperColor";
 
 	// Global 
-	const std::string ShaderPropertyManager::sTileTexture = "TileTexture";
-    const std::string ShaderPropertyManager::sTileSampler = "TileSampler";
+	const std::string ShaderPropertyManager::sFontTexture = "FontTexture";
+    const std::string ShaderPropertyManager::sFontSampler = "FontSampler";
+
+	const std::string ShaderPropertyManager::sScreenTileTexture = "ScreenTileTexture";
+	const std::string ShaderPropertyManager::sScreenTileSampler = "ScreenTileSampler";
 
 	ShaderPropertyPtr ShaderPropertyManager::GetProperty(std::string const& name)
 	{

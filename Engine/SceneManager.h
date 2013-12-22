@@ -35,10 +35,7 @@ namespace Disorder
 		void SetDefaultCamera(CameraPtr const& camera);
 
 		void UpdateLight();
-		const std::vector<RendererPtr>& GetRendererList(CameraPtr const camera) const
-		{
-			return _vRenderObjects;
-		}
+		void GetRendererList(CameraPtr const camera,std::vector<RendererPtr>& renderObjList) const;
 
 		void SetAmbientColor(Vector3 const& lowerColor,Vector3 const& upperColor);
 		void UpdateShaderProperty();

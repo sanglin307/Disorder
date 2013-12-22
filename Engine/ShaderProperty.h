@@ -99,8 +99,10 @@ namespace Disorder
 		static const std::string sAmbientUpperColor;
 
 		//for global property
-		static const std::string sTileTexture;
-		static const std::string sTileSampler;
+		static const std::string sFontTexture;
+		static const std::string sFontSampler;
+		static const std::string sScreenTileTexture;
+	    static const std::string sScreenTileSampler;
 
 	public:
 		std::string Name;

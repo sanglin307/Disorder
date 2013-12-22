@@ -20,15 +20,142 @@ namespace Disorder
 
 //////////////////////////////////////////////////////////////////////////
 
+	void BatchScreenString::SetTexture(RenderSurfacePtr const& texture)
+	{
+		_texture = texture;
+ 
+	    ShaderPropertyManagerPtr globalProperty = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderPropertyPtr texProperty = globalProperty->CreateProperty(ShaderPropertyManager::sFontTexture,eSP_ShaderResource);
+	    texProperty->SetData(_texture);
+	 
+		ShaderPropertyPtr Sampler = globalProperty->CreateProperty(ShaderPropertyManager::sFontSampler,eSP_SampleState);
+		Sampler->SetData(texture->Tex2DResource->Sampler);
+ 
+	}
+
+	void BatchScreenString::Draw(int pass,CameraPtr const& camera)
+	{
+		BOOST_ASSERT(_vertexs.size()%4==0);
+
+		if( _vertexs.size() == 0 )
+			return;
+ 
+		RenderEnginePtr renderEngine = GEngine->RenderEngine;
+
+
+		const RenderBufferPtr & vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
+		void* vertexBuffer = renderEngine->Map(vertexRenderBuffer,BA_Write_Only);
+		memcpy(vertexBuffer,_vertexs.data(),_vertexs.size()*sizeof(BatchTileVertex));
+		renderEngine->UnMap(vertexRenderBuffer);
+
+		const RenderBufferPtr & indexRenderBuffer = _renderLayout->GetIndexBuffer();
+		void* indexBuffer = renderEngine->Map(indexRenderBuffer,BA_Write_Only);
+		memcpy(indexBuffer,_indexs.data(),_indexs.size()*sizeof(WORD));
+		renderEngine->UnMap(indexRenderBuffer);
+
+		renderEngine->SetRenderLayout(_renderLayout);
+	
+		renderEngine->SetEffect(_renderEffect);
+		renderEngine->DrawIndexed(_indexs.size(),0,0);
+
+		_indexs.clear();
+		_vertexs.clear();
+	}
+
+	unsigned int BatchScreenString::GetCurrentDrawTriNumber()
+	{
+		return _indexs.size() /3;
+	}
+
+	void BatchScreenString::AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord)
+	{
+		if( _vertexs.size() >= _savedVertexBufferSize )
+		{
+			_savedVertexBufferSize *= 2;
+			const RenderBufferPtr & vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
+			vertexRenderBuffer->Resize(sizeof(BatchTileVertex) * _savedVertexBufferSize);
+		}
+
+		if( _indexs.size() >= _savedIndexBufferSize )
+		{
+			_savedIndexBufferSize *= 2;
+			const RenderBufferPtr & indexRenderBuffer = _renderLayout->GetIndexBuffer();
+			indexRenderBuffer->Resize(sizeof(WORD) * _savedIndexBufferSize);
+		}
+
+	
+
+		BatchTileVertex vertex;
+		vertex.position = position;
+		vertex.color = color;
+		vertex.texcoord = texcoord;
+
+		_vertexs.push_back(vertex);
+		
+		if(_vertexs.size() % 4 == 0 )
+		{
+			WORD index = _vertexs.size() - 4;
+			_indexs.push_back(index);
+			_indexs.push_back(index+1);
+			_indexs.push_back(index+2);
+			_indexs.push_back(index+2);
+			_indexs.push_back(index+1);
+			_indexs.push_back(index+3);
+		}
+ 
+	}
+
+	BatchScreenString::BatchScreenString(std::string const& name)
+		:Renderer(name)
+	{
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
+		_renderEffect = RenderEffect::Create(); 
+		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"2DFont",SM_4_0,"VS");
+		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"2DFont",SM_4_0,"PS");
+	    
+		_renderEffect->BindShader(vertexShader);
+		_renderEffect->BindShader(pixelShader);
+ 
+		BlendDesc blendDesc;
+		blendDesc.BlendEnable = true;
+		blendDesc.SrcBlend = BLEND_SRC_ALPHA;
+		blendDesc.DestBlend = BLEND_INV_SRC_ALPHA;
+		blendDesc.BlendOp = BLEND_OP_ADD;
+		 
+		BlendStatePtr blendState = resourceManager->CreateBlendState(&blendDesc,1);
+		_renderEffect->BindBlendState(blendState);
+
+	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList,true);
+	 
+		_savedVertexBufferSize = 2048;
+		_savedIndexBufferSize = (UINT)(_savedVertexBufferSize * 1.5f);
+ 
+		RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,BAH_GPU_Read | BAH_CPU_Write,sizeof(BatchTileVertex),sizeof(BatchTileVertex)*_savedVertexBufferSize,NULL);
+		_renderLayout->BindVertexBuffer(vertexBuffer);
+
+		//Index buffer
+		RenderBufferPtr indexBuffer = resourceManager->CreateRenderBuffer(RBT_Index,BAH_GPU_Read | BAH_CPU_Write,sizeof(WORD),sizeof(WORD)*_savedIndexBufferSize,NULL);
+		_renderLayout->BindIndexBuffer(indexBuffer);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////
+
+	BatchScreenTilesPtr BatchScreenTiles::Create(std::string const& name)
+	{
+		BatchScreenTiles *pTiles = new BatchScreenTiles(name);
+		return BatchScreenTilesPtr(pTiles);
+	}
+
 	void BatchScreenTiles::SetTexture(RenderSurfacePtr const& texture)
 	{
 		_texture = texture;
  
 	    ShaderPropertyManagerPtr globalProperty = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
-		ShaderPropertyPtr texProperty = globalProperty->CreateProperty(ShaderPropertyManager::sTileTexture,eSP_ShaderResource);
+		ShaderPropertyPtr texProperty = globalProperty->CreateProperty(ShaderPropertyManager::sScreenTileTexture,eSP_ShaderResource);
 	    texProperty->SetData(_texture);
 	 
-		ShaderPropertyPtr Sampler = globalProperty->CreateProperty(ShaderPropertyManager::sTileSampler,eSP_SampleState);
+		ShaderPropertyPtr Sampler = globalProperty->CreateProperty(ShaderPropertyManager::sScreenTileSampler,eSP_SampleState);
 		Sampler->SetData(texture->Tex2DResource->Sampler);
  
 	}
@@ -110,8 +237,8 @@ namespace Disorder
 	{
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
 		_renderEffect = RenderEffect::Create(); 
-		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"2DTiles",SM_4_0,"VS");
-		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"2DTiles",SM_4_0,"PS");
+		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"ScreenTiles",SM_4_0,"VS");
+		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"ScreenTiles",SM_4_0,"PS");
 	    
 		_renderEffect->BindShader(vertexShader);
 		_renderEffect->BindShader(pixelShader);
@@ -127,7 +254,7 @@ namespace Disorder
 
 	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList,true);
 	 
-		_savedVertexBufferSize = 2048;
+		_savedVertexBufferSize = 16;
 		_savedIndexBufferSize = (UINT)(_savedVertexBufferSize * 1.5f);
  
 		RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,BAH_GPU_Read | BAH_CPU_Write,sizeof(BatchTileVertex),sizeof(BatchTileVertex)*_savedVertexBufferSize,NULL);
@@ -138,8 +265,7 @@ namespace Disorder
 		_renderLayout->BindIndexBuffer(indexBuffer);
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-	
+	/////////////////////////////////////////////////////////////////////////
 	BatchLines::BatchLines(std::string const& name)
 		:Renderer(name)
 	{
@@ -213,6 +339,11 @@ namespace Disorder
 		_LightIntensityPackProperty = _LightPropertyManager->CreateProperty(ShaderPropertyManager::sLightIntensityPack,eSP_Vector4);
 		_LightDirArrayProperty = _LightPropertyManager->CreateProperty(ShaderPropertyManager::sLightDirArray,eSP_Vector3);
 		_LightColorArrayProperty = _LightPropertyManager->CreateProperty(ShaderPropertyManager::sLightColorArray,eSP_Vector3);
+	}
+
+	bool GeometryRenderer::Overlaps(const Frustrum& frustrum)
+	{
+		return frustrum.Overlaps( _geometryObject->BoundingBox.GetBox());
 	}
 
 	void GeometryRenderer::BindRenderResource()
@@ -339,9 +470,9 @@ namespace Disorder
 		 yAxis = ProjectViewMatrix * yAxis;
 		 zAxis = ProjectViewMatrix * zAxis;
 
-		 GEngine->GameCanvas->DrawStringDeviceSpace(xAxis,35,Vector4(1.0f,0,0,1.0f),std::string("X"));
-		 GEngine->GameCanvas->DrawStringDeviceSpace(yAxis,35,Vector4(0,1.0f,0,1.0f),std::string("Y"));
-		 GEngine->GameCanvas->DrawStringDeviceSpace(zAxis,35,Vector4(0,0,1.0f,1.0f),std::string("Z"));
+		 GEngine->GameCanvas->DrawStringDeviceSpace(Vector2(xAxis.x,xAxis.y),35,Vector4(1.0f,0,0,1.0f),std::string("X"));
+		 GEngine->GameCanvas->DrawStringDeviceSpace(Vector2(yAxis.x,yAxis.y),35,Vector4(0,1.0f,0,1.0f),std::string("Y"));
+		 GEngine->GameCanvas->DrawStringDeviceSpace(Vector2(zAxis.x,zAxis.y),35,Vector4(0,0,1.0f,1.0f),std::string("Z"));
 
 	  }
 

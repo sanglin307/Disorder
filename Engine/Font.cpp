@@ -62,7 +62,7 @@ namespace Disorder
 		// just in case the size might chop a glyph in half, add another glyph width/height
 		tex_side += std::max(max_width, (max_height>>6));
 		// Now round up to nearest power of two
-		UINT roundUpSize = Math::firstPO2From(tex_side);
+		UINT roundUpSize = Math::FirstPO2From(tex_side);
 
 		// Would we benefit from using a non-square texture (2X width(
 		size_t finalWidth, finalHeight;

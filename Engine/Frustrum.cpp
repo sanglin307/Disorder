@@ -8,6 +8,55 @@ namespace Disorder
 		memset(_Points,0,8*sizeof(Vector3));
 	}
 
+	bool Frustrum::Overlaps(BoxBounds const& bounds) const
+	{
+		for(int i=0;i<6;i++)
+		{
+			Plane::Side side = _Planes[i].GetSide(bounds);
+			if( side == Plane::NO_SIDE || side == Plane::NEGATIVE_SIDE )
+				return false;
+		}
+
+		return true;
+	}
+
+	bool Frustrum::Overlaps(SphereBounds const& bounds) const
+	{
+		for(int i=0;i<6;i++)
+		{
+			Plane::Side side = _Planes[i].GetSide(bounds.Origin,bounds.Radius);
+			if( side == Plane::NO_SIDE || side == Plane::NEGATIVE_SIDE )
+				return false;
+		}
+
+		return true;
+	}
+
+
+	bool Frustrum::Inside(SphereBounds const& bounds) const
+	{
+		for(int i=0;i<6;i++)
+		{
+			Plane::Side side = _Planes[i].GetSide(bounds.Origin,bounds.Radius);
+			if( side != Plane::POSITIVE_SIDE )
+				return false;
+		}
+
+		return true;
+	}
+
+	bool Frustrum::Inside(BoxBounds const& bounds) const
+	{
+		for(int i=0;i<6;i++)
+		{
+			Plane::Side side = _Planes[i].GetSide(bounds);
+			if( side != Plane::POSITIVE_SIDE )
+				return false;
+		}
+
+		return true;
+	}
+
 	void Frustrum::Construct(const Matrix4& viewMatrix,const Matrix4& projMatrix)
 	{
 		//near
@@ -79,13 +128,6 @@ namespace Disorder
 		GEngine->GameCanvas->DrawLine(_Points[2],color,_Points[6],color);
 		GEngine->GameCanvas->DrawLine(_Points[3],color,_Points[7],color);
 
-	/*	color = Vector4(0,1.0f,0,1.f);
-		GEngine->GameCanvas->DrawLine(_Points[0],Vector4::ONE,_Points[0] + _Planes[PS_Near].Normal,Vector4::ONE);
-		GEngine->GameCanvas->DrawLine(_Points[4],color,_Points[4] + _Planes[PS_Far].Normal,color);
-		GEngine->GameCanvas->DrawLine(_Points[7],color,_Points[7] + _Planes[PS_Left].Normal,color);
-		GEngine->GameCanvas->DrawLine(_Points[2],color,_Points[2] + _Planes[PS_Right].Normal,color);
-		GEngine->GameCanvas->DrawLine(_Points[1],color,_Points[1] + _Planes[PS_Top].Normal,color);
-		GEngine->GameCanvas->DrawLine(_Points[3],color,_Points[3] + _Planes[PS_Bottom].Normal,color);*/
 	}
 
 }

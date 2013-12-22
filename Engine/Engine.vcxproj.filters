@@ -29,9 +29,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="TodoList.txt" />
-    <None Include="..\Resource\FX\2DTiles.dsf">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\Resource\FX\BaseLightPass.dsf">
       <Filter>Shaders</Filter>
     </None>
@@ -58,6 +55,12 @@
     </None>
     <None Include="..\Config\RenderConfig.xml">
       <Filter>Config</Filter>
+    </None>
+    <None Include="..\Resource\FX\2DFont.dsf">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Resource\FX\ScreenTiles.dsf">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

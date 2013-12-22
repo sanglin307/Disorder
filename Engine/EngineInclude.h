@@ -49,6 +49,12 @@ namespace Disorder
 {
 	class Component;
 	typedef boost::shared_ptr<Component> ComponentPtr;
+	class CameraUpdateStrategy;
+	typedef boost::shared_ptr<CameraUpdateStrategy> CameraUpdateStrategyPtr;
+	class CameraFirstPersonUpdate;
+	typedef boost::shared_ptr<CameraFirstPersonUpdate> CameraFirstPersonUpdatePtr;
+	class CameraSphereTargetUpdate;
+	typedef boost::shared_ptr<CameraSphereTargetUpdate> CameraSphereTargetUpdatePtr;
 	class Camera;
 	typedef boost::shared_ptr<Camera> CameraPtr;
 	class InputEventHandler;
@@ -128,6 +134,8 @@ namespace Disorder
 	typedef boost::shared_ptr<BlendState> BlendStatePtr;
 	class DepthStencilState;
 	typedef boost::shared_ptr<DepthStencilState> DepthStencilStatePtr;
+	class BatchScreenTiles;
+	typedef boost::shared_ptr<BatchScreenTiles> BatchScreenTilesPtr;
 	class Canvas;
 	typedef boost::shared_ptr<Canvas> CanvasPtr;
 	class FileSystem;
@@ -208,6 +216,6 @@ namespace Disorder
 #include "Engine.h"
 #include "Config.h"
 
-
+#include "Logger.h"
  
 // TODO: reference additional headers your program requires here
