@@ -10,9 +10,9 @@ namespace Disorder
 	{		
 	}
 
-	void WindowsViewport::Draw()
+	void WindowsViewport::Render()
 	{
-		Viewport::Draw();
+		Viewport::Render();
 		
 	}
 
@@ -190,7 +190,7 @@ namespace Disorder
 			return 1;*/
 
 		case WM_PAINT:
-			(*viewportIter)->Draw();
+			(*viewportIter)->Render();
 			break;
  
 		//case WM_SIZE:

@@ -20,15 +20,50 @@ cbuffer ObjectTransform
 
 cbuffer MaterialProperty
 {
-	float3 AmbientColor;
 	float3 DiffuseColor;
+	float3 SpecularColor;
+	float  Shininess;
 }
 
-// support max 4 direct lights now
-cbuffer LightProperty
+cbuffer DirectionLightProperty
 {
-	int    LightNumber;
-	float4 LightIntensityPack;
-	float3 LightDirArray;
-	float3 LightColorArray;	
+	float3 DirectionLightColor;
+	float3 DirectionLightDir;	
+	float  DirectionLightIntensity;
 } 
+
+float3 CalculateAmbient(float3 normal, float3 color)
+{
+	// Convert from [-1, 1] to [0, 1]
+	float up = normal.y * 0.5 + 0.5;
+
+	// Calculate the ambient value
+	float3 ambient = AmbientLowColor + up * (AmbientUpperColor - AmbientLowColor);
+
+	// Apply the ambient value to the color
+	return ambient * color;
+}
+
+struct Material
+{
+   float3 Normal;
+   float3 DiffuseColor;
+   float3 SpecularColor;
+   float  Shininess;
+};
+
+Material PrepareMaterial(float3 normal, float2 UV)
+{
+	Material material;
+
+	// Normalize the interpulated vertex normal
+	material.Normal = normalize(normal);
+
+	// Sample the texture and convert to linear space
+    material.DiffuseColor = DiffuseColor;
+	material.SpecularColor = SpecularColor;
+	material.Shininess = Shininess;
+ 
+	return material;
+} 
+

@@ -9,19 +9,39 @@ namespace Disorder
 		Renderer(std::string const& name);
 		virtual ~Renderer(){};
 
-		virtual void PreDraw(CameraPtr const& camera){};
-		virtual void Draw(int pass,CameraPtr const& camera) = 0;
-		virtual void PostDraw(CameraPtr const& camera){};
+		virtual void PreRender(CameraPtr const& camera){};
+		virtual void Render(CameraPtr const& camera) = 0;
+		virtual void PostRender(CameraPtr const& camera){};
 
 		virtual bool Overlaps(const Frustrum& frustrum)
 		{
 			return true;
 		}
-
-		virtual unsigned int GetPassNumber() = 0;
-
+ 
 		virtual void AddLight(LightPtr & light);
 		virtual void ClearLight();
+		const std::vector<LightPtr>& GetLightArray() const
+		{
+			return _vLightArray;
+		}
+
+		const RenderLayoutPtr& GetRenderLayout() const
+		{
+			return _renderLayout;
+		}
+
+		const RenderEffectPtr& GetRenderEffect() const
+		{
+			return _renderEffect;
+		}
+
+		virtual void BuildRenderLayout(ShaderObjectPtr const& shaderObject,bool releaseOld){};
+		 
+
+		void SetRenderEffect(RenderEffectPtr const& effect)
+		{
+			_renderEffect = effect;
+		}
  
 	protected:
 		RenderEffectPtr _renderEffect;
@@ -38,13 +58,8 @@ namespace Disorder
 		void SetTexture(RenderSurfacePtr const& texture);
 		 
 		void AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord);
-		virtual void Draw(int pass,CameraPtr const& camera);
-
-		virtual unsigned int GetPassNumber()
-		{
-			return 1;
-		}
-
+		virtual void Render(CameraPtr const& camera);
+ 
 		unsigned int GetCurrentDrawTriNumber();
 
 	protected:
@@ -65,13 +80,9 @@ namespace Disorder
 		void SetTexture(RenderSurfacePtr const& texture);
 		 
 		void AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord);
-		virtual void Draw(int pass,CameraPtr const& camera);
+		virtual void Render(CameraPtr const& camera);
 
-		virtual unsigned int GetPassNumber()
-		{
-			return 1;
-		}
-
+		 
 		unsigned int GetCurrentDrawTriNumber();
 
 	protected:
@@ -88,12 +99,9 @@ namespace Disorder
 	public:
 		BatchLines(std::string const& name);
 		void AddLine(Vector3 const& beginPos,Vector4 const& beginColor,Vector3 const& endPos,Vector4 const& endColor);
-		virtual void Draw(int pass,CameraPtr const& camera);
+		virtual void Render(CameraPtr const& camera);
 
-		virtual unsigned int GetPassNumber()
-		{
-			return 1;
-		}
+	 
 	private:
 		std::vector<BatchLineVertex> _vertexs;
 		unsigned int _savedVertexBufferSize;
@@ -106,14 +114,7 @@ namespace Disorder
 	      SurfaceMaterialPtr _material;
 
 	private:
-		  void BindRenderResource();
-
-		    // for forward render
-		  void SetBaseLightPass();
 		  void SetDynamicLightPass(LightPtr const& light);
-
-		  void _Draw();
-
 		  void DrawAxis(CameraPtr const& camera);
 		  void DrawBoundingBox(CameraPtr const& camera);
 
@@ -124,26 +125,14 @@ namespace Disorder
 		  static GeometryRendererPtr Create(std::string const& name);
 
           void SetGeometry(GeometryPtr const& geometry,SurfaceMaterialPtr const& mat);
-		
-		  virtual unsigned int GetPassNumber()
-		  {
-			  return _material->RenderPass.size();
-		  }
+		  virtual void BuildRenderLayout(ShaderObjectPtr const& shaderObject,bool releaseOld);
 
-		  virtual bool Overlaps(const Frustrum& frustrum);
-		 
-		  virtual void PreDraw(CameraPtr const& camera);
-		  virtual void Draw(int pass,CameraPtr const& camera);
-		  virtual void PostDraw(CameraPtr const& camera);
+		  virtual bool Overlaps(const Frustrum& frustrum);		 
+		  virtual void PreRender(CameraPtr const& camera);
+		  virtual void Render(CameraPtr const& camera);
+		  virtual void PostRender(CameraPtr const& camera);
 
 	protected:
-		ShaderPropertyManagerPtr _LightPropertyManager;
-
-		// light array
-		ShaderPropertyPtr _LightNumberProperty;
-		ShaderPropertyPtr _LightIntensityPackProperty;
-		ShaderPropertyPtr _LightDirArrayProperty;
-		ShaderPropertyPtr _LightColorArrayProperty;
  
 		// for each light
 		ShaderPropertyPtr _LightTypeProperty;

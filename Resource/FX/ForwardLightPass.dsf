@@ -1,0 +1,65 @@
+#include "Common.dsf"
+
+struct VS_INPUT
+{
+    float3 Position  : POSITION;
+    float3 Normal : NORMAL;
+};
+
+//--------------------------------------------------------------------------------------
+struct VS_OUTPUT
+{
+    float4 Position : SV_POSITION;
+    float3 NormalWorld: TEXCOORD0; 
+	float3 PositionWorld: TEXCOORD1;
+};
+ 
+//--------------------------------------------------------------------------------------
+// Vertex Shader
+//--------------------------------------------------------------------------------------
+VS_OUTPUT RenderSceneVS( VS_INPUT input )
+{
+    VS_OUTPUT output;
+    output.Position = mul( float4(input.Position,1.0f),WorldTransform);
+	output.PositionWorld = output.Position.xyz;
+    output.Position = mul( output.Position, CameraView );
+    output.Position = mul( output.Position, CameraProjection );
+    output.NormalWorld = mul(float4(input.Normal,1.0),WorldNormalTransform).xyz;
+	
+    return output;
+}
+
+
+//--------------------------------------------------------------------------------------
+// Pixel Shader
+//--------------------------------------------------------------------------------------
+
+
+float3 CalculateDirectionLight(float3 position, Material material)
+{
+   //diffuse
+   float3 lightColor = DirectionLightIntensity * DirectionLightColor.rgb;
+   float NDotL = max(dot(DirectionLightDir, material.Normal),0);
+   float3 finalColor = lightColor * NDotL * material.DiffuseColor;
+   
+   //specular
+   float3 ToEye = normalize(CameraPosition - position);
+   float3 reflectVector = reflect(-DirectionLightDir,material.Normal);
+   float NDotH = max(dot(reflectVector, ToEye),0);
+   finalColor += lightColor * saturate(pow(NDotH, material.Shininess)) * material.SpecularColor;
+   
+   return finalColor;
+}
+
+
+
+float4 DirectionalLightPS( VS_OUTPUT input ) : SV_Target
+{
+    Material mat = PrepareMaterial(input.NormalWorld,(float2)0);
+
+	float3 finalColor = CalculateAmbient(mat.Normal,mat.DiffuseColor);
+
+	finalColor += CalculateDirectionLight(input.PositionWorld,mat);
+
+    return float4(finalColor,1.0f);
+}

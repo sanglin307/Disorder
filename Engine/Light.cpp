@@ -2,7 +2,7 @@
 
 namespace Disorder
 {
-	Vector3 Light::DefaultLightDirection(0.0f,-1.0f,-1.0f);
+	Vector3 Light::DefaultLightDirection(0.0f,0.0f,-1.0f);
 
 	LightPtr Light::Create(std::string const& name)
 	{
@@ -26,6 +26,18 @@ namespace Disorder
 		CastShadows = false;
 		ShadowColor = Vector3::ZERO;
  
+	}
+
+	void Light::DebugDraw()
+	{
+		if( LightType == LT_Directional )
+		{
+			GameObjectPtr go = GetBase();
+			Vector3 beginPos = go->GetWorldPosition();
+			Vector3 endPos = beginPos + GetDirection();
+			
+			GEngine->GameCanvas->DrawLine(beginPos,Vector4::ONE,endPos,Vector4(Color));
+		}
 	}
 
 	Vector3 Light::GetDirection()

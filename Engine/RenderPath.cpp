@@ -2,13 +2,8 @@
 
 namespace Disorder
 {
-	void RenderPath::Render(RenderPathType type)
-	{
-		if( type == RPT_ForwardLighting )
-			_ForwardLighting();
-	}
-
-	void RenderPath::_ForwardLighting()
+	//////////////////////////////////////////////////////////////////////////////////////////
+	void ForwardRenderPath::Render()
 	{
 		GEngine->RenderEngine->SetRenderTarget(GRenderSurface.RenderTarget,GRenderSurface.DepthStencilBuffer);
 		GEngine->RenderEngine->ClearRenderTarget(GRenderSurface.RenderTarget,Vector4(0.1f,0.1f,0.1f,1.0f));
@@ -28,14 +23,24 @@ namespace Disorder
 		for(unsigned int i=0;i< rendererList.size(); i++ )
 		{
 			RendererPtr obj = rendererList[i];
-			obj->PreDraw(mainCamera);
+			obj->BuildRenderLayout(_DirectionLightEffect->GetVertexShader(),false);
+			obj->PreRender(mainCamera);
 
-			for( unsigned int j=0;j< obj->GetPassNumber();j++ )
+			// render lights
+			const std::vector<LightPtr>& lightList = obj->GetLightArray();
+			for( size_t i=0;i<lightList.size();i++ )
 			{
-				obj->Draw(j,mainCamera);
+				lightList[i]->DebugDraw();
+
+				if(lightList[i]->LightType == LT_Directional)
+				{
+					SetDirectionLight(lightList[i]);
+					obj->SetRenderEffect(_DirectionLightEffect);
+					obj->Render(mainCamera);
+				}
 			}
 
-			obj->PostDraw(mainCamera);
+			obj->PostRender(mainCamera);
 		}
 
 		mainCamera->DrawAxis();
@@ -47,8 +52,45 @@ namespace Disorder
 			GEngine->Stat.DrawStat();
 		}
 
-		GEngine->GameCanvas->Draw(mainCamera);
+		GEngine->GameCanvas->Render(mainCamera);
 
 		GEngine->RenderEngine->OnDrawEnd();
+	}
+
+	void ForwardRenderPath::SetDirectionLight(LightPtr const& light)
+	{
+		if( light->LightType != LT_Directional )
+			return;
+
+		_DirectionLightPropertyManager->ClearShaderPropertyValue();
+		_DirectionLightIntensityProperty->SetData(light->Intensity);
+		_DirectionLightDirProperty->SetData(light->GetDirection());
+		_DirectionLightColorProperty->SetData(light->Color);
+
+		_DirectionLightPropertyManager->UpdateShaderProperty();
+	}
+ 
+
+	ForwardRenderPathPtr ForwardRenderPath::Create()
+	{
+		ForwardRenderPath *pPath = new ForwardRenderPath;
+		return ForwardRenderPathPtr(pPath);
+	}
+
+	ForwardRenderPath::ForwardRenderPath()
+	{
+		_type = RPT_ForwardLighting;
+
+		_DirectionLightPropertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerDirectionLight);
+
+		_DirectionLightIntensityProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightIntensity,eSP_Float);
+		_DirectionLightDirProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightDir,eSP_Vector3);
+		_DirectionLightColorProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightColor,eSP_Vector3);
+
+		_DirectionLightEffect = RenderEffect::Create();
+		ShaderObjectPtr vertexShader = GEngine->RenderResManager->CreateShader(ST_VertexShader,"ForwardLightPass",SM_4_0,"RenderSceneVS");
+		ShaderObjectPtr pixelShader = GEngine->RenderResManager->CreateShader(ST_PixelShader,"ForwardLightPass",SM_4_0,"DirectionalLightPS");
+		_DirectionLightEffect->BindShader(vertexShader);
+		_DirectionLightEffect->BindShader(pixelShader);
 	}
 }

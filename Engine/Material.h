@@ -13,8 +13,7 @@ namespace Disorder
 		std::string ShaderModel;
  
 		virtual void UpdateShaderProperty(){};
-		std::vector<RenderEffectPtr> RenderPass;
-        
+	
         const ShaderPropertyManagerPtr& GetShaderPropertyManager() const
         {
              return _propertyManager;
@@ -29,7 +28,7 @@ namespace Disorder
     class SurfaceLambert : public SurfaceMaterial
 	{
      public:
-		 Vector3 AmbientColor;
+		 
 		 Vector3 DiffuseColor;
 		 Vector3 EmissiveColor;
 		 float Transparency;
@@ -40,8 +39,7 @@ namespace Disorder
 	protected:
 
 		 SurfaceLambert(std::string const& name);
-
-         ShaderPropertyPtr  AmbientColorProperty;
+ 
          ShaderPropertyPtr  DiffuseColorProperty;
          ShaderPropertyPtr  EmissiveColorProperty;
          ShaderPropertyPtr  TransparentColorProperty;
@@ -63,6 +61,7 @@ namespace Disorder
 		SurfacePhong(std::string const& name);
 
 		ShaderPropertyPtr SpecularColorProperty;
+		 
 		ShaderPropertyPtr ReflectionColorProperty;
 		ShaderPropertyPtr ShininessProperty;
 

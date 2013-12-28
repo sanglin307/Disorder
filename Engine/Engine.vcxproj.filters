@@ -29,9 +29,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="TodoList.txt" />
-    <None Include="..\Resource\FX\BaseLightPass.dsf">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\Resource\FX\BasePassPhong.dsf">
       <Filter>Shaders</Filter>
     </None>
@@ -60,6 +57,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\Resource\FX\ScreenTiles.dsf">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Resource\FX\ForwardLightPass.dsf">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

@@ -19,7 +19,7 @@ namespace Disorder
 		void DrawTile(Vector3 const& p00, Vector3 const& c00, Vector2 const& t00,Vector3 const& p01, Vector3 const& c01, Vector2 const& t01,
 			          Vector3 const& p10, Vector3 const& c10, Vector2 const& t10,Vector3 const& p11, Vector3 const& c11, Vector2 const& t11,TexturePtr tex);
 
-		void Draw(CameraPtr const& camera);
+		void Render(CameraPtr const& camera);
 
 		unsigned int GetCurrentDrawTriNumber();
 

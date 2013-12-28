@@ -8,8 +8,8 @@ namespace Disorder
 	{
 		_sceneImporter = FbxSceneImporter::Create();
 
-		_vAmbientLowerColor = Vector3(0.2f);
-		_vAmbientUpperColor = Vector3(0.8f);
+		_vAmbientLowerColor = Vector3::ZERO;
+		_vAmbientUpperColor = Vector3::UNIT_SCALE * 0.25f;
 		_propertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerScene);
 		_sAmbientLowerProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientLowColor,eSP_Vector3);
 		_sAmbientUpperProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientUpperColor,eSP_Vector3);
@@ -41,6 +41,7 @@ namespace Disorder
 
 	void SceneManager::UpdateShaderProperty()
 	{
+		_propertyManager->ClearShaderPropertyValue();
 		_sAmbientLowerProperty->SetData(_vAmbientLowerColor);
 		_sAmbientUpperProperty->SetData(_vAmbientUpperColor);
 		_propertyManager->UpdateShaderProperty();

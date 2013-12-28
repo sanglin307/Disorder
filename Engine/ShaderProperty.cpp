@@ -100,6 +100,37 @@ namespace Disorder
 		}
 	}
  
+	void ShaderProperty::ClearData()
+	{
+		switch(PropertyType)
+		{
+			case eSP_Int:
+				SetData(0);
+				break;
+			case eSP_Float:
+				SetData(0.f);
+				break;
+			case eSP_ConstBuffer:
+			case eSP_ShaderResource:
+			case eSP_SampleState:
+				break;
+			case eSP_Vector3:
+				SetData(Vector3::ZERO);
+				break;
+			case eSP_Vector4:
+				SetData(Vector4::ZERO);
+				break;
+			case eSP_Matrix4:
+				SetData(Matrix4::IDENTITY);
+				break;
+			case eSP_Matrix3:
+				SetData(Matrix3::IDENTITY);
+				break;
+			default:
+				BOOST_ASSERT(0);
+		}
+	}
+
 	void ShaderProperty::SetData(int data)
 	{
 		BOOST_ASSERT(PropertyType == eSP_Int);
@@ -224,7 +255,7 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sManagerCamera = "CameraTransforms";
     const std::string ShaderPropertyManager::sManagerObject = "ObjectTransform";
     const std::string ShaderPropertyManager::sManagerMaterial = "MaterialProperty";
-    const std::string ShaderPropertyManager::sManagerLight = "LightProperty";
+    const std::string ShaderPropertyManager::sManagerDirectionLight = "DirectionLightProperty";
 	const std::string ShaderPropertyManager::sManagerScene = "SceneProperty";
 	const std::string ShaderPropertyManager::sManagerGlobal = "Global";
 
@@ -238,7 +269,6 @@ namespace Disorder
     const std::string ShaderPropertyManager::sObjectNormal = "WorldNormalTransform";
 
     // for Material Property
-    const std::string ShaderPropertyManager::sAmbientColor = "AmbientColor";
     const std::string ShaderPropertyManager::sDiffuseColor = "DiffuseColor";
 	const std::string ShaderPropertyManager::sEmissiveColor = "EmissiveColor";
     const std::string ShaderPropertyManager::sSpecularColor = "SpecularColor";
@@ -246,10 +276,10 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sShininess = "Shininess";
 
     // LightProperty
-    const std::string ShaderPropertyManager::sLightNumber = "LightNumber";
-    const std::string ShaderPropertyManager::sLightIntensityPack = "LightIntensityPack";
-    const std::string ShaderPropertyManager::sLightDirArray = "LightDirArray";
-    const std::string ShaderPropertyManager::sLightColorArray = "LightColorArray";
+    const std::string ShaderPropertyManager::sDirectionLightIntensity = "DirectionLightIntensity";
+    const std::string ShaderPropertyManager::sDirectionLightDir = "DirectionLightDir";
+    const std::string ShaderPropertyManager::sDirectionLightColor = "DirectionLightColor";
+ 
 
 	// scene ambient
 	const std::string ShaderPropertyManager::sAmbientLowColor = "AmbientLowColor";
@@ -268,6 +298,16 @@ namespace Disorder
 			return _shaderPropertyMap.at(name);
 
 		return NULL;
+	}
+
+	void ShaderPropertyManager::ClearShaderPropertyValue()
+	{
+		ShaderPropertyMap::const_iterator iter = _shaderPropertyMap.begin();
+		while( iter != _shaderPropertyMap.end() )
+		{
+			iter->second->ClearData();
+			++iter;
+		}
 	}
 
 	ShaderPropertyPtr ShaderPropertyManager::CreateProperty(std::string const& name,EShaderProperty type)

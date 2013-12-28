@@ -126,16 +126,10 @@ namespace Disorder
 
 			if( mouseEvent.RelativeX != 0 )
 			{
-				//float pitch = pCamera->_rotation.GetPitch();
-				//float yaw = pCamera->_rotation.GetYaw();
-				//;
-
+ 
 				Quaternion q(mouseEvent.RelativeX *  pCamera->_rotateSpeed * deltaSeconds,Vector3::UNIT_Y);
 				pCamera->_rotation = pCamera->_rotation * q ;
-			
-				// std::stringstream stream;
-				// stream << " old:" << pitch << ":" << yaw <<":" << roll << "new:"<< pCamera->_rotation.GetPitch() <<":" <<pCamera->_rotation.GetYaw() <<":" << pCamera->_rotation.GetRoll();
-				// GLogger->Info(stream.str());
+			 
                  pCamera->_viewMatrixInvalid = true;
 			}
  
@@ -232,6 +226,7 @@ namespace Disorder
 
 	void Camera::UpdateShaderProperty()
 	{
+		_propertyManager->ClearShaderPropertyValue();
 		_viewMatrixProperty->SetData(ViewMatrix);
 		_projMatrixProperty->SetData(ProjectMatrix);
 		_positionProperty->SetData(_eyePos);
@@ -373,7 +368,7 @@ namespace Disorder
 		std::stringstream strstream;
 		Vector3 lookAt = _eyePos + _viewVec * 50;
 		float roll = _rotation.GetRoll() * Math::fRad2Deg;
-		strstream << "camera: [eyePos](" << _eyePos.x << "; " << _eyePos.y << "; " << _eyePos.z << ")     [Focus At](" << lookAt.x << ";  "<< lookAt.y << ";  " << lookAt.z << ")" << roll;
+		strstream << "camera: [eyePos](" << (int)_eyePos.x << "; " <<  (int)_eyePos.y << "; " <<  (int)_eyePos.z << ")     [Focus At](" <<  (int)lookAt.x << ";  "<<  (int)lookAt.y << ";  " <<  (int)lookAt.z << ")" <<  (int)roll;
 		if( _updateMode == eFirstPersonMode )
 		{
 			GEngine->GameCanvas->DrawString(Vector2(5.0f,GConfig->pRenderConfig->SizeY - 40.f),30,Vector4::ONE,"First Person Mode");

@@ -21,7 +21,7 @@ namespace Disorder
 		RegisterPropertyManager(ShaderPropertyManager::sManagerCamera);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerObject);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerMaterial);
-		RegisterPropertyManager(ShaderPropertyManager::sManagerLight);
+		RegisterPropertyManager(ShaderPropertyManager::sManagerDirectionLight);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerScene);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerGlobal);
 	}

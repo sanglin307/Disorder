@@ -17,13 +17,15 @@ namespace Disorder
    {
 	   //Client Init
 	   GLogger->Init();
+	   RenderResManager->Init();
+	   RenderEngine->Init();  
 	   SceneImporter->Init();
 	   GameClient->Init();
-	   RenderEngine->Init();   
+	   
 
 	   ViewportPtr const& viewport = GameClient->GetViewport(0);
 	   RenderEngine->CreateViewport(viewport->GetWindow());
-	   RenderResManager->Init();
+	 
 	   GameCanvas = Canvas::Create(viewport->SizeX,viewport->SizeY);
 
 	   GSceneManager->Init();
@@ -45,7 +47,7 @@ namespace Disorder
 	   GSceneManager->Tick(deltaSeconds);
 
 	   //Draw Evertything~
-	   GameClient->GetViewport(0)->Draw();
+	   GameClient->GetViewport(0)->Render();
 
 
    }

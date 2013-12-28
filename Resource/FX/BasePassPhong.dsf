@@ -13,7 +13,7 @@ cbuffer ObjectTransform
 
 cbuffer MaterialProperty
 {
-	float4 AmbientColor;
+ 
 	float4 DiffuseColor;
 }
 

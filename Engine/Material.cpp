@@ -14,8 +14,8 @@ namespace Disorder
 	//////////////////////////////////////////////////////////////////////////
 	
 	void SurfaceLambert::UpdateShaderProperty()
-	{
-		AmbientColorProperty->SetData(AmbientColor); 
+	{	
+		_propertyManager->ClearShaderPropertyValue();
 		DiffuseColorProperty->SetData(DiffuseColor);
 		EmissiveColorProperty->SetData(EmissiveColor);
 		_propertyManager->UpdateShaderProperty();
@@ -24,7 +24,6 @@ namespace Disorder
 	SurfaceLambert::SurfaceLambert(std::string const& name)
 		:SurfaceMaterial(name)
 	{
-
 	}
 
 	SurfaceLambertPtr SurfaceLambert::Create(std::string const& name)
@@ -34,24 +33,12 @@ namespace Disorder
  
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
 		ShaderPropertyManagerPtr parameterManager = mat->GetShaderPropertyManager();
-
-
-		RenderEffectPtr baseEffect = RenderEffect::Create();
-		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"BaseLightPass",SM_4_0,"VS");
-		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"BaseLightPass",SM_4_0,"PS");
-		baseEffect->BindShader(vertexShader);
-		baseEffect->BindShader(pixelShader);
  
-		mat->AmbientColorProperty = parameterManager->CreateProperty(ShaderPropertyManager::sAmbientColor,eSP_Vector3);
 		mat->DiffuseColorProperty = parameterManager->CreateProperty(ShaderPropertyManager::sDiffuseColor,eSP_Vector3);
 		mat->EmissiveColorProperty = parameterManager->CreateProperty(ShaderPropertyManager::sEmissiveColor,eSP_Vector3);
 
-		mat->AmbientColor = Vector3(0.1f);
 		mat->DiffuseColor = Vector3(0.8f);
 		mat->EmissiveColor = Vector3::ZERO;
- 
-		mat->RenderPass.push_back(baseEffect);
-
 
 		//RenderEffectPtr lightEffect =  resourceManager->CreateRenderEffect("LightPass.fx",SM_4_0,"VS","PS");
 	 //
@@ -87,9 +74,11 @@ namespace Disorder
 
 	void SurfacePhong::UpdateShaderProperty()
 	{
-		SurfaceLambert::UpdateShaderProperty();
-		
-
+		_propertyManager->ClearShaderPropertyValue();
+		DiffuseColorProperty->SetData(DiffuseColor);
+		SpecularColorProperty->SetData(SpecularColor);
+		ShininessProperty->SetData(Shininess);
+		_propertyManager->UpdateShaderProperty();
 	}
 
 	SurfacePhongPtr SurfacePhong::Create(std::string const& name)
@@ -99,23 +88,16 @@ namespace Disorder
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
 		ShaderPropertyManagerPtr parameterManager = mat->GetShaderPropertyManager();
 
-		
-		RenderEffectPtr baseEffect = RenderEffect::Create();
-		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"BaseLightPass",SM_4_0,"VS");
-		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"BaseLightPass",SM_4_0,"PS");
-		baseEffect->BindShader(vertexShader);
-		baseEffect->BindShader(pixelShader);
-
+		mat->DiffuseColorProperty = parameterManager->CreateProperty(ShaderPropertyManager::sDiffuseColor,eSP_Vector3);
 		mat->SpecularColorProperty = parameterManager->CreateProperty(ShaderPropertyManager::sSpecularColor,eSP_Vector3);
 		mat->ReflectionColorProperty = parameterManager->CreateProperty(ShaderPropertyManager::sReflectionColor,eSP_Vector3);
 		mat->ShininessProperty = parameterManager->CreateProperty(ShaderPropertyManager::sShininess,eSP_Float);
 
-		mat->Shininess = 0.f;
+		mat->Shininess = 8.f;
 		mat->SpecularColor = Vector3(0.8f);
 		mat->ReflectionColor = Vector3(0.f);
  
-		mat->RenderPass.push_back(baseEffect);
-
+	
 		/*DepthStencilDesc dsDesc;
 		dsDesc.DepthEnable = false;
 		DepthStencilStatePtr noDepthState = resourceManager->CreateDepthStencilState(&dsDesc,0);

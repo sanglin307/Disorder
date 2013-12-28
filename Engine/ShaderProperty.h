@@ -27,6 +27,8 @@ namespace Disorder
 		int GetTotalSize();
 		int GetElementNumber();
 
+		void ClearData();
+
 		void SetData(int data);
 		void SetData(float data);
 		void SetData(RenderBufferPtr constBuffer);
@@ -67,7 +69,7 @@ namespace Disorder
         static const std::string sManagerCamera;
         static const std::string sManagerObject;
         static const std::string sManagerMaterial;
-        static const std::string sManagerLight;
+        static const std::string sManagerDirectionLight;
 		static const std::string sManagerScene;
         static const std::string sManagerGlobal; // used to save global constant buffer,sampler,texture
 		
@@ -81,18 +83,17 @@ namespace Disorder
         static const std::string sObjectNormal;
 
         // for Material Property
-        static const std::string sAmbientColor;
         static const std::string sDiffuseColor;
 		static const std::string sEmissiveColor;
 		static const std::string sSpecularColor;
+		static const std::string sSpecularExp;
 		static const std::string sReflectionColor;
 		static const std::string sShininess;
 
         // LightProperty
-        static const std::string sLightNumber;
-        static const std::string sLightIntensityPack;
-        static const std::string sLightDirArray;
-        static const std::string sLightColorArray;
+        static const std::string sDirectionLightIntensity;
+        static const std::string sDirectionLightDir;
+        static const std::string sDirectionLightColor;
 
 		//for scene property
 		static const std::string sAmbientLowColor;
@@ -107,6 +108,7 @@ namespace Disorder
 	public:
 		std::string Name;
  
+		virtual void ClearShaderPropertyValue();
 		virtual void UpdateShaderProperty() = 0;
 		 
 		ShaderPropertyPtr GetProperty(std::string const& name);

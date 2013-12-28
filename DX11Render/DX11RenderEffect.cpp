@@ -370,6 +370,9 @@ namespace Disorder
 
 	void DX11ShaderPropertyManager::UpdateShaderProperty()
 	{
+		if( ConstantBuffer == NULL )
+			return;
+
 		BYTE* pData = new BYTE[ConstantBuffer->CBSize];
 		BYTE* pDest = pData;
 		for(unsigned int j=0;j<ConstantBuffer->Parameters.size();j++)

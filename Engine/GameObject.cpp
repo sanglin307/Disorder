@@ -32,6 +32,7 @@ namespace Disorder
 
 	void GameObject::UpdateShaderProperty()
 	{
+		_propertyManager->ClearShaderPropertyValue();
 		_worldMatrixProperty->SetData(_worldMatrix);
 		_worldNormalMatrixProperty->SetData(_worldMatrix.GetNormalMatrix());
 		_propertyManager->UpdateShaderProperty();

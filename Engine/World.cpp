@@ -20,7 +20,7 @@ namespace Disorder
 			 GSceneManager->CreateDefaultCamera();
 		 }
 
-    	 GameObjectPtr go = GameObject::Create("test",Vector3(0.0f,4,-4.0f));
+    	/* GameObjectPtr go = GameObject::Create("test",Vector3(0.0f,4,-4.0f));
  		 LightPtr light = Light::Create("DefaultLight");
     	 light->Color = Vector3(1.0f,1.0f,1.0f);
  		 
@@ -29,7 +29,7 @@ namespace Disorder
  		 light->Range = 1000;
  		 go->AddComponent(light);
 
- 		 level->AddGameObject(go);
+ 		 level->AddGameObject(go);*/
 
 		 GEngine->RenderResManager->DumpContent();
 	 }

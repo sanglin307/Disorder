@@ -33,7 +33,7 @@ namespace Disorder
  
 	}
 
-	void BatchScreenString::Draw(int pass,CameraPtr const& camera)
+	void BatchScreenString::Render(CameraPtr const& camera)
 	{
 		BOOST_ASSERT(_vertexs.size()%4==0);
 
@@ -160,7 +160,7 @@ namespace Disorder
  
 	}
 
-	void BatchScreenTiles::Draw(int pass,CameraPtr const& camera)
+	void BatchScreenTiles::Render(CameraPtr const& camera)
 	{
 		BOOST_ASSERT(_vertexs.size()%4==0);
 
@@ -306,7 +306,7 @@ namespace Disorder
  
 	}
 
-	void BatchLines::Draw(int pass,CameraPtr const& camera)
+	void BatchLines::Render(CameraPtr const& camera)
 	{
 		BOOST_ASSERT(_vertexs.size()%2==0);
 
@@ -333,43 +333,13 @@ namespace Disorder
 	GeometryRenderer::GeometryRenderer(std::string const& name)
 		:Renderer(name)
 	{
-		_LightPropertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerLight);
-
-		_LightNumberProperty = _LightPropertyManager->CreateProperty(ShaderPropertyManager::sLightNumber,eSP_Int);
-		_LightIntensityPackProperty = _LightPropertyManager->CreateProperty(ShaderPropertyManager::sLightIntensityPack,eSP_Vector4);
-		_LightDirArrayProperty = _LightPropertyManager->CreateProperty(ShaderPropertyManager::sLightDirArray,eSP_Vector3);
-		_LightColorArrayProperty = _LightPropertyManager->CreateProperty(ShaderPropertyManager::sLightColorArray,eSP_Vector3);
 	}
 
 	bool GeometryRenderer::Overlaps(const Frustrum& frustrum)
 	{
 		return frustrum.Overlaps( _geometryObject->BoundingBox.GetBox());
 	}
-
-	void GeometryRenderer::BindRenderResource()
-	{
-		BOOST_ASSERT(_geometryObject != NULL && _material != NULL);
-
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
  
-		//compile shader
-		ShaderObjectPtr vertexShader = _material->RenderPass[FRP_BaseLight]->GetVertexShader();
-		 
-	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList,false);
- 
-		std::vector<RenderBufferPtr> bufferArray;
-		resourceManager->CreateRenderBufferArray(_geometryObject,BAH_GPU_Read,vertexShader,bufferArray);
-		for(unsigned int index = 0;index<bufferArray.size();index++)
-		{
-			if( bufferArray[index]->GetBufferType() == RBT_Vertex )
-		        _renderLayout->BindVertexBuffer(bufferArray[index]);
-			else if(  bufferArray[index]->GetBufferType() == RBT_Index )
-				_renderLayout->BindIndexBuffer(bufferArray[index]);
-		}
-	 
-	 
-	}
-
 	GeometryRendererPtr GeometryRenderer::Create(std::string const& name)
 	{
 		GeometryRenderer *pRender = new GeometryRenderer(name);
@@ -380,19 +350,36 @@ namespace Disorder
 	{
 		_geometryObject = geometry;
 		_material = mat;
-
-		BindRenderResource();
 	}
 
-	 void GeometryRenderer::PreDraw(CameraPtr const& camera)
+	void GeometryRenderer::BuildRenderLayout(ShaderObjectPtr const& shaderObject,bool releaseOld)
+	{
+		if( _geometryObject == NULL )
+			return;
+
+		if( _renderLayout != NULL && releaseOld == false )
+			return;
+
+	    _renderLayout = GEngine->RenderResManager->CreateRenderLayout(shaderObject,TT_TriangleList,false);
+ 
+		std::vector<RenderBufferPtr> bufferArray;
+		GEngine->RenderResManager->CreateRenderBufferArray(_geometryObject,BAH_GPU_Read,shaderObject,bufferArray);
+		for(unsigned int index = 0;index<bufferArray.size();index++)
+		{
+			if( bufferArray[index]->GetBufferType() == RBT_Vertex )
+		        _renderLayout->BindVertexBuffer(bufferArray[index]);
+			else if(  bufferArray[index]->GetBufferType() == RBT_Index )
+				_renderLayout->BindIndexBuffer(bufferArray[index]);
+		}
+	}
+
+	 void GeometryRenderer::PreRender(CameraPtr const& camera)
 	 {
 		 GetBase()->UpdateShaderProperty();
 		 if( _material != NULL )
 		 {
 			_material->UpdateShaderProperty();
 		 }
-
-
 	 }
 
 	 void GeometryRenderer::DrawBoundingBox(CameraPtr const& camera)
@@ -476,44 +463,13 @@ namespace Disorder
 
 	  }
 
-	 void GeometryRenderer::PostDraw(CameraPtr const& camera)
+	 void GeometryRenderer::PostRender(CameraPtr const& camera)
 	 {
 		  DrawAxis(camera);
 		  DrawBoundingBox(camera);
 	 }
  
-	void GeometryRenderer::SetBaseLightPass()
-	{
-		if( _vLightArray.size() == 0 )
-			return;
-
-		int lightNumber = 0;
-		Vector4 intensityVec(0.0f);
-		Vector3 dirVec;
-		Vector3 colorVec;
-		for(unsigned int i=0;i<_vLightArray.size();i++)
-		{
-			if( _vLightArray[i]->LightType == LT_Directional )
-			{
-			   intensityVec[lightNumber] = _vLightArray[i]->Intensity;
-			   dirVec = _vLightArray[i]->GetDirection();
-			   colorVec = _vLightArray[i]->Color;
-			   lightNumber++;
-
-			   break;
-			}
-		}
-
-		if( lightNumber == 0 )
-			return;
  
-		_LightNumberProperty->SetData(lightNumber);
-		_LightIntensityPackProperty->SetData(intensityVec);
-		_LightDirArrayProperty->SetData(dirVec);
-		_LightColorArrayProperty->SetData(colorVec);
-		_LightPropertyManager->UpdateShaderProperty();
-	}
-
 	void GeometryRenderer::SetDynamicLightPass(LightPtr const& light)
 	{
 		BOOST_ASSERT(light->LightType != LT_Directional);
@@ -529,42 +485,23 @@ namespace Disorder
 		_material->LightColor->SetData(light->Color);*/
 	}
 
-	void GeometryRenderer::Draw(int pass,CameraPtr const& camera)
+	void GeometryRenderer::Render(CameraPtr const& camera)
 	{
 		BOOST_ASSERT(_renderLayout != NULL);
  
-		_renderEffect = _material->RenderPass[pass];
 		if( _renderEffect == NULL )
 			return;
  
-		if( pass == FRP_BaseLight )
-		{
-			SetBaseLightPass();
-			_Draw();
-		}
-		else if( pass == FRP_DynamicLight )
-		{
-			for(unsigned int i=0;i< _vLightArray.size();i++)
-			{
-				if( _vLightArray[i]->LightType != LT_Directional )
-				{
-					SetDynamicLightPass(_vLightArray[i]);
-					_Draw();
-				}
-			}
-		}
-		 
-	}
-
-	void GeometryRenderer::_Draw()
-	{
 		GameObjectPtr gameObject = _baseObject.lock();
 		RenderEnginePtr renderEngine = GEngine->RenderEngine;
 		renderEngine->SetRenderLayout(_renderLayout);
  
 		renderEngine->SetEffect(_renderEffect);
 		renderEngine->DrawIndexed(_geometryObject->Indices.size(),0,0);
+		 
 	}
+
+
 
 	
 }

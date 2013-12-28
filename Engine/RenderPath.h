@@ -4,15 +4,38 @@
 
 namespace Disorder
 {
-
 	class RenderPath
 	{
 	public:
-		static void Render(RenderPathType type);
+		virtual void Render() = 0;
 
+		RenderPathType GetType()
+		{
+			return _type;
+		}
 
-	private:
-		static void _ForwardLighting();
+	protected:
+		RenderPathType _type;
+
+	};
+
+	class ForwardRenderPath : public RenderPath
+	{
+	public:
+		virtual void Render();
+		static ForwardRenderPathPtr Create();
+
+	protected:
+		void SetDirectionLight(LightPtr const& light);
+
+		ForwardRenderPath();
+
+		ShaderPropertyManagerPtr _DirectionLightPropertyManager;
+		ShaderPropertyPtr _DirectionLightIntensityProperty;
+		ShaderPropertyPtr _DirectionLightDirProperty;
+		ShaderPropertyPtr _DirectionLightColorProperty;
+
+		RenderEffectPtr _DirectionLightEffect;
 
 	};
 }

@@ -10,7 +10,7 @@ namespace Disorder
 		
 		 static WindowsViewportPtr Create(int x,int y,int sizeX,int sizeY,void* hWnd);
 
-		 virtual void Draw();
+		 virtual void Render();
 
 		 virtual inline void* GetWindow()
 		 {

@@ -86,7 +86,7 @@
     <None Include="..\Config\CameraConfig.xml" />
     <None Include="..\Config\RenderConfig.xml" />
     <None Include="..\Resource\FX\2DFont.dsf" />
-    <None Include="..\Resource\FX\BaseLightPass.dsf" />
+    <None Include="..\Resource\FX\ForwardLightPass.dsf" />
     <None Include="..\Resource\FX\BasePassPhong.dsf" />
     <None Include="..\Resource\FX\BatchLines.dsf" />
     <None Include="..\Resource\FX\Common.dsf" />

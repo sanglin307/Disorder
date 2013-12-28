@@ -39,7 +39,10 @@ namespace Disorder
 
 		static Vector3 DefaultLightDirection;
 
-		 static LightPtr Create(std::string const& name);
+		static LightPtr Create(std::string const& name);
+
+		void DebugDraw();
+
 	protected:
 		Light(std::string const& name);
 	};

@@ -31,10 +31,10 @@ namespace Disorder
 		}
 	}
 
-	void Canvas::Draw(CameraPtr const& camera)
+	void Canvas::Render(CameraPtr const& camera)
 	{
-		_lineElement.Draw(0,camera);
-		_stringElement.Draw(0,camera);
+		_lineElement.Render(camera);
+		_stringElement.Render(camera);
 		
 	}
 

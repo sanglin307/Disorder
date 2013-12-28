@@ -122,6 +122,10 @@ namespace Disorder
 	class RenderSurface;
 	typedef boost::shared_ptr<RenderSurface> RenderSurfacePtr;
 	class RenderSurfaceManager;
+	class RenderPath;
+	typedef boost::shared_ptr<RenderPath> RenderPathPtr;
+	class ForwardRenderPath;
+	typedef boost::shared_ptr<ForwardRenderPath> ForwardRenderPathPtr;
 	class FontManager;
 	typedef boost::shared_ptr<FontManager> FontManagerPtr;
 	class Font;

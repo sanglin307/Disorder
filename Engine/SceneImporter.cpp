@@ -665,7 +665,6 @@ namespace Disorder
 
 	void FbxSceneImporter::ProcessLight(FbxNode* pNode,GameObjectPtr const& gameObject)
 	{
-		return ;
 
 		 FbxLight* lLight = (FbxLight*) pNode->GetNodeAttribute();
 		 LightPtr lightObj = Light::Create(gameObject->Name);
@@ -682,11 +681,15 @@ namespace Disorder
 			 BOOST_ASSERT(0);
 		 }
 
+		 if(lightObj->LightType != LT_Directional )
+			 return;
+
 		 lightObj->Color.x = (float)lLight->Color.Get()[0];
 		 lightObj->Color.y = (float)lLight->Color.Get()[1];
 		 lightObj->Color.z = (float)lLight->Color.Get()[2];
 
-		 lightObj->Intensity = (float)lLight->Intensity.Get();
+		 lightObj->Intensity = (float)lLight->Intensity.Get()/100.f;
+
 		 lightObj->Range = (float)lLight->InnerAngle.Get();
 
 		 gameObject->AddComponent(lightObj);
@@ -863,10 +866,7 @@ namespace Disorder
 					material->ShaderModel = lMaterial->ShadingModel.Get().Buffer();
 
 					FbxSurfacePhong* lPhoneMaterial = (FbxSurfacePhong *) lMaterial;
-					material->AmbientColor.x = (float)lPhoneMaterial->Ambient.Get()[0];
-					material->AmbientColor.y = (float)lPhoneMaterial->Ambient.Get()[1];
-					material->AmbientColor.z = (float)lPhoneMaterial->Ambient.Get()[2];
-
+ 
 					// Display the Diffuse Color
 					material->DiffuseColor.x = (float)lPhoneMaterial->Diffuse.Get()[0];
 					material->DiffuseColor.y = (float)lPhoneMaterial->Diffuse.Get()[1];
@@ -892,6 +892,7 @@ namespace Disorder
 					material->ReflectionColor.x =  (float)lPhoneMaterial->Reflection.Get()[0];
 					material->ReflectionColor.y =  (float)lPhoneMaterial->Reflection.Get()[1];
 					material->ReflectionColor.z =  (float)lPhoneMaterial->Reflection.Get()[2];
+					materials.push_back(material);
 				}
 				else if(lMaterial->GetClassId().Is(FbxSurfaceLambert::ClassId) )
 				{
@@ -901,9 +902,7 @@ namespace Disorder
 			        material->ShaderModel = lMaterial->ShadingModel.Get().Buffer();
 
 					FbxSurfaceLambert* lLambertMaterial = (FbxSurfaceLambert *)lMaterial;
-					material->AmbientColor.x = (float)lLambertMaterial->Ambient.Get()[0];
-					material->AmbientColor.y = (float)lLambertMaterial->Ambient.Get()[1];
-					material->AmbientColor.z = (float)lLambertMaterial->Ambient.Get()[2];
+				 
 
 					// Display the Diffuse Color
 					material->DiffuseColor.x = (float)lLambertMaterial->Diffuse.Get()[0];
@@ -924,6 +923,7 @@ namespace Disorder
 					GLogger->Warning("Unkown Material type!");
 				}
  
+				
 				
           
            }//for (int lCount = 0; lCount < lMaterialCount; lCount ++)
