@@ -2,81 +2,110 @@
 
 namespace Disorder
 {
-	Vector3 Light::DefaultLightDirection(0.0f,0.0f,-1.0f);
-
-	LightPtr Light::Create(std::string const& name)
-	{
-		Light *pLight = new Light(name);
-		return LightPtr(pLight);
-
-	}
 
 	Light::Light(std::string const& name)
 		:Component(name,CT_Light)
 	{
-		LightType = LT_Directional;
-		Color.x = 1.0f;
-		Color.y = 1.0f;
-		Color.z = 1.0f;
-
+		LightType = LT_None;
+		Color = Vector3::UNIT_SCALE;
 		Intensity = 0.8f; 
-		SpotAngle = 30;
-		Range = 10.0f;
-
 		CastShadows = false;
 		ShadowColor = Vector3::ZERO;
+	}
  
+	//////////////////////////////////////////////////////////////////////////////////
+
+	Vector3 DirectionLight::DefaultDirection(0.0f,0.0f,-1.0f);
+ 
+
+	DirectionLight::DirectionLight(std::string const& name)
+		:Light(name)
+	{
+		LightType = LT_Directional;
 	}
 
-	void Light::DebugDraw()
+	DirectionLightPtr DirectionLight::Create(std::string const& name)
 	{
-		if( LightType == LT_Directional )
-		{
-			GameObjectPtr go = GetBase();
-			Vector3 beginPos = go->GetWorldPosition();
-			Vector3 endPos = beginPos + GetDirection();
+		DirectionLight *pLight = new DirectionLight(name);
+		return DirectionLightPtr(pLight);
+	}
+
+	bool DirectionLight::Touch(RendererPtr renderObject)
+	{
+		return true;
+	}
+
+	Vector3 DirectionLight::GetDirection()
+	{
+		GameObjectPtr go = GetBase();
+		return go->GetWorldRotation() * DirectionLight::DefaultDirection;
+	}
+
+	void DirectionLight::DebugDraw()
+	{
+		GameObjectPtr go = GetBase();
+		Vector3 beginPos = go->GetWorldPosition();
+		Vector3 endPos = beginPos + GetDirection();
 			
-			GEngine->GameCanvas->DrawLine(beginPos,Vector4::ONE,endPos,Vector4(Color));
-		}
+		GEngine->GameCanvas->DrawLine(beginPos,Vector4::ONE,endPos,Vector4(Color));
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	PointLight::PointLight(std::string const& name)
+		:Light(name)
+	{
+		LightType = LT_Point;
+		Range = 10.0f;
 	}
 
-	Vector3 Light::GetDirection()
+	PointLightPtr PointLight::Create(std::string const& name)
 	{
-		if( LightType == LT_Directional || LightType == LT_Spot )
-		{
-			GameObjectPtr go = GetBase();
-			return go->GetWorldRotation() * Light::DefaultLightDirection;
-		}
-		else
-			return Vector3::ZERO;
+		PointLight *pLight = new PointLight(name);
+		return PointLightPtr(pLight);
 	}
 
-	 
-
-	bool Light::Touch(RendererPtr renderObject)
+	bool PointLight::Touch(RendererPtr renderObject)
 	{
-		if( LightType == LT_Directional )
-			return true;
+		GameObjectPtr lightGo = GetBase();
+		GameObjectPtr renderGo = renderObject->GetBase(); 
+		return Range * Range > lightGo->GetWorldPosition().SquaredDistance(renderGo->GetWorldPosition());
+	}
 
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	SpotLight::SpotLight(std::string const& name)
+		:Light(name)
+	{
+		LightType = LT_Spot;
+		SpotAngle = 30;
+		
+	}
+
+	SpotLightPtr SpotLight::Create(std::string const& name)
+	{
+		SpotLight *pLight = new SpotLight(name);
+		return SpotLightPtr(pLight);
+	}
+
+	Vector3 SpotLight::GetDirection()
+	{
+		GameObjectPtr go = GetBase();
+		return go->GetWorldRotation() * DirectionLight::DefaultDirection;
+	}
+
+	bool SpotLight::Touch(RendererPtr renderObject)
+	{
 		GameObjectPtr lightGo = GetBase();
 		GameObjectPtr renderGo = renderObject->GetBase();
-		if( LightType == LT_Point )
-		{
-			return Range * Range > lightGo->GetWorldPosition().SquaredDistance(renderGo->GetWorldPosition());
-		}
-		
-		if( LightType == LT_Spot )
-		{
-			Vector3 renderPos = renderGo->GetWorldPosition();
-			Vector3 lightPos = lightGo->GetWorldPosition();
-			bool bRange = Range * Range > lightPos.SquaredDistance(renderPos);
-			if( bRange == false )
-				return false;
+		 
+		Vector3 renderPos = renderGo->GetWorldPosition();
+		Vector3 lightPos = lightGo->GetWorldPosition();
+		bool bRange = Range * Range > lightPos.SquaredDistance(renderPos);
+		if( bRange == false )
+			return false;
 
-			float angle = GetDirection().AngleBetween(renderPos - lightPos);
-			return angle * Math::fRad2Deg < SpotAngle;
-		}
-
-		return false;
+		float angle = GetDirection().AngleBetween(renderPos - lightPos);
+		return angle * Math::fRad2Deg < SpotAngle;
+ 
 	}
 }

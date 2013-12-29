@@ -152,6 +152,12 @@ namespace Disorder
 	typedef boost::shared_ptr<FbxSceneImporter> FbxSceneImporterPtr;
 	class Light;
 	typedef boost::shared_ptr<Light> LightPtr;
+	class DirectionLight;
+	typedef boost::shared_ptr<DirectionLight> DirectionLightPtr;
+	class PointLight;
+	typedef boost::shared_ptr<PointLight> PointLightPtr;
+	class SpotLight;
+	typedef boost::shared_ptr<SpotLight> SpotLightPtr;
 	class Config;
 	typedef boost::shared_ptr<Config> ConfigPtr;
 	class Engine;

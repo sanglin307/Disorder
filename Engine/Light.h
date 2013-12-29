@@ -6,7 +6,8 @@ namespace Disorder
 
 	enum ELightType
 	{
-		LT_Directional = 0,
+		LT_None = 0,
+		LT_Directional,
 		LT_Point,
 		LT_Spot
 	};
@@ -26,25 +27,54 @@ namespace Disorder
 		ELightType LightType;
 		Vector3   Color;
 		float     Intensity; 
-		float     SpotAngle;
-		float     Range;
 		bool      CastShadows;
 		Vector3   ShadowColor;
-
 		ELightDecayType DecayType;
 
-		Vector3 GetDirection();
-
-		bool Touch(RendererPtr renderObject);
-
-		static Vector3 DefaultLightDirection;
-
-		static LightPtr Create(std::string const& name);
-
-		void DebugDraw();
-
+		virtual bool Touch(RendererPtr renderObject) = 0;
+		
 	protected:
 		Light(std::string const& name);
+	};
+
+	class DirectionLight : public Light
+	{
+	protected:
+		DirectionLight(std::string const& name);
+		
+	public:
+		static Vector3 DefaultDirection;
+
+		static DirectionLightPtr Create(std::string const& name);
+		Vector3 GetDirection();
+		virtual bool Touch(RendererPtr renderObject);
+		void DebugDraw();
+	};
+
+	class PointLight : public Light
+	{
+	protected:
+		PointLight(std::string const& name);
+	
+	public:
+		float Range;
+		static PointLightPtr Create(std::string const& name);
+		virtual bool Touch(RendererPtr renderObject);
+ 
+	};
+
+	class SpotLight : public Light
+	{
+	protected:
+		SpotLight(std::string const& name);
+
+	public:
+		float Range;
+		float SpotAngle;
+		Vector3 GetDirection();
+		static SpotLightPtr Create(std::string const& name);
+		virtual bool Touch(RendererPtr renderObject);
+ 
 	};
 }
 

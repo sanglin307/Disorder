@@ -665,34 +665,47 @@ namespace Disorder
 
 	void FbxSceneImporter::ProcessLight(FbxNode* pNode,GameObjectPtr const& gameObject)
 	{
-
 		 FbxLight* lLight = (FbxLight*) pNode->GetNodeAttribute();
-		 LightPtr lightObj = Light::Create(gameObject->Name);
-		
+	 
 		 if(lLight->LightType.Get() == FbxLight::ePoint )
-			 lightObj->LightType = LT_Point;
+		 {
+			 PointLightPtr lightObj = PointLight::Create(gameObject->Name);
+			 lightObj->Range = 10;
+			 lightObj->Color.x = (float)lLight->Color.Get()[0];
+		     lightObj->Color.y = (float)lLight->Color.Get()[1];
+		     lightObj->Color.z = (float)lLight->Color.Get()[2];
+
+		     lightObj->Intensity = (float)lLight->Intensity.Get()/100.f;
+			 gameObject->AddComponent(lightObj);
+		 }
 		 else if(lLight->LightType.Get() == FbxLight::eDirectional )
-			 lightObj->LightType = LT_Directional;
+		 {
+			 DirectionLightPtr lightObj = DirectionLight::Create(gameObject->Name);
+			 lightObj->Color.x = (float)lLight->Color.Get()[0];
+		     lightObj->Color.y = (float)lLight->Color.Get()[1];
+		     lightObj->Color.z = (float)lLight->Color.Get()[2];
+
+		     lightObj->Intensity = (float)lLight->Intensity.Get()/100.f;
+			 gameObject->AddComponent(lightObj);
+		 }
 		 else if(lLight->LightType.Get() == FbxLight::eSpot )
-			 lightObj->LightType = LT_Spot;
+		 {
+			 SpotLightPtr lightObj = SpotLight::Create(gameObject->Name);
+			 lightObj->Range = 10;
+			 lightObj->Color.x = (float)lLight->Color.Get()[0];
+		     lightObj->Color.y = (float)lLight->Color.Get()[1];
+		     lightObj->Color.z = (float)lLight->Color.Get()[2];
+
+		     lightObj->Intensity = (float)lLight->Intensity.Get()/100.f;
+			 lightObj->SpotAngle = (float)lLight->InnerAngle.Get();
+			 gameObject->AddComponent(lightObj);
+		 }
 		 else
 		 {
 			 GLogger->Error("Not supported light Type!");
 			 BOOST_ASSERT(0);
 		 }
-
-		 if(lightObj->LightType != LT_Directional )
-			 return;
-
-		 lightObj->Color.x = (float)lLight->Color.Get()[0];
-		 lightObj->Color.y = (float)lLight->Color.Get()[1];
-		 lightObj->Color.z = (float)lLight->Color.Get()[2];
-
-		 lightObj->Intensity = (float)lLight->Intensity.Get()/100.f;
-
-		 lightObj->Range = (float)lLight->InnerAngle.Get();
-
-		 gameObject->AddComponent(lightObj);
+ 
 	}
 
 	void FbxSceneImporter::ProcessMaterials(FbxMesh *pMesh,std::vector<SurfaceMaterialPtr> & materials, int &usedMaterial)

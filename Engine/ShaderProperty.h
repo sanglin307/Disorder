@@ -70,6 +70,7 @@ namespace Disorder
         static const std::string sManagerObject;
         static const std::string sManagerMaterial;
         static const std::string sManagerDirectionLight;
+		static const std::string sManagerForwardFourLight;
 		static const std::string sManagerScene;
         static const std::string sManagerGlobal; // used to save global constant buffer,sampler,texture
 		
@@ -90,10 +91,25 @@ namespace Disorder
 		static const std::string sReflectionColor;
 		static const std::string sShininess;
 
-        // LightProperty
+        // forward direction LightProperty
         static const std::string sDirectionLightIntensity;
         static const std::string sDirectionLightDir;
         static const std::string sDirectionLightColor;
+
+		//forward four light
+		static const std::string sForwardLightPosX;
+		static const std::string sForwardLightPosY;
+		static const std::string sForwardLightPosZ;
+		static const std::string sForwardLightDirX;
+		static const std::string sForwardLightDirY;
+		static const std::string sForwardLightDirZ;
+		static const std::string sForwardLightRangeRcp;
+		static const std::string sForwardSpotCosOuterCone;
+		static const std::string sForwardSpotCosInnerConeRcp;
+		static const std::string sForwardCapsuleLen;
+		static const std::string sForwardLightColorR;
+		static const std::string sForwardLightColorG;
+		static const std::string sForwardLightColorB;
 
 		//for scene property
 		static const std::string sAmbientLowColor;

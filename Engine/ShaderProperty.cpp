@@ -256,6 +256,7 @@ namespace Disorder
     const std::string ShaderPropertyManager::sManagerObject = "ObjectTransform";
     const std::string ShaderPropertyManager::sManagerMaterial = "MaterialProperty";
     const std::string ShaderPropertyManager::sManagerDirectionLight = "DirectionLightProperty";
+	const std::string ShaderPropertyManager::sManagerForwardFourLight = "ForwardFourLights";
 	const std::string ShaderPropertyManager::sManagerScene = "SceneProperty";
 	const std::string ShaderPropertyManager::sManagerGlobal = "Global";
 
@@ -275,11 +276,25 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sReflectionColor = "ReflectionColor";
 	const std::string ShaderPropertyManager::sShininess = "Shininess";
 
-    // LightProperty
+    // Forward Dirction LightProperty
     const std::string ShaderPropertyManager::sDirectionLightIntensity = "DirectionLightIntensity";
     const std::string ShaderPropertyManager::sDirectionLightDir = "DirectionLightDir";
     const std::string ShaderPropertyManager::sDirectionLightColor = "DirectionLightColor";
  
+	// forward four light property
+	const std::string ShaderPropertyManager::sForwardLightPosX = "ForwardLightPosX";
+	const std::string ShaderPropertyManager::sForwardLightPosY = "ForwardLightPosY";
+	const std::string ShaderPropertyManager::sForwardLightPosZ = "ForwardLightPosZ";
+	const std::string ShaderPropertyManager::sForwardLightDirX = "ForwardLightDirX";
+	const std::string ShaderPropertyManager::sForwardLightDirY = "ForwardLightDirY";
+	const std::string ShaderPropertyManager::sForwardLightDirZ = "ForwardLightDirZ";
+	const std::string ShaderPropertyManager::sForwardLightRangeRcp = "ForwardLightRangeRcp";
+	const std::string ShaderPropertyManager::sForwardSpotCosOuterCone = "ForwardSpotCosOuterCone";
+	const std::string ShaderPropertyManager::sForwardSpotCosInnerConeRcp = "ForwardSpotCosInnerConeRcp";
+	const std::string ShaderPropertyManager::sForwardCapsuleLen = "ForwardCapsuleLen";
+	const std::string ShaderPropertyManager::sForwardLightColorR = "ForwardLightColorR";
+	const std::string ShaderPropertyManager::sForwardLightColorG = "ForwardLightColorG";
+	const std::string ShaderPropertyManager::sForwardLightColorB = "ForwardLightColorB";
 
 	// scene ambient
 	const std::string ShaderPropertyManager::sAmbientLowColor = "AmbientLowColor";

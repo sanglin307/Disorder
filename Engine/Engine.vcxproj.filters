@@ -38,15 +38,6 @@
     <None Include="..\Resource\FX\Common.dsf">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\Resource\FX\DiffuseTex.dsf">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Resource\FX\LightPass.dsf">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Resource\FX\LightPassPhong.dsf">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\Config\CameraConfig.xml">
       <Filter>Config</Filter>
     </None>

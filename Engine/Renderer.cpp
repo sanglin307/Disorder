@@ -10,12 +10,19 @@ namespace Disorder
  
 	void Renderer::AddLight(LightPtr & light)
 	{
-		_vLightArray.push_back(light);
+		if( light->LightType == LT_Directional )
+		{
+			DirectionLightPtr dLight = boost::dynamic_pointer_cast<DirectionLight>(light);
+			_vDirectionLights.push_back(dLight);
+		}
+		else
+			_vNonDirectionLights.push_back(light);
 	}
 
 	void Renderer::ClearLight()
 	{
-		_vLightArray.clear();
+		_vNonDirectionLights.clear();
+		_vDirectionLights.clear();
 	}
 
 //////////////////////////////////////////////////////////////////////////

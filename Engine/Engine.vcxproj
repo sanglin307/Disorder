@@ -90,9 +90,6 @@
     <None Include="..\Resource\FX\BasePassPhong.dsf" />
     <None Include="..\Resource\FX\BatchLines.dsf" />
     <None Include="..\Resource\FX\Common.dsf" />
-    <None Include="..\Resource\FX\LightPass.dsf" />
-    <None Include="..\Resource\FX\DiffuseTex.dsf" />
-    <None Include="..\Resource\FX\LightPassPhong.dsf" />
     <None Include="..\Resource\FX\ScreenTiles.dsf" />
     <None Include="TodoList.txt" />
   </ItemGroup>

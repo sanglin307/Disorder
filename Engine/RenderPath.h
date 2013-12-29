@@ -26,8 +26,8 @@ namespace Disorder
 		static ForwardRenderPathPtr Create();
 
 	protected:
-		void SetDirectionLight(LightPtr const& light);
-
+		void SetDirectionLight(const std::vector<DirectionLightPtr>& directionLightArray);
+		void SetFourLight(const std::vector<LightPtr>& lightArray);
 		ForwardRenderPath();
 
 		ShaderPropertyManagerPtr _DirectionLightPropertyManager;
@@ -36,6 +36,22 @@ namespace Disorder
 		ShaderPropertyPtr _DirectionLightColorProperty;
 
 		RenderEffectPtr _DirectionLightEffect;
+
+		ShaderPropertyManagerPtr _LightFourPropertyManager;
+		ShaderPropertyPtr ForwardLightPosX;
+		ShaderPropertyPtr ForwardLightPosY;
+		ShaderPropertyPtr ForwardLightPosZ;
+		ShaderPropertyPtr ForwardLightDirX;
+		ShaderPropertyPtr ForwardLightDirY;
+		ShaderPropertyPtr ForwardLightDirZ;
+		ShaderPropertyPtr ForwardLightRangeRcp;
+		ShaderPropertyPtr ForwardSpotCosOuterCone;
+		ShaderPropertyPtr ForwardSpotCosInnerConeRcp;
+		ShaderPropertyPtr ForwardCapsuleLen;
+		ShaderPropertyPtr ForwardLightColorR;
+		ShaderPropertyPtr ForwardLightColorG;
+		ShaderPropertyPtr ForwardLightColorB;
+		RenderEffectPtr _FourLightEffect;
 
 	};
 }

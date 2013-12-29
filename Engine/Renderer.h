@@ -20,10 +20,17 @@ namespace Disorder
  
 		virtual void AddLight(LightPtr & light);
 		virtual void ClearLight();
-		const std::vector<LightPtr>& GetLightArray() const
+		
+		const std::vector<LightPtr>& GetNonDirectionLights() const
 		{
-			return _vLightArray;
+			return _vNonDirectionLights;
 		}
+
+		const std::vector<DirectionLightPtr>& GetDirectionLights() const
+		{
+			return _vDirectionLights;
+		}
+
 
 		const RenderLayoutPtr& GetRenderLayout() const
 		{
@@ -46,7 +53,8 @@ namespace Disorder
 	protected:
 		RenderEffectPtr _renderEffect;
 		RenderLayoutPtr _renderLayout;
-		std::vector<LightPtr> _vLightArray;
+		std::vector<DirectionLightPtr> _vDirectionLights;
+		std::vector<LightPtr> _vNonDirectionLights;
 	};
  
 	class BatchScreenString : public Renderer

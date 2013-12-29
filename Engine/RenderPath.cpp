@@ -27,17 +27,40 @@ namespace Disorder
 			obj->PreRender(mainCamera);
 
 			// render lights
-			const std::vector<LightPtr>& lightList = obj->GetLightArray();
-			for( size_t i=0;i<lightList.size();i++ )
+			const std::vector<DirectionLightPtr>& directionLightList = obj->GetDirectionLights();
+			if( directionLightList.size() > 0 )
 			{
-				lightList[i]->DebugDraw();
+				SetDirectionLight(directionLightList);
+				obj->SetRenderEffect(_DirectionLightEffect);
+				obj->Render(mainCamera);	 
+			}
 
-				if(lightList[i]->LightType == LT_Directional)
+			//non direction lights
+			const std::vector<LightPtr>& nonDirectionLights = obj->GetNonDirectionLights();
+			size_t lightIndex = 0;
+			std::vector<LightPtr> lightArray;
+			while( lightIndex < nonDirectionLights.size() )
+			{
+				if(lightArray.size() == 4 )
 				{
-					SetDirectionLight(lightList[i]);
-					obj->SetRenderEffect(_DirectionLightEffect);
+					SetFourLight(lightArray);
+					obj->SetRenderEffect(_FourLightEffect);
 					obj->Render(mainCamera);
+					lightArray.clear();
 				}
+				else
+				{
+					lightArray.push_back(nonDirectionLights[lightIndex]);
+				}
+
+				lightIndex++;
+			}
+
+			if(lightArray.size() > 0 )
+			{
+				SetFourLight(lightArray);
+				obj->SetRenderEffect(_FourLightEffect);
+				obj->Render(mainCamera);
 			}
 
 			obj->PostRender(mainCamera);
@@ -57,19 +80,28 @@ namespace Disorder
 		GEngine->RenderEngine->OnDrawEnd();
 	}
 
-	void ForwardRenderPath::SetDirectionLight(LightPtr const& light)
+	void ForwardRenderPath::SetDirectionLight(const std::vector<DirectionLightPtr>& directionLightArray)
 	{
-		if( light->LightType != LT_Directional )
+		BOOST_ASSERT(directionLightArray.size() <=1 );
+
+		if( directionLightArray.size() == 0 )
 			return;
 
+		DirectionLightPtr dLight = directionLightArray[0];
 		_DirectionLightPropertyManager->ClearShaderPropertyValue();
-		_DirectionLightIntensityProperty->SetData(light->Intensity);
-		_DirectionLightDirProperty->SetData(light->GetDirection());
-		_DirectionLightColorProperty->SetData(light->Color);
+		_DirectionLightIntensityProperty->SetData(dLight->Intensity);
+		_DirectionLightDirProperty->SetData(dLight->GetDirection());
+		_DirectionLightColorProperty->SetData(dLight->Color);
 
 		_DirectionLightPropertyManager->UpdateShaderProperty();
 	}
  
+	void ForwardRenderPath::SetFourLight(const std::vector<LightPtr>& lightArray)
+	{
+		BOOST_ASSERT(lightArray.size() <= 4);
+
+
+	}
 
 	ForwardRenderPathPtr ForwardRenderPath::Create()
 	{
@@ -92,5 +124,35 @@ namespace Disorder
 		ShaderObjectPtr pixelShader = GEngine->RenderResManager->CreateShader(ST_PixelShader,"ForwardLightPass",SM_4_0,"DirectionalLightPS");
 		_DirectionLightEffect->BindShader(vertexShader);
 		_DirectionLightEffect->BindShader(pixelShader);
+
+
+		_LightFourPropertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerForwardFourLight);
+		ForwardLightPosX = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightPosX,eSP_Vector4);
+		ForwardLightPosY = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightPosY,eSP_Vector4);
+		ForwardLightPosZ = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightPosZ,eSP_Vector4);
+		ForwardLightDirX = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightDirX,eSP_Vector4);
+		ForwardLightDirY = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightDirY,eSP_Vector4);
+		ForwardLightDirZ = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightDirZ,eSP_Vector4);
+		ForwardLightRangeRcp = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightRangeRcp,eSP_Vector4);
+		ForwardSpotCosOuterCone = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardSpotCosOuterCone,eSP_Vector4);
+		ForwardSpotCosInnerConeRcp = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardSpotCosInnerConeRcp,eSP_Vector4);
+		ForwardCapsuleLen = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardCapsuleLen,eSP_Vector4);
+		ForwardLightColorR = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightColorR,eSP_Vector4);
+		ForwardLightColorG = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightColorG,eSP_Vector4);
+		ForwardLightColorB = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightColorB,eSP_Vector4);
+
+		_FourLightEffect = RenderEffect::Create();
+		ShaderObjectPtr fVertexShader = GEngine->RenderResManager->CreateShader(ST_VertexShader,"ForwardLightPass",SM_4_0,"RenderSceneVS");
+		ShaderObjectPtr fPixelShader = GEngine->RenderResManager->CreateShader(ST_PixelShader,"ForwardLightPass",SM_4_0,"ForwardFourLightPS");
+		_FourLightEffect->BindShader(fVertexShader);
+		_FourLightEffect->BindShader(fPixelShader);
+		BlendDesc bDesc;
+		bDesc.BlendEnable = true;
+		bDesc.BlendOp = BLEND_OP_ADD;
+		bDesc.SrcBlend = BLEND_ONE;
+		bDesc.DestBlend = BLEND_ONE;
+		BlendStatePtr blendState = GEngine->RenderResManager->CreateBlendState(&bDesc,1);
+		_FourLightEffect->BindBlendState(blendState);
+
 	}
 }
