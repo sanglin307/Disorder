@@ -66,7 +66,7 @@ namespace Disorder
 			obj->PostRender(mainCamera);
 		}
 
-		mainCamera->DrawAxis();
+		GSceneManager->DebugDraw();
 
 		// before we call canvas draw ,we should check if we should add stat info to canvas.
 		if(GEngine->Stat.bEnable())
@@ -98,8 +98,80 @@ namespace Disorder
  
 	void ForwardRenderPath::SetFourLight(const std::vector<LightPtr>& lightArray)
 	{
-		BOOST_ASSERT(lightArray.size() <= 4);
+		if( lightArray.size() == 0 )
+			return;
 
+		BOOST_ASSERT(lightArray.size() <= 4);
+	
+		Vector4 LightPosX(0.0f);
+		Vector4 LightPosY(0.0f);
+		Vector4 LightPosZ(0.0f);
+		Vector4 LightDirX(0.0f);
+		Vector4 LightDirY(0.0f);
+		Vector4 LightDirZ(0.0f);
+		Vector4 LightRangeRcp(0.0f);
+		Vector4 SpotCosOuterCone(-2.0f);
+		Vector4 SpotCosInnerConeRcp(1.0f);
+		Vector4 CapsuleLen(0.0f);
+		Vector4 LightColorR(0.0f);
+		Vector4 LightColorG(0.0f);
+		Vector4 LightColorB(0.0f);
+
+		for(size_t i=0;i<lightArray.size();i++)
+		{
+			LightPtr light = lightArray[i];
+			if(light->LightType == LT_Point )
+			{
+				PointLightPtr pLight = boost::dynamic_pointer_cast<PointLight>(light);
+				Vector3 pos = pLight->GetPosition();
+				LightPosX[i] = pos.x;
+				LightPosY[i] = pos.y;
+				LightPosZ[i] = pos.z;
+				LightRangeRcp[i] = 1.0f / pLight->Range;
+				LightColorR[i] = pLight->Color.x;
+				LightColorG[i] = pLight->Color.y;
+				LightColorB[i] = pLight->Color.z;
+			}
+			else if(light->LightType == LT_Spot )
+			{
+				SpotLightPtr sLight = boost::dynamic_pointer_cast<SpotLight>(light);
+				Vector3 pos = sLight->GetPosition();
+				LightPosX[i] = pos.x;
+				LightPosY[i] = pos.y;
+				LightPosZ[i] = pos.z;
+				Vector3 dir = sLight->GetDirection();
+				LightDirX[i] = dir.x;
+				LightDirY[i] = dir.y;
+				LightDirZ[i] = dir.z;
+				LightRangeRcp[i] = 1.0f / sLight->Range;
+				SpotCosInnerConeRcp[i] = 1.0f / Math::Cosf(sLight->SpotInnerAngle);
+				SpotCosOuterCone[i] = Math::Cosf(sLight->SpotOuterAngle);
+				LightColorR[i] = sLight->Color.x;
+				LightColorG[i] = sLight->Color.y;
+				LightColorB[i] = sLight->Color.z;
+			}
+			else
+			{
+				BOOST_ASSERT(0);
+			}
+			
+		}
+
+		_LightFourPropertyManager->ClearShaderPropertyValue();
+		ForwardLightPosX->SetData(LightPosX);
+		ForwardLightPosY->SetData(LightPosY);
+		ForwardLightPosZ->SetData(LightPosZ);
+		ForwardLightDirX->SetData(LightDirX);
+		ForwardLightDirY->SetData(LightDirY);
+		ForwardLightDirZ->SetData(LightDirZ);
+		ForwardLightRangeRcp->SetData(LightRangeRcp);
+		ForwardSpotCosOuterCone->SetData(SpotCosOuterCone);
+		ForwardSpotCosInnerConeRcp->SetData(SpotCosInnerConeRcp);
+		ForwardCapsuleLen->SetData(CapsuleLen);
+		ForwardLightColorR->SetData(LightColorR);
+		ForwardLightColorG->SetData(LightColorG);
+		ForwardLightColorB->SetData(LightColorB);
+		_LightFourPropertyManager->UpdateShaderProperty();
 
 	}
 
@@ -151,8 +223,19 @@ namespace Disorder
 		bDesc.BlendOp = BLEND_OP_ADD;
 		bDesc.SrcBlend = BLEND_ONE;
 		bDesc.DestBlend = BLEND_ONE;
+		bDesc.BlendOpAlpha = BLEND_OP_ADD;
+		bDesc.SrcBlendAlpha = BLEND_ONE;
+		bDesc.DestBlendAlpha = BLEND_ONE;
 		BlendStatePtr blendState = GEngine->RenderResManager->CreateBlendState(&bDesc,1);
 		_FourLightEffect->BindBlendState(blendState);
+
+		RasterizeDesc rDesc;
+
+		DepthStencilDesc dsDesc;
+		dsDesc.DepthFunc = CF_Less_Equal;
+		DepthStencilStatePtr noDepthState = GEngine->RenderResManager->CreateDepthStencilState(&dsDesc,0);
+		_FourLightEffect->BindDepthStencilState(noDepthState);
+
 
 	}
 }

@@ -55,7 +55,7 @@ namespace Disorder
  
 		ClientPtr GameClient;
 		CanvasPtr GameCanvas;
-
+		ConsolePtr GameConsole;
 		RenderEnginePtr RenderEngine;
 		SceneImporterPtr SceneImporter;
 		RenderResourceManagerPtr RenderResManager;

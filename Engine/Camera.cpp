@@ -17,6 +17,10 @@ namespace Disorder
 
     bool CameraSphereTargetUpdate::MouseEvent(Camera *pCamera,MouseInputEvent const& mouseEvent,float deltaSeconds)
 	{
+		/*std::stringstream str;
+		str<<"RZ:"<<mouseEvent.RelativeZ;
+		GLogger->Info(str.str());*/
+
 		const InputManagerPtr inputManager = GEngine->GameClient->GetInputManager();
 		if( inputManager->IsKeyDown(OIS::KC_LMENU) )
 		{
@@ -25,16 +29,16 @@ namespace Disorder
 				if( mouseEvent.RelativeX != 0 )
 				{
 					Vector3 moveDelta = pCamera->_xAxis * pCamera->_moveSpeed * deltaSeconds * (float)mouseEvent.RelativeX;
-					pCamera->_eyePos += moveDelta;
-					_target += moveDelta;
+					pCamera->_eyePos -= moveDelta;
+					_target -= moveDelta;
 					pCamera->_viewMatrixInvalid = true;
 				}
 
 				if( mouseEvent.RelativeY != 0 )
 				{
 					Vector3 moveDelta = pCamera->_upVec * pCamera->_moveSpeed * deltaSeconds * (float)mouseEvent.RelativeY;
-					pCamera->_eyePos -= moveDelta;
-					_target -= moveDelta;
+					pCamera->_eyePos += moveDelta;
+					_target += moveDelta;
 					pCamera->_viewMatrixInvalid = true;
 				}
 			}
@@ -47,12 +51,12 @@ namespace Disorder
 
 				if( mouseEvent.RelativeX != 0 && mouseEvent.buttonDown(OIS::MB_Left) )
 				{				
-					zAngle -= deltaSeconds * pCamera->_rotateSpeed * mouseEvent.RelativeX;	  
+					zAngle += deltaSeconds * pCamera->_rotateSpeed * mouseEvent.RelativeX;	  
 				}
 
 				if( mouseEvent.RelativeY != 0 && mouseEvent.buttonDown(OIS::MB_Left) )
 				{
-					yAngle -= deltaSeconds * pCamera->_rotateSpeed * mouseEvent.RelativeY;	  	    
+					yAngle += deltaSeconds * pCamera->_rotateSpeed * mouseEvent.RelativeY;	  	    
 				}
 
 				if( mouseEvent.RelativeZ != 0 )
@@ -348,23 +352,8 @@ namespace Disorder
 
 	}
 
-	void Camera::DrawAxis()
+	void Camera::DebugDraw()
 	{
-
-	}
-
-	void Camera::Update(float delta)
-	{
- 
-		if( GSceneManager->GetDefaultCamera().get() != this )
-			return;
- 
-		if(_updateStrategy != NULL )
-		{
-			_updateStrategy->Update(this,delta);
-		}
-
-		// debug draw
 		std::stringstream strstream;
 		Vector3 lookAt = _eyePos + _viewVec * 50;
 		float roll = _rotation.GetRoll() * Math::fRad2Deg;
@@ -378,6 +367,19 @@ namespace Disorder
 			GEngine->GameCanvas->DrawString(Vector2(5.0f,GConfig->pRenderConfig->SizeY - 40.f),30,Vector4::ONE,"Spherical Coordinate Mode");
 		}
 		GEngine->GameCanvas->DrawString(Vector2(5.0f,GConfig->pRenderConfig->SizeY - 20.f),30,Vector4::ONE,strstream.str());
+	}
+
+	void Camera::Update(float delta)
+	{
+ 
+		if( GSceneManager->GetDefaultCamera().get() != this )
+			return;
+ 
+		if(_updateStrategy != NULL )
+		{
+			_updateStrategy->Update(this,delta);
+		}
+		
 	}
 
 	void Camera::LookAt(Vector3 const& eyePos,Vector3 const& lookAt,Vector3 const& upVec)

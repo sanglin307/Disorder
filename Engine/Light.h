@@ -32,6 +32,7 @@ namespace Disorder
 		ELightDecayType DecayType;
 
 		virtual bool Touch(RendererPtr renderObject) = 0;
+		virtual void DebugDraw(){};
 		
 	protected:
 		Light(std::string const& name);
@@ -48,7 +49,7 @@ namespace Disorder
 		static DirectionLightPtr Create(std::string const& name);
 		Vector3 GetDirection();
 		virtual bool Touch(RendererPtr renderObject);
-		void DebugDraw();
+		virtual void DebugDraw();
 	};
 
 	class PointLight : public Light
@@ -58,9 +59,10 @@ namespace Disorder
 	
 	public:
 		float Range;
+		Vector3 GetPosition();
 		static PointLightPtr Create(std::string const& name);
 		virtual bool Touch(RendererPtr renderObject);
- 
+        virtual void DebugDraw();
 	};
 
 	class SpotLight : public Light
@@ -70,10 +72,13 @@ namespace Disorder
 
 	public:
 		float Range;
-		float SpotAngle;
+		float SpotInnerAngle;
+		float SpotOuterAngle;
 		Vector3 GetDirection();
+		Vector3 GetPosition();
 		static SpotLightPtr Create(std::string const& name);
 		virtual bool Touch(RendererPtr renderObject);
+		virtual void DebugDraw();
  
 	};
 }

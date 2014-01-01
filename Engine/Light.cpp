@@ -57,6 +57,12 @@ namespace Disorder
 		Range = 10.0f;
 	}
 
+	Vector3 PointLight::GetPosition()
+	{
+		GameObjectPtr lightGo = GetBase();
+		return lightGo->GetWorldPosition();
+	}
+
 	PointLightPtr PointLight::Create(std::string const& name)
 	{
 		PointLight *pLight = new PointLight(name);
@@ -70,6 +76,9 @@ namespace Disorder
 		return Range * Range > lightGo->GetWorldPosition().SquaredDistance(renderGo->GetWorldPosition());
 	}
 
+	void PointLight::DebugDraw()
+	{
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -77,8 +86,15 @@ namespace Disorder
 		:Light(name)
 	{
 		LightType = LT_Spot;
-		SpotAngle = 30;
+		SpotInnerAngle = 30 * Math::fDeg2Rad;
+		SpotOuterAngle = 90 * Math::fDeg2Rad;
 		
+	}
+
+	Vector3 SpotLight::GetPosition()
+	{
+		GameObjectPtr lightGo = GetBase();
+		return lightGo->GetWorldPosition();
 	}
 
 	SpotLightPtr SpotLight::Create(std::string const& name)
@@ -93,6 +109,10 @@ namespace Disorder
 		return go->GetWorldRotation() * DirectionLight::DefaultDirection;
 	}
 
+	void SpotLight::DebugDraw()
+	{
+	}
+
 	bool SpotLight::Touch(RendererPtr renderObject)
 	{
 		GameObjectPtr lightGo = GetBase();
@@ -105,7 +125,7 @@ namespace Disorder
 			return false;
 
 		float angle = GetDirection().AngleBetween(renderPos - lightPos);
-		return angle * Math::fRad2Deg < SpotAngle;
+		return angle < SpotOuterAngle;
  
 	}
 }

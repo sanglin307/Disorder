@@ -50,6 +50,8 @@ namespace Disorder
 			_renderEffect = effect;
 		}
  
+		virtual void DebugDraw(){};
+
 	protected:
 		RenderEffectPtr _renderEffect;
 		RenderLayoutPtr _renderLayout;
@@ -122,7 +124,7 @@ namespace Disorder
 	      SurfaceMaterialPtr _material;
 
 	private:
-		  void SetDynamicLightPass(LightPtr const& light);
+
 		  void DrawAxis(CameraPtr const& camera);
 		  void DrawBoundingBox(CameraPtr const& camera);
 
@@ -139,7 +141,7 @@ namespace Disorder
 		  virtual void PreRender(CameraPtr const& camera);
 		  virtual void Render(CameraPtr const& camera);
 		  virtual void PostRender(CameraPtr const& camera);
-
+		  virtual void DebugDraw();
 	protected:
  
 		// for each light

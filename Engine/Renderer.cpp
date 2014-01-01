@@ -440,6 +440,13 @@ namespace Disorder
 	     GEngine->GameCanvas->DrawLine(boxVec8,color,boxVec5,color);
 	 }
 	
+	 void GeometryRenderer::DebugDraw()
+	 {
+		  CameraPtr camera = GSceneManager->GetDefaultCamera();
+		  DrawAxis(camera);
+		  DrawBoundingBox(camera);
+	 }
+
 	  void GeometryRenderer::DrawAxis(CameraPtr const& camera)
 	  {
 		 // draw local axis for debug
@@ -471,26 +478,9 @@ namespace Disorder
 	  }
 
 	 void GeometryRenderer::PostRender(CameraPtr const& camera)
-	 {
-		  DrawAxis(camera);
-		  DrawBoundingBox(camera);
+	 {	 
 	 }
  
- 
-	void GeometryRenderer::SetDynamicLightPass(LightPtr const& light)
-	{
-		BOOST_ASSERT(light->LightType != LT_Directional);
-
-	/*	_material->LightType->SetData((int)(light->LightType));
-		_material->LightIntensity->SetData((float)(light->Intensity));
-		GameObjectPtr go = light->GetBase();
-		if( light->LightType == LT_Point )
-		{
-			_material->LightPos->SetData(go->GetWorldPosition());
-		}
-
-		_material->LightColor->SetData(light->Color);*/
-	}
 
 	void GeometryRenderer::Render(CameraPtr const& camera)
 	{

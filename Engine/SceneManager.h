@@ -40,6 +40,9 @@ namespace Disorder
 		void SetAmbientColor(Vector3 const& lowerColor,Vector3 const& upperColor);
 		void UpdateShaderProperty();
 		
+		void DebugDraw();
+
+		bool EnableDebugDraw;
 
 	protected:
 		static SceneManagerPtr Create();
@@ -50,8 +53,7 @@ namespace Disorder
 		CameraMap   _mCameraObjects;
 		CameraPtr   _mDefaultCamera;
 
-		std::vector<LightPtr> _vDirectionalLights;
-		std::vector<LightPtr> _vNonDirectionalLights;
+		std::vector<LightPtr> _vLightList;
 		std::vector<RendererPtr> _vRenderObjects;
 
 		SceneImporterPtr _sceneImporter;

@@ -93,7 +93,7 @@ namespace Disorder
 		Frustrum CameraFrustrum;
 
 		void SetUpdateStrategy(ECameraUpdateStrategy mode);
-		void DrawAxis();
+		void DebugDraw();
 
 		void UpdateShaderProperty();
 

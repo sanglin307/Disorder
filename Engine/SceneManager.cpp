@@ -14,10 +14,26 @@ namespace Disorder
 		_sAmbientLowerProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientLowColor,eSP_Vector3);
 		_sAmbientUpperProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientUpperColor,eSP_Vector3);
 
+		EnableDebugDraw = true;
 	}
 
 	void SceneManager::Exit()
 	{
+	}
+
+	void SceneManager::DebugDraw()
+	{
+		if( !EnableDebugDraw )
+			return;
+        
+		for(size_t i=0;i<_vLightList.size();i++)
+			_vLightList[i]->DebugDraw();
+
+		for(size_t j=0;j<_vRenderObjects.size();j++ )
+			_vRenderObjects[j]->DebugDraw();
+
+		if( _mDefaultCamera != NULL )
+			_mDefaultCamera->DebugDraw();
 	}
 
 	void SceneManager::GetRendererList(CameraPtr const camera,std::vector<RendererPtr>& renderObjList) const
@@ -112,15 +128,10 @@ namespace Disorder
 		for(unsigned int i=0;i<_vRenderObjects.size();i++ )
 		{
 			_vRenderObjects[i]->ClearLight();
-			for(unsigned int j=0;j<_vDirectionalLights.size();j++)
+			for(unsigned int j=0;j<_vLightList.size();j++)
 			{
-				_vRenderObjects[i]->AddLight(_vDirectionalLights[j]);
-			}
-
-			for(unsigned int k=0;k<_vNonDirectionalLights.size();k++)
-			{
-				if( _vNonDirectionalLights[k]->Touch(_vRenderObjects[i]))
-					_vRenderObjects[i]->AddLight(_vNonDirectionalLights[k]);
+				if( _vLightList[j]->Touch(_vRenderObjects[i]) )
+				   _vRenderObjects[i]->AddLight(_vLightList[j]);
 			}
 		}
 	}
@@ -132,10 +143,7 @@ namespace Disorder
 		if( _mLightObjects.find(light->Name) == _mLightObjects.end() )
 		{
 			_mLightObjects.insert(std::pair<std::string,LightPtr>(light->Name,light));
-			if( light->LightType == LT_Directional )
-				_vDirectionalLights.push_back(light);
-			else
-				_vNonDirectionalLights.push_back(light);
+			_vLightList.push_back(light);
 		}
 	}
 

@@ -697,7 +697,9 @@ namespace Disorder
 		     lightObj->Color.z = (float)lLight->Color.Get()[2];
 
 		     lightObj->Intensity = (float)lLight->Intensity.Get()/100.f;
-			 lightObj->SpotAngle = (float)lLight->InnerAngle.Get();
+			 lightObj->SpotInnerAngle = (float)lLight->InnerAngle.Get();
+			 lightObj->SpotOuterAngle = (float)lLight->OuterAngle.Get();
+
 			 gameObject->AddComponent(lightObj);
 		 }
 		 else

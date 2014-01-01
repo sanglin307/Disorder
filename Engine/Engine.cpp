@@ -27,7 +27,7 @@ namespace Disorder
 	   RenderEngine->CreateViewport(viewport->GetWindow());
 	 
 	   GameCanvas = Canvas::Create(viewport->SizeX,viewport->SizeY);
-
+	   GameConsole = Console::Create();
 	   GSceneManager->Init();
  
 	   GWorld->Init();

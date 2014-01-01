@@ -158,6 +158,8 @@ namespace Disorder
 	typedef boost::shared_ptr<PointLight> PointLightPtr;
 	class SpotLight;
 	typedef boost::shared_ptr<SpotLight> SpotLightPtr;
+	class Console;
+	typedef boost::shared_ptr<Console> ConsolePtr;
 	class Config;
 	typedef boost::shared_ptr<Config> ConfigPtr;
 	class Engine;
