@@ -73,7 +73,9 @@ namespace Disorder
 
 	    virtual void Tick(float delta);
 		virtual bool IsKeyDown(OIS::KeyCode key);
-
+		int  GetMousePosX();
+		int GetMousePosY();
+		int GetMousePosWheel();
 		static InputManagerPtr Create(unsigned int hWnd);
 
 	private:

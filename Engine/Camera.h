@@ -66,11 +66,12 @@ namespace Disorder
 
 	protected:
 		CameraSphereTargetUpdate(float radius,const Vector3& target)
-			:_radius(radius),_target(target)
+			:_radius(radius),_target(target),_zoomPos(-1)
 		{};
 
 		float _radius;
 		Vector3 _target;
+		int _zoomPos;
 	};
 
 	class Camera : public InputListener,public Component

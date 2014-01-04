@@ -12,17 +12,28 @@ namespace Disorder
 
 	bool CameraSphereTargetUpdate::KeyboardEvent(Camera *pCamera,OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds)
 	{
-		return true;
+		if( key == OIS::KC_LMENU )
+		{
+			const InputManagerPtr inputManager = GEngine->GameClient->GetInputManager();
+			if( state == IS_Press )
+			{
+				_zoomPos = inputManager->GetMousePosWheel();
+			}
+			else if( state == IS_Release )
+			{
+				_zoomPos = -1;
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
     bool CameraSphereTargetUpdate::MouseEvent(Camera *pCamera,MouseInputEvent const& mouseEvent,float deltaSeconds)
 	{
-		/*std::stringstream str;
-		str<<"RZ:"<<mouseEvent.RelativeZ;
-		GLogger->Info(str.str());*/
-
 		const InputManagerPtr inputManager = GEngine->GameClient->GetInputManager();
-		if( inputManager->IsKeyDown(OIS::KC_LMENU) )
+		if( inputManager->IsKeyDown( OIS::KC_LMENU ) )
 		{
 			if( mouseEvent.buttonDown(OIS::MB_Right) )
 			{
@@ -42,7 +53,7 @@ namespace Disorder
 					pCamera->_viewMatrixInvalid = true;
 				}
 			}
-			else if( mouseEvent.RelativeX != 0 || mouseEvent.RelativeY != 0 || mouseEvent.RelativeZ != 0)
+			else if(mouseEvent.RelativeX != 0 || mouseEvent.RelativeY != 0 || _zoomPos != -1)
 			{
 				float yAngle = 0.f;
 				float zAngle = 0.f;
@@ -59,9 +70,16 @@ namespace Disorder
 					yAngle += deltaSeconds * pCamera->_rotateSpeed * mouseEvent.RelativeY;	  	    
 				}
 
-				if( mouseEvent.RelativeZ != 0 )
+				if( _zoomPos != -1 )
 				{
-					_radius -= mouseEvent.RelativeZ * deltaSeconds;
+					int deltaWheel = mouseEvent.AbsoluteZ - _zoomPos;
+
+					if( deltaWheel != 0 )
+					{
+						_radius -= deltaWheel * deltaSeconds;
+					}
+
+					_zoomPos = mouseEvent.AbsoluteZ;
 				}
 
 				if( _radius < 5 )
@@ -87,8 +105,10 @@ namespace Disorder
 				upVec.Normalise();
 				pCamera->LookAt_(finalPos,_target,upVec);
 			}		
+	
+			
+		 
 		}
-
 		return true;
 	}
 

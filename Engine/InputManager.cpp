@@ -154,6 +154,21 @@ namespace Disorder
 		OIS::InputManager::destroyInputSystem(_oisInputManager);
 	}
 
+	int InputManager::GetMousePosX()
+	{
+		return _oisMouse->getMouseState().X.abs;
+	}
+
+	int InputManager::GetMousePosY()
+	{
+		return _oisMouse->getMouseState().Y.abs;
+	}
+
+	int InputManager::GetMousePosWheel()
+	{
+		return _oisMouse->getMouseState().Z.abs;
+	}
+
 	bool InputManager::IsKeyDown(OIS::KeyCode key)
 	{
 		return _oisKeyboard->isKeyDown(key);
