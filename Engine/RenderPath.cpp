@@ -5,16 +5,17 @@ namespace Disorder
 	//////////////////////////////////////////////////////////////////////////////////////////
 	void ForwardRenderPath::Render()
 	{
-		GEngine->RenderEngine->SetRenderTarget(GRenderSurface.RenderTarget,GRenderSurface.DepthStencilBuffer);
-		GEngine->RenderEngine->ClearRenderTarget(GRenderSurface.RenderTarget,Vector4(0.1f,0.1f,0.1f,1.0f));
-		GEngine->RenderEngine->ClearDepthStencil(GRenderSurface.DepthStencilBuffer,true,1.0f,false,0);
-		GEngine->RenderEngine->OnDrawBegin();
-
 		CameraPtr mainCamera = GSceneManager->GetDefaultCamera();
 
 		if( mainCamera == NULL )
 			return;
 
+		GEngine->RenderEngine->OnDrawBegin();
+
+		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,GEngine->RenderSurfaceCache->DepthStencilBuffer);
+		GEngine->RenderEngine->ClearRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,Vector4(0.1f,0.1f,0.1f,1.0f));
+		GEngine->RenderEngine->ClearDepthStencil(GEngine->RenderSurfaceCache->DepthStencilBuffer,true,1.0f,false,0);
+ 
 		GSceneManager->UpdateShaderProperty();
 		mainCamera->UpdateShaderProperty();
 
@@ -185,20 +186,20 @@ namespace Disorder
 	{
 		_type = RPT_ForwardLighting;
 
-		_DirectionLightPropertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerDirectionLight);
+		_DirectionLightPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerDirectionLight);
 
 		_DirectionLightIntensityProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightIntensity,eSP_Float);
 		_DirectionLightDirProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightDir,eSP_Vector3);
 		_DirectionLightColorProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightColor,eSP_Vector3);
 
 		_DirectionLightEffect = RenderEffect::Create();
-		ShaderObjectPtr vertexShader = GEngine->RenderResManager->CreateShader(ST_VertexShader,"ForwardLightPass",SM_4_0,"RenderSceneVS");
-		ShaderObjectPtr pixelShader = GEngine->RenderResManager->CreateShader(ST_PixelShader,"ForwardLightPass",SM_4_0,"DirectionalLightPS");
+		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLightPass",SM_4_0,"RenderSceneVS");
+		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLightPass",SM_4_0,"DirectionalLightPS");
 		_DirectionLightEffect->BindShader(vertexShader);
 		_DirectionLightEffect->BindShader(pixelShader);
 
 
-		_LightFourPropertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerForwardFourLight);
+		_LightFourPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerForwardFourLight);
 		ForwardLightPosX = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightPosX,eSP_Vector4);
 		ForwardLightPosY = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightPosY,eSP_Vector4);
 		ForwardLightPosZ = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightPosZ,eSP_Vector4);
@@ -214,8 +215,8 @@ namespace Disorder
 		ForwardLightColorB = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightColorB,eSP_Vector4);
 
 		_FourLightEffect = RenderEffect::Create();
-		ShaderObjectPtr fVertexShader = GEngine->RenderResManager->CreateShader(ST_VertexShader,"ForwardLightPass",SM_4_0,"RenderSceneVS");
-		ShaderObjectPtr fPixelShader = GEngine->RenderResManager->CreateShader(ST_PixelShader,"ForwardLightPass",SM_4_0,"ForwardFourLightPS");
+		ShaderObjectPtr fVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLightPass",SM_4_0,"RenderSceneVS");
+		ShaderObjectPtr fPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLightPass",SM_4_0,"ForwardFourLightPS");
 		_FourLightEffect->BindShader(fVertexShader);
 		_FourLightEffect->BindShader(fPixelShader);
 		BlendDesc bDesc;
@@ -226,16 +227,99 @@ namespace Disorder
 		bDesc.BlendOpAlpha = BLEND_OP_ADD;
 		bDesc.SrcBlendAlpha = BLEND_ONE;
 		bDesc.DestBlendAlpha = BLEND_ONE;
-		BlendStatePtr blendState = GEngine->RenderResManager->CreateBlendState(&bDesc,1);
+		BlendStatePtr blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc,1);
 		_FourLightEffect->BindBlendState(blendState);
 
 		RasterizeDesc rDesc;
 
 		DepthStencilDesc dsDesc;
 		dsDesc.DepthFunc = CF_Less_Equal;
-		DepthStencilStatePtr noDepthState = GEngine->RenderResManager->CreateDepthStencilState(&dsDesc,0);
+		DepthStencilStatePtr noDepthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dsDesc,0);
 		_FourLightEffect->BindDepthStencilState(noDepthState);
 
 
 	}
+
+	////////////////////////////////////////////////////////////////////////////////////////
+
+	DeferredShadingPtr DeferredShading::Create()
+	{
+		DeferredShading *pShading = new DeferredShading;
+		return DeferredShadingPtr(pShading);
+	}
+
+	DeferredShading::DeferredShading()
+	{
+		_type = RPT_DeferredShading;
+
+		_RenderSceneEffect = RenderEffect::Create();
+		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShadingPass",SM_4_0,"RenderSceneVS");
+		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShadingPass",SM_4_0,"RenderScenePS");
+		_RenderSceneEffect->BindShader(vertexShader);
+		_RenderSceneEffect->BindShader(pixelShader);
+
+
+		GEngine->RenderSurfaceCache->InitGBuffer(GConfig->pRenderConfig->SizeX,GConfig->pRenderConfig->SizeY);
+	}
+
+	void DeferredShading::Render()
+	{
+		CameraPtr mainCamera = GSceneManager->GetDefaultCamera();
+
+		if( mainCamera == NULL )
+			return;
+
+		GSceneManager->UpdateShaderProperty();
+		mainCamera->UpdateShaderProperty();
+
+		GEngine->RenderEngine->OnDrawBegin();
+	
+		RenderSurfacePtr depthSurfacePtr = GEngine->RenderSurfaceCache->GBuffer->DepthStencilBuffer;
+		RenderSurfacePtr colorSurfacePtr = GEngine->RenderSurfaceCache->GBuffer->BasicColorBuffer;
+		RenderSurfacePtr normalSurfacePtr = GEngine->RenderSurfaceCache->GBuffer->NormalDataBuffer;
+		RenderSurfacePtr specularSurfacePtr = GEngine->RenderSurfaceCache->GBuffer->SpecularDataBuffer;
+
+		GEngine->RenderEngine->ClearDepthStencil(depthSurfacePtr,true,1.f,true,0);
+		GEngine->RenderEngine->ClearRenderTarget(colorSurfacePtr,Vector4::ZERO);
+		GEngine->RenderEngine->ClearRenderTarget(normalSurfacePtr,Vector4::ZERO);
+		GEngine->RenderEngine->ClearRenderTarget(specularSurfacePtr,Vector4::ZERO);
+
+		std::vector<RenderSurfacePtr> vRenderSurface;
+		vRenderSurface.push_back(colorSurfacePtr);
+		vRenderSurface.push_back(normalSurfacePtr);
+		vRenderSurface.push_back(specularSurfacePtr);
+
+		GEngine->RenderEngine->SetRenderTarget(vRenderSurface,GEngine->RenderSurfaceCache->GBuffer->DepthStencilBuffer);
+ 
+		RenderScene(mainCamera);
+
+		static bool sSaveTest = false;
+		if( sSaveTest )
+		{
+			GEngine->RenderEngine->SaveRenderSurface(depthSurfacePtr,"GBuffer_DepthStencilBuffer.bmp");
+			GEngine->RenderEngine->SaveRenderSurface(colorSurfacePtr,"GBuffer_BaseColorBuffer.bmp");
+			GEngine->RenderEngine->SaveRenderSurface(normalSurfacePtr,"GBuffer_NormalBuffer.bmp");
+			GEngine->RenderEngine->SaveRenderSurface(specularSurfacePtr,"GBuffer_SpecularBuffer.bmp");
+
+			sSaveTest = false;
+		}
+
+
+	}
+
+	void DeferredShading::RenderScene(const CameraPtr& mainCamera)
+	{
+		std::vector<RendererPtr> rendererList;
+		GSceneManager->GetRendererList(mainCamera,rendererList);
+		for(unsigned int i=0;i< rendererList.size(); i++ )
+		{
+			RendererPtr obj = rendererList[i];
+			obj->BuildRenderLayout(_RenderSceneEffect->GetVertexShader(),false);
+			obj->PreRender(mainCamera);
+			obj->SetRenderEffect(_RenderSceneEffect);
+			obj->Render(mainCamera);
+			obj->PostRender(mainCamera);
+		}
+	}
+ 
 }

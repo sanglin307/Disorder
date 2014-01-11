@@ -23,12 +23,12 @@ namespace Disorder
 			 return NULL;
 		 }
 		 const ImageSpec& spec = imageInput->spec();
-		 std::vector<unsigned char> vPixels(spec.width*spec.height*spec.nchannels);
+		 std::vector<unsigned char> vPixels((size_t)spec.image_bytes());
 		 imageInput->read_image(TypeDesc::UINT8,&vPixels[0]);
 		 imageInput->close();
 		 delete imageInput;
 
-		 ImagePtr imagePtr = Image::Create(spec,vPixels);
+		 ImagePtr imagePtr = Image::Create(spec,vPixels.data());
 		 _mapImages[fileName] = imagePtr;
 
 		 return imagePtr;
@@ -56,6 +56,9 @@ namespace Disorder
 
 	void ImageManager::Save(std::string const& fileName,ImagePtr const& image)
 	{
+		if( image == NULL )
+			return;
+
 		std::string imageFile = GConfig->sResourceTexPath + fileName;
 		ImageOutput *imageOut = ImageOutput::create(imageFile.c_str());
 		if( !imageOut )
@@ -72,29 +75,198 @@ namespace Disorder
 		delete imageOut;
 	}
 
-	ImagePtr Image::Create(ImageSpec const& spec,std::vector<unsigned char> const& pixels)
+	////////////////////////////////////////////////////////////////////////////////////////
+
+	Image::~Image()
 	{
-		Image *pImage = new Image(spec,pixels);
+		if( _pPixelRawData )
+			delete _pPixelRawData;
+	}
+ 
+	ImagePtr Image::Create(ImageSpec const& spec,void* pData)
+	{
+		Image *pImage = new Image(spec,pData);
 		return ImagePtr(pImage);
 	}
 
 	ImagePtr Image::Create(int width,int height,int channels,unsigned char* pixels)
 	{
-		Image *pImage = new Image(width,height,channels,pixels);
+		Image *pImage = new Image(ImageSpec(width,height,channels,TypeDesc::UINT8),pixels);
 		return ImagePtr(pImage);
 	}
 
-
-	Image::Image(int width,int height,int channels,unsigned char* pixels)
+	ImagePtr Image::Create(int width,int height,int channels,unsigned short* pixels)
 	{
-		_imageSpec = ImageSpec(width,height,channels,TypeDesc::UINT8);
-		int size = width*height*channels;
-		_vPixels.resize(size);
-		memcpy(&_vPixels[0],pixels,size*sizeof(unsigned char));
+		Image *pImage = new Image(ImageSpec(width,height,channels,TypeDesc::UINT16),pixels);
+		return ImagePtr(pImage);
 	}
 
-	Image::Image(ImageSpec const& spec,std::vector<unsigned char> const& pixels)
-		:_imageSpec(spec),_vPixels(pixels)
+    ImagePtr Image::Create(int width,int height,int channels,unsigned int* pixels)
 	{
+		Image *pImage = new Image(ImageSpec(width,height,channels,TypeDesc::UINT32),pixels);
+		return ImagePtr(pImage);
+	}
+
+	ImagePtr Image::Create(int width,int height,int channels,float* pixels)
+	{
+		Image *pImage = new Image(ImageSpec(width,height,channels,TypeDesc::FLOAT),pixels);
+		return ImagePtr(pImage);
+	}
+
+	void Image::InitImage(unsigned int bytes,void* pData)
+	{
+		BOOST_ASSERT(_pPixelRawData == NULL);
+		_pPixelRawData = new unsigned int[bytes];
+		memcpy(_pPixelRawData,pData,bytes);
+	}
+ 
+	Image::Image(ImageSpec const& spec,void* pPixels)
+		:_imageSpec(spec),_pPixelRawData(NULL)
+	{
+		InitImage((size_t)spec.image_bytes(),pPixels);
+	}
+
+	ImagePtr Image::Create(int width,int height,PixelFormat format,void* pData)
+	{
+		// only support some format
+		ImageSpec spec;
+		switch (format)
+		{
+		  case PF_A8_UNORM:
+		  case PF_R8_SINT:
+		  case PF_R8_SNORM:
+		  case PF_R8_TYPELESS:
+		  case PF_R8_UINT:
+		  case PF_R8_UNORM:
+			  spec = ImageSpec(width,height,1,TypeDesc::UINT8);
+			  break;
+		  case PF_B5G5R5A1_UNORM:
+		  case PF_B5G6R5_UNORM:
+		  case PF_D16_UNORM:
+		  case PF_R16_FLOAT:
+		  case PF_R16_SINT:
+		  case PF_R16_SNORM:
+		  case PF_R16_TYPELESS:
+		  case PF_R16_UINT:
+		  case PF_R16_UNORM:
+		  case PF_R8G8_SINT:
+		  case PF_R8G8_SNORM:
+		  case PF_R8G8_TYPELESS:
+		  case PF_R8G8_UINT:
+		  case PF_R8G8_UNORM:
+			  spec = ImageSpec(width,height,2,TypeDesc::UINT8);
+			  break;
+		  case PF_D24_UNORM_S8_UINT:
+		  case PF_R24_UNORM_X8_TYPELESS:
+		  case PF_R24G8_TYPELESS:
+		  case PF_D32_FLOAT:
+		  case PF_D32_FLOAT_S8X24_UINT:
+		  case PF_R32_FLOAT:
+		  case PF_R32_FLOAT_X8X24_TYPELESS:
+		  case PF_R32_SINT:
+		  case PF_R32_TYPELESS:
+		  case PF_R32_UINT:
+			  spec = ImageSpec(width,height,4,TypeDesc::UINT8);
+			  break;
+	
+		  case PF_R10G10B10_XR_BIAS_A2_UNORM:
+		  case PF_R10G10B10A2_TYPELESS:
+		  case PF_R10G10B10A2_UINT:
+		  case PF_R10G10B10A2_UNORM:
+		  case PF_R11G11B10_FLOAT:
+			  spec = ImageSpec(width,height,4,TypeDesc::UINT8);
+			  break;
+		  case PF_R16G16_FLOAT:
+		  case PF_R16G16_SINT:
+		  case PF_R16G16_SNORM:
+		  case PF_R16G16_TYPELESS:
+		  case PF_R16G16_UINT:
+		  case PF_R16G16_UNORM:
+		      spec = ImageSpec(width,height,2,TypeDesc::UINT16);
+			  break;
+
+		  case PF_B8G8R8X8_TYPELESS:
+		  case PF_B8G8R8X8_UNORM:
+		  case PF_B8G8R8X8_UNORM_SRGB:	 
+		  case PF_G8R8_G8B8_UNORM: 
+		  case PF_R8G8_B8G8_UNORM:
+		  case PF_R8G8B8A8_SINT:
+		  case PF_R8G8B8A8_SNORM:
+		  case PF_R8G8B8A8_TYPELESS:
+		  case PF_R8G8B8A8_UINT:
+		  case PF_R8G8B8A8_UNORM:
+		  case PF_R8G8B8A8_UNORM_SRGB:
+		  case PF_B8G8R8A8_TYPELESS:
+		  case PF_B8G8R8A8_UNORM:
+		  case PF_B8G8R8A8_UNORM_SRGB:
+		  case PF_R9G9B9E5_SHAREDEXP:
+		  case PF_X24_TYPELESS_G8_UINT:
+		  case PF_X32_TYPELESS_G8X24_UINT:
+			  spec = ImageSpec(width,height,4,TypeDesc::UINT8);
+			  break;
+		  case PF_R16G16B16A16_FLOAT:
+		  case PF_R16G16B16A16_SINT:
+		  case PF_R16G16B16A16_SNORM:
+		  case PF_R16G16B16A16_TYPELESS:
+		  case PF_R16G16B16A16_UINT:
+		  case PF_R16G16B16A16_UNORM:
+			  spec = ImageSpec(width,height,4,TypeDesc::UINT16);
+			  break;
+		  case PF_R32G32_FLOAT:
+		  case PF_R32G32_SINT:
+		  case PF_R32G32_TYPELESS:
+		  case PF_R32G32_UINT:
+		  case PF_R32G8X24_TYPELESS:
+			  spec = ImageSpec(width,height,2,TypeDesc::UINT32);
+			  break;
+
+		  case PF_R32G32B32_FLOAT:
+		  case PF_R32G32B32_SINT:
+		  case PF_R32G32B32_TYPELESS:
+		  case PF_R32G32B32_UINT:
+			  spec = ImageSpec(width,height,3,TypeDesc::UINT32);
+			  break;
+
+		  case PF_R32G32B32A32_FLOAT:
+		  case PF_R32G32B32A32_SINT:
+		  case PF_R32G32B32A32_TYPELESS:
+		  case PF_R32G32B32A32_UINT:
+			  spec = ImageSpec(width,height,4,TypeDesc::UINT32);
+			  break;
+
+		 // case PF_BC1_TYPELESS:
+		 // case PF_BC1_UNORM:
+		 // case PF_BC1_UNORM_SRGB:
+		 // case PF_BC4_SNORM:
+		 // case PF_BC4_TYPELESS:
+		 // case PF_BC4_UNORM:
+			//return 4;
+
+		 // case PF_BC2_TYPELESS:
+		 // case PF_BC2_UNORM:
+		 // case PF_BC2_UNORM_SRGB:
+		 // case PF_BC3_TYPELESS:
+		 // case PF_BC3_UNORM:
+		 // case PF_BC3_UNORM_SRGB:
+		 // case PF_BC5_SNORM:
+		 // case PF_BC5_TYPELESS:
+		 // case PF_BC5_UNORM:
+		 // case PF_BC6H_SF16:
+		 // case PF_BC6H_TYPELESS:
+		 // case PF_BC6H_UF16:
+		 // case PF_BC7_TYPELESS:
+		 // case PF_BC7_UNORM:
+		 // case PF_BC7_UNORM_SRGB:
+			//return 8;
+
+		  default:
+			  std::stringstream str;
+			  str<< "Not support pixel format:"<< format << "  to save to image!";
+			  GLogger->Error(str.str());
+			  return NULL;
+	    }
+
+		Image *pImage = new Image(spec,pData);
+		return ImagePtr(pImage);
 	}
 }

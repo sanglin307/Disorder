@@ -19,6 +19,7 @@ namespace Disorder
 
 		virtual void ClearRenderTarget(const RenderSurfacePtr& renderTarget,const Vector4& color ) = 0;
 		virtual void ClearDepthStencil(const RenderSurfacePtr& depthBuffer,bool bClearDepth,float depth,bool bClearStencil,unsigned char stencil) = 0;
+		virtual void SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget,const RenderSurfacePtr& depthStencil) = 0;
 		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil) = 0;
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout) = 0;
 		
@@ -30,10 +31,20 @@ namespace Disorder
 		virtual void UnMap(RenderBufferPtr const& buffer) = 0;
 		virtual void UpdateSubresource(RenderBufferPtr const& buffer,void* pSrcData,unsigned int srcDataSize) = 0;
 
+		virtual void SaveRenderSurface(RenderSurfacePtr const& surface,std::string const& fileName){};
+
         BlendStatePtr CachedBlendState;
         RasterizeStatePtr CachedRasterizeState;
 		DepthStencilStatePtr CachedDepthStencilState;
  
+		static size_t ComputePixelSizeBits(PixelFormat format);
+		static size_t ComputeBlockSizeBits(PixelFormat format);
+		static size_t ComputePixelChannel(PixelFormat format); 
+		static bool  IsCompressed(PixelFormat format);
+		static unsigned int GetTextureFormatDimensionAlignment(PixelFormat format);
+		static bool IsDepthStencilFormat(PixelFormat format);
+		static PixelFormat GetDepthTextureFormat(PixelFormat format);
+
 	protected:
 		virtual void SetBlendState(BlendStatePtr const& blendState) = 0;
 		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState)=0;

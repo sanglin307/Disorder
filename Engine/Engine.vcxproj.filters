@@ -29,9 +29,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="TodoList.txt" />
-    <None Include="..\Resource\FX\BasePassPhong.dsf">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\Resource\FX\BatchLines.dsf">
       <Filter>Shaders</Filter>
     </None>
@@ -53,6 +50,9 @@
     <None Include="..\Resource\FX\ForwardLightPass.dsf">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="..\Resource\FX\DeferredShadingPass.dsf">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrixs.h">
@@ -66,9 +66,6 @@
     </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderUtil.h">
-      <Filter>RenderSystem</Filter>
     </ClInclude>
     <ClInclude Include="RenderState.h">
       <Filter>RenderSystem</Filter>
@@ -161,9 +158,6 @@
     <ClInclude Include="Material.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>RenderSystem</Filter>
-    </ClInclude>
     <ClInclude Include="RenderEffect.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
@@ -177,9 +171,6 @@
       <Filter>Mathematics</Filter>
     </ClInclude>
     <ClInclude Include="RenderPath.h">
-      <Filter>RenderSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderInclude.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
     <ClInclude Include="Image.h">
@@ -199,6 +190,9 @@
     </ClInclude>
     <ClInclude Include="Frustrum.h">
       <Filter>Mathematics</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderDefine.h">
+      <Filter>RenderSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -254,9 +248,6 @@
     <ClCompile Include="Matrixs.cpp">
       <Filter>Mathematics</Filter>
     </ClCompile>
-    <ClCompile Include="RenderUtil.cpp">
-      <Filter>RenderSystem</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>RenderSystem</Filter>
     </ClCompile>
@@ -291,9 +282,6 @@
       <Filter>GameEngine</Filter>
     </ClCompile>
     <ClCompile Include="Material.cpp">
-      <Filter>RenderSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
       <Filter>RenderSystem</Filter>
     </ClCompile>
     <ClCompile Include="Light.cpp">
@@ -331,6 +319,9 @@
     </ClCompile>
     <ClCompile Include="Frustrum.cpp">
       <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderEngine.cpp">
+      <Filter>RenderSystem</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -41,8 +41,8 @@ namespace Disorder
 			Y = 0;
 			SizeX = 640;
 			SizeY = 480;
-			ColorFormat = PF_R10G10B10A2;//PF_R8G8B8A8;
-			DepthStencilFormat = PF_D24S8;
+			ColorFormat = PF_R10G10B10A2_UNORM;
+			DepthStencilFormat = PF_D24_UNORM_S8_UINT;
 			SampleCount = 0;
 			SampleQuality = 0;
 			SyncInterval = 0;

@@ -12,13 +12,15 @@ namespace Disorder
 		if( state == IS_Release && key == OIS::KC_H )
 		{
 			GSceneManager->EnableDebugDraw = !GSceneManager->EnableDebugDraw;
+			return true;
 		}
-		return true;
+
+		return false;
 	}
 
 	bool Console::MouseEvent(MouseInputEvent const& mouseEvent,float deltaSeconds)
 	{
-		return true;
+		return false;
 	}
 
 	ConsolePtr Console::Create()

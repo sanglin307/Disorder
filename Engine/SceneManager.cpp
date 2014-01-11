@@ -10,7 +10,7 @@ namespace Disorder
 
 		_vAmbientLowerColor = Vector3::ZERO;
 		_vAmbientUpperColor = Vector3::UNIT_SCALE * 0.25f;
-		_propertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerScene);
+		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerScene);
 		_sAmbientLowerProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientLowColor,eSP_Vector3);
 		_sAmbientUpperProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientUpperColor,eSP_Vector3);
 

@@ -17,7 +17,7 @@ namespace Disorder
    {
 	   //Client Init
 	   GLogger->Init();
-	   RenderResManager->Init();
+	   RenderResourceMgr->Init();
 	   RenderEngine->Init();  
 	   SceneImporter->Init();
 	   GameClient->Init();

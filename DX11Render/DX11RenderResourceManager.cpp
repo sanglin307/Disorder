@@ -75,9 +75,9 @@ namespace Disorder
 		return renderBuffer;
 	}
  
-	RenderSurfacePtr DX11RenderResourceManager::CreateRenderSurface(RenderTexture2DPtr const& texture,unsigned int usage)
+	RenderSurfacePtr DX11RenderResourceManager::CreateRenderSurface(RenderTexture2DPtr const& texture,unsigned int usage,PixelFormat RenderTargetFormat,PixelFormat DepthFormat,PixelFormat ShaderResFormat)
 	{
-		RenderSurfacePtr surface = DX11RenderSurface::Create(texture,usage);
+		RenderSurfacePtr surface = DX11RenderSurface::Create(texture,usage,RenderTargetFormat,DepthFormat,ShaderResFormat);
 		 
 		return surface;
 
@@ -90,9 +90,9 @@ namespace Disorder
 		return texture;
 	}
 
-	RenderTexture2DPtr DX11RenderResourceManager::CreateRenderTexture2D(SamplerStatePtr const& sampler,PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,BufferInitData const* pData)
+	RenderTexture2DPtr DX11RenderResourceManager::CreateRenderTexture2D(SamplerStatePtr const& sampler,PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,unsigned int usage,BufferInitData const* pData)
 	{
-		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat,width,height,bMipmap,pData);
+		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat,width,height,bMipmap,usage,pData);
 		texture->Sampler = sampler;
 		return texture;
 

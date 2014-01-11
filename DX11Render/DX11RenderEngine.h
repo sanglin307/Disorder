@@ -21,6 +21,7 @@ namespace Disorder
 
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
 		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil);
+		virtual void SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget,const RenderSurfacePtr& depthStencil);
 
 		//virtual void UpdateMVPMatrix(RenderEffectPtr const& technique, Matrix4 const& worldMatrix,Matrix4 const& viewMatrix,Matrix4 const& projMatrix);
 		virtual void SetEffect(RenderEffectPtr const& technique);
@@ -42,7 +43,16 @@ namespace Disorder
 		{
 			return _pImmediateContext;
 		};
- 
+
+		virtual void SaveRenderSurface(RenderSurfacePtr const& surface,std::string const& fileName);
+
+		// pixel format related things.
+		static DXGI_FORMAT GetPixelFormat(PixelFormat format);
+		static PixelFormat GetBasePixelFormat(DXGI_FORMAT format);
+		static DXGI_FORMAT GetDepthShaderResourceFormat(DXGI_FORMAT format);
+        static DXGI_FORMAT GetDepthTextureFormat(DXGI_FORMAT format);
+		
+
 	protected:
 
 		void EnumAdapters();

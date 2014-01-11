@@ -25,7 +25,7 @@ namespace Disorder
 
 		_worldMatrix.MakeTransform(_wldPos,_wldScale,_wldRot);
 
-		_propertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerObject);
+		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerObject);
 		_worldMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sObjectWorld,eSP_Matrix4);	
 		_worldNormalMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sObjectNormal,eSP_Matrix4);
 	}

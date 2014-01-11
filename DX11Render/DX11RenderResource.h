@@ -27,7 +27,7 @@ namespace Disorder
 	{
 	public:
 
-		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,BufferInitData const* pData);
+		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,unsigned int bindFlag,BufferInitData const* pData);
 		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat,ImagePtr const& image);
 	    static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,ID3D11Texture2DPtr DXInterface);
 		virtual void * GetLowInterface();

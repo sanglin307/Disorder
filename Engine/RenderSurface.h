@@ -13,13 +13,7 @@ namespace Disorder
 	class RenderSurface
 	{
 	public:
-
-		virtual void Create(const RenderTexture2DPtr& resource,unsigned int usage)
-		{
-			Tex2DResource = resource;
-			Usage = usage;
-		}
-
+ 
 		virtual void* GetLowInterface(RenderSurfaceUsage usage)
 		{
 			return 0;
@@ -32,17 +26,30 @@ namespace Disorder
 	    unsigned int Usage;
 	};
 
-	class RenderSurfaceManager
+	class RenderGBuffer
 	{
 	public:
-
-		RenderSurfacePtr RenderTarget;
 		RenderSurfacePtr DepthStencilBuffer;
+		RenderSurfacePtr BasicColorBuffer;
+		RenderSurfacePtr NormalDataBuffer;
+		RenderSurfacePtr SpecularDataBuffer;
+
+	protected:
+		RenderGBuffer(){}
 
 	};
 
-	extern RenderSurfaceManager GRenderSurface;
+	class RenderSurfaceCache
+	{
+	public:
+		RenderSurfacePtr RenderTarget;
+		RenderSurfacePtr DepthStencilBuffer;
+		RenderGBufferPtr GBuffer;
 
+		virtual void InitGBuffer(unsigned int width,unsigned int height) = 0;
+
+	};
+ 
 }
 
 

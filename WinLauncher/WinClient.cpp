@@ -95,7 +95,8 @@ namespace Disorder
 					std::list<InputListenerPtr>::iterator inputIter = _inputListenerList.begin();
 					while( inputIter != _inputListenerList.end() )
 					{
-						(*inputIter)->KeyboardEvent(iterKey->key,iterKey->text,iterKey->state,delta);
+						if( (*inputIter)->KeyboardEvent(iterKey->key,iterKey->text,iterKey->state,delta) )
+							break;
 						inputIter++;
 					}
 
@@ -113,7 +114,9 @@ namespace Disorder
 					std::list<InputListenerPtr>::iterator inputIter = _inputListenerList.begin();
 					while( inputIter != _inputListenerList.end() )
 					{
-						(*inputIter)->MouseEvent(*iterKey,delta);
+						if( (*inputIter)->MouseEvent(*iterKey,delta) )
+							break;
+
 						inputIter++;
 					}
 

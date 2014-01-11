@@ -52,6 +52,8 @@ namespace Disorder
 					_target += moveDelta;
 					pCamera->_viewMatrixInvalid = true;
 				}
+
+				return true;
 			}
 			else if(mouseEvent.RelativeX != 0 || mouseEvent.RelativeY != 0 || _zoomPos != -1)
 			{
@@ -104,12 +106,13 @@ namespace Disorder
 				upVec = pCamera->_viewVec.Cross(xVec);
 				upVec.Normalise();
 				pCamera->LookAt_(finalPos,_target,upVec);
+				return true;
 			}		
 	
 			
 		 
 		}
-		return true;
+		return false;
 	}
 
 	void CameraSphereTargetUpdate::SetTarget(Camera *pCamera,const Vector3& target)
@@ -128,7 +131,7 @@ namespace Disorder
 
 	bool CameraFirstPersonUpdate::KeyboardEvent(Camera *pCamera,OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds)
 	{
-		return true;
+		return false;
 	}
 
 	bool CameraFirstPersonUpdate::MouseEvent(Camera *pCamera,MouseInputEvent const& mouseEvent,float deltaSeconds)
@@ -139,12 +142,13 @@ namespace Disorder
 			{
 				float pitch = pCamera->_rotation.GetPitch();
 				if( pitch > 90 || pitch < -90 )
-					return true;
+					return false;
 	 
 				Quaternion q(mouseEvent.RelativeY * pCamera->_rotateSpeed * deltaSeconds,Vector3::UNIT_X);
                 pCamera->_rotation = pCamera->_rotation * q;
 			
                 pCamera->_viewMatrixInvalid = true;
+				return true;
  
 			}
 
@@ -154,12 +158,12 @@ namespace Disorder
 				Quaternion q(mouseEvent.RelativeX *  pCamera->_rotateSpeed * deltaSeconds,Vector3::UNIT_Y);
 				pCamera->_rotation = pCamera->_rotation * q ;
 			 
-                 pCamera->_viewMatrixInvalid = true;
+                pCamera->_viewMatrixInvalid = true;
+				return true;
 			}
- 
-
 		}
-		return true;
+
+		return false;
 	}
 
 	bool CameraFirstPersonUpdate::Update(Camera *pCamera, float deltaSeconds)
@@ -241,7 +245,7 @@ namespace Disorder
 		_updateStrategy = CameraSphereTargetUpdate::Create(10,Vector3::ZERO);
 		_updateMode = eSphericalTargetMode;
 
-		_propertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerCamera);
+		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerCamera);
 		_viewMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraView,eSP_Matrix4);
 		_projMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraProjection,eSP_Matrix4);
 		_positionProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraPosition,eSP_Vector3);
@@ -336,15 +340,21 @@ namespace Disorder
 		if( state == IS_Release )
 		{
 		   if( key == OIS::KC_P )
+		   {
 			   SetUpdateStrategy(eFirstPersonMode);
+			   return true;
+		   }
 		   else if( key == OIS::KC_O )
+		   {
 			   SetUpdateStrategy(eSphericalTargetMode);
+			   return true;
+		   }
 		}
 
 		if( _updateStrategy != NULL )
 			return _updateStrategy->KeyboardEvent(this,key,text,state,deltaSeconds);
 
-		return true;
+		return false;
 	}
 
 	bool Camera::MouseEvent(MouseInputEvent const& mouseEvent,float deltaSeconds)
@@ -352,7 +362,7 @@ namespace Disorder
 		if( _updateStrategy != NULL )
 			return _updateStrategy->MouseEvent(this,mouseEvent,deltaSeconds);
  
-		return true;
+		return false;
 	}
 
 	void Camera::SetUpdateStrategy(ECameraUpdateStrategy mode)

@@ -10,17 +10,55 @@ namespace Disorder
 		return DX11RenderEnginePtr(pEngine);
 	}
 
+	DXGI_FORMAT DX11RenderEngine::GetPixelFormat(PixelFormat format)
+	{
+		return (DXGI_FORMAT)format;
+	}
+
+	PixelFormat DX11RenderEngine::GetBasePixelFormat(DXGI_FORMAT format)
+	{
+		return (PixelFormat)format;
+	}
+ 
+	DXGI_FORMAT DX11RenderEngine::GetDepthTextureFormat(DXGI_FORMAT format)
+	{
+		switch (format)
+		{
+		  case DXGI_FORMAT_D32_FLOAT_S8X24_UINT: 
+			  return DXGI_FORMAT_R32G8X24_TYPELESS;
+		  case DXGI_FORMAT_D32_FLOAT:            
+			  return DXGI_FORMAT_R32_TYPELESS;
+		  case DXGI_FORMAT_D24_UNORM_S8_UINT:    
+			  return DXGI_FORMAT_R24G8_TYPELESS;
+		  case DXGI_FORMAT_D16_UNORM:            
+			  return DXGI_FORMAT_R16_TYPELESS;
+		  default:
+			  BOOST_ASSERT(0);
+			  return DXGI_FORMAT_UNKNOWN;
+		}
+	}
+
+	DXGI_FORMAT DX11RenderEngine::GetDepthShaderResourceFormat(DXGI_FORMAT format)
+	{
+		switch (format)
+		{
+		  case DXGI_FORMAT_D32_FLOAT_S8X24_UINT: 
+			  return DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+		  case DXGI_FORMAT_D32_FLOAT:            
+			  return DXGI_FORMAT_R32_UINT;
+		  case DXGI_FORMAT_D24_UNORM_S8_UINT:    
+			  return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		  case DXGI_FORMAT_D16_UNORM:            
+			  return DXGI_FORMAT_R16_UNORM;
+		  default:
+			   BOOST_ASSERT(0);
+			  return DXGI_FORMAT_UNKNOWN;
+		}
+	}
+ 
 	 DX11RenderEngine::DX11RenderEngine()
 	 {
-		GPixelFormats[ PF_Unknown		].PlatformFormat	= DXGI_FORMAT_UNKNOWN;
-		GPixelFormats[ PF_R32G32B32A32F	].PlatformFormat	= DXGI_FORMAT_R32G32B32A32_FLOAT;
-		GPixelFormats[ PF_R32G32B32F	].PlatformFormat	= DXGI_FORMAT_R32G32B32_FLOAT;
-		GPixelFormats[ PF_R8G8B8A8		].PlatformFormat	= DXGI_FORMAT_R8G8B8A8_UNORM;
-		GPixelFormats[ PF_R32G32F       ].PlatformFormat    = DXGI_FORMAT_R32G32_FLOAT;
-		GPixelFormats[ PF_R8G8          ].PlatformFormat    = DXGI_FORMAT_R8G8_UNORM;
-		GPixelFormats[ PF_R10G10B10A2   ].PlatformFormat    = DXGI_FORMAT_R10G10B10A2_UNORM; 
-		GPixelFormats[ PF_D24S8 ].PlatformFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
+		 
 		_driverType = D3D_DRIVER_TYPE_NULL;
 		_featureLevel = D3D_FEATURE_LEVEL_11_0;
  
@@ -90,7 +128,7 @@ namespace Disorder
 		sd.BufferCount = 1;
 		sd.BufferDesc.Width = GConfig->pRenderConfig->SizeX;
 		sd.BufferDesc.Height = GConfig->pRenderConfig->SizeY;
-		sd.BufferDesc.Format = (DXGI_FORMAT)GPixelFormats[GConfig->pRenderConfig->ColorFormat].PlatformFormat; 
+		sd.BufferDesc.Format = DX11RenderEngine::GetPixelFormat(GConfig->pRenderConfig->ColorFormat); 
 		sd.BufferDesc.RefreshRate.Numerator = 60;
 		sd.BufferDesc.RefreshRate.Denominator = 1;
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
@@ -117,7 +155,7 @@ namespace Disorder
  
 		ID3D11RenderTargetView* pRenderTargetView = NULL;
 		D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
-	    RTVDesc.Format = (DXGI_FORMAT)GPixelFormats[GConfig->pRenderConfig->ColorFormat].PlatformFormat;
+	    RTVDesc.Format = DX11RenderEngine::GetPixelFormat(GConfig->pRenderConfig->ColorFormat);
 	    RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	    RTVDesc.Texture2D.MipSlice = 0;
 		hr = _pd3dDevice->CreateRenderTargetView( pBackBuffer, &RTVDesc, &pRenderTargetView );
@@ -125,14 +163,14 @@ namespace Disorder
 
 		ID3D11ShaderResourceView* pShaderResourceView = NULL;
 		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
-		SRVDesc.Format = (DXGI_FORMAT)GPixelFormats[GConfig->pRenderConfig->ColorFormat].PlatformFormat;
+		SRVDesc.Format = DX11RenderEngine::GetPixelFormat(GConfig->pRenderConfig->ColorFormat);
 		SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		SRVDesc.Texture2D.MostDetailedMip = 0;
 		SRVDesc.Texture2D.MipLevels = 1;
 		hr = _pd3dDevice->CreateShaderResourceView( pBackBuffer,&SRVDesc,&pShaderResourceView );
 		BOOST_ASSERT(SUCCEEDED(hr));
 
-		GRenderSurface.RenderTarget = DX11RenderSurface::Create(BackBufferTex,MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView),MakeComPtr<ID3D11ShaderResourceView>(pShaderResourceView),NULL);
+		GEngine->RenderSurfaceCache->RenderTarget = DX11RenderSurface::Create(BackBufferTex,MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView),MakeComPtr<ID3D11ShaderResourceView>(pShaderResourceView),NULL);
 
 		//Create a stencil & depth buffer.
 		ID3D11Texture2D* pDepthStencil = NULL;
@@ -143,7 +181,7 @@ namespace Disorder
 		descDepth.Height = GConfig->pRenderConfig->SizeY;
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
-		descDepth.Format = (DXGI_FORMAT)GPixelFormats[GConfig->pRenderConfig->DepthStencilFormat].PlatformFormat;
+		descDepth.Format = DX11RenderEngine::GetPixelFormat(GConfig->pRenderConfig->DepthStencilFormat);
 		descDepth.SampleDesc.Count = 1;
 		descDepth.SampleDesc.Quality = 0;
 		descDepth.Usage = D3D11_USAGE_DEFAULT;
@@ -164,7 +202,7 @@ namespace Disorder
 		hr = _pd3dDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &pDepthStencilView );
 		BOOST_ASSERT(SUCCEEDED(hr));
 
-		GRenderSurface.DepthStencilBuffer = DX11RenderSurface::Create(DepthBufferTex,NULL,NULL,MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView));
+		GEngine->RenderSurfaceCache->DepthStencilBuffer = DX11RenderSurface::Create(DepthBufferTex,NULL,NULL,MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView));
  
 		// Setup the viewport
 		D3D11_VIEWPORT vp;
@@ -393,6 +431,48 @@ namespace Disorder
 			ID3D11DepthStencilState* pState = (ID3D11DepthStencilState*)(depthStencilState->GetLowInterface());
 			_pImmediateContext->OMSetDepthStencilState(pState,depthStencilState->StencilRef);
 		}
+	}
+
+	void DX11RenderEngine::SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget,const RenderSurfacePtr& depthStencil)
+	{
+		std::vector<ID3D11RenderTargetView*> vRenderTarget;
+		for(size_t i=0;i<renderTarget.size();i++ )
+		{
+			DX11RenderSurfacePtr dxRenderTarget = renderTarget[i] == NULL ? NULL : boost::dynamic_pointer_cast<DX11RenderSurface>(renderTarget[i]);
+			vRenderTarget.push_back(dxRenderTarget->RenderTargetView.get());
+		}
+
+		DX11RenderSurfacePtr dxDepthStencil = depthStencil == NULL ? NULL : boost::dynamic_pointer_cast<DX11RenderSurface>(depthStencil);
+		_pImmediateContext->OMSetRenderTargets(vRenderTarget.size(),&(vRenderTarget[0]),dxDepthStencil->DepthStencilView.get());
+
+	}
+
+	void DX11RenderEngine::SaveRenderSurface(RenderSurfacePtr const& surface,std::string const& fileName)
+	{
+		//create stage texture
+		D3D11_TEXTURE2D_DESC desc;
+		ID3D11Texture2D *pTex = (ID3D11Texture2D*)surface->Tex2DResource->GetLowInterface();
+		pTex->GetDesc(&desc);
+		desc.Usage = D3D11_USAGE_STAGING;
+		desc.BindFlags = 0;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        desc.MiscFlags = 0;
+
+		ID3D11Texture2D* pStageTex2D = NULL; 
+		HRESULT hr = _pd3dDevice->CreateTexture2D( &desc, NULL, &pStageTex2D );
+		BOOST_ASSERT(hr==S_OK);
+
+		_pImmediateContext->CopyResource(pStageTex2D,pTex);
+
+		D3D11_MAPPED_SUBRESOURCE MappedResource;
+		_pImmediateContext->Map(pStageTex2D,D3D11CalcSubresource(0, 0, 1),D3D11_MAP_READ,0,&MappedResource);
+		
+		ImagePtr image = Image::Create(desc.Width,desc.Height,surface->Tex2DResource->Format,MappedResource.pData);
+		GImageManager->Save(fileName,image);
+
+		_pImmediateContext->Unmap(pStageTex2D,D3D11CalcSubresource(0, 0, 1));
+		pStageTex2D->Release();
+		
 	}
 
 	void DX11RenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil)

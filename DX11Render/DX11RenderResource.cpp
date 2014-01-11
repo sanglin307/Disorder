@@ -263,12 +263,12 @@ namespace Disorder
 		const ImageSpec &spec = image->GetSpec();
 		_BufferInitData data;
 		data.Data = image->GetImageData();
-		data.RowPitch = GPixelFormats[pixelFormat].BlockBytes * spec.width;
+		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat)/8 * spec.width;
 		data.SlicePitch = 0;
-		return Create(pixelFormat,spec.width,spec.height,false,&data);
+		return Create(pixelFormat,spec.width,spec.height,false,RSU_ShaderResource,&data);
 	}
 
-	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,BufferInitData const* pData)
+	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,unsigned int usage,BufferInitData const* pData)
 	{
 		DX11RenderTexture2D* pTexture = new DX11RenderTexture2D;
 
@@ -294,9 +294,15 @@ namespace Disorder
 		}
 
 		desc.ArraySize = 1;
-		desc.Format = (DXGI_FORMAT)GPixelFormats[pixelFormat].PlatformFormat;
+		desc.Format = DX11RenderEngine::GetPixelFormat(pixelFormat);
 		desc.Usage = D3D11_USAGE_DEFAULT;
-		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		if( usage & RSU_RenderTarget )
+			desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+		if( usage & RSU_DepthStencil )
+			desc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
+		if( usage & RSU_ShaderResource )
+			desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
 		desc.CPUAccessFlags = 0;
         desc.MiscFlags = 0;
 

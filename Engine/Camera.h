@@ -16,12 +16,12 @@ namespace Disorder
 
 		virtual bool KeyboardEvent(Camera *pCamera ,OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds)
 		{
-			return true;
+			return false;
 		}
 
 		virtual bool MouseEvent(Camera *pCamera,MouseInputEvent const& mouseEvent,float deltaSeconds)
 		{
-			return true;
+			return false;
 		}
 
 		virtual bool Update(Camera *pCamera, float deltaSeconds)

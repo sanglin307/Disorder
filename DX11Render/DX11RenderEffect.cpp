@@ -187,7 +187,7 @@ namespace Disorder
 	{
 		DX11ShaderReflectionPtr pReflection = DX11ShaderReflection::Create();
 
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderResourceMgr;
 	 
 		ID3D11ShaderReflection* pReflector = NULL;
 		BOOST_ASSERT(DataInterface != NULL);

@@ -8,7 +8,7 @@ namespace Disorder
 	SurfaceMaterial::SurfaceMaterial(std::string const& name)
 		:Name(name)
 	{
-		_propertyManager = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerMaterial);
+		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerMaterial);
 	}
  
 	//////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@ namespace Disorder
 		SurfaceLambert* mat = new SurfaceLambert(name);
 		mat->Type = MT_Lambert;
  
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderResourceMgr;
 		ShaderPropertyManagerPtr parameterManager = mat->GetShaderPropertyManager();
  
 		mat->DiffuseColorProperty = parameterManager->CreateProperty(ShaderPropertyManager::sDiffuseColor,eSP_Vector3);
@@ -85,7 +85,7 @@ namespace Disorder
 	{
 		SurfacePhong* mat = new SurfacePhong(name);
 		mat->Type = MT_Phong;
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderResourceMgr;
 		ShaderPropertyManagerPtr parameterManager = mat->GetShaderPropertyManager();
 
 		mat->DiffuseColorProperty = parameterManager->CreateProperty(ShaderPropertyManager::sDiffuseColor,eSP_Vector3);

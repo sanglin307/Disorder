@@ -16,21 +16,27 @@ namespace Disorder
 			return _imageSpec;
 		}
 
-		const unsigned char* GetImageData() const
+		const void* GetImageData() const
 		{
-			return _vPixels.data();
+			return _pPixelRawData;
 		}
 
-		static ImagePtr Create(ImageSpec const& spec,std::vector<unsigned char> const& pixels);
+		static ImagePtr Create(ImageSpec const& spec,void* pData);
+		static ImagePtr Create(int width,int height,PixelFormat format,void* pData);
 		static ImagePtr Create(int width,int height,int channels,unsigned char* pixels);
+		static ImagePtr Create(int width,int height,int channels,unsigned short* pixels);
+		static ImagePtr Create(int width,int height,int channels,unsigned int* pixels);
+		static ImagePtr Create(int width,int height,int channels,float* pixels);
+
+		~Image();
 
 	protected:
 		
-		Image(ImageSpec const& spec,std::vector<unsigned char> const& pixels);
-		Image(int width,int height,int channels,unsigned char* pixels);
-		
+		Image(ImageSpec const& spec,void* pPixels);
+		void InitImage(unsigned int bytes,void* pData);
+
 		ImageSpec _imageSpec;
-		std::vector<unsigned char> _vPixels;
+		void* _pPixelRawData;
 
 	};
 

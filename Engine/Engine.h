@@ -58,7 +58,8 @@ namespace Disorder
 		ConsolePtr GameConsole;
 		RenderEnginePtr RenderEngine;
 		SceneImporterPtr SceneImporter;
-		RenderResourceManagerPtr RenderResManager;
+		RenderResourceManagerPtr RenderResourceMgr;
+		RenderSurfaceCachePtr RenderSurfaceCache;
 
 	    EngineStat Stat;
 

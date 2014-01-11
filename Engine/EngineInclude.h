@@ -121,11 +121,16 @@ namespace Disorder
 	typedef boost::shared_ptr<RenderTexture3D> RenderTexture3DPtr;
 	class RenderSurface;
 	typedef boost::shared_ptr<RenderSurface> RenderSurfacePtr;
-	class RenderSurfaceManager;
+	class RenderGBuffer;
+	typedef boost::shared_ptr<RenderGBuffer> RenderGBufferPtr;
+	class RenderSurfaceCache;
+	typedef boost::shared_ptr<RenderSurfaceCache> RenderSurfaceCachePtr;
 	class RenderPath;
 	typedef boost::shared_ptr<RenderPath> RenderPathPtr;
 	class ForwardRenderPath;
 	typedef boost::shared_ptr<ForwardRenderPath> ForwardRenderPathPtr;
+	class DeferredShading;
+	typedef boost::shared_ptr<DeferredShading> DeferredShadingPtr;
 	class FontManager;
 	typedef boost::shared_ptr<FontManager> FontManagerPtr;
 	class Font;
@@ -192,15 +197,13 @@ namespace Disorder
 #include "FileSystem.h"
 #include "MainLoop.h"
 #include "InputManager.h"
-#include "Image.h"
 #include "Component.h"
 #include "Camera.h"
 #include "Light.h"
-
-#include "RenderInclude.h"
+#include "RenderDefine.h"
+#include "Image.h"
 #include "VertexFormat.h"
 #include "Texture.h"
-#include "RenderUtil.h"
 #include "ShaderProperty.h"
 #include "RenderResource.h"
 #include "RenderState.h"

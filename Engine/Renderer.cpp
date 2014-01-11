@@ -31,7 +31,7 @@ namespace Disorder
 	{
 		_texture = texture;
  
-	    ShaderPropertyManagerPtr globalProperty = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+	    ShaderPropertyManagerPtr globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 		ShaderPropertyPtr texProperty = globalProperty->CreateProperty(ShaderPropertyManager::sFontTexture,eSP_ShaderResource);
 	    texProperty->SetData(_texture);
 	 
@@ -115,7 +115,7 @@ namespace Disorder
 	BatchScreenString::BatchScreenString(std::string const& name)
 		:Renderer(name)
 	{
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderResourceMgr;
 		_renderEffect = RenderEffect::Create(); 
 		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"2DFont",SM_4_0,"VS");
 		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"2DFont",SM_4_0,"PS");
@@ -158,7 +158,7 @@ namespace Disorder
 	{
 		_texture = texture;
  
-	    ShaderPropertyManagerPtr globalProperty = GEngine->RenderResManager->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+	    ShaderPropertyManagerPtr globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 		ShaderPropertyPtr texProperty = globalProperty->CreateProperty(ShaderPropertyManager::sScreenTileTexture,eSP_ShaderResource);
 	    texProperty->SetData(_texture);
 	 
@@ -242,7 +242,7 @@ namespace Disorder
 	BatchScreenTiles::BatchScreenTiles(std::string const& name)
 		:Renderer(name)
 	{
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderResourceMgr;
 		_renderEffect = RenderEffect::Create(); 
 		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"ScreenTiles",SM_4_0,"VS");
 		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"ScreenTiles",SM_4_0,"PS");
@@ -276,7 +276,7 @@ namespace Disorder
 	BatchLines::BatchLines(std::string const& name)
 		:Renderer(name)
 	{
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderResManager;
+		RenderResourceManagerPtr resourceManager  = GEngine->RenderResourceMgr;
 		_renderEffect =  RenderEffect::Create();
 		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"BatchLines",SM_4_0,"VS");
 		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"BatchLines",SM_4_0,"PS");
@@ -367,10 +367,10 @@ namespace Disorder
 		if( _renderLayout != NULL && releaseOld == false )
 			return;
 
-	    _renderLayout = GEngine->RenderResManager->CreateRenderLayout(shaderObject,TT_TriangleList,false);
+	    _renderLayout = GEngine->RenderResourceMgr->CreateRenderLayout(shaderObject,TT_TriangleList,false);
  
 		std::vector<RenderBufferPtr> bufferArray;
-		GEngine->RenderResManager->CreateRenderBufferArray(_geometryObject,BAH_GPU_Read,shaderObject,bufferArray);
+		GEngine->RenderResourceMgr->CreateRenderBufferArray(_geometryObject,BAH_GPU_Read,shaderObject,bufferArray);
 		for(unsigned int index = 0;index<bufferArray.size();index++)
 		{
 			if( bufferArray[index]->GetBufferType() == RBT_Vertex )

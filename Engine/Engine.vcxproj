@@ -41,7 +41,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
-    <IncludePath>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;..\..\External\oiio\src\include;$(FBXSDK)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;..\..\External\oiio\src\include;$(FBXSDK)\include;..\..\External\openEXR\lib\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -86,8 +86,8 @@
     <None Include="..\Config\CameraConfig.xml" />
     <None Include="..\Config\RenderConfig.xml" />
     <None Include="..\Resource\FX\2DFont.dsf" />
+    <None Include="..\Resource\FX\DeferredShadingPass.dsf" />
     <None Include="..\Resource\FX\ForwardLightPass.dsf" />
-    <None Include="..\Resource\FX\BasePassPhong.dsf" />
     <None Include="..\Resource\FX\BatchLines.dsf" />
     <None Include="..\Resource\FX\Common.dsf" />
     <None Include="..\Resource\FX\ScreenTiles.dsf" />
@@ -123,7 +123,7 @@
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="RenderInclude.h" />
+    <ClInclude Include="RenderDefine.h" />
     <ClInclude Include="RenderLayout.h" />
     <ClInclude Include="RenderPath.h" />
     <ClInclude Include="RenderResource.h" />
@@ -131,14 +131,12 @@
     <ClInclude Include="RenderState.h" />
     <ClInclude Include="RenderSurface.h" />
     <ClInclude Include="RenderEffect.h" />
-    <ClInclude Include="RenderUtil.h" />
     <ClInclude Include="SceneImporter.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="MathLib.h" />
     <ClInclude Include="ShaderProperty.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="GameTime.h" />
-    <ClInclude Include="Texture.h" />
     <ClInclude Include="VertexFormat.h" />
     <ClInclude Include="Vectors.h" />
     <ClInclude Include="Viewport.h" />
@@ -176,6 +174,7 @@
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="RenderEffect.cpp" />
+    <ClCompile Include="RenderEngine.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderLayout.cpp" />
     <ClCompile Include="RenderPath.cpp" />
@@ -183,12 +182,10 @@
     <ClCompile Include="RenderResourceManager.cpp" />
     <ClCompile Include="RenderState.cpp" />
     <ClCompile Include="RenderSurface.cpp" />
-    <ClCompile Include="RenderUtil.cpp" />
     <ClCompile Include="SceneImporter.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="ShaderProperty.cpp" />
-    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Vectors.cpp" />
     <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="World.cpp" />

@@ -54,6 +54,19 @@ namespace Disorder
 		RenderEffectPtr _FourLightEffect;
 
 	};
+
+	class DeferredShading : public RenderPath
+	{
+	public:
+		virtual void Render();
+		static DeferredShadingPtr Create();
+	protected:
+		DeferredShading();
+        void RenderScene(const CameraPtr& mainCamera);
+
+		RenderEffectPtr _RenderSceneEffect;
+	};
+
 }
 
 

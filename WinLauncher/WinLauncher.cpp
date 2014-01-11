@@ -34,7 +34,8 @@ void PeekMessage()
 	Disorder::GEngine->RenderEngine = Disorder::DX11RenderEngine::Create();
 	Disorder::GEngine->FileManager = Disorder::WinFileSystem::Create();
 	Disorder::GEngine->SceneImporter = Disorder::FbxSceneImporter::Create();
-	Disorder::GEngine->RenderResManager = Disorder::DX11RenderResourceManager::Create();
+	Disorder::GEngine->RenderResourceMgr = Disorder::DX11RenderResourceManager::Create();
+	Disorder::GEngine->RenderSurfaceCache = Disorder::DX11RenderSurfaceCache::Create();
 	Disorder::GMainLoop->Init();
 
  }

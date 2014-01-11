@@ -177,10 +177,10 @@ namespace Disorder
 		//std::string strImageFileName = fontName + ".tif";
 		//GImageManager->Save(strImageFileName,fontImage);
 
-		SamplerStatePtr sampler = GEngine->RenderResManager->CreateSamplerState(SF_Linear,TAM_Clamp,0);
-		PixelFormat pixelFormat = PF_R8G8;
-		RenderTexture2DPtr fontTexture = GEngine->RenderResManager->CreateRenderTexture2D(sampler,pixelFormat,fontImage);
-		_glyphsTexture = GEngine->RenderResManager->CreateRenderSurface(fontTexture,RSU_ShaderResource);
+		SamplerStatePtr sampler = GEngine->RenderResourceMgr->CreateSamplerState(SF_Linear,TAM_Clamp,0);
+		PixelFormat pixelFormat = PF_R8G8_UNORM;
+		RenderTexture2DPtr fontTexture = GEngine->RenderResourceMgr->CreateRenderTexture2D(sampler,pixelFormat,fontImage);
+		_glyphsTexture = GEngine->RenderResourceMgr->CreateRenderSurface(fontTexture,RSU_ShaderResource,PF_UNKNOWN,PF_UNKNOWN,pixelFormat);
 		delete imageData;
 	}
 

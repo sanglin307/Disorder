@@ -1,17 +1,13 @@
 FBX file format version for file MiniGun_CameraLight.fbx is 7,2,0
+Shader Object :BatchLines:PS
 Shader Object :BatchLines:VS
 Shader Object :2DFont:PS
 Shader Object :2DFont:VS
-Shader Object :BatchLines:PS
-Shader Object :ForwardLightPass:ForwardFourLightPS
-Shader Object :ForwardLightPass:DirectionalLightPS
-Shader Object :ForwardLightPass:RenderSceneVS
+Shader Object :DeferredShadingPass:RenderScenePS
+Shader Object :DeferredShadingPass:RenderSceneVS
 Shader Property Manager Name :Global
  ****** Shader Property :FontTexture
- ****** Shader Property :ForwardFourLights
- ****** Shader Property :DirectionLightProperty
  ****** Shader Property :MaterialProperty
- ****** Shader Property :SceneProperty
  ****** Shader Property :FontSampler
  ****** Shader Property :ObjectTransform
  ****** Shader Property :CameraTransforms
@@ -19,23 +15,7 @@ Shader Property Manager Name :SceneProperty
  ****** Shader Property :AmbientUpperColor
  ****** Shader Property :AmbientLowColor
 Shader Property Manager Name :ForwardFourLights
- ****** Shader Property :ForwardLightColorG
- ****** Shader Property :ForwardLightColorR
- ****** Shader Property :ForwardSpotCosInnerConeRcp
- ****** Shader Property :ForwardLightRangeRcp
- ****** Shader Property :ForwardSpotCosOuterCone
- ****** Shader Property :ForwardLightDirZ
- ****** Shader Property :ForwardLightColorB
- ****** Shader Property :ForwardCapsuleLen
- ****** Shader Property :ForwardLightDirY
- ****** Shader Property :ForwardLightDirX
- ****** Shader Property :ForwardLightPosZ
- ****** Shader Property :ForwardLightPosY
- ****** Shader Property :ForwardLightPosX
 Shader Property Manager Name :DirectionLightProperty
- ****** Shader Property :DirectionLightColor
- ****** Shader Property :DirectionLightDir
- ****** Shader Property :DirectionLightIntensity
 Shader Property Manager Name :MaterialProperty
  ****** Shader Property :EmissiveColor
  ****** Shader Property :ReflectionColor
