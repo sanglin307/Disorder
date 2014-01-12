@@ -305,6 +305,19 @@ namespace Disorder
 		}
 
 
+		GSceneManager->DebugDraw();
+
+		// before we call canvas draw ,we should check if we should add stat info to canvas.
+		if(GEngine->Stat.bEnable())
+		{
+			GDrawTriNumber += GEngine->GameCanvas->GetCurrentDrawTriNumber();
+			GEngine->Stat.DrawStat();
+		}
+
+		GEngine->GameCanvas->Render(mainCamera);
+
+		GEngine->RenderEngine->OnDrawEnd();
+
 	}
 
 	void DeferredShading::RenderScene(const CameraPtr& mainCamera)
