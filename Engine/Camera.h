@@ -137,6 +137,8 @@ namespace Disorder
 		ShaderPropertyPtr _viewMatrixProperty;
 		ShaderPropertyPtr _projMatrixProperty;
 		ShaderPropertyPtr _positionProperty;
+		ShaderPropertyPtr _perspectiveValueProperty;
+		ShaderPropertyPtr _viewInvProperty;
 
 
 	};

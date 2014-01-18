@@ -32,11 +32,15 @@ namespace Disorder
 
 	protected:
 		
-		Image(ImageSpec const& spec,void* pPixels);
-		void InitImage(unsigned int bytes,void* pData);
+		Image(ImageSpec const& spec);
+		Image(ImageSpec const& spec,void *pPixels);
+		void InitRawImage(unsigned int bytes,void* pData); // only used to set non-convert data
 
 		ImageSpec _imageSpec;
 		void* _pPixelRawData;
+
+		void ConvertData_B5G5R5A1_UNORM(int width,int height,void *pData);
+		void ConvertData_PF_R24G8_TYPELESS(int width,int height,void *pData);
 
 	};
 

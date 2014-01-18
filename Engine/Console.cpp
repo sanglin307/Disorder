@@ -15,6 +15,12 @@ namespace Disorder
 			return true;
 		}
 
+		if( state == IS_Release && key == OIS::KC_R )
+		{
+			GEngine->GameClient->GetViewport(0)->ToggleRenderPath();
+			return true;
+		}
+
 		return false;
 	}
 

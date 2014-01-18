@@ -25,6 +25,14 @@ namespace Disorder
 			BOOST_ASSERT(0);
 	}
 
+	 void Viewport::ToggleRenderPath()
+	 {
+		 if( _renderPath->GetType() == RPT_ForwardLighting )
+			 SetRenderPath(RPT_DeferredShading);
+		 else if(_renderPath->GetType() == RPT_DeferredShading )
+			 SetRenderPath(RPT_ForwardLighting);
+	 }
+
     RenderPathPtr Viewport::GetRenderPath()
 	{
 		return _renderPath;

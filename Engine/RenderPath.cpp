@@ -2,6 +2,31 @@
 
 namespace Disorder
 {
+	RenderPath::RenderPath()
+	{
+		_DirectionLightPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerDirectionLight);
+		_DirectionLightIntensityProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightIntensity,eSP_Float);
+		_DirectionLightDirProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightDir,eSP_Vector3);
+		_DirectionLightColorProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightColor,eSP_Vector3);
+
+	}
+
+	void RenderPath::SetDirectionLight(const std::vector<DirectionLightPtr>& directionLightArray)
+	{
+		BOOST_ASSERT(directionLightArray.size() <=1 );
+
+		if( directionLightArray.size() == 0 )
+			return;
+
+		DirectionLightPtr dLight = directionLightArray[0];
+		_DirectionLightPropertyManager->ClearShaderPropertyValue();
+		_DirectionLightIntensityProperty->SetData(dLight->Intensity);
+		_DirectionLightDirProperty->SetData(dLight->GetDirection());
+		_DirectionLightColorProperty->SetData(dLight->Color);
+
+		_DirectionLightPropertyManager->UpdateShaderProperty();
+	}
+
 	//////////////////////////////////////////////////////////////////////////////////////////
 	void ForwardRenderPath::Render()
 	{
@@ -13,7 +38,7 @@ namespace Disorder
 		GEngine->RenderEngine->OnDrawBegin();
 
 		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,GEngine->RenderSurfaceCache->DepthStencilBuffer);
-		GEngine->RenderEngine->ClearRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,Vector4(0.1f,0.1f,0.1f,1.0f));
+		GEngine->RenderEngine->ClearRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,Vector4(0.f,0.f,0.f,1.0f));
 		GEngine->RenderEngine->ClearDepthStencil(GEngine->RenderSurfaceCache->DepthStencilBuffer,true,1.0f,false,0);
  
 		GSceneManager->UpdateShaderProperty();
@@ -61,11 +86,13 @@ namespace Disorder
 			{
 				SetFourLight(lightArray);
 				obj->SetRenderEffect(_FourLightEffect);
-				obj->Render(mainCamera);
+				//obj->Render(mainCamera);
 			}
 
 			obj->PostRender(mainCamera);
 		}
+
+		GEngine->GameCanvas->DrawString(Vector2(7.0f,30),28,Vector4::ONE,"Forward Lighting Mode");
 
 		GSceneManager->DebugDraw();
 
@@ -81,21 +108,7 @@ namespace Disorder
 		GEngine->RenderEngine->OnDrawEnd();
 	}
 
-	void ForwardRenderPath::SetDirectionLight(const std::vector<DirectionLightPtr>& directionLightArray)
-	{
-		BOOST_ASSERT(directionLightArray.size() <=1 );
-
-		if( directionLightArray.size() == 0 )
-			return;
-
-		DirectionLightPtr dLight = directionLightArray[0];
-		_DirectionLightPropertyManager->ClearShaderPropertyValue();
-		_DirectionLightIntensityProperty->SetData(dLight->Intensity);
-		_DirectionLightDirProperty->SetData(dLight->GetDirection());
-		_DirectionLightColorProperty->SetData(dLight->Color);
-
-		_DirectionLightPropertyManager->UpdateShaderProperty();
-	}
+	
  
 	void ForwardRenderPath::SetFourLight(const std::vector<LightPtr>& lightArray)
 	{
@@ -185,13 +198,7 @@ namespace Disorder
 	ForwardRenderPath::ForwardRenderPath()
 	{
 		_type = RPT_ForwardLighting;
-
-		_DirectionLightPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerDirectionLight);
-
-		_DirectionLightIntensityProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightIntensity,eSP_Float);
-		_DirectionLightDirProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightDir,eSP_Vector3);
-		_DirectionLightColorProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightColor,eSP_Vector3);
-
+ 
 		_DirectionLightEffect = RenderEffect::Create();
 		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLightPass",SM_4_0,"RenderSceneVS");
 		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLightPass",SM_4_0,"DirectionalLightPS");
@@ -257,7 +264,35 @@ namespace Disorder
 		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShadingPass",SM_4_0,"RenderScenePS");
 		_RenderSceneEffect->BindShader(vertexShader);
 		_RenderSceneEffect->BindShader(pixelShader);
+		DepthStencilDesc depthDesc;
+		depthDesc.DepthEnable = true;
+		depthDesc.DepthWrite = true;
+		depthDesc.DepthFunc = CF_Less;
+		depthDesc.StencilEnable = true;
+		depthDesc.BackFaceStencilDepthFailOp = depthDesc.FrontFaceStencilDepthFailOp = STENCIL_OP_REPLACE;
+		depthDesc.BackFaceStencilFailOp = depthDesc.FrontFaceStencilFailOp = STENCIL_OP_REPLACE;
+		depthDesc.BackFaceStencilPassOp = depthDesc.FrontFaceStencilPassOp = STENCIL_OP_REPLACE;
+		depthDesc.BackFaceStencilFunc = depthDesc.BackFaceStencilFunc = CF_Always;
+		DepthStencilStatePtr _DepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&depthDesc,1);
+		_RenderSceneEffect->BindDepthStencilState(_DepthWriteState);
 
+		_LightingEffect = RenderEffect::Create();
+	     vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShadingPass",SM_4_0,"LightingVS");
+		 pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShadingPass",SM_4_0,"LightingPS");
+		_LightingEffect->BindShader(vertexShader);
+		_LightingEffect->BindShader(pixelShader); 
+
+		DepthStencilDesc nodepthWriteDesc;
+		nodepthWriteDesc.DepthEnable = true;
+		nodepthWriteDesc.DepthWrite = false;
+		nodepthWriteDesc.DepthFunc = CF_Less;
+		nodepthWriteDesc.StencilEnable = true;
+		nodepthWriteDesc.BackFaceStencilDepthFailOp = nodepthWriteDesc.FrontFaceStencilDepthFailOp = STENCIL_OP_KEEP;
+		nodepthWriteDesc.BackFaceStencilFailOp = nodepthWriteDesc.FrontFaceStencilFailOp = STENCIL_OP_KEEP;
+		nodepthWriteDesc.BackFaceStencilPassOp = nodepthWriteDesc.FrontFaceStencilPassOp = STENCIL_OP_KEEP;
+		nodepthWriteDesc.BackFaceStencilFunc = nodepthWriteDesc.BackFaceStencilFunc = CF_Equal;
+		DepthStencilStatePtr _noDepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&nodepthWriteDesc,0);
+		_LightingEffect->BindDepthStencilState(_noDepthWriteState);
 
 		GEngine->RenderSurfaceCache->InitGBuffer(GConfig->pRenderConfig->SizeX,GConfig->pRenderConfig->SizeY);
 	}
@@ -289,7 +324,7 @@ namespace Disorder
 		vRenderSurface.push_back(normalSurfacePtr);
 		vRenderSurface.push_back(specularSurfacePtr);
 
-		GEngine->RenderEngine->SetRenderTarget(vRenderSurface,GEngine->RenderSurfaceCache->GBuffer->DepthStencilBuffer);
+		GEngine->RenderEngine->SetRenderTarget(vRenderSurface,depthSurfacePtr);
  
 		RenderScene(mainCamera);
 
@@ -304,7 +339,29 @@ namespace Disorder
 			sSaveTest = false;
 		}
 
-
+		GEngine->RenderSurfaceCache->GBuffer->UpdateShaderProperty();
+	
+		//lighting pass
+		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,GEngine->RenderSurfaceCache->DepthStencilBuffer);
+		GEngine->RenderEngine->ClearRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,Vector4(0.f,0.f,0.f,1.0f));
+		GEngine->RenderEngine->ClearDepthStencil(GEngine->RenderSurfaceCache->DepthStencilBuffer,true,1.0f,false,0);
+		GEngine->RenderEngine->SetPrimitiveTopology(TT_TriangleStrip);
+		const std::vector<LightPtr>& vLights = GSceneManager->GetLightsList();
+		std::vector<DirectionLightPtr> directionLightArray;
+		for(size_t i=0;i<vLights.size();i++ )
+		{
+			if( vLights[i]->LightType == LT_Directional )
+			{
+				directionLightArray.push_back(boost::dynamic_pointer_cast<DirectionLight>(vLights[i]));
+			}
+		}
+		SetDirectionLight(directionLightArray);
+		GEngine->RenderEngine->SetEffect(_LightingEffect);
+		GEngine->RenderEngine->Draw(4,0);
+		GEngine->RenderEngine->SetEffect(NULL);
+		
+		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,depthSurfacePtr,true);
+		GEngine->GameCanvas->DrawString(Vector2(7.0f,30),28,Vector4::ONE,"Deferred Shading Mode");
 		GSceneManager->DebugDraw();
 
 		// before we call canvas draw ,we should check if we should add stat info to canvas.
@@ -332,6 +389,7 @@ namespace Disorder
 			obj->SetRenderEffect(_RenderSceneEffect);
 			obj->Render(mainCamera);
 			obj->PostRender(mainCamera);
+			 
 		}
 	}
  

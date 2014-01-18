@@ -38,6 +38,7 @@ namespace Disorder
 		 }
 
 		 void SetRenderPath(RenderPathType type);
+		 void ToggleRenderPath();
 		 RenderPathPtr GetRenderPath();
 	 };
 

@@ -264,6 +264,8 @@ namespace Disorder
     const std::string ShaderPropertyManager::sCameraView = "CameraView";
     const std::string ShaderPropertyManager::sCameraProjection = "CameraProjection";
 	const std::string ShaderPropertyManager::sCameraPosition = "CameraPosition";
+	const std::string ShaderPropertyManager::sPerspectiveValues = "PerspectiveValues";
+	const std::string ShaderPropertyManager::sViewInv = "sViewInv";
 
     // for ObjectTransform
     const std::string ShaderPropertyManager::sObjectWorld = "WorldTransform";
@@ -300,12 +302,18 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sAmbientLowColor = "AmbientLowColor";
 	const std::string ShaderPropertyManager::sAmbientUpperColor = "AmbientUpperColor";
 
+
 	// Global 
 	const std::string ShaderPropertyManager::sFontTexture = "FontTexture";
     const std::string ShaderPropertyManager::sFontSampler = "FontSampler";
 
 	const std::string ShaderPropertyManager::sScreenTileTexture = "ScreenTileTexture";
 	const std::string ShaderPropertyManager::sScreenTileSampler = "ScreenTileSampler";
+
+	const std::string ShaderPropertyManager::sGBufferDepthTexture = "GBufferDepthTexture";
+	const std::string ShaderPropertyManager::sGBufferColorSpecIntTexture = "GBufferColorSpecIntTexture";
+	const std::string ShaderPropertyManager::sGBufferNormalTexture = "GBufferNormalTexture";
+	const std::string ShaderPropertyManager::sGBufferSpecPowTexture = "GBufferSpecPowTexture";
 
 	ShaderPropertyPtr ShaderPropertyManager::GetProperty(std::string const& name)
 	{

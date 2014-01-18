@@ -75,9 +75,9 @@ namespace Disorder
 		return renderBuffer;
 	}
  
-	RenderSurfacePtr DX11RenderResourceManager::CreateRenderSurface(RenderTexture2DPtr const& texture,unsigned int usage,PixelFormat RenderTargetFormat,PixelFormat DepthFormat,PixelFormat ShaderResFormat)
+	RenderSurfacePtr DX11RenderResourceManager::CreateRenderSurface(RenderTexture2DPtr const& texture,unsigned int usage,PixelFormat RenderTargetFormat,PixelFormat DepthFormat,PixelFormat ShaderResFormat,bool ReadOnlyDepth,bool ReadOnlyStencil)
 	{
-		RenderSurfacePtr surface = DX11RenderSurface::Create(texture,usage,RenderTargetFormat,DepthFormat,ShaderResFormat);
+		RenderSurfacePtr surface = DX11RenderSurface::Create(texture,usage,RenderTargetFormat,DepthFormat,ShaderResFormat,ReadOnlyDepth,ReadOnlyStencil);
 		 
 		return surface;
 

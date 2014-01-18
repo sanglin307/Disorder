@@ -257,7 +257,7 @@ namespace Disorder
 
 	void DX11RenderEngine::SetBlendState(BlendStatePtr const& blendState)
 	{ 
-		if( CachedBlendState != blendState )
+	    if( CachedBlendState != blendState )
 		{
 			CachedBlendState = blendState;
 		    ID3D11BlendState *pState = (ID3D11BlendState*)(blendState->GetLowInterface());
@@ -281,18 +281,111 @@ namespace Disorder
 	 
 	}
 
+	D3D_PRIMITIVE_TOPOLOGY DX11RenderEngine::GetPlatformTopology(TopologyType tType)
+	{
+		switch (tType)
+		{
+		case TT_PointList:
+			return D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
+		case TT_LineList:
+			return D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+		case TT_LineStrip:
+			return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
+		case TT_TriangleList:
+			return D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		case TT_TriangleStrip:
+			return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+		case TT_LineList_Adj:
+			return D3D_PRIMITIVE_TOPOLOGY_LINELIST_ADJ;
+		case TT_LineStrip_Adj:
+			return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
+		case TT_TriangleList_Adj:
+			return D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ;
+		case TT_TriangleStrip_Adj:
+			return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ;
+		case TT_1_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST;
+		case TT_2_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
+		case TT_3_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
+		case TT_4_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST;
+		case TT_5_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_5_CONTROL_POINT_PATCHLIST;
+		case TT_6_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_6_CONTROL_POINT_PATCHLIST;
+		case TT_7_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_7_CONTROL_POINT_PATCHLIST;
+		case TT_8_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_8_CONTROL_POINT_PATCHLIST;
+		case TT_9_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_9_CONTROL_POINT_PATCHLIST;
+		case TT_10_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_10_CONTROL_POINT_PATCHLIST;
+		case TT_11_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_11_CONTROL_POINT_PATCHLIST;
+		case TT_12_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST;
+		case TT_13_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_13_CONTROL_POINT_PATCHLIST;
+		case TT_14_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_14_CONTROL_POINT_PATCHLIST;
+		case TT_15_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_15_CONTROL_POINT_PATCHLIST;
+		case TT_16_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_16_CONTROL_POINT_PATCHLIST;
+		case TT_17_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_17_CONTROL_POINT_PATCHLIST;
+		case TT_18_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_18_CONTROL_POINT_PATCHLIST;
+		case TT_19_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_19_CONTROL_POINT_PATCHLIST;
+		case TT_20_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_20_CONTROL_POINT_PATCHLIST;
+		case TT_21_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_21_CONTROL_POINT_PATCHLIST;
+		case TT_22_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_22_CONTROL_POINT_PATCHLIST;
+		case TT_23_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_23_CONTROL_POINT_PATCHLIST;
+		case TT_24_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_24_CONTROL_POINT_PATCHLIST;
+		case TT_25_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_25_CONTROL_POINT_PATCHLIST;
+		case TT_26_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_26_CONTROL_POINT_PATCHLIST;
+		case TT_27_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_27_CONTROL_POINT_PATCHLIST;
+		case TT_28_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_28_CONTROL_POINT_PATCHLIST;
+		case TT_29_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_29_CONTROL_POINT_PATCHLIST;
+		case TT_30_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_30_CONTROL_POINT_PATCHLIST;
+		case TT_31_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_31_CONTROL_POINT_PATCHLIST;
+		case TT_32_Ctrl_Pt_PatchList:
+			return D3D_PRIMITIVE_TOPOLOGY_32_CONTROL_POINT_PATCHLIST;
+		default:
+			BOOST_ASSERT(0);
+			return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+		}
+	}
+
+	void DX11RenderEngine::SetPrimitiveTopology(TopologyType topologyType)
+	{
+		_pImmediateContext->IASetInputLayout(NULL);
+		_pImmediateContext->IASetPrimitiveTopology(DX11RenderEngine::GetPlatformTopology(topologyType));
+		_pImmediateContext->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
+	}
+
 	void DX11RenderEngine::SetRenderLayout( RenderLayoutPtr const& renderLayout)
 	{
-
 		DX11RenderLayoutPtr dxRenderLayout = boost::dynamic_pointer_cast<DX11RenderLayout>(renderLayout);
 
 		TopologyType topology = renderLayout->GetTopology();
-		if(topology == TT_TriangleList )
-			_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		else if( topology == TT_LineList )
-			_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-		else
-			BOOST_ASSERT(0);
+		_pImmediateContext->IASetPrimitiveTopology(DX11RenderEngine::GetPlatformTopology(topology));
 
 		//set layout
 		_pImmediateContext->IASetInputLayout((ID3D11InputLayout*)(renderLayout->GetLowInterface()));
@@ -335,90 +428,113 @@ namespace Disorder
  
 	void DX11RenderEngine::SetEffect(RenderEffectPtr const& effect)
 	{
-		// render State
-        SetBlendState(effect->GetBlendState());
-		SetRasterizeState(effect->GetRasterizeState());
-		SetDepthStencilState(effect->GetDepthStencilState());
+		if( effect == NULL ) // clean up
+		{			 
+			void* nullArrayInputRes[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT  ] = { NULL };
+			_pImmediateContext->VSSetConstantBuffers(0,D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT  ,(ID3D11Buffer**)&nullArrayInputRes);
+			_pImmediateContext->PSSetConstantBuffers(0,D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT ,(ID3D11Buffer**)&nullArrayInputRes);
 
-		effect->UpdateShaderParameter();
+			void* nullArraySampler[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT] = { NULL };
+			_pImmediateContext->VSSetSamplers(0,D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT,(ID3D11SamplerState**)&nullArraySampler);
+			_pImmediateContext->PSSetSamplers(0,D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT,(ID3D11SamplerState**)&nullArraySampler);
 
-		ShaderObjectPtr vertexShader = effect->GetVertexShader();
-		if( vertexShader != NULL )
-		{
-			ID3D11VertexShader *pShader = (ID3D11VertexShader *)(vertexShader->GetLowInterface());
-			_pImmediateContext->VSSetShader(pShader, NULL,0);
-
-			DX11ShaderObjectPtr dxVertexShader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
-			std::size_t cbsize = dxVertexShader->CachedConstBuffer.size();
-			if( cbsize > 0 )
-			{
-				_pImmediateContext->VSSetConstantBuffers(0,cbsize,&(dxVertexShader->CachedConstBuffer[0]));
-			}
-			else
-			{
-				_pImmediateContext->VSSetConstantBuffers(0,0,0);
-			}
-
-
-			std::size_t sssize = dxVertexShader->CachedSamplerState.size();
-			if( sssize > 0 )
-			{
-				_pImmediateContext->VSSetSamplers(0,sssize,&(dxVertexShader->CachedSamplerState[0]));	 
-			}
-			else
-			{
-				_pImmediateContext->VSSetSamplers(0,0,0);
-			}
-
-
-			std::size_t srsize = dxVertexShader->CachedShaderResourceView.size();
-			if( srsize > 0 )
-			{
-				_pImmediateContext->VSSetShaderResources(0,srsize,&(dxVertexShader->CachedShaderResourceView[0]));	 
-			}
-			else
-			{
-				_pImmediateContext->VSSetShaderResources(0,0,0);
-			}
-
+			void* nullArray[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
+			_pImmediateContext->VSSetShaderResources(0,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT ,(ID3D11ShaderResourceView**)&nullArray);
+			_pImmediateContext->PSSetShaderResources(0,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT ,(ID3D11ShaderResourceView**)&nullArray);
 		}
-
-		ShaderObjectPtr pixelShader = effect->GetPixelShader();
-		if( pixelShader != NULL )
+		else
 		{
-			ID3D11PixelShader *pShader = (ID3D11PixelShader *)(pixelShader->GetLowInterface());
-			_pImmediateContext->PSSetShader(pShader,NULL,0);
+			// render State
+			SetBlendState(effect->GetBlendState());
+			SetRasterizeState(effect->GetRasterizeState());
+			SetDepthStencilState(effect->GetDepthStencilState());
 
-			DX11ShaderObjectPtr dxPixelShader = boost::dynamic_pointer_cast<DX11ShaderObject>(pixelShader);
+			effect->UpdateShaderParameter();
 
-			std::size_t csize = dxPixelShader->CachedConstBuffer.size();
-			if( csize > 0 )
+			ShaderObjectPtr vertexShader = effect->GetVertexShader();
+			if( vertexShader != NULL )
 			{
-				_pImmediateContext->PSSetConstantBuffers(0,csize,&(dxPixelShader->CachedConstBuffer[0]));			 
-			}
-			else
-			{		 
-				_pImmediateContext->PSSetConstantBuffers(0,0,0);
+				ID3D11VertexShader *pShader = (ID3D11VertexShader *)(vertexShader->GetLowInterface());
+				_pImmediateContext->VSSetShader(pShader, NULL,0);
+
+				DX11ShaderObjectPtr dxVertexShader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
+				std::size_t cbsize = dxVertexShader->CachedConstBuffer.size();
+				if( cbsize > 0 )
+				{
+					_pImmediateContext->VSSetConstantBuffers(0,cbsize,&(dxVertexShader->CachedConstBuffer[0]));
+				}
+				else
+				{
+					void* nullArray[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT  ] = { NULL };
+					_pImmediateContext->VSSetConstantBuffers(0,D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT  ,(ID3D11Buffer**)&nullArray);
+				}
+
+
+				std::size_t sssize = dxVertexShader->CachedSamplerState.size();
+				if( sssize > 0 )
+				{
+					_pImmediateContext->VSSetSamplers(0,sssize,&(dxVertexShader->CachedSamplerState[0]));	 
+				}
+				else
+				{
+					void* nullArray[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT] = { NULL };
+					_pImmediateContext->VSSetSamplers(0,D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT,(ID3D11SamplerState**)&nullArray);
+				}
+
+
+				std::size_t srsize = dxVertexShader->CachedShaderResourceView.size();
+				if( srsize > 0 )
+				{
+					_pImmediateContext->VSSetShaderResources(0,srsize,&(dxVertexShader->CachedShaderResourceView[0]));	 
+				}
+				else
+				{
+					void* nullArray[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
+					_pImmediateContext->VSSetShaderResources(0,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT ,(ID3D11ShaderResourceView**)&nullArray);
+				}
+
 			}
 
-			std::size_t sssize = dxPixelShader->CachedSamplerState.size();
-			if( sssize > 0 )
+			ShaderObjectPtr pixelShader = effect->GetPixelShader();
+			if( pixelShader != NULL )
 			{
-				_pImmediateContext->PSSetSamplers(0,sssize,&(dxPixelShader->CachedSamplerState[0]));		 
-			}
-			else
-			{
-				_pImmediateContext->PSSetSamplers(0,0,0);
-			}
+				ID3D11PixelShader *pShader = (ID3D11PixelShader *)(pixelShader->GetLowInterface());
+				_pImmediateContext->PSSetShader(pShader,NULL,0);
 
-			std::size_t srsize = dxPixelShader->CachedShaderResourceView.size();
-			if( srsize > 0 )
-			{
-				_pImmediateContext->PSSetShaderResources(0,srsize,&(dxPixelShader->CachedShaderResourceView[0]));				 
-			}
-			else
-			{
-				_pImmediateContext->PSSetShaderResources(0,0,0);
+				DX11ShaderObjectPtr dxPixelShader = boost::dynamic_pointer_cast<DX11ShaderObject>(pixelShader);
+
+				std::size_t csize = dxPixelShader->CachedConstBuffer.size();
+				if( csize > 0 )
+				{
+					_pImmediateContext->PSSetConstantBuffers(0,csize,&(dxPixelShader->CachedConstBuffer[0]));			 
+				}
+				else
+				{		 
+					void* nullArray[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT  ] = { NULL };
+					_pImmediateContext->PSSetConstantBuffers(0,D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT ,(ID3D11Buffer**)&nullArray);
+				}
+
+				std::size_t sssize = dxPixelShader->CachedSamplerState.size();
+				if( sssize > 0 )
+				{
+					_pImmediateContext->PSSetSamplers(0,sssize,&(dxPixelShader->CachedSamplerState[0]));		 
+				}
+				else
+				{
+					void* nullArray[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT] = { NULL };
+					_pImmediateContext->PSSetSamplers(0,D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT,(ID3D11SamplerState**)&nullArray);
+				}
+
+				std::size_t srsize = dxPixelShader->CachedShaderResourceView.size();
+				if( srsize > 0 )
+				{
+					_pImmediateContext->PSSetShaderResources(0,srsize,&(dxPixelShader->CachedShaderResourceView[0]));				 
+				}
+				else
+				{
+					void* nullArray[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
+					_pImmediateContext->PSSetShaderResources(0,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT ,(ID3D11ShaderResourceView**)&nullArray);
+				}
 			}
 		}
 	}
@@ -433,7 +549,7 @@ namespace Disorder
 		}
 	}
 
-	void DX11RenderEngine::SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget,const RenderSurfacePtr& depthStencil)
+	void DX11RenderEngine::SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget,const RenderSurfacePtr& depthStencil,bool useReadOnlyDepthStencil)
 	{
 		std::vector<ID3D11RenderTargetView*> vRenderTarget;
 		for(size_t i=0;i<renderTarget.size();i++ )
@@ -443,7 +559,15 @@ namespace Disorder
 		}
 
 		DX11RenderSurfacePtr dxDepthStencil = depthStencil == NULL ? NULL : boost::dynamic_pointer_cast<DX11RenderSurface>(depthStencil);
-		_pImmediateContext->OMSetRenderTargets(vRenderTarget.size(),&(vRenderTarget[0]),dxDepthStencil->DepthStencilView.get());
+		if( _featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil && dxDepthStencil->DepthStencilReadOnlyView == NULL )
+		{
+			BOOST_ASSERT(0);
+			return;
+		}
+		if( _featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil )
+			_pImmediateContext->OMSetRenderTargets(vRenderTarget.size(),&(vRenderTarget[0]),dxDepthStencil->DepthStencilReadOnlyView.get());
+		else
+		    _pImmediateContext->OMSetRenderTargets(vRenderTarget.size(),&(vRenderTarget[0]),dxDepthStencil->DepthStencilView.get());
 
 	}
 
@@ -475,13 +599,22 @@ namespace Disorder
 		
 	}
 
-	void DX11RenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil)
+	void DX11RenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil,bool useReadOnlyDepthStencil)
 	{
 		DX11RenderSurfacePtr dxRenderTarget = renderTarget == NULL ? NULL : boost::dynamic_pointer_cast<DX11RenderSurface>(renderTarget);
 		DX11RenderSurfacePtr dxDepthStencil = depthStencil == NULL ? NULL : boost::dynamic_pointer_cast<DX11RenderSurface>(depthStencil);
 
 		ID3D11RenderTargetView* pView = dxRenderTarget->RenderTargetView.get();
-		_pImmediateContext->OMSetRenderTargets(1,&pView,dxDepthStencil->DepthStencilView.get());
+		if( _featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil && dxDepthStencil->DepthStencilReadOnlyView == NULL )
+		{
+			BOOST_ASSERT(0);
+			return;
+		}
+
+		if( _featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil )
+			_pImmediateContext->OMSetRenderTargets(1,&pView,dxDepthStencil->DepthStencilReadOnlyView.get());
+		else
+		    _pImmediateContext->OMSetRenderTargets(1,&pView,dxDepthStencil->DepthStencilView.get());
 	}
 
 	void DX11RenderEngine::ClearRenderTarget(const RenderSurfacePtr& renderTarget,const Vector4& color )
@@ -506,8 +639,6 @@ namespace Disorder
 	void DX11RenderEngine::OnDrawBegin()
 	{
 		GDrawTriNumber = 0;
-
-		// Clear the back buffer 
  
 		
 	}

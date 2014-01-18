@@ -34,8 +34,15 @@ namespace Disorder
 		RenderSurfacePtr NormalDataBuffer;
 		RenderSurfacePtr SpecularDataBuffer;
 
+		virtual void UpdateShaderProperty();
+
 	protected:
-		RenderGBuffer(){}
+		RenderGBuffer();
+
+		ShaderPropertyPtr _GBufferDepthTexture;
+		ShaderPropertyPtr _GBufferColorSpecIntTexture;
+		ShaderPropertyPtr _GBufferNormalTexture;
+		ShaderPropertyPtr _GBufferSpecPowTexture;
 
 	};
 

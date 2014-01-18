@@ -85,7 +85,7 @@ namespace Disorder
  
 	ImagePtr Image::Create(ImageSpec const& spec,void* pData)
 	{
-		Image *pImage = new Image(spec,pData);
+		Image *pImage = new Image(spec);
 		return ImagePtr(pImage);
 	}
 
@@ -113,23 +113,69 @@ namespace Disorder
 		return ImagePtr(pImage);
 	}
 
-	void Image::InitImage(unsigned int bytes,void* pData)
+	void Image::InitRawImage(unsigned int bytes,void* pData)
 	{
-		BOOST_ASSERT(_pPixelRawData == NULL);
-		_pPixelRawData = new unsigned int[bytes];
-		memcpy(_pPixelRawData,pData,bytes);
+		if( !_pPixelRawData )
+		{
+		   _pPixelRawData = new unsigned char[bytes];
+		   memcpy(_pPixelRawData,pData,bytes);
+		}
 	}
  
-	Image::Image(ImageSpec const& spec,void* pPixels)
+	Image::Image(ImageSpec const& spec)
 		:_imageSpec(spec),_pPixelRawData(NULL)
 	{
-		InitImage((size_t)spec.image_bytes(),pPixels);
+	}
+
+	Image::Image(ImageSpec const& spec,void *pPixels)
+		:_imageSpec(spec),_pPixelRawData(NULL)
+	{
+		InitRawImage((unsigned int)spec.image_bytes(),pPixels);
+	}
+
+	// not debug yet
+	void Image::ConvertData_B5G5R5A1_UNORM(int width,int height,void *pData)
+	{
+		BOOST_ASSERT(_pPixelRawData == 0);
+		_pPixelRawData = new unsigned char[width*height*4];
+
+		for(int i=0;i<width;i++ )
+			for(int j=0;j<height;j++ )
+			{
+				int index = j*width + i;
+				unsigned short* pSrc = ((unsigned short*)pData) + index;
+				unsigned char* pDest = ((unsigned char*)_pPixelRawData) + 4 * index;
+				pDest[0] = (*pSrc) >> 1 & 0x1F; // R
+				pDest[1] = (*pSrc) >> 6 & 0x1F; // G
+				pDest[2] = (*pSrc) >> 11 & 0x1F; // B;
+				pDest[3] = (*pSrc) & 0x01;  // A
+			}
+	}
+
+	// include PF_D24_UNORM_S8_UINT,PF_R24_UNORM_X8_TYPELESS
+	void Image::ConvertData_PF_R24G8_TYPELESS(int width,int height,void *pData)
+	{
+		BOOST_ASSERT(_pPixelRawData == 0);
+		_pPixelRawData = new unsigned char[width*height*3];
+
+		for(int i=0;i<width;i++ )
+			for(int j=0;j<height;j++ )
+			{
+				int index = j*width + i;
+				unsigned int* pSrc = ((unsigned int*)pData) + index;
+				unsigned char* pDest = ((unsigned char*)_pPixelRawData) + 3 * index;
+				pDest[0] = (unsigned char)(((*pSrc) >> 8 & 0x0FFFFFF) / 65536.f);  
+				pDest[1] = (*pSrc) & 0x00FF;  
+				pDest[2] = 0;
+			}
 	}
 
 	ImagePtr Image::Create(int width,int height,PixelFormat format,void* pData)
 	{
 		// only support some format
 		ImageSpec spec;
+		Image *pImage = NULL;
+
 		switch (format)
 		{
 		  case PF_A8_UNORM:
@@ -141,6 +187,10 @@ namespace Disorder
 			  spec = ImageSpec(width,height,1,TypeDesc::UINT8);
 			  break;
 		  case PF_B5G5R5A1_UNORM:
+			  spec = ImageSpec(width,height,4,TypeDesc::UINT8);
+			  pImage = new Image(spec);
+			  pImage->ConvertData_B5G5R5A1_UNORM(width,height,pData);
+			  break;
 		  case PF_B5G6R5_UNORM:
 		  case PF_D16_UNORM:
 		  case PF_R16_FLOAT:
@@ -159,6 +209,10 @@ namespace Disorder
 		  case PF_D24_UNORM_S8_UINT:
 		  case PF_R24_UNORM_X8_TYPELESS:
 		  case PF_R24G8_TYPELESS:
+			   spec = ImageSpec(width,height,3,TypeDesc::UINT8);
+			   pImage = new Image(spec);
+			   pImage->ConvertData_PF_R24G8_TYPELESS(width,height,pData);
+			   break;
 		  case PF_D32_FLOAT:
 		  case PF_D32_FLOAT_S8X24_UINT:
 		  case PF_R32_FLOAT:
@@ -266,7 +320,12 @@ namespace Disorder
 			  return NULL;
 	    }
 
-		Image *pImage = new Image(spec,pData);
+		if( pImage == NULL ) // non convert data
+		{
+			 pImage = new Image(spec);
+			 pImage->InitRawImage((size_t)spec.image_bytes(),pData);
+		}
+
 		return ImagePtr(pImage);
 	}
 }

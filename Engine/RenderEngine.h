@@ -19,10 +19,11 @@ namespace Disorder
 
 		virtual void ClearRenderTarget(const RenderSurfacePtr& renderTarget,const Vector4& color ) = 0;
 		virtual void ClearDepthStencil(const RenderSurfacePtr& depthBuffer,bool bClearDepth,float depth,bool bClearStencil,unsigned char stencil) = 0;
-		virtual void SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget,const RenderSurfacePtr& depthStencil) = 0;
-		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil) = 0;
+		virtual void SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget,const RenderSurfacePtr& depthStencil,bool useReadOnlyDepthStencil = false) = 0;
+		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil,bool useReadOnlyDepthStencil = false) = 0;
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout) = 0;
-		
+		virtual void SetPrimitiveTopology(TopologyType topologyType) = 0;
+
 		virtual void SetEffect(RenderEffectPtr const& effect) = 0;
 		virtual void DrawIndexed(unsigned int indexCount,unsigned int startIndexLocation,int baseVertexLocation) = 0;
 		virtual void Draw(unsigned int vertexCount,unsigned int startVertexLocation) = 0;

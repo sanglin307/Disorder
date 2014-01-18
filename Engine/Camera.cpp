@@ -249,6 +249,8 @@ namespace Disorder
 		_viewMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraView,eSP_Matrix4);
 		_projMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraProjection,eSP_Matrix4);
 		_positionProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraPosition,eSP_Vector3);
+		_perspectiveValueProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sPerspectiveValues,eSP_Vector4);
+		_viewInvProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sViewInv,eSP_Matrix4);
 	 
 	}
 
@@ -258,6 +260,8 @@ namespace Disorder
 		_viewMatrixProperty->SetData(ViewMatrix);
 		_projMatrixProperty->SetData(ProjectMatrix);
 		_positionProperty->SetData(_eyePos);
+		_perspectiveValueProperty->SetData(Vector4(1.0f / ProjectMatrix[0][0],1.0f / ProjectMatrix[1][1],ProjectMatrix[3][2],-ProjectMatrix[2][2]));
+		_viewInvProperty->SetData(ViewMatrix.Inverse().Transpose());
 		_propertyManager->UpdateShaderProperty();
 
 	}

@@ -1,13 +1,6 @@
 #include "Common.dsf"
 
-struct Material
-{
-   float3 Normal;
-   float3 DiffuseColor;
-   float3 SpecularColor;
-   float  Shininess;
-};
-
+ 
 Material PrepareMaterial(float3 normal, float2 UV)
 {
 	Material material;
@@ -22,96 +15,7 @@ Material PrepareMaterial(float3 normal, float2 UV)
  
 	return material;
 } 
-
-cbuffer ForwardFourLights 
-{
-	float4 ForwardLightPosX	;	
-	float4 ForwardLightPosY	;	
-	float4 ForwardLightPosZ	;	
-	float4 ForwardLightDirX	;	
-	float4 ForwardLightDirY	;	
-	float4 ForwardLightDirZ	;	
-	float4 ForwardLightRangeRcp	;	
-	float4 ForwardSpotCosOuterCone	;	
-	float4 ForwardSpotCosInnerConeRcp;	
-	float4 ForwardCapsuleLen;			
-	float4 ForwardLightColorR;			
-	float4 ForwardLightColorG;		
-	float4 ForwardLightColorB;			
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// Pixel shaders
-/////////////////////////////////////////////////////////////////////////////
-
-
-float4 dot4x4(float4 aX, float4 aY, float4 aZ, float4 bX, float4 bY, float4 bZ)
-{
-	return aX * bX + aY * bY + aZ * bZ;
-}
-
-// Dot product between a four three component vectors and a single three component vector
-float4 dot4x1(float4 aX, float4 aY, float4 aZ, float3 b)
-{
-	return aX * b.xxxx + aY * b.yyyy + aZ * b.zzzz;
-}
-
-// Four light calculation helper function
-float3 CalculateFourLights(float3 position, Material material)
-{
-	float3 ToEye = CameraPosition.xyz - position;
-   
-	// Find the shortest distance between the pixel and capsules segment
-	float4 ToCapsuleStartX = position.xxxx - ForwardLightPosX;
-	float4 ToCapsuleStartY = position.yyyy - ForwardLightPosY;
-	float4 ToCapsuleStartZ = position.zzzz - ForwardLightPosZ;
-	float4 DistOnLine = dot4x4(ToCapsuleStartX, ToCapsuleStartY, ToCapsuleStartZ, ForwardLightDirX, ForwardLightDirY, ForwardLightDirZ);
-	float4 CapsuleLenSafe = max(ForwardCapsuleLen, 1.e-6);
-	DistOnLine = ForwardCapsuleLen * saturate(DistOnLine / CapsuleLenSafe);
-	float4 PointOnLineX = ForwardLightPosX + ForwardLightDirX * DistOnLine;
-	float4 PointOnLineY = ForwardLightPosY + ForwardLightDirY * DistOnLine;
-	float4 PointOnLineZ = ForwardLightPosZ + ForwardLightDirZ * DistOnLine;
-	float4 ToLightX = PointOnLineX - position.xxxx;
-	float4 ToLightY = PointOnLineY - position.yyyy;
-	float4 ToLightZ = PointOnLineZ - position.zzzz;
-	float4 DistToLightSqr = dot4x4(ToLightX, ToLightY, ToLightZ, ToLightX, ToLightY, ToLightZ);
-	float4 DistToLight = sqrt(DistToLightSqr);
-   
-	// Phong diffuse
-	ToLightX /= DistToLight; // Normalize
-	ToLightY /= DistToLight; // Normalize
-	ToLightZ /= DistToLight; // Normalize
-	float4 NDotL = saturate(dot4x1(ToLightX, ToLightY, ToLightZ, material.Normal));
-	//float3 finalColor = float3(dot(ForwardLightColorR, NDotL), dot(ForwardLightColorG, NDotL), dot(ForwardLightColorB, NDotL));
-   
-	// Blinn specular
-	ToEye = normalize(ToEye);
-	float4 HalfWayX = ToEye.xxxx + ToLightX;
-	float4 HalfWayY = ToEye.yyyy + ToLightY;
-	float4 HalfWayZ = ToEye.zzzz + ToLightZ;
-	float4 HalfWaySize = sqrt(dot4x4(HalfWayX, HalfWayY, HalfWayZ, HalfWayX, HalfWayY, HalfWayZ));
-	float4 NDotH = saturate(dot4x1(HalfWayX / HalfWaySize, HalfWayY / HalfWaySize, HalfWayZ / HalfWaySize, material.Normal));
-	float4 SpecValue = pow(NDotH, material.Shininess.xxxx) ;//* material.specIntensity;
-	//finalColor += float3(dot(ForwardLightColorR, SpecValue), dot(ForwardLightColorG, SpecValue), dot(ForwardLightColorB, SpecValue));
-   
-	// Cone attenuation
-	float4 cosAng = dot4x4(ForwardLightDirX, ForwardLightDirY, ForwardLightDirZ, ToLightX, ToLightY, ToLightZ);
-	float4 conAtt = saturate((cosAng - ForwardSpotCosOuterCone) * ForwardSpotCosInnerConeRcp);
-	conAtt *= conAtt;
-   
-	// Attenuation
-	float4 DistToLightNorm = 1.0 - saturate(DistToLight * ForwardLightRangeRcp);
-	float4 Attn = DistToLightNorm * DistToLightNorm;
-	Attn *= conAtt; // Include the cone attenuation
-
-	// Calculate the final color value
-	float4 pixelIntensity = (NDotL + SpecValue) * Attn;
-	float3 finalColor = float3(dot(ForwardLightColorR, pixelIntensity), dot(ForwardLightColorG, pixelIntensity), dot(ForwardLightColorB, pixelIntensity)); 
-	finalColor *= material.DiffuseColor;
-   
-	return finalColor;
-}
-
+ 
 struct VS_INPUT
 {
     float3 Position  : POSITION;
@@ -144,25 +48,7 @@ VS_OUTPUT RenderSceneVS( VS_INPUT input )
 //--------------------------------------------------------------------------------------
 // Pixel Shader
 //--------------------------------------------------------------------------------------
-
-
-float3 CalculateDirectionLight(float3 position, Material material)
-{
-   //diffuse
-   float3 lightColor = DirectionLightIntensity * DirectionLightColor.rgb;
-   float NDotL = max(dot(DirectionLightDir, material.Normal),0);
-   float3 finalColor = lightColor * NDotL * material.DiffuseColor;
-   
-   //specular
-   float3 ToEye = normalize(CameraPosition - position);
-   float3 reflectVector = reflect(-DirectionLightDir,material.Normal);
-   float NDotH = max(dot(reflectVector, ToEye),0);
-   finalColor += lightColor * saturate(pow(NDotH, material.Shininess)) * material.SpecularColor;
-   
-   return finalColor;
-}
-
-
+ 
 float4 DirectionalLightPS( VS_OUTPUT input ) : SV_Target
 {
     Material mat = PrepareMaterial(input.NormalWorld,(float2)0);

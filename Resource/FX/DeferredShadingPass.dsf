@@ -1,23 +1,23 @@
 #include "Common.dsf"
 
 
-struct VS_INPUT
+struct SceneVSInput
 {
     float3 Position  : POSITION;
     float3 Normal : NORMAL;
 };
 
 //--------------------------------------------------------------------------------------
-struct VS_OUTPUT
+struct SceneVSOutput
 {
     float4 Position : SV_POSITION;
     float3 NormalWorld: TEXCOORD0; 
 	float3 PositionWorld: TEXCOORD1;
 };
 
-VS_OUTPUT RenderSceneVS( VS_INPUT input )
+SceneVSOutput RenderSceneVS( SceneVSInput input )
 {   
-    VS_OUTPUT output;
+    SceneVSOutput output;
     output.Position = mul( float4(input.Position,1.0f),WorldTransform);
 	output.PositionWorld = output.Position.xyz;
     output.Position = mul( output.Position, CameraView );
@@ -31,16 +31,16 @@ VS_OUTPUT RenderSceneVS( VS_INPUT input )
 // Pixel shader
 /////////////////////////////////////////////////////////////////////////////
 
-struct PS_GBUFFER_OUT
+struct ScenePSOutput
 {
 	float4 ColorShiness : SV_TARGET0;
 	float4 Normal : SV_TARGET1;
 	float4 SpecColor : SV_TARGET2;
 };
 
-PS_GBUFFER_OUT PackGBuffer(float3 BaseColor, float3 Normal, float3 SpecColor, float SpecPower)
+ScenePSOutput PackGBuffer(float3 BaseColor, float3 Normal, float3 SpecColor, float SpecPower)
 {
-	PS_GBUFFER_OUT Out;
+	ScenePSOutput Out;
  
 	// Pack all the data into the GBuffer structure
 	Out.ColorShiness = float4(BaseColor.rgb, SpecPower);
@@ -50,11 +50,131 @@ PS_GBUFFER_OUT PackGBuffer(float3 BaseColor, float3 Normal, float3 SpecColor, fl
 	return Out;
 }
 
-PS_GBUFFER_OUT RenderScenePS( VS_OUTPUT In )
+ScenePSOutput RenderScenePS( SceneVSOutput In )
 { 
     // Lookup mesh texture and modulate it with diffuse
    // float3 DiffuseColor = DiffuseTexture.Sample( LinearSampler, In.UV );
 	//DiffuseColor *= DiffuseColor;
 
 	return PackGBuffer(DiffuseColor, normalize(In.NormalWorld), SpecularColor, Shininess);
+}
+
+Texture2D<float> GBufferDepthTexture;
+Texture2D<float4> GBufferColorSpecIntTexture;
+Texture2D<float3> GBufferNormalTexture;
+Texture2D<float4> GBufferSpecPowTexture;
+ 
+struct GBufferData
+{
+	float LinearDepth;
+	float3 Color;
+	float3 Normal;
+	float3 SpecularColor;
+	float Shiness;
+};
+
+float3 DecodeNormal(float2 encodedNormal)
+{
+    float4 decodedNormal = encodedNormal.xyyy * float4(2,2,0,0) + float4(-1,-1,1,-1);
+    decodedNormal.z = dot(decodedNormal.xyz, -decodedNormal.xyw);
+    decodedNormal.xy *= sqrt(decodedNormal.z);
+    return decodedNormal.xyz * 2.0 + float3(0.0, 0.0, -1.0);
+}
+
+float ConvertZToLinearDepth(float depth)
+{
+	float linearDepth = PerspectiveValues.z / (depth + PerspectiveValues.w);
+	return linearDepth;
+}
+
+float3 CalcWorldPos(float2 csPos, float depth)
+{
+	float4 position;
+
+	position.xy = csPos.xy * PerspectiveValues.xy * depth;
+	position.z = depth;
+	position.w = 1.0;
+	
+	return mul(position, ViewInv).xyz;
+}
+
+/*SURFACE_DATA UnpackGBuffer(float2 UV)
+{
+	SURFACE_DATA Out;
+
+	float depth = GBufferDepthTexture.Sample( PointSampler, UV.xy ).x;
+	Out.LinearDepth = ConvertZToLinearDepth(depth);
+	float4 baseColorSpecInt = GBufferColorSpecIntTexture.Sample( PointSampler, UV.xy );
+	Out.Color = baseColorSpecInt.xyz;
+	Out.SpecIntensity = baseColorSpecInt.w;
+	Out.Normal = GBufferNormalTexture.Sample( PointSampler, UV.xy ).xyz;
+	Out.Normal = normalize(Out.Normal * 2.0 - 1.0);
+	Out.SpecPow = GBufferSpecPowTexture.Sample( PointSampler, UV.xy ).x;
+
+	return Out;
+}*/
+
+GBufferData UnpackGBuffer(int2 location)
+{
+	GBufferData Out;
+	int3 location3 = int3(location, 0);
+
+	float depth = GBufferDepthTexture.Load(location3).x;
+	Out.LinearDepth = ConvertZToLinearDepth(depth);
+	float4 baseColorSpecInt = GBufferColorSpecIntTexture.Load(location3);
+	Out.Color = baseColorSpecInt.xyz;
+	Out.Shiness = baseColorSpecInt.w;
+	Out.Normal = GBufferNormalTexture.Load(location3).xyz;
+	Out.Normal = normalize(Out.Normal * 2.0 - 1.0);
+	Out.SpecularColor = GBufferSpecPowTexture.Load(location3).xyz;
+
+	return Out;
+}
+
+void MaterialFromGBuffer(GBufferData gbd, inout Material mat)
+{
+	mat.Normal = gbd.Normal;
+	mat.DiffuseColor.xyz = gbd.Color;
+	mat.SpecularColor = gbd.SpecularColor;
+	mat.Shininess = gbd.Shiness;
+}
+
+/////////////////////////Lighting///////////////////////////////////////////////
+
+struct LightVSOutput
+{
+	float4 Position : SV_Position; // vertex position 
+	float2 ScreenPos: TEXCOORD0;
+};
+
+LightVSOutput LightingVS( uint VertexID : SV_VertexID )
+{
+	LightVSOutput Output;
+
+	Output.Position = ScreenSpacePos[VertexID];
+	Output.ScreenPos = Output.Position.xy;
+
+	return Output;    
+}
+
+float4 LightingPS(LightVSOutput In) : SV_TARGET
+{
+	// Unpack the GBuffer
+	GBufferData gbd = UnpackGBuffer(In.Position.xy);
+	
+	// Convert the data into the material structure
+	Material mat;
+	MaterialFromGBuffer(gbd, mat);
+
+	// Reconstruct the world position
+	float3 position = CalcWorldPos(In.ScreenPos, gbd.LinearDepth);
+
+	// Calculate the ambient color
+	float3 finalColor = CalculateAmbient(mat.Normal, mat.DiffuseColor);
+
+	// Calculate the directional light
+	finalColor += CalculateDirectionLight(position, mat);
+
+	// Return the final color
+	return float4(finalColor, 1.0);
 }

@@ -41,7 +41,7 @@ namespace Disorder
 
 	}
 
-	DX11RenderSurfacePtr DX11RenderSurface::Create(const RenderTexture2DPtr& resource,unsigned int usage,PixelFormat RenderTargetFormat,PixelFormat DepthFormat,PixelFormat ShaderResFormat)
+	DX11RenderSurfacePtr DX11RenderSurface::Create(const RenderTexture2DPtr& resource,unsigned int usage,PixelFormat RenderTargetFormat,PixelFormat DepthFormat,PixelFormat ShaderResFormat,bool readOnlyDepth,bool readOnlyStencil)
 	{
 		DX11RenderSurface *pSurface = new DX11RenderSurface;
 		pSurface->Tex2DResource = resource;
@@ -69,6 +69,18 @@ namespace Disorder
 			descDSV.Texture2D.MipSlice = 0;
 			renderEngine->D3DDevice()->CreateDepthStencilView( (ID3D11Resource *)resource->GetLowInterface(), &descDSV, &pDepthStencilView );
 			pSurface->DepthStencilView = MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView);
+
+			// only feature level > 11 support it.
+			if( renderEngine->GetFeatureLevel() >= D3D_FEATURE_LEVEL_11_0 && ( readOnlyDepth || readOnlyStencil ) )
+			{
+				if( readOnlyDepth )
+				    descDSV.Flags |= D3D11_DSV_READ_ONLY_DEPTH ;
+				if( readOnlyStencil )
+					descDSV.Flags |= D3D11_DSV_READ_ONLY_STENCIL;
+
+				renderEngine->D3DDevice()->CreateDepthStencilView( (ID3D11Resource *)resource->GetLowInterface(), &descDSV, &pDepthStencilView );
+			    pSurface->DepthStencilReadOnlyView = MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView);
+			}
 		}
 
 		if( usage & RSU_ShaderResource )
@@ -93,7 +105,7 @@ namespace Disorder
 
 		unsigned int surfaceUsage = RSU_DepthStencil|RSU_ShaderResource;
 		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateRenderTexture2D(linearSampleState,PF_R24G8_TYPELESS,width,height,false,surfaceUsage,NULL);
-		DepthStencilBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(depthStencilTex,surfaceUsage,PF_UNKNOWN,PF_D24_UNORM_S8_UINT,PF_R24_UNORM_X8_TYPELESS);
+		DepthStencilBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(depthStencilTex,surfaceUsage,PF_UNKNOWN,PF_D24_UNORM_S8_UINT,PF_R24_UNORM_X8_TYPELESS,true,true);
 
 		surfaceUsage = RSU_RenderTarget | RSU_ShaderResource;
 		RenderTexture2DPtr basicColorTex = GEngine->RenderResourceMgr->CreateRenderTexture2D(linearSampleState,PF_R8G8B8A8_UNORM,width,height,false,surfaceUsage,NULL);

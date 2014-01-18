@@ -36,6 +36,10 @@ namespace Disorder
 
 		void UpdateLight();
 		void GetRendererList(CameraPtr const camera,std::vector<RendererPtr>& renderObjList) const;
+		const std::vector<LightPtr>& GetLightsList() const
+		{
+			return _vLightList;
+		}
 
 		void SetAmbientColor(Vector3 const& lowerColor,Vector3 const& upperColor);
 		void UpdateShaderProperty();

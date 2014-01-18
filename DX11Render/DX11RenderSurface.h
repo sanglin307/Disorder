@@ -10,9 +10,10 @@ namespace Disorder
 	public:
 
 		static DX11RenderSurfacePtr Create(const RenderTexture2DPtr& resource,ID3D11RenderTargetViewPtr RenerTarget,ID3D11ShaderResourceViewPtr ShaderResource,ID3D11DepthStencilViewPtr DepthStencil);
-		static DX11RenderSurfacePtr Create(const RenderTexture2DPtr& resource,unsigned int usage,PixelFormat RenderTargetFormat,PixelFormat DepthFormat,PixelFormat ShaderResFormat);
+		static DX11RenderSurfacePtr Create(const RenderTexture2DPtr& resource,unsigned int usage,PixelFormat RenderTargetFormat,PixelFormat DepthFormat,PixelFormat ShaderResFormat,bool readOnlyDepth = false,bool readOnlyStencil = false);
 		virtual void* GetLowInterface(RenderSurfaceUsage usage);
 
+		ID3D11DepthStencilViewPtr DepthStencilReadOnlyView;  // only dx11 feature level support it.
 		ID3D11DepthStencilViewPtr DepthStencilView;
 		ID3D11ShaderResourceViewPtr ShaderResourceView;
 		ID3D11RenderTargetViewPtr RenderTargetView;

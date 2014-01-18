@@ -72,12 +72,15 @@ namespace Disorder
         static const std::string sManagerDirectionLight;
 		static const std::string sManagerForwardFourLight;
 		static const std::string sManagerScene;
+		static const std::string sManagerGBufferUnpack;
         static const std::string sManagerGlobal; // used to save global constant buffer,sampler,texture
 		
         // for CameraTransforms
         static const std::string sCameraView;
         static const std::string sCameraProjection;
 		static const std::string sCameraPosition;
+		static const std::string sPerspectiveValues;
+		static const std::string sViewInv;
 
         // for ObjectTransform
         static const std::string sObjectWorld;
@@ -114,12 +117,17 @@ namespace Disorder
 		//for scene property
 		static const std::string sAmbientLowColor;
 		static const std::string sAmbientUpperColor;
-
+ 
 		//for global property
 		static const std::string sFontTexture;
 		static const std::string sFontSampler;
 		static const std::string sScreenTileTexture;
 	    static const std::string sScreenTileSampler;
+
+		static const std::string sGBufferDepthTexture;
+		static const std::string sGBufferColorSpecIntTexture;
+		static const std::string sGBufferNormalTexture;
+		static const std::string sGBufferSpecPowTexture;
 
 	public:
 		std::string Name;

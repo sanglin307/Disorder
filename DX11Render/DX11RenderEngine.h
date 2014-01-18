@@ -20,8 +20,9 @@ namespace Disorder
 		virtual void ClearDepthStencil(const RenderSurfacePtr& depthBuffer,bool bClearDepth,float depth,bool bClearStencil,unsigned char stencil);
 
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
-		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil);
-		virtual void SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget,const RenderSurfacePtr& depthStencil);
+		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil,bool useReadOnlyDepthStencil = false);
+		virtual void SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget,const RenderSurfacePtr& depthStencil,bool useReadOnlyDepthStencil = false);
+		virtual void SetPrimitiveTopology(TopologyType topologyType);
 
 		//virtual void UpdateMVPMatrix(RenderEffectPtr const& technique, Matrix4 const& worldMatrix,Matrix4 const& viewMatrix,Matrix4 const& projMatrix);
 		virtual void SetEffect(RenderEffectPtr const& technique);
@@ -44,6 +45,11 @@ namespace Disorder
 			return _pImmediateContext;
 		};
 
+		D3D_FEATURE_LEVEL GetFeatureLevel()
+		{
+			return _featureLevel;
+		}
+
 		virtual void SaveRenderSurface(RenderSurfacePtr const& surface,std::string const& fileName);
 
 		// pixel format related things.
@@ -52,6 +58,7 @@ namespace Disorder
 		static DXGI_FORMAT GetDepthShaderResourceFormat(DXGI_FORMAT format);
         static DXGI_FORMAT GetDepthTextureFormat(DXGI_FORMAT format);
 		
+		static D3D_PRIMITIVE_TOPOLOGY GetPlatformTopology(TopologyType tType);
 
 	protected:
 

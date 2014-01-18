@@ -3,10 +3,18 @@ Shader Object :BatchLines:PS
 Shader Object :BatchLines:VS
 Shader Object :2DFont:PS
 Shader Object :2DFont:VS
+Shader Object :DeferredShadingPass:LightingPS
+Shader Object :DeferredShadingPass:LightingVS
 Shader Object :DeferredShadingPass:RenderScenePS
 Shader Object :DeferredShadingPass:RenderSceneVS
 Shader Property Manager Name :Global
  ****** Shader Property :FontTexture
+ ****** Shader Property :GBufferColorSpecIntTexture
+ ****** Shader Property :GBufferDepthTexture
+ ****** Shader Property :DirectionLightProperty
+ ****** Shader Property :GBufferSpecPowTexture
+ ****** Shader Property :GBufferNormalTexture
+ ****** Shader Property :SceneProperty
  ****** Shader Property :MaterialProperty
  ****** Shader Property :FontSampler
  ****** Shader Property :ObjectTransform
@@ -16,6 +24,9 @@ Shader Property Manager Name :SceneProperty
  ****** Shader Property :AmbientLowColor
 Shader Property Manager Name :ForwardFourLights
 Shader Property Manager Name :DirectionLightProperty
+ ****** Shader Property :DirectionLightColor
+ ****** Shader Property :DirectionLightDir
+ ****** Shader Property :DirectionLightIntensity
 Shader Property Manager Name :MaterialProperty
  ****** Shader Property :EmissiveColor
  ****** Shader Property :ReflectionColor
@@ -26,6 +37,9 @@ Shader Property Manager Name :ObjectTransform
  ****** Shader Property :WorldNormalTransform
  ****** Shader Property :WorldTransform
 Shader Property Manager Name :CameraTransforms
+ ****** Shader Property :sViewInv
+ ****** Shader Property :PerspectiveValues
  ****** Shader Property :CameraPosition
  ****** Shader Property :CameraProjection
+ ****** Shader Property :ViewInv
  ****** Shader Property :CameraView
