@@ -116,8 +116,22 @@ namespace Disorder
 
 		RenderTexture2DPtr specularTex = GEngine->RenderResourceMgr->CreateRenderTexture2D(linearSampleState,PF_R8G8B8A8_UNORM,width,height,false,surfaceUsage,NULL);
 		SpecularDataBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(specularTex,surfaceUsage,PF_R8G8B8A8_UNORM,PF_UNKNOWN,PF_R8G8B8A8_UNORM);
+
+		
+		_GBufferVisualEffect = RenderEffect::Create();
+		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"GBufferVisual",SM_4_0,"GBufferVisualVS");
+		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"GBufferVisual",SM_4_0,"GBufferVisualPS");
+		_GBufferVisualEffect->BindShader(vertexShader);
+		_GBufferVisualEffect->BindShader(pixelShader);
+
 	}
 
+	void DX11RenderGBuffer::DebugVisual()
+	{
+		GEngine->RenderEngine->SetPrimitiveTopology(TT_TriangleStrip);
+		GEngine->RenderEngine->SetEffect(_GBufferVisualEffect);
+		GEngine->RenderEngine->Draw(16,0);
+	}
 
 	DX11RenderGBufferPtr DX11RenderGBuffer::Create(unsigned int width,unsigned int height)
 	{

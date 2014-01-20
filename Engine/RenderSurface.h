@@ -36,6 +36,8 @@ namespace Disorder
 
 		virtual void UpdateShaderProperty();
 
+		virtual void DebugVisual(){}
+
 	protected:
 		RenderGBuffer();
 
@@ -43,6 +45,10 @@ namespace Disorder
 		ShaderPropertyPtr _GBufferColorSpecIntTexture;
 		ShaderPropertyPtr _GBufferNormalTexture;
 		ShaderPropertyPtr _GBufferSpecPowTexture;
+		ShaderPropertyPtr _GBufferPointSampler;
+
+		RenderEffectPtr _GBufferVisualEffect;
+
 
 	};
 

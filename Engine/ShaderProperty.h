@@ -128,6 +128,7 @@ namespace Disorder
 		static const std::string sGBufferColorSpecIntTexture;
 		static const std::string sGBufferNormalTexture;
 		static const std::string sGBufferSpecPowTexture;
+		static const std::string sGBufferPointSampler;
 
 	public:
 		std::string Name;

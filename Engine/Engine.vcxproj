@@ -86,10 +86,12 @@
     <None Include="..\Config\CameraConfig.xml" />
     <None Include="..\Config\RenderConfig.xml" />
     <None Include="..\Resource\FX\2DFont.dsf" />
-    <None Include="..\Resource\FX\DeferredShadingPass.dsf" />
-    <None Include="..\Resource\FX\ForwardLightPass.dsf" />
+    <None Include="..\Resource\FX\DeferredShading.dsf" />
+    <None Include="..\Resource\FX\DeferredShadingCommon.dsf" />
+    <None Include="..\Resource\FX\ForwardLighting.dsf" />
     <None Include="..\Resource\FX\BatchLines.dsf" />
     <None Include="..\Resource\FX\Common.dsf" />
+    <None Include="..\Resource\FX\GBufferVisual.dsf" />
     <None Include="..\Resource\FX\ScreenTiles.dsf" />
     <None Include="TodoList.txt" />
   </ItemGroup>

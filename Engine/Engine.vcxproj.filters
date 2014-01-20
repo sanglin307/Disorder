@@ -47,10 +47,16 @@
     <None Include="..\Resource\FX\ScreenTiles.dsf">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\Resource\FX\ForwardLightPass.dsf">
+    <None Include="..\Resource\FX\DeferredShading.dsf">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\Resource\FX\DeferredShadingPass.dsf">
+    <None Include="..\Resource\FX\ForwardLighting.dsf">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Resource\FX\GBufferVisual.dsf">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Resource\FX\DeferredShadingCommon.dsf">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

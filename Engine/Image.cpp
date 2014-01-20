@@ -165,7 +165,7 @@ namespace Disorder
 				unsigned int* pSrc = ((unsigned int*)pData) + index;
 				unsigned char* pDest = ((unsigned char*)_pPixelRawData) + 3 * index;
 				pDest[0] = (unsigned char)(((*pSrc) >> 8 & 0x0FFFFFF) / 65536.f);  
-				pDest[1] = (*pSrc) & 0x00FF;  
+				pDest[1] = 0;//(*pSrc) & 0x00FF;  
 				pDest[2] = 0;
 			}
 	}

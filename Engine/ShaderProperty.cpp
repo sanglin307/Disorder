@@ -314,6 +314,8 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sGBufferColorSpecIntTexture = "GBufferColorSpecIntTexture";
 	const std::string ShaderPropertyManager::sGBufferNormalTexture = "GBufferNormalTexture";
 	const std::string ShaderPropertyManager::sGBufferSpecPowTexture = "GBufferSpecPowTexture";
+	const std::string ShaderPropertyManager::sGBufferPointSampler = "GBufferPointSampler";
+
 
 	ShaderPropertyPtr ShaderPropertyManager::GetProperty(std::string const& name)
 	{

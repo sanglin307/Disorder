@@ -26,7 +26,7 @@ namespace Disorder
 	{
 	public:
 		static DX11RenderGBufferPtr Create(unsigned int width,unsigned int height);
-
+		virtual void DebugVisual();
 	protected:
 		DX11RenderGBuffer(unsigned int width,unsigned int height);
 	};
