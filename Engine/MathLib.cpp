@@ -29,4 +29,43 @@ namespace Disorder
 
 		pos += origin;
 	}
+
+	// fov use rad, opengl
+   Matrix4 Math::PerspectiveMatrix(float fovy, float aspect, float zNear, float zFar)
+   {
+       float tanHalfFovy = tan(fovy / 2);
+	   Matrix4 Result = Matrix4::ZERO;
+       Result[0][0] = 1 / (aspect * tanHalfFovy);
+       Result[1][1] = 1 / (tanHalfFovy);
+       Result[2][2] = - (zFar + zNear) / (zFar - zNear);
+       Result[2][3] = - 1;
+       Result[3][2] = - (2 * zFar * zNear) / (zFar - zNear);
+       return Result;
+   }
+
+   Matrix4 Math::LookAtMatrix(Vector3 &eye,Vector3 &center,Vector3 &up)
+   {
+	   Vector3 f = (center - eye);
+	   f.Normalise();
+	   up.Normalise();
+	   Vector3 u = up;
+	   Vector3 s = f.Cross(u);
+	   s.Normalise();
+	   u = s.Cross(f);
+
+	   Matrix4 Result = Matrix4::IDENTITY;
+	   Result[0][0] = s.x;
+	   Result[1][0] = s.y;
+	   Result[2][0] = s.z;
+	   Result[0][1] = u.x;
+	   Result[1][1] = u.y;
+	   Result[2][1] = u.z;
+	   Result[0][2] =-f.x;
+	   Result[1][2] =-f.y;
+	   Result[2][2] =-f.z;
+	   Result[3][0] =-s.Dot(eye);
+	   Result[3][1] =-u.Dot(eye);
+	   Result[3][2] = f.Dot(eye);
+	   return Result;
+	 }
 }

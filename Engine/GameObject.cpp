@@ -112,7 +112,7 @@ namespace Disorder
 	{
 		Quaternion rot;
 		rot.FromAngleAxis(radian,axis);
-		_locRot = _locRot * rot;
+		_locRot = rot * _locRot;
 		RefreshWorldTransform();
 	}
 
