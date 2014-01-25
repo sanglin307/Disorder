@@ -32,10 +32,10 @@ namespace Disorder
 		_texture = texture;
  
 	    ShaderPropertyManagerPtr globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
-		ShaderPropertyPtr texProperty = globalProperty->CreateProperty(ShaderPropertyManager::sFontTexture,eSP_ShaderResource);
+		ShaderPropertyPtr texProperty = globalProperty->CreateProperty(ShaderPropertyManager::sTextTexture,eSP_ShaderResource);
 	    texProperty->SetData(_texture);
 	 
-		ShaderPropertyPtr Sampler = globalProperty->CreateProperty(ShaderPropertyManager::sFontSampler,eSP_SampleState);
+		ShaderPropertyPtr Sampler = globalProperty->CreateProperty(ShaderPropertyManager::sTextSampler,eSP_SampleState);
 		Sampler->SetData(texture->Tex2DResource->Sampler);
  
 	}
@@ -117,8 +117,8 @@ namespace Disorder
 	{
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderResourceMgr;
 		_renderEffect = RenderEffect::Create(); 
-		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"2DFont",SM_4_0,"VS");
-		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"2DFont",SM_4_0,"PS");
+		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"2DText",SM_4_0,"VS");
+		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"2DText",SM_4_0,"PS");
 	    
 		_renderEffect->BindShader(vertexShader);
 		_renderEffect->BindShader(pixelShader);
@@ -131,6 +131,11 @@ namespace Disorder
 		 
 		BlendStatePtr blendState = resourceManager->CreateBlendState(&blendDesc,1);
 		_renderEffect->BindBlendState(blendState);
+
+		RasterizeDesc rDesc;
+		rDesc.FrontCounterClockwise = false;
+		RasterizeStatePtr rState = resourceManager->CreateRasterizeState(&rDesc);
+		_renderEffect->BindRasterizeState(rState);
 
 	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_TriangleList,true);
 	 
@@ -272,6 +277,30 @@ namespace Disorder
 		_renderLayout->BindIndexBuffer(indexBuffer);
 	}
 
+	////////////////////////////////////////////////////////////////////////////
+	SimpleTile::SimpleTile()
+		:Renderer("DefaultSimpleTile")
+	{
+	}
+
+	SimpleTile::SimpleTile(std::string const& name,const std::vector<TileTexVertex>& positions,const RenderEffectPtr& renderEffect)
+		:Renderer(name)
+	{
+		BOOST_ASSERT(positions.size() == 4);
+		_renderEffect = renderEffect;
+		_renderLayout = GEngine->RenderResourceMgr->CreateRenderLayout(_renderEffect->GetVertexShader(),TT_TriangleStrip,true);
+		RenderBufferPtr vertexBuffer = GEngine->RenderResourceMgr->CreateRenderBuffer(RBT_Vertex,BAH_GPU_Read,sizeof(TileTexVertex),sizeof(TileTexVertex)*4,(void*)positions.data());
+		_renderLayout->BindVertexBuffer(vertexBuffer);
+	}
+
+	void SimpleTile::Render(CameraPtr const& camera)
+	{
+		RenderEnginePtr renderEngine = GEngine->RenderEngine;
+		renderEngine->SetRenderLayout(_renderLayout);
+		renderEngine->SetEffect(_renderEffect);
+		renderEngine->Draw(4,0);
+	}
+
 	/////////////////////////////////////////////////////////////////////////
 	BatchLines::BatchLines(std::string const& name)
 		:Renderer(name)
@@ -282,6 +311,12 @@ namespace Disorder
 		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"BatchLines",SM_4_0,"PS");
 		_renderEffect->BindShader(vertexShader);
 		_renderEffect->BindShader(pixelShader);
+
+		RasterizeDesc rDesc;
+		rDesc.AntialiasedLineEnable = true;
+
+		RasterizeStatePtr rState = resourceManager->CreateRasterizeState(&rDesc);
+		_renderEffect->BindRasterizeState(rState);
 
 	    _renderLayout = resourceManager->CreateRenderLayout(vertexShader,TT_LineList,true);
 	 
@@ -466,7 +501,7 @@ namespace Disorder
 		 GEngine->GameCanvas->DrawLine(original,Vector4(0,1.0f,0,1.0f),yAxis,Vector4(0,1.0f,0,1.0f));
 		 GEngine->GameCanvas->DrawLine(original,Vector4(0,0,1.0f,1.0f),zAxis,Vector4(0,0,1.0f,1.0f));
 
-		 Matrix4 ProjectViewMatrix = camera->ProjectMatrix * camera->ViewMatrix;
+		 Matrix4 ProjectViewMatrix = camera->ProjectMatrix.Transpose() * camera->ViewMatrix.Transpose();
 		 xAxis = ProjectViewMatrix * xAxis;
 		 yAxis = ProjectViewMatrix * yAxis;
 		 zAxis = ProjectViewMatrix * zAxis;

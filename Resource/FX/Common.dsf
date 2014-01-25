@@ -9,9 +9,11 @@ cbuffer CameraTransforms
 {
 	matrix CameraView;
 	matrix CameraProjection;	
+	matrix CameraViewProj;
+    matrix CameraViewInv;
+	matrix CameraProjInv;
+	matrix CameraViewProjInv;
 	float3 CameraPosition;
-	float4 PerspectiveValues;
-    float4x4 ViewInv;
 }
 
 cbuffer ObjectTransform
@@ -37,8 +39,8 @@ cbuffer DirectionLightProperty
 static const float4 ScreenSpacePos[4] = 
 {
 	float4(-1.0, 1.0,0.0,1.0),
-	float4(1.0, 1.0,0.0,1.0),
 	float4(-1.0, -1.0,0.0,1.0),
+	float4(1.0, 1.0,0.0,1.0),
 	float4(1.0, -1.0,0.0,1.0),
 };
 
@@ -66,12 +68,12 @@ float3 CalculateDirectionLight(float3 position, Material material)
 {
    //diffuse
    float3 lightColor = DirectionLightIntensity * DirectionLightColor.rgb;
-   float NDotL = max(dot(DirectionLightDir, material.Normal),0);
+   float NDotL = max(dot(-DirectionLightDir, material.Normal),0);
    float3 finalColor = lightColor * NDotL * material.DiffuseColor;
    
    //specular
    float3 ToEye = normalize(CameraPosition - position);
-   float3 reflectVector = reflect(-DirectionLightDir,material.Normal);
+   float3 reflectVector = reflect(DirectionLightDir,material.Normal);
    float NDotH = max(dot(reflectVector, ToEye),0);
    finalColor += lightColor * saturate(pow(NDotH, material.Shininess)) * material.SpecularColor;
    

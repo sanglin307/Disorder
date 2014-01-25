@@ -85,7 +85,7 @@
   <ItemGroup>
     <None Include="..\Config\CameraConfig.xml" />
     <None Include="..\Config\RenderConfig.xml" />
-    <None Include="..\Resource\FX\2DFont.dsf" />
+    <None Include="..\Resource\FX\2DText.dsf" />
     <None Include="..\Resource\FX\DeferredShading.dsf" />
     <None Include="..\Resource\FX\DeferredShadingCommon.dsf" />
     <None Include="..\Resource\FX\ForwardLighting.dsf" />

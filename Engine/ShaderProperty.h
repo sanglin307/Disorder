@@ -78,9 +78,11 @@ namespace Disorder
         // for CameraTransforms
         static const std::string sCameraView;
         static const std::string sCameraProjection;
+		static const std::string sCameraViewProj;
+		static const std::string sCameraViewInv;
+		static const std::string sCameraProjInv;
+		static const std::string sCameraViewProjInv;
 		static const std::string sCameraPosition;
-		static const std::string sPerspectiveValues;
-		static const std::string sViewInv;
 
         // for ObjectTransform
         static const std::string sObjectWorld;
@@ -119,8 +121,8 @@ namespace Disorder
 		static const std::string sAmbientUpperColor;
  
 		//for global property
-		static const std::string sFontTexture;
-		static const std::string sFontSampler;
+		static const std::string sTextTexture;
+		static const std::string sTextSampler;
 		static const std::string sScreenTileTexture;
 	    static const std::string sScreenTileSampler;
 

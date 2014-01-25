@@ -90,7 +90,9 @@ namespace Disorder
 		virtual void Tick(float delta);
 
 		Matrix4 ViewMatrix;
+		Matrix4 ViewInvMatrix;
 		Matrix4 ProjectMatrix;
+		Matrix4 ProjectInvMatrix;
 		Frustrum CameraFrustrum;
 
 		void SetUpdateStrategy(ECameraUpdateStrategy mode);
@@ -136,10 +138,11 @@ namespace Disorder
 		ShaderPropertyManagerPtr _propertyManager;
 		ShaderPropertyPtr _viewMatrixProperty;
 		ShaderPropertyPtr _projMatrixProperty;
-		ShaderPropertyPtr _positionProperty;
-		ShaderPropertyPtr _perspectiveValueProperty;
+		ShaderPropertyPtr _viewProjMatrixProperty;
 		ShaderPropertyPtr _viewInvProperty;
-
+		ShaderPropertyPtr _projInvProperty;
+		ShaderPropertyPtr _viewProjInvProperty;
+		ShaderPropertyPtr _positionProperty;
 
 	};
 }

@@ -1004,7 +1004,7 @@ namespace Disorder
 		Vector3 position(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
 		lTmpVector =  pNode->EvaluateLocalRotation();
 		Matrix3 rotMatrix;
-		rotMatrix.FromEulerAnglesXYZ((float)lTmpVector[0],(float)lTmpVector[1],(float)lTmpVector[2]);
+		rotMatrix.FromEulerAnglesXYZ((float)lTmpVector[0]*Math::fDeg2Rad,(float)lTmpVector[1]*Math::fDeg2Rad,(float)lTmpVector[2]*Math::fDeg2Rad);
 		Quaternion rot;
 		rot.FromRotationMatrix(rotMatrix);
 		lTmpVector = pNode->EvaluateLocalScaling();

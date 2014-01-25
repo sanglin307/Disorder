@@ -70,7 +70,7 @@ namespace Disorder
 
 		RenderEffectPtr _RenderSceneEffect;
 
-		
+		SimpleTile _LightingTile;
 		RenderEffectPtr _LightingEffect;
 	};
 

@@ -45,9 +45,9 @@ namespace Disorder
 	{
 		GameObjectPtr go = GetBase();
 		Vector3 beginPos = go->GetWorldPosition();
-		Vector3 endPos = beginPos + GetDirection();
+		Vector3 endPos = beginPos + GetDirection() * 2;
 			
-		GEngine->GameCanvas->DrawLine(beginPos,Vector4::ONE,endPos,Vector4(Color));
+		GEngine->GameCanvas->DrawLine(beginPos,Vector4::ONE,endPos,Vector4(0,0,0,1.f));
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	PointLight::PointLight(std::string const& name)

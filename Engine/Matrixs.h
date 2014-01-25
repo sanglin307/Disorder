@@ -845,10 +845,7 @@ namespace Disorder
         }
     };
 
-    /* Removed from Vector4 and made a non-member here because otherwise
-       OgreMatrix4.h and OgreVector4.h have to try to include and inline each 
-       other, which frankly doesn't work ;)
-   */
+ 
     inline Vector4 operator * (const Vector4& v, const Matrix4& mat)
     {
         return Vector4(

@@ -141,9 +141,10 @@ namespace Disorder
 		static  void ConvertToSphericalCoord(const Vector3& pos,const Vector3& origin,float &radius,float &yAngle,float &zAngle);	
 		static  void ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const Vector3& origin,Vector3& pos);
 		
-		static Matrix4 PerspectiveMatrix(float fovy, float aspect, float zNear, float zFar);
-		static Matrix4 LookAtMatrix(Vector3 &eye,Vector3 &center,Vector3 &up);
-
+		static Matrix4 PerspectiveFovRH(float fieldOfViewY,float aspectRatio,float znearPlane,float zfarPlane);
+		
+		static Matrix4 ViewMatrixRH(const Vector3 &eye,const Vector3 &center,const Vector3 &up);
+		 
 		static const float Math::POS_INFINITY;
         static const float Math::NEG_INFINITY;
 		static const float PI;

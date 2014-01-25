@@ -19,7 +19,7 @@ namespace Disorder
 	public:
 		Frustrum();
 		void Construct(const Matrix4& viewMatrix,const Matrix4& projMatrix);
-
+		void Construct(const Matrix4 &mViewProjection);
 		bool Overlaps(BoxBounds const& bounds) const;
 		bool Overlaps(SphereBounds const& bounds) const;
 

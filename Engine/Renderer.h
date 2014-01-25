@@ -117,6 +117,14 @@ namespace Disorder
 		unsigned int _savedVertexBufferSize;
 	};
 
+	class SimpleTile : public Renderer
+	{
+	public:
+		SimpleTile();
+		SimpleTile(std::string const& name,const std::vector<TileTexVertex>& positions,const RenderEffectPtr& renderEffect);
+		virtual void Render(CameraPtr const& camera);
+	};
+
 	class GeometryRenderer : public Renderer
 	{
 	private:

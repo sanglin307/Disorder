@@ -282,6 +282,18 @@ namespace Disorder
 		_LightingEffect->BindShader(vertexShader);
 		_LightingEffect->BindShader(pixelShader); 
 
+		std::vector<TileTexVertex> tilePos;
+		TileTexVertex vertex;
+		vertex.position = Vector3(-1.f, 1.f,0.f);
+		tilePos.push_back(vertex);
+		vertex.position = Vector3(-1.0f, -1.0f,0.0f);
+		tilePos.push_back(vertex);
+		vertex.position = Vector3(1.0f, 1.0f,0.0f);
+		tilePos.push_back(vertex);
+		vertex.position = Vector3(1.0f, -1.0f,0.0f);
+		tilePos.push_back(vertex);
+		_LightingTile = SimpleTile("DeferLightingTile",tilePos,_LightingEffect);
+
 		DepthStencilDesc nodepthWriteDesc;
 		nodepthWriteDesc.DepthEnable = true;
 		nodepthWriteDesc.DepthWrite = false;

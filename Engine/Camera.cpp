@@ -40,8 +40,8 @@ namespace Disorder
 				if( mouseEvent.RelativeX != 0 )
 				{
 					Vector3 moveDelta = pCamera->_xAxis * pCamera->_moveSpeed * deltaSeconds * (float)mouseEvent.RelativeX;
-					pCamera->_eyePos -= moveDelta;
-					_target -= moveDelta;
+					pCamera->_eyePos += moveDelta;
+					_target += moveDelta;
 					pCamera->_viewMatrixInvalid = true;
 				}
 
@@ -148,19 +148,17 @@ namespace Disorder
                 pCamera->_rotation = pCamera->_rotation * q;
 			
                 pCamera->_viewMatrixInvalid = true;
-				return true;
  
 			}
 
 			if( mouseEvent.RelativeX != 0 )
 			{
- 
-				Quaternion q(mouseEvent.RelativeX *  pCamera->_rotateSpeed * deltaSeconds,Vector3::UNIT_Y);
+				Quaternion q(-mouseEvent.RelativeX *  pCamera->_rotateSpeed * deltaSeconds,Vector3::UNIT_Y);
 				pCamera->_rotation = pCamera->_rotation * q ;
 			 
                 pCamera->_viewMatrixInvalid = true;
-				return true;
 			}
+			return true;
 		}
 
 		return false;
@@ -183,13 +181,13 @@ namespace Disorder
 
 		if( inputManager->IsKeyDown(OIS::KC_A) )
 		{
-			pCamera->_eyePos = pCamera->_eyePos - pCamera->_xAxis * pCamera->_moveSpeed * deltaSeconds;
+			pCamera->_eyePos = pCamera->_eyePos + pCamera->_xAxis * pCamera->_moveSpeed * deltaSeconds;
 			pCamera->_viewMatrixInvalid = true;
 		}
 
 		if( inputManager->IsKeyDown(OIS::KC_D) )
 		{
-			pCamera->_eyePos = pCamera->_eyePos + pCamera->_xAxis * pCamera->_moveSpeed * deltaSeconds;
+			pCamera->_eyePos = pCamera->_eyePos - pCamera->_xAxis * pCamera->_moveSpeed * deltaSeconds;
 			pCamera->_viewMatrixInvalid = true;
 		}
 
@@ -248,9 +246,11 @@ namespace Disorder
 		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerCamera);
 		_viewMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraView,eSP_Matrix4);
 		_projMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraProjection,eSP_Matrix4);
+		_viewProjMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraViewProj,eSP_Matrix4);
+		_viewInvProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraViewInv,eSP_Matrix4);
+		_projInvProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraProjInv,eSP_Matrix4);
+		_viewProjInvProperty =  _propertyManager->CreateProperty(ShaderPropertyManager::sCameraViewProjInv,eSP_Matrix4);
 		_positionProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraPosition,eSP_Vector3);
-		_perspectiveValueProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sPerspectiveValues,eSP_Vector4);
-		_viewInvProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sViewInv,eSP_Matrix4);
 	 
 	}
 
@@ -259,9 +259,11 @@ namespace Disorder
 		_propertyManager->ClearShaderPropertyValue();
 		_viewMatrixProperty->SetData(ViewMatrix);
 		_projMatrixProperty->SetData(ProjectMatrix);
+		_viewProjMatrixProperty->SetData(ViewMatrix * ProjectMatrix );
+		_viewInvProperty->SetData(ViewInvMatrix);
+		_projInvProperty->SetData(ProjectInvMatrix);
+		_viewProjInvProperty->SetData(ProjectInvMatrix * ViewInvMatrix);
 		_positionProperty->SetData(_eyePos);
-		_perspectiveValueProperty->SetData(Vector4(1.0f / ProjectMatrix[0][0],1.0f / ProjectMatrix[1][1],ProjectMatrix[3][2],-ProjectMatrix[2][2]));
-		_viewInvProperty->SetData(ViewMatrix.Inverse().Transpose());
 		_propertyManager->UpdateShaderProperty();
 
 	}
@@ -273,21 +275,8 @@ namespace Disorder
 
 		_rotation.ToAxes(_xAxis,_upVec,_viewVec);
 			 
-
-		Vector3 yAxis = _viewVec.Cross(_xAxis);
-		yAxis.Normalise();
-		 
-	   /* ViewMatrix = Matrix4(xAxis.x,                   yAxis.x,	                 _viewVec.x,	               0,
-							xAxis.y,                   yAxis.y,	                 _viewVec.y,	               0,
-							xAxis.z,                   yAxis.z,	                 _viewVec.z,                   0,
-							-xAxis.dotProduct(_eyePos),-yAxis.dotProduct(_eyePos), -_viewVec.dotProduct(_eyePos),1);*/
-		 
-		ViewMatrix = Matrix4(_xAxis.x,           _xAxis.y,	                  _xAxis.z,	       -_xAxis.Dot(_eyePos),
-				            yAxis.x,            yAxis.y,	                  yAxis.z,	       -yAxis.Dot(_eyePos),
-							_viewVec.x,         _viewVec.y,	              _viewVec.z,      -_viewVec.Dot(_eyePos),
-							0,                  0,                          0,               1 );
-
- 
+		ViewMatrix = Math::ViewMatrixRH(_eyePos,_eyePos + _viewVec,_upVec);
+		ViewInvMatrix = ViewMatrix.Inverse();
 		CameraFrustrum.Construct(ViewMatrix,ProjectMatrix);
 		_viewMatrixInvalid = false;
 
@@ -298,24 +287,9 @@ namespace Disorder
 		if( !_projectMatrixInvalid )
 			return;
 
-		float h = 1.0f / Math::Tan(_FOV / 2);
-		float w = h / _aspectRatio;
-		float q = _farPlane / (_farPlane - _nearPlane);
-
-		/*ProjectMatrix = Matrix4(
-				w,		0,		0,				0,
-				0,		h,		0,				0,
-				0,		0,		q,				1,
-				0,		0,		-nearPlane * q, 0 );*/
-
-		ProjectMatrix = Matrix4(
-				w,		0,		0,				0,
-				0,		h,		0,				0,
-				0,		0,		q,				-_nearPlane * q,
-				0,		0,		1,              0 );
-
+		ProjectMatrix = Math::PerspectiveFovRH(_FOV,_aspectRatio,_nearPlane,_farPlane);
 		GEngine->RenderEngine->AdjustProjMatrix(ProjectMatrix);
- 
+		ProjectInvMatrix = ProjectMatrix.Inverse();
 		CameraFrustrum.Construct(ViewMatrix,ProjectMatrix);
 		_projectMatrixInvalid = false;
 
@@ -401,6 +375,7 @@ namespace Disorder
 			GEngine->GameCanvas->DrawString(Vector2(5.0f,GConfig->pRenderConfig->SizeY - 40.f),30,Vector4::ONE,"Spherical Coordinate Mode");
 		}
 		GEngine->GameCanvas->DrawString(Vector2(5.0f,GConfig->pRenderConfig->SizeY - 20.f),30,Vector4::ONE,strstream.str());
+ 
 	}
 
 	void Camera::Update(float delta)

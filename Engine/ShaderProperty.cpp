@@ -263,9 +263,11 @@ namespace Disorder
 	// for CameraTransforms
     const std::string ShaderPropertyManager::sCameraView = "CameraView";
     const std::string ShaderPropertyManager::sCameraProjection = "CameraProjection";
+	const std::string ShaderPropertyManager::sCameraViewProj = "CameraViewProj";
+	const std::string ShaderPropertyManager::sCameraViewInv = "CameraViewInv";
+	const std::string ShaderPropertyManager::sCameraProjInv = "CameraProjInv";
+	const std::string ShaderPropertyManager::sCameraViewProjInv = "CameraViewProjInv";
 	const std::string ShaderPropertyManager::sCameraPosition = "CameraPosition";
-	const std::string ShaderPropertyManager::sPerspectiveValues = "PerspectiveValues";
-	const std::string ShaderPropertyManager::sViewInv = "sViewInv";
 
     // for ObjectTransform
     const std::string ShaderPropertyManager::sObjectWorld = "WorldTransform";
@@ -304,8 +306,8 @@ namespace Disorder
 
 
 	// Global 
-	const std::string ShaderPropertyManager::sFontTexture = "FontTexture";
-    const std::string ShaderPropertyManager::sFontSampler = "FontSampler";
+	const std::string ShaderPropertyManager::sTextTexture = "TextTexture";
+    const std::string ShaderPropertyManager::sTextSampler = "TextSampler";
 
 	const std::string ShaderPropertyManager::sScreenTileTexture = "ScreenTileTexture";
 	const std::string ShaderPropertyManager::sScreenTileSampler = "ScreenTileSampler";

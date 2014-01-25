@@ -18,11 +18,10 @@ struct SceneVSOutput
 SceneVSOutput RenderSceneVS( SceneVSInput input )
 {   
     SceneVSOutput output;
-    output.Position = mul( float4(input.Position,1.0f),WorldTransform);
+    output.Position = mul( WorldTransform,float4(input.Position,1.0f));
 	output.PositionWorld = output.Position.xyz;
-    output.Position = mul( output.Position, CameraView );
-    output.Position = mul( output.Position, CameraProjection );
-    output.NormalWorld = mul(float4(input.Normal,1.0),WorldNormalTransform).xyz;
+    output.Position = mul( CameraViewProj,output.Position);
+    output.NormalWorld = mul(WorldNormalTransform,float4(input.Normal,1.0)).xyz;
 	
     return output;
 }
@@ -65,7 +64,7 @@ GBufferData UnpackGBuffer(int2 location)
 	int3 location3 = int3(location, 0);
 
 	float depth = GBufferDepthTexture.Load(location3).x;
-	Out.LinearDepth = ConvertZToLinearDepth(depth);
+	Out.Depth = depth;
 	float4 baseColorSpecInt = GBufferColorSpecIntTexture.Load(location3);
 	Out.Color = baseColorSpecInt.xyz;
 	Out.Shiness = baseColorSpecInt.w;
@@ -112,7 +111,7 @@ float4 LightingPS(LightVSOutput In) : SV_TARGET
 	MaterialFromGBuffer(gbd, mat);
 
 	// Reconstruct the world position
-	float3 position = CalcWorldPos(In.ScreenPos, gbd.LinearDepth);
+	float3 position = CalculateWorldPos(In.ScreenPos, gbd.Depth);
 
 	// Calculate the ambient color
 	float3 finalColor = CalculateAmbient(mat.Normal, mat.DiffuseColor);

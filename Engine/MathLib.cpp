@@ -31,41 +31,30 @@ namespace Disorder
 	}
 
 	// fov use rad, opengl
-   Matrix4 Math::PerspectiveMatrix(float fovy, float aspect, float zNear, float zFar)
+   Matrix4 Math::PerspectiveFovRH(float fieldOfViewY,float aspectRatio,float znearPlane,float zfarPlane)
    {
-       float tanHalfFovy = tan(fovy / 2);
-	   Matrix4 Result = Matrix4::ZERO;
-       Result[0][0] = 1 / (aspect * tanHalfFovy);
-       Result[1][1] = 1 / (tanHalfFovy);
-       Result[2][2] = - (zFar + zNear) / (zFar - zNear);
-       Result[2][3] = - 1;
-       Result[3][2] = - (2 * zFar * zNear) / (zFar - zNear);
-       return Result;
+	   float h = 1.0f / Math::Tan(fieldOfViewY / 2);
+	   float w = h / aspectRatio;
+      
+	   return Matrix4(  w,  0,  0,                                             0,
+                        0,  h,  0,                                             0,
+                        0,  0,  zfarPlane/(znearPlane-zfarPlane),              -1,
+                        0,  0,  znearPlane*zfarPlane/(znearPlane-zfarPlane),   0);
    }
 
-   Matrix4 Math::LookAtMatrix(Vector3 &eye,Vector3 &center,Vector3 &up)
+   Matrix4 Math::ViewMatrixRH(const Vector3 &eye,const Vector3 &center,const Vector3 &up)
    {
-	   Vector3 f = (center - eye);
-	   f.Normalise();
-	   up.Normalise();
-	   Vector3 u = up;
-	   Vector3 s = f.Cross(u);
-	   s.Normalise();
-	   u = s.Cross(f);
+	   Vector3 zaxis = eye - center;
+	   zaxis.Normalise();
+	   Vector3 xaxis = up.Cross(zaxis);
+	   xaxis.Normalise();
+	   Vector3 yaxis = zaxis.Cross(xaxis);
 
-	   Matrix4 Result = Matrix4::IDENTITY;
-	   Result[0][0] = s.x;
-	   Result[1][0] = s.y;
-	   Result[2][0] = s.z;
-	   Result[0][1] = u.x;
-	   Result[1][1] = u.y;
-	   Result[2][1] = u.z;
-	   Result[0][2] =-f.x;
-	   Result[1][2] =-f.y;
-	   Result[2][2] =-f.z;
-	   Result[3][0] =-s.Dot(eye);
-	   Result[3][1] =-u.Dot(eye);
-	   Result[3][2] = f.Dot(eye);
-	   return Result;
-	 }
+	   return Matrix4(  xaxis.x,         yaxis.x,           zaxis.x,          0,
+                        xaxis.y,         yaxis.y,           zaxis.y,          0,
+                        xaxis.z,         yaxis.z,           zaxis.z,          0,
+						-xaxis.Dot(eye), -yaxis.Dot(eye),   -zaxis.Dot(eye),  1 );
+   }
+
+     
 }

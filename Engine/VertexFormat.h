@@ -16,7 +16,11 @@ namespace Disorder
 		Vector4 color;
 	};
 
-
+	struct TileTexVertex
+	{
+		Vector3 position;
+		Vector2 texcoord;
+	};
 
 
 
