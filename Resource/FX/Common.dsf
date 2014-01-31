@@ -26,7 +26,8 @@ cbuffer MaterialProperty
 {
 	float3 DiffuseColor;
 	float3 SpecularColor;
-	float  Shininess;
+	float3 EmissiveColor;
+	float  SpecularExp;	
 }
 
 cbuffer DirectionLightProperty
@@ -35,21 +36,13 @@ cbuffer DirectionLightProperty
 	float3 DirectionLightDir;	
 	float  DirectionLightIntensity;
 } 
-
-static const float4 ScreenSpacePos[4] = 
-{
-	float4(-1.0, 1.0,0.0,1.0),
-	float4(-1.0, -1.0,0.0,1.0),
-	float4(1.0, 1.0,0.0,1.0),
-	float4(1.0, -1.0,0.0,1.0),
-};
-
+ 
 struct Material
 {
    float3 Normal;
    float3 DiffuseColor;
    float3 SpecularColor;
-   float  Shininess;
+   float  SpecularExp;
 };
 
 float3 CalculateAmbient(float3 normal, float3 color)
@@ -75,7 +68,7 @@ float3 CalculateDirectionLight(float3 position, Material material)
    float3 ToEye = normalize(CameraPosition - position);
    float3 reflectVector = reflect(DirectionLightDir,material.Normal);
    float NDotH = max(dot(reflectVector, ToEye),0);
-   finalColor += lightColor * saturate(pow(NDotH, material.Shininess)) * material.SpecularColor;
+   finalColor += lightColor * saturate(pow(NDotH, material.SpecularExp)) * material.SpecularColor;
    
    return finalColor;
 }
@@ -148,7 +141,7 @@ float3 CalculateFourLights(float3 position, Material material)
 	float4 HalfWayZ = ToEye.zzzz + ToLightZ;
 	float4 HalfWaySize = sqrt(dot4x4(HalfWayX, HalfWayY, HalfWayZ, HalfWayX, HalfWayY, HalfWayZ));
 	float4 NDotH = saturate(dot4x1(HalfWayX / HalfWaySize, HalfWayY / HalfWaySize, HalfWayZ / HalfWaySize, material.Normal));
-	float4 SpecValue = pow(NDotH, material.Shininess.xxxx) ;//* material.specIntensity;
+	float4 SpecValue = pow(NDotH, material.SpecularExp.xxxx) ;//* material.specIntensity;
 	//finalColor += float3(dot(ForwardLightColorR, SpecValue), dot(ForwardLightColorG, SpecValue), dot(ForwardLightColorB, SpecValue));
    
 	// Cone attenuation

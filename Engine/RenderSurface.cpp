@@ -9,10 +9,12 @@ namespace Disorder
 		_GBufferColorSpecIntTexture = propertyManager->CreateProperty(ShaderPropertyManager::sGBufferColorSpecIntTexture,eSP_ShaderResource);
 		_GBufferNormalTexture = propertyManager->CreateProperty(ShaderPropertyManager::sGBufferNormalTexture,eSP_ShaderResource);
 		_GBufferSpecPowTexture = propertyManager->CreateProperty(ShaderPropertyManager::sGBufferSpecPowTexture,eSP_ShaderResource);
-		
+		_SurfaceVisTex = propertyManager->CreateProperty(ShaderPropertyManager::sSurfaceVisTex,eSP_ShaderResource);
+		_SurfaceSampler = propertyManager->CreateProperty(ShaderPropertyManager::sSurfaceSampler,eSP_SampleState);
 		_GBufferPointSampler = propertyManager->CreateProperty(ShaderPropertyManager::sGBufferPointSampler,eSP_SampleState);
 		SamplerStatePtr pointState = GEngine->RenderResourceMgr->CreateSamplerState(SF_Point,TAM_Clamp,0);
 		_GBufferPointSampler->SetData(pointState);
+		_SurfaceSampler->SetData(pointState);
 	}
 
 	void RenderGBuffer::UpdateShaderProperty()

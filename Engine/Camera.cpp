@@ -42,7 +42,7 @@ namespace Disorder
 					Vector3 moveDelta = pCamera->_xAxis * pCamera->_moveSpeed * deltaSeconds * (float)mouseEvent.RelativeX;
 					pCamera->_eyePos += moveDelta;
 					_target += moveDelta;
-					pCamera->_viewMatrixInvalid = true;
+					pCamera->_InvalidViewMatrix = true;
 				}
 
 				if( mouseEvent.RelativeY != 0 )
@@ -50,7 +50,7 @@ namespace Disorder
 					Vector3 moveDelta = pCamera->_upVec * pCamera->_moveSpeed * deltaSeconds * (float)mouseEvent.RelativeY;
 					pCamera->_eyePos += moveDelta;
 					_target += moveDelta;
-					pCamera->_viewMatrixInvalid = true;
+					pCamera->_InvalidViewMatrix = true;
 				}
 
 				return true;
@@ -90,7 +90,8 @@ namespace Disorder
 					_radius = 100;
 
 				float limit = 3.0f;
-				limit = Math::PI / 180 * limit;
+				limit = limit * Math::fDeg2Rad;
+
 				if( yAngle < limit )
 					yAngle = limit;
 
@@ -129,6 +130,8 @@ namespace Disorder
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 
+ 
+
 	bool CameraFirstPersonUpdate::KeyboardEvent(Camera *pCamera,OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds)
 	{
 		return false;
@@ -138,26 +141,40 @@ namespace Disorder
 	{
 		if( mouseEvent.buttonDown(OIS::MB_Left) )
 		{
-			if( mouseEvent.RelativeY != 0 )
-			{
-				float pitch = pCamera->_rotation.GetPitch();
-				if( pitch > 90 || pitch < -90 )
-					return false;
-	 
-				Quaternion q(mouseEvent.RelativeY * pCamera->_rotateSpeed * deltaSeconds,Vector3::UNIT_X);
-                pCamera->_rotation = pCamera->_rotation * q;
-			
-                pCamera->_viewMatrixInvalid = true;
- 
-			}
+			//float pitch = pCamera->_rotation.GetPitch(false);
+		  //  float yaw = pCamera->_rotation.GetYaw(false);
+			//float roll = pCamera->_rotation.GetRoll(false);
 
 			if( mouseEvent.RelativeX != 0 )
 			{
-				Quaternion q(-mouseEvent.RelativeX *  pCamera->_rotateSpeed * deltaSeconds,Vector3::UNIT_Y);
-				pCamera->_rotation = pCamera->_rotation * q ;
-			 
-                pCamera->_viewMatrixInvalid = true;
+		//		yaw += mouseEvent.RelativeX * pCamera->_rotateSpeed * deltaSeconds;
 			}
+
+			if( mouseEvent.RelativeY != 0 )
+			{
+		//		pitch += mouseEvent.RelativeY *  pCamera->_rotateSpeed * deltaSeconds;    
+				/*if( pitch > Math::HALF_PI )
+					pitch = Math::HALF_PI;
+				if( pitch < -Math::HALF_PI )
+					pitch = -Math::HALF_PI;*/
+
+			}
+
+			if( mouseEvent.RelativeY != 0 || mouseEvent.RelativeX != 0 )
+			{
+			/*	Matrix3 testMat;
+				pCamera->_rotation.ToRotationMatrix(testMat);
+				testMat = testMat.Transpose();
+				Matrix3 rotMat;
+				rotMat.FromEulerAnglesXYZ(pitch,yaw,roll);
+				pCamera->_rotation.FromRotationMatrix(rotMat);
+
+				pitch = pCamera->_rotation.GetPitch();
+				yaw = pCamera->_rotation.GetYaw();
+				roll = pCamera->_rotation.GetRoll();
+				pCamera->_InvalidViewMatrix = true;*/
+			}
+
 			return true;
 		}
 
@@ -170,37 +187,37 @@ namespace Disorder
 		if( inputManager->IsKeyDown(OIS::KC_W) )
 		{
 			pCamera->_eyePos = pCamera->_eyePos + pCamera->_viewVec * pCamera->_moveSpeed * deltaSeconds;
-			pCamera->_viewMatrixInvalid = true;
+			pCamera->_InvalidViewMatrix = true;
 		}
 
 		if( inputManager->IsKeyDown(OIS::KC_S) )
 		{
 			pCamera->_eyePos = pCamera->_eyePos - pCamera->_viewVec * pCamera->_moveSpeed * deltaSeconds;
-			pCamera->_viewMatrixInvalid = true;
+			pCamera->_InvalidViewMatrix = true;
 		}
 
 		if( inputManager->IsKeyDown(OIS::KC_A) )
 		{
 			pCamera->_eyePos = pCamera->_eyePos + pCamera->_xAxis * pCamera->_moveSpeed * deltaSeconds;
-			pCamera->_viewMatrixInvalid = true;
+			pCamera->_InvalidViewMatrix = true;
 		}
 
 		if( inputManager->IsKeyDown(OIS::KC_D) )
 		{
 			pCamera->_eyePos = pCamera->_eyePos - pCamera->_xAxis * pCamera->_moveSpeed * deltaSeconds;
-			pCamera->_viewMatrixInvalid = true;
+			pCamera->_InvalidViewMatrix = true;
 		}
 
 		if( inputManager->IsKeyDown(OIS::KC_Q) )
 		{
 			pCamera->_eyePos = pCamera->_eyePos + pCamera->_upVec * pCamera->_moveSpeed * deltaSeconds;
-			pCamera->_viewMatrixInvalid = true;
+			pCamera->_InvalidViewMatrix = true;
 		}
 
 		if( inputManager->IsKeyDown(OIS::KC_E) )
 		{
 			pCamera->_eyePos = pCamera->_eyePos - pCamera->_upVec * pCamera->_moveSpeed * deltaSeconds;
-			pCamera->_viewMatrixInvalid = true;
+			pCamera->_InvalidViewMatrix = true;
 		}
 
 		return true;
@@ -227,7 +244,12 @@ namespace Disorder
 		_upVec = _viewVec.Cross(_xAxis);
 		_upVec.Normalise();
 
-		_rotation.FromAxes(_xAxis,_upVec,_viewVec);
+		Eigen::Matrix3f rotMat;
+		rotMat.col(0) = Eigen::Vector3f(_xAxis.x,_xAxis.y,_xAxis.z);
+		rotMat.col(1) = Eigen::Vector3f(_upVec.x,_upVec.y,_upVec.z);
+		rotMat.col(2) = Eigen::Vector3f(_viewVec.x,_viewVec.y,_viewVec.z);
+
+		_rotation = Eigen::Quaternionf(rotMat);
 
 		_nearPlane = GConfig->pCameraConfig->NearClip;
 		_farPlane = GConfig->pCameraConfig->FarClip;
@@ -237,61 +259,65 @@ namespace Disorder
 		_moveSpeed = GConfig->pCameraConfig->mFreeMode.MoveSpeed;
 		_rotateSpeed = GConfig->pCameraConfig->mFreeMode.RotateSpeed;
 
-		_viewMatrixInvalid = true;
-		_projectMatrixInvalid = true;
+		_InvalidViewMatrix = true;
+		_InvalidProjMatrix = true;
 
-		_updateStrategy = CameraSphereTargetUpdate::Create(10,Vector3::ZERO);
-		_updateMode = eSphericalTargetMode;
+		SetUpdateStrategy(eSphericalTargetMode);
 
 		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerCamera);
-		_viewMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraView,eSP_Matrix4);
-		_projMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraProjection,eSP_Matrix4);
-		_viewProjMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraViewProj,eSP_Matrix4);
-		_viewInvProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraViewInv,eSP_Matrix4);
-		_projInvProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraProjInv,eSP_Matrix4);
-		_viewProjInvProperty =  _propertyManager->CreateProperty(ShaderPropertyManager::sCameraViewProjInv,eSP_Matrix4);
-		_positionProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraPosition,eSP_Vector3);
+		_viewMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraView,eSP_Float,16);
+		_projMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraProjection,eSP_Float,16);
+		_viewProjMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraViewProj,eSP_Float,16);
+		_viewInvProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraViewInv,eSP_Float,16);
+		_projInvProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraProjInv,eSP_Float,16);
+		_viewProjInvProperty =  _propertyManager->CreateProperty(ShaderPropertyManager::sCameraViewProjInv,eSP_Float,16);
+		_positionProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraPosition,eSP_Float,3);
 	 
 	}
 
 	void Camera::UpdateShaderProperty()
 	{
-		_propertyManager->ClearShaderPropertyValue();
-		_viewMatrixProperty->SetData(ViewMatrix);
-		_projMatrixProperty->SetData(ProjectMatrix);
-		_viewProjMatrixProperty->SetData(ViewMatrix * ProjectMatrix );
-		_viewInvProperty->SetData(ViewInvMatrix);
-		_projInvProperty->SetData(ProjectInvMatrix);
-		_viewProjInvProperty->SetData(ProjectInvMatrix * ViewInvMatrix);
-		_positionProperty->SetData(_eyePos);
+		_viewMatrixProperty->SetData(ViewMatrix.data());
+		_projMatrixProperty->SetData(ProjMatrix.data());
+		_viewProjMatrixProperty->SetData(ViewProjMatrix.data());
+		_viewInvProperty->SetData(ViewInvMatrix.data());
+		_projInvProperty->SetData(ProjInvMatrix.data());
+		_viewProjInvProperty->SetData(ViewProjInvMatrix.data());
+		_positionProperty->SetData(_eyePos.Ptr());
 		_propertyManager->UpdateShaderProperty();
 
 	}
 
 	void Camera::UpdateViewMatrix()
 	{
-		if( !_viewMatrixInvalid )
+		if( !_InvalidViewMatrix )
 			return;
 
 		_rotation.ToAxes(_xAxis,_upVec,_viewVec);
-			 
+
 		ViewMatrix = Math::ViewMatrixRH(_eyePos,_eyePos + _viewVec,_upVec);
-		ViewInvMatrix = ViewMatrix.Inverse();
-		CameraFrustrum.Construct(ViewMatrix,ProjectMatrix);
-		_viewMatrixInvalid = false;
+		ViewInvMatrix = ViewMatrix.inverse().matrix();
+		ViewProjMatrix =  ProjMatrix * ViewMatrix.matrix();
+		ViewProjInvMatrix = ViewInvMatrix * ProjInvMatrix;
+		CameraFrustrum.Construct(ViewMatrix.matrix(),ProjMatrix);
+		_InvalidViewMatrix = false;
 
 	}
 
 	void Camera::UpdateProjectMatrix()
 	{
-		if( !_projectMatrixInvalid )
+		if( !_InvalidProjMatrix )
 			return;
+ 
+		ProjMatrix = Math::ProjFovRH(_FOV,_aspectRatio,_nearPlane,_farPlane);
 
-		ProjectMatrix = Math::PerspectiveFovRH(_FOV,_aspectRatio,_nearPlane,_farPlane);
-		GEngine->RenderEngine->AdjustProjMatrix(ProjectMatrix);
-		ProjectInvMatrix = ProjectMatrix.Inverse();
-		CameraFrustrum.Construct(ViewMatrix,ProjectMatrix);
-		_projectMatrixInvalid = false;
+		//GEngine->RenderEngine->AdjustProjMatrix(ProjMatrix);
+		ProjInvMatrix = ProjMatrix.inverse();
+		ViewProjMatrix =  ProjMatrix * ViewMatrix.matrix();
+		ViewProjInvMatrix = ViewInvMatrix * ProjInvMatrix;
+
+		CameraFrustrum.Construct(ViewMatrix.matrix(),ProjMatrix);
+		_InvalidProjMatrix = false;
 
 	}
 
@@ -315,20 +341,6 @@ namespace Disorder
 
 	bool Camera::KeyboardEvent(OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds)
 	{
-		if( state == IS_Release )
-		{
-		   if( key == OIS::KC_P )
-		   {
-			   SetUpdateStrategy(eFirstPersonMode);
-			   return true;
-		   }
-		   else if( key == OIS::KC_O )
-		   {
-			   SetUpdateStrategy(eSphericalTargetMode);
-			   return true;
-		   }
-		}
-
 		if( _updateStrategy != NULL )
 			return _updateStrategy->KeyboardEvent(this,key,text,state,deltaSeconds);
 
@@ -343,11 +355,21 @@ namespace Disorder
 		return false;
 	}
 
+	void Camera::ToggleUpdateStratety()
+	{
+		if( _updateMode == eFirstPersonMode )
+		{
+			SetUpdateStrategy(eSphericalTargetMode);
+		}
+		else if( _updateMode == eSphericalTargetMode )
+		{
+			SetUpdateStrategy(eFirstPersonMode);
+		}
+	}
+
 	void Camera::SetUpdateStrategy(ECameraUpdateStrategy mode)
 	{
-		if( _updateMode == mode )
-			return;
-
+ 
 		_updateMode = mode;
 		if( _updateMode == eFirstPersonMode )
 		{
@@ -368,13 +390,13 @@ namespace Disorder
 		strstream << "camera: [eyePos](" << (int)_eyePos.x << "; " <<  (int)_eyePos.y << "; " <<  (int)_eyePos.z << ")     [Focus At](" <<  (int)lookAt.x << ";  "<<  (int)lookAt.y << ";  " <<  (int)lookAt.z << ")" <<  (int)roll;
 		if( _updateMode == eFirstPersonMode )
 		{
-			GEngine->GameCanvas->DrawString(Vector2(5.0f,GConfig->pRenderConfig->SizeY - 40.f),30,Vector4::ONE,"First Person Mode");
+			GEngine->GameCanvas->DrawString(0.005f,0.945f,0.04f,Vector4::ONE,"First Person Mode");
 		}
 		else if( _updateMode == eSphericalTargetMode )
 		{
-			GEngine->GameCanvas->DrawString(Vector2(5.0f,GConfig->pRenderConfig->SizeY - 40.f),30,Vector4::ONE,"Spherical Coordinate Mode");
+			GEngine->GameCanvas->DrawString(0.005f,0.945f,0.04f,Vector4::ONE,"Spherical Coordinate Mode");
 		}
-		GEngine->GameCanvas->DrawString(Vector2(5.0f,GConfig->pRenderConfig->SizeY - 20.f),30,Vector4::ONE,strstream.str());
+		GEngine->GameCanvas->DrawString(0.005f,0.965f,0.04f,Vector4::ONE,strstream.str());
  
 	}
 
@@ -413,7 +435,7 @@ namespace Disorder
 
 		 _rotation.FromAxes(_xAxis,_upVec,_viewVec);
 
-		 _viewMatrixInvalid = true;
+		 _InvalidViewMatrix = true;
 	}
 
 	void Camera::ProjCalculate(float FOV,  float nearPlane,float farPlane)
@@ -423,6 +445,6 @@ namespace Disorder
 		_nearPlane	 = nearPlane;
 		_farPlane	 = farPlane;
 
-		_projectMatrixInvalid = true;
+		_InvalidProjMatrix = true;
 	}		 
 }

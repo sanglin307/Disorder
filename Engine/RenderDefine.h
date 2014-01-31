@@ -5,17 +5,7 @@
 
 namespace Disorder
 {
-	// fbx means...
-	enum MaterialType
-	{
-		MT_Phong,
-		MT_Lambert,
-		MT_HLSL,
-		MT_CGFX,
-		MT_MentalRay,
-		MT_None
-	};
-
+	 
 	enum RenderPathType
 	{
 		RPT_ForwardLighting,

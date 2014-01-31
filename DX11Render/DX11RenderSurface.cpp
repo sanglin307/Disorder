@@ -119,18 +119,59 @@ namespace Disorder
 
 		
 		_GBufferVisualEffect = RenderEffect::Create();
-		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"GBufferVisual",SM_4_0,"GBufferVisualVS");
-		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"GBufferVisual",SM_4_0,"GBufferVisualPS");
+		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"SurfaceVisual",SM_4_0,"SurfaceVisualVS");
+		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"SurfaceVisual",SM_4_0,"SurfaceVisualPS");
 		_GBufferVisualEffect->BindShader(vertexShader);
 		_GBufferVisualEffect->BindShader(pixelShader);
 
+		std::vector<TileTexVertex> tilePos;
+		TileTexVertex vertex;
+		vertex.position = Vector3(-0.55f, -0.55f,0.f);
+		vertex.texcoord = Vector2(1.f,0.f);
+		tilePos.push_back(vertex);
+		vertex.position = Vector3(-0.95f, -0.55f,0.0f);
+		vertex.texcoord = Vector2(0.f,0.f);
+		tilePos.push_back(vertex);
+		vertex.position = Vector3(-0.55f, -0.95f,0.0f);
+		vertex.texcoord = Vector2(1.f,1.0f);
+		tilePos.push_back(vertex);
+		vertex.position = Vector3(-0.95f, -0.95f,0.0f);
+		vertex.texcoord = Vector2(0.0f,1.0f);
+		tilePos.push_back(vertex);
+		_DepthVisTile = SimpleTile("GBufferDepthTile",tilePos,_GBufferVisualEffect);
+
+		tilePos[0].position = Vector3(-0.05f,-0.55f,0.0f);
+		tilePos[1].position = Vector3(-0.45f,-0.55f,0.0f);
+		tilePos[2].position = Vector3(-0.05f,-0.95f,0.0f);
+		tilePos[3].position = Vector3(-0.45f,-0.95f,0.0f);
+		_ColorVisTile = SimpleTile("GBufferColorTile",tilePos,_GBufferVisualEffect);
+
+		tilePos[0].position = Vector3(0.45f,-0.55f,0.0f);
+		tilePos[1].position = Vector3(0.05f,-0.55f,0.0f);
+		tilePos[2].position = Vector3(0.45f,-0.95f,0.0f);
+		tilePos[3].position = Vector3(0.05f,-0.95f,0.0f);
+		_NormalVisTile = SimpleTile("GBufferNormalTile",tilePos,_GBufferVisualEffect);
+	
+		tilePos[0].position = Vector3(0.95f,-0.55f,0.0f);
+		tilePos[1].position = Vector3(0.55f,-0.55f,0.0f);
+		tilePos[2].position = Vector3(0.95f,-0.95f,0.0f);
+		tilePos[3].position = Vector3(0.55f,-0.95f,0.0f);
+		_SpecPowVisTile = SimpleTile("GBufferSpeclTile",tilePos,_GBufferVisualEffect);
+ 
 	}
 
 	void DX11RenderGBuffer::DebugVisual()
 	{
-		GEngine->RenderEngine->SetPrimitiveTopology(TT_TriangleStrip);
-		GEngine->RenderEngine->SetEffect(_GBufferVisualEffect);
-		GEngine->RenderEngine->Draw(16,0);
+		CameraPtr mainCamera = GSceneManager->GetDefaultCamera();
+
+		//_GBufferVisTex->SetData(DepthStencilBuffer);
+		//_DepthVisTile.Render(mainCamera);
+		_SurfaceVisTex->SetData(BasicColorBuffer);
+		_ColorVisTile.Render(mainCamera);
+		_SurfaceVisTex->SetData(NormalDataBuffer);
+		_NormalVisTile.Render(mainCamera);
+		_SurfaceVisTex->SetData(SpecularDataBuffer);
+		_SpecPowVisTile.Render(mainCamera);
 	}
 
 	DX11RenderGBufferPtr DX11RenderGBuffer::Create(unsigned int width,unsigned int height)

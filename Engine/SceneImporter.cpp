@@ -877,7 +877,7 @@ namespace Disorder
 				{
 					// We found a Phong material.  Display its properties.
 					// Display the Ambient Color
-					SurfacePhongPtr material = SurfacePhong::Create(lMaterial->GetName());
+					SurfaceMaterialPtr material = SurfaceMaterial::Create(lMaterial->GetName());
 					material->ShaderModel = lMaterial->ShadingModel.Get().Buffer();
 
 					FbxSurfacePhong* lPhoneMaterial = (FbxSurfacePhong *) lMaterial;
@@ -901,23 +901,18 @@ namespace Disorder
 					material->Transparency = (float)(lPhoneMaterial->TransparencyFactor.Get());
 
 					// Display the Shininess
-					material->Shininess = (float)lPhoneMaterial->Shininess.Get();
-
-					// Display the Reflectivity
-					material->ReflectionColor.x =  (float)lPhoneMaterial->Reflection.Get()[0];
-					material->ReflectionColor.y =  (float)lPhoneMaterial->Reflection.Get()[1];
-					material->ReflectionColor.z =  (float)lPhoneMaterial->Reflection.Get()[2];
+					material->SpecularExp = (float)lPhoneMaterial->Shininess.Get();
+ 
 					materials.push_back(material);
 				}
 				else if(lMaterial->GetClassId().Is(FbxSurfaceLambert::ClassId) )
 				{
 					// We found a Lambert material. Display its properties.
 					// Display the Ambient Color
-					SurfaceLambertPtr material = SurfaceLambert::Create(lMaterial->GetName());
+					SurfaceMaterialPtr material = SurfaceMaterial::Create(lMaterial->GetName());
 			        material->ShaderModel = lMaterial->ShadingModel.Get().Buffer();
 
 					FbxSurfaceLambert* lLambertMaterial = (FbxSurfaceLambert *)lMaterial;
-				 
 
 					// Display the Diffuse Color
 					material->DiffuseColor.x = (float)lLambertMaterial->Diffuse.Get()[0];
@@ -937,9 +932,6 @@ namespace Disorder
 				{
 					GLogger->Warning("Unkown Material type!");
 				}
- 
-				
-				
           
            }//for (int lCount = 0; lCount < lMaterialCount; lCount ++)
         }
@@ -975,7 +967,7 @@ namespace Disorder
 			 geometryRender->SetGeometry(geometry,matArray[usedMaterial]);
 		 else
 		 {
-			 SurfaceMaterialPtr mat = SurfaceLambert::Create("DefaultLambert");
+			 SurfaceMaterialPtr mat = SurfaceMaterial::Create("DefaultMaterial");
 		     geometryRender->SetGeometry(geometry,mat);
 		 }
 

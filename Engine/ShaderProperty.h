@@ -8,10 +8,7 @@ namespace Disorder
 	{
 		eSP_Int,
 		eSP_Float,
-		eSP_Vector3,
-		eSP_Vector4,
-		eSP_Matrix3,
-		eSP_Matrix4,
+		eSP_Double,
 		eSP_ConstBuffer,
 		eSP_ShaderResource,
 		eSP_SampleState
@@ -24,28 +21,25 @@ namespace Disorder
 		
 		~ShaderProperty();
 
-		int GetTotalSize();
-		int GetElementNumber();
+		unsigned int GetLength()
+		{
+			return _length;
+		}
 
 		void ClearData();
 
-		void SetData(int data);
-		void SetData(float data);
+		void SetData(int* data);
+		void SetData(float* data);
+		void SetData(double* data);
 		void SetData(RenderBufferPtr constBuffer);
 		void SetData(RenderSurfacePtr shaderResource);
 		void SetData(SamplerStatePtr sample);
-		void SetData(Vector3 const& vec);
-		void SetData(Vector4 const& vec);
-		void SetData(Matrix3 const& mat);
-		void SetData(Matrix4 const& mat);
 
 		void* GetData();
-		int GetDataAsInt();
-		float GetDataAsFloat();
-		Vector3 GetDataAsVector3();
-		Vector4 GetDataAsVector4();
-		Matrix3 GetDataAsMatrix3();
-		Matrix4 GetDataAsMatrix4();
+		int* GetDataAsInt();
+		float* GetDataAsFloat();
+		double* GetDataAsDouble();
+
 		RenderBufferPtr GetDataAsConstBuffer();
 		RenderSurfacePtr GetDataAsShaderResource();
 		SamplerStatePtr GetDataAsSampler();
@@ -53,11 +47,12 @@ namespace Disorder
 		EShaderProperty PropertyType;
 		std::string PropertyName;
  
-		static ShaderPropertyPtr Create(EShaderProperty type,std::string const& name);
+		static ShaderPropertyPtr Create(EShaderProperty type,unsigned int length,std::string const& name);
 
 	private:
-		ShaderProperty(EShaderProperty type,std::string const& name);
+		ShaderProperty(EShaderProperty type,unsigned int length,std::string const& name);
 		void* _data;
+		unsigned int _length;
 
 	};
  
@@ -93,8 +88,7 @@ namespace Disorder
 		static const std::string sEmissiveColor;
 		static const std::string sSpecularColor;
 		static const std::string sSpecularExp;
-		static const std::string sReflectionColor;
-		static const std::string sShininess;
+		static const std::string sTransparency;
 
         // forward direction LightProperty
         static const std::string sDirectionLightIntensity;
@@ -131,6 +125,8 @@ namespace Disorder
 		static const std::string sGBufferNormalTexture;
 		static const std::string sGBufferSpecPowTexture;
 		static const std::string sGBufferPointSampler;
+		static const std::string sSurfaceVisTex;
+		static const std::string sSurfaceSampler;
 
 	public:
 		std::string Name;
@@ -139,7 +135,7 @@ namespace Disorder
 		virtual void UpdateShaderProperty() = 0;
 		 
 		ShaderPropertyPtr GetProperty(std::string const& name);
-		ShaderPropertyPtr CreateProperty(std::string const& name,EShaderProperty type);
+		ShaderPropertyPtr CreateProperty(std::string const& name,EShaderProperty type,unsigned int length = 1);
 
 		virtual void DumpContent();
 	protected:

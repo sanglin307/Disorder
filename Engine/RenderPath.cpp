@@ -5,9 +5,25 @@ namespace Disorder
 	RenderPath::RenderPath()
 	{
 		_DirectionLightPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerDirectionLight);
-		_DirectionLightIntensityProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightIntensity,eSP_Float);
-		_DirectionLightDirProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightDir,eSP_Vector3);
-		_DirectionLightColorProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightColor,eSP_Vector3);
+		_DirectionLightIntensityProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightIntensity,eSP_Float,1);
+		_DirectionLightDirProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightDir,eSP_Float,3);
+		_DirectionLightColorProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightColor,eSP_Float,3);
+
+		
+		_LightFourPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerForwardFourLight);
+		ForwardLightPosX = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightPosX,eSP_Float,4);
+		ForwardLightPosY = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightPosY,eSP_Float,4);
+		ForwardLightPosZ = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightPosZ,eSP_Float,4);
+		ForwardLightDirX = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightDirX,eSP_Float,4);
+		ForwardLightDirY = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightDirY,eSP_Float,4);
+		ForwardLightDirZ = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightDirZ,eSP_Float,4);
+		ForwardLightRangeRcp = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightRangeRcp,eSP_Float,4);
+		ForwardSpotCosOuterCone = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardSpotCosOuterCone,eSP_Float,4);
+		ForwardSpotCosInnerConeRcp = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardSpotCosInnerConeRcp,eSP_Float,4);
+		ForwardCapsuleLen = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardCapsuleLen,eSP_Float,4);
+		ForwardLightColorR = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightColorR,eSP_Float,4);
+		ForwardLightColorG = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightColorG,eSP_Float,4);
+		ForwardLightColorB = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightColorB,eSP_Float,4);
 
 	}
 
@@ -20,97 +36,15 @@ namespace Disorder
 
 		DirectionLightPtr dLight = directionLightArray[0];
 		_DirectionLightPropertyManager->ClearShaderPropertyValue();
-		_DirectionLightIntensityProperty->SetData(dLight->Intensity);
-		_DirectionLightDirProperty->SetData(dLight->GetDirection());
-		_DirectionLightColorProperty->SetData(dLight->Color);
+		_DirectionLightIntensityProperty->SetData(&(dLight->Intensity));
+		Vector3 dir = dLight->GetDirection();
+		_DirectionLightDirProperty->SetData(dir.Ptr());
+		_DirectionLightColorProperty->SetData(dLight->Color.Ptr());
 
 		_DirectionLightPropertyManager->UpdateShaderProperty();
 	}
 
-	//////////////////////////////////////////////////////////////////////////////////////////
-	void ForwardRenderPath::Render()
-	{
-		CameraPtr mainCamera = GSceneManager->GetDefaultCamera();
-
-		if( mainCamera == NULL )
-			return;
-
-		GEngine->RenderEngine->OnDrawBegin();
-
-		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,GEngine->RenderSurfaceCache->DepthStencilBuffer);
-		GEngine->RenderEngine->ClearRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,Vector4(0.f,0.f,0.f,1.0f));
-		GEngine->RenderEngine->ClearDepthStencil(GEngine->RenderSurfaceCache->DepthStencilBuffer,true,1.0f,false,0);
- 
-		GSceneManager->UpdateShaderProperty();
-		mainCamera->UpdateShaderProperty();
-
-		std::vector<RendererPtr> rendererList;
-		GSceneManager->GetRendererList(mainCamera,rendererList);
-		for(unsigned int i=0;i< rendererList.size(); i++ )
-		{
-			RendererPtr obj = rendererList[i];
-			obj->BuildRenderLayout(_DirectionLightEffect->GetVertexShader(),false);
-			obj->PreRender(mainCamera);
-
-			// render lights
-			const std::vector<DirectionLightPtr>& directionLightList = obj->GetDirectionLights();
-			if( directionLightList.size() > 0 )
-			{
-				SetDirectionLight(directionLightList);
-				obj->SetRenderEffect(_DirectionLightEffect);
-				obj->Render(mainCamera);	 
-			}
-
-			//non direction lights
-			const std::vector<LightPtr>& nonDirectionLights = obj->GetNonDirectionLights();
-			size_t lightIndex = 0;
-			std::vector<LightPtr> lightArray;
-			while( lightIndex < nonDirectionLights.size() )
-			{
-				if(lightArray.size() == 4 )
-				{
-					SetFourLight(lightArray);
-					obj->SetRenderEffect(_FourLightEffect);
-					obj->Render(mainCamera);
-					lightArray.clear();
-				}
-				else
-				{
-					lightArray.push_back(nonDirectionLights[lightIndex]);
-				}
-
-				lightIndex++;
-			}
-
-			if(lightArray.size() > 0 )
-			{
-				SetFourLight(lightArray);
-				obj->SetRenderEffect(_FourLightEffect);
-				//obj->Render(mainCamera);
-			}
-
-			obj->PostRender(mainCamera);
-		}
-
-		GEngine->GameCanvas->DrawString(Vector2(7.0f,30),28,Vector4::ONE,"Forward Lighting Mode");
-
-		GSceneManager->DebugDraw();
-
-		// before we call canvas draw ,we should check if we should add stat info to canvas.
-		if(GEngine->Stat.bEnable())
-		{
-			GDrawTriNumber += GEngine->GameCanvas->GetCurrentDrawTriNumber();
-			GEngine->Stat.DrawStat();
-		}
-
-		GEngine->GameCanvas->Render(mainCamera);
-
-		GEngine->RenderEngine->OnDrawEnd();
-	}
-
-	
- 
-	void ForwardRenderPath::SetFourLight(const std::vector<LightPtr>& lightArray)
+	void RenderPath::SetFourLight(const std::vector<LightPtr>& lightArray)
 	{
 		if( lightArray.size() == 0 )
 			return;
@@ -172,22 +106,104 @@ namespace Disorder
 		}
 
 		_LightFourPropertyManager->ClearShaderPropertyValue();
-		ForwardLightPosX->SetData(LightPosX);
-		ForwardLightPosY->SetData(LightPosY);
-		ForwardLightPosZ->SetData(LightPosZ);
-		ForwardLightDirX->SetData(LightDirX);
-		ForwardLightDirY->SetData(LightDirY);
-		ForwardLightDirZ->SetData(LightDirZ);
-		ForwardLightRangeRcp->SetData(LightRangeRcp);
-		ForwardSpotCosOuterCone->SetData(SpotCosOuterCone);
-		ForwardSpotCosInnerConeRcp->SetData(SpotCosInnerConeRcp);
-		ForwardCapsuleLen->SetData(CapsuleLen);
-		ForwardLightColorR->SetData(LightColorR);
-		ForwardLightColorG->SetData(LightColorG);
-		ForwardLightColorB->SetData(LightColorB);
+		ForwardLightPosX->SetData(LightPosX.Ptr());
+		ForwardLightPosY->SetData(LightPosY.Ptr());
+		ForwardLightPosZ->SetData(LightPosZ.Ptr());
+		ForwardLightDirX->SetData(LightDirX.Ptr());
+		ForwardLightDirY->SetData(LightDirY.Ptr());
+		ForwardLightDirZ->SetData(LightDirZ.Ptr());
+		ForwardLightRangeRcp->SetData(LightRangeRcp.Ptr());
+		ForwardSpotCosOuterCone->SetData(SpotCosOuterCone.Ptr());
+		ForwardSpotCosInnerConeRcp->SetData(SpotCosInnerConeRcp.Ptr());
+		ForwardCapsuleLen->SetData(CapsuleLen.Ptr());
+		ForwardLightColorR->SetData(LightColorR.Ptr());
+		ForwardLightColorG->SetData(LightColorG.Ptr());
+		ForwardLightColorB->SetData(LightColorB.Ptr());
 		_LightFourPropertyManager->UpdateShaderProperty();
 
 	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+	void ForwardRenderPath::Render()
+	{
+		CameraPtr mainCamera = GSceneManager->GetDefaultCamera();
+
+		if( mainCamera == NULL )
+			return;
+
+		GEngine->RenderEngine->OnDrawBegin();
+
+		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,GEngine->RenderSurfaceCache->DepthStencilBuffer);
+		GEngine->RenderEngine->ClearRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,Vector4(0.f,0.f,0.f,1.0f));
+		GEngine->RenderEngine->ClearDepthStencil(GEngine->RenderSurfaceCache->DepthStencilBuffer,true,1.0f,false,0);
+ 
+		GSceneManager->UpdateShaderProperty();
+		mainCamera->UpdateShaderProperty();
+
+		std::vector<RendererPtr> rendererList;
+		GSceneManager->GetRendererList(mainCamera,rendererList);
+		for(unsigned int i=0;i< rendererList.size(); i++ )
+		{
+			RendererPtr obj = rendererList[i];
+			obj->BuildRenderLayout(_DirectionLightEffect->GetVertexShader(),false);
+			obj->PreRender(mainCamera);
+
+			// render lights
+			const std::vector<DirectionLightPtr>& directionLightList = obj->GetDirectionLights();
+			if( directionLightList.size() > 0 )
+			{
+				SetDirectionLight(directionLightList);
+				obj->SetRenderEffect(_DirectionLightEffect);
+				obj->Render(mainCamera);	 
+			}
+
+			//non direction lights
+			const std::vector<LightPtr>& nonDirectionLights = obj->GetNonDirectionLights();
+			size_t lightIndex = 0;
+			std::vector<LightPtr> lightArray;
+			while( lightIndex < nonDirectionLights.size() )
+			{
+				if(lightArray.size() == 4 )
+				{
+					SetFourLight(lightArray);
+					obj->SetRenderEffect(_FourLightEffect);
+					obj->Render(mainCamera);
+					lightArray.clear();
+				}
+				else
+				{
+					lightArray.push_back(nonDirectionLights[lightIndex]);
+				}
+
+				lightIndex++;
+			}
+
+			if(lightArray.size() > 0 )
+			{
+				SetFourLight(lightArray);
+				obj->SetRenderEffect(_FourLightEffect);
+				obj->Render(mainCamera);
+			}
+
+			obj->PostRender(mainCamera);
+		}
+
+		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,Vector4::ONE,"Forward Lighting Mode");
+
+		GSceneManager->DebugDraw();
+
+		// before we call canvas draw ,we should check if we should add stat info to canvas.
+		if(GEngine->Stat.bEnable())
+		{
+			GDrawTriNumber += GEngine->GameCanvas->GetCurrentDrawTriNumber();
+			GEngine->Stat.DrawStat();
+		}
+
+		GEngine->GameCanvas->Render(mainCamera);
+
+		GEngine->RenderEngine->OnDrawEnd();
+	}
+ 
 
 	ForwardRenderPathPtr ForwardRenderPath::Create()
 	{
@@ -204,23 +220,7 @@ namespace Disorder
 		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"DirectionalLightPS");
 		_DirectionLightEffect->BindShader(vertexShader);
 		_DirectionLightEffect->BindShader(pixelShader);
-
-
-		_LightFourPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerForwardFourLight);
-		ForwardLightPosX = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightPosX,eSP_Vector4);
-		ForwardLightPosY = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightPosY,eSP_Vector4);
-		ForwardLightPosZ = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightPosZ,eSP_Vector4);
-		ForwardLightDirX = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightDirX,eSP_Vector4);
-		ForwardLightDirY = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightDirY,eSP_Vector4);
-		ForwardLightDirZ = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightDirZ,eSP_Vector4);
-		ForwardLightRangeRcp = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightRangeRcp,eSP_Vector4);
-		ForwardSpotCosOuterCone = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardSpotCosOuterCone,eSP_Vector4);
-		ForwardSpotCosInnerConeRcp = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardSpotCosInnerConeRcp,eSP_Vector4);
-		ForwardCapsuleLen = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardCapsuleLen,eSP_Vector4);
-		ForwardLightColorR = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightColorR,eSP_Vector4);
-		ForwardLightColorG = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightColorG,eSP_Vector4);
-		ForwardLightColorB = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightColorB,eSP_Vector4);
-
+ 
 		_FourLightEffect = RenderEffect::Create();
 		ShaderObjectPtr fVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"RenderSceneVS");
 		ShaderObjectPtr fPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"ForwardFourLightPS");
@@ -236,9 +236,7 @@ namespace Disorder
 		bDesc.DestBlendAlpha = BLEND_ONE;
 		BlendStatePtr blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc,1);
 		_FourLightEffect->BindBlendState(blendState);
-
-		RasterizeDesc rDesc;
-
+ 
 		DepthStencilDesc dsDesc;
 		dsDesc.DepthFunc = CF_Less_Equal;
 		DepthStencilStatePtr noDepthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dsDesc,0);
@@ -278,9 +276,31 @@ namespace Disorder
 
 		_LightingEffect = RenderEffect::Create();
 	     vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"LightingVS");
-		 pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"LightingPS");
+		 pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"BaseLightingPS");
 		_LightingEffect->BindShader(vertexShader);
 		_LightingEffect->BindShader(pixelShader); 
+
+		_FourLightEffect = RenderEffect::Create();
+		ShaderObjectPtr fVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"LightingVS");
+		ShaderObjectPtr fPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"DeferFourLightPS");
+		_FourLightEffect->BindShader(fVertexShader);
+		_FourLightEffect->BindShader(fPixelShader);
+		BlendDesc bDesc;
+		bDesc.BlendEnable = true;
+		bDesc.BlendOp = BLEND_OP_ADD;
+		bDesc.SrcBlend = BLEND_ONE;
+		bDesc.DestBlend = BLEND_ONE;
+		bDesc.BlendOpAlpha = BLEND_OP_ADD;
+		bDesc.SrcBlendAlpha = BLEND_ONE;
+		bDesc.DestBlendAlpha = BLEND_ONE;
+		BlendStatePtr blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc,1);
+		_FourLightEffect->BindBlendState(blendState);
+ 
+		DepthStencilDesc dsDesc;
+		dsDesc.DepthFunc = CF_Less_Equal;
+		DepthStencilStatePtr noDepthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dsDesc,0);
+		_FourLightEffect->BindDepthStencilState(noDepthState);
+
 
 		std::vector<TileTexVertex> tilePos;
 		TileTexVertex vertex;
@@ -357,19 +377,53 @@ namespace Disorder
 		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,GEngine->RenderSurfaceCache->DepthStencilBuffer);
 		GEngine->RenderEngine->ClearRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,Vector4(0.f,0.f,0.f,1.0f));
 		GEngine->RenderEngine->ClearDepthStencil(GEngine->RenderSurfaceCache->DepthStencilBuffer,true,1.0f,false,0);
-		GEngine->RenderEngine->SetPrimitiveTopology(TT_TriangleStrip);
+	
 		const std::vector<LightPtr>& vLights = GSceneManager->GetLightsList();
 		std::vector<DirectionLightPtr> directionLightArray;
+		std::vector<LightPtr> nonDirectionLights;
 		for(size_t i=0;i<vLights.size();i++ )
 		{
 			if( vLights[i]->LightType == LT_Directional )
 			{
 				directionLightArray.push_back(boost::dynamic_pointer_cast<DirectionLight>(vLights[i]));
 			}
+			else
+			{
+				nonDirectionLights.push_back(vLights[i]);
+			}
 		}
 		SetDirectionLight(directionLightArray);
-		GEngine->RenderEngine->SetEffect(_LightingEffect);
-		GEngine->RenderEngine->Draw(4,0);
+		_LightingTile.SetRenderEffect(_LightingEffect);
+		_LightingTile.Render(mainCamera);
+
+		if( nonDirectionLights.size() > 0 )
+		{
+			size_t lightIndex = 0;
+			std::vector<LightPtr> lightArray;
+			while( lightIndex < nonDirectionLights.size() )
+			{
+				if(lightArray.size() == 4 )
+				{
+					SetFourLight(lightArray);
+					_LightingTile.SetRenderEffect(_FourLightEffect);
+					_LightingTile.Render(mainCamera);
+					lightArray.clear();
+				}
+				else
+				{
+					lightArray.push_back(nonDirectionLights[lightIndex]);
+				}
+
+				lightIndex++;
+			}
+
+			if(lightArray.size() > 0 )
+			{
+				SetFourLight(lightArray);
+				_LightingTile.SetRenderEffect(_FourLightEffect);
+				_LightingTile.Render(mainCamera);
+			}
+		}
 
 		if( GSceneManager->EnableDebugDraw )
 		    GEngine->RenderSurfaceCache->GBuffer->DebugVisual();
@@ -377,7 +431,7 @@ namespace Disorder
 		GEngine->RenderEngine->SetEffect(NULL);
 		
 		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,depthSurfacePtr,true);
-		GEngine->GameCanvas->DrawString(Vector2(7.0f,30),28,Vector4::ONE,"Deferred Shading Mode");
+		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,Vector4::ONE,"Deferred Shading Mode");
 		GSceneManager->DebugDraw();
 
 		// before we call canvas draw ,we should check if we should add stat info to canvas.

@@ -18,28 +18,12 @@ namespace Disorder
 
 		RenderPath();
 		void SetDirectionLight(const std::vector<DirectionLightPtr>& directionLightArray);
+		void SetFourLight(const std::vector<LightPtr>& lightArray);
 
 		ShaderPropertyManagerPtr _DirectionLightPropertyManager;
 		ShaderPropertyPtr _DirectionLightIntensityProperty;
 		ShaderPropertyPtr _DirectionLightDirProperty;
 		ShaderPropertyPtr _DirectionLightColorProperty;
-
-		RenderPathType _type;
-
-	};
-
-	class ForwardRenderPath : public RenderPath
-	{
-	public:
-		virtual void Render();
-		static ForwardRenderPathPtr Create();
-
-	protected:
-	
-		void SetFourLight(const std::vector<LightPtr>& lightArray);
-		ForwardRenderPath();
- 
-		RenderEffectPtr _DirectionLightEffect;
 
 		ShaderPropertyManagerPtr _LightFourPropertyManager;
 		ShaderPropertyPtr ForwardLightPosX;
@@ -55,6 +39,22 @@ namespace Disorder
 		ShaderPropertyPtr ForwardLightColorR;
 		ShaderPropertyPtr ForwardLightColorG;
 		ShaderPropertyPtr ForwardLightColorB;
+
+		RenderPathType _type;
+
+	};
+
+	class ForwardRenderPath : public RenderPath
+	{
+	public:
+		virtual void Render();
+		static ForwardRenderPathPtr Create();
+
+	protected:
+
+		ForwardRenderPath();
+ 
+		RenderEffectPtr _DirectionLightEffect;
 		RenderEffectPtr _FourLightEffect;
 
 	};
@@ -72,6 +72,7 @@ namespace Disorder
 
 		SimpleTile _LightingTile;
 		RenderEffectPtr _LightingEffect;
+		RenderEffectPtr _FourLightEffect;
 	};
 
 }

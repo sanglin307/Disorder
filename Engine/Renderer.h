@@ -122,6 +122,7 @@ namespace Disorder
 	public:
 		SimpleTile();
 		SimpleTile(std::string const& name,const std::vector<TileTexVertex>& positions,const RenderEffectPtr& renderEffect);
+		 
 		virtual void Render(CameraPtr const& camera);
 	};
 

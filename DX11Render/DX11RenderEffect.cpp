@@ -130,8 +130,9 @@ namespace Disorder
 		hr = CompileShaderFromFile(fileName, entryPoint, GetShaderModelDes(type), &pVSBlob );
 		if( FAILED( hr ) )
 		{
-			MessageBox( NULL,
-						L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK );
+			std::ostringstream stream;
+			stream << "the shader file :"<< fileName << "  entry point: ("<< entryPoint << ")   cannot be compiled.";
+			MessageBoxA( NULL,stream.str().c_str(), "Error", MB_OK );
 			return ShaderObjectPtr();
 		}
 
@@ -269,6 +270,7 @@ namespace Disorder
 					ShaderPropertyPtr pParam;
 					std::string varName = var_desc.Name;
 					EShaderProperty shaderProperty;
+					unsigned int length = 1;
 					if( type_desc.Class == D3D_SVC_SCALAR && type_desc.Type == D3D_SVT_INT)
 					{
 					    shaderProperty = eSP_Int;
@@ -279,27 +281,20 @@ namespace Disorder
 					}
 					else if ( type_desc.Class == D3D_SVC_VECTOR )
 					{		
-						if( type_desc.Columns == 3)
-						   shaderProperty = eSP_Vector3;
-						else if( type_desc.Columns == 4)
-						   shaderProperty = eSP_Vector4;
-						else
-						{
-							BOOST_ASSERT(0);
-						}
- 
+						 shaderProperty = eSP_Float;
+						 length = type_desc.Columns;
 					}
 					else if ( ( type_desc.Class == D3D_SVC_MATRIX_ROWS ) ||
 								( type_desc.Class == D3D_SVC_MATRIX_COLUMNS ) )
 					{
-						 
+						shaderProperty = eSP_Float;
 						if ( type_desc.Columns == 4 && type_desc.Rows == 4  ) 
 						{
-							shaderProperty = eSP_Matrix4;
+							length = 16;
 						}
 						else if( type_desc.Columns == 3 && type_desc.Rows == 3 )
 						{
-							shaderProperty = eSP_Matrix3;
+							length = 9;
 						}
 						else
 						{
@@ -310,7 +305,7 @@ namespace Disorder
 
 					// we don't support array now
 					BOOST_ASSERT(type_desc.Elements == 0);
-					pParam = propertyManager->CreateProperty(varName,shaderProperty);
+					pParam = propertyManager->CreateProperty(varName,shaderProperty,length);
 
 					constantBuffer.Parameters.push_back( pParam );
 					 

@@ -18,8 +18,7 @@ namespace Disorder
  
 	public:
 		Frustrum();
-		void Construct(const Matrix4& viewMatrix,const Matrix4& projMatrix);
-		void Construct(const Matrix4 &mViewProjection);
+		void Construct(const Eigen::Matrix4f& viewMatrix,const Eigen::Matrix4f& projMatrix);
 		bool Overlaps(BoxBounds const& bounds) const;
 		bool Overlaps(SphereBounds const& bounds) const;
 
@@ -28,7 +27,7 @@ namespace Disorder
 		void Draw();
 	private:
 		Plane _Planes[6];
-		Vector3 _Points[8]; // clock-wise, near - far
+		Eigen::Vector4f _Points[8]; // clock-wise, near - far
 	};
 
 }

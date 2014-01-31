@@ -11,8 +11,8 @@ namespace Disorder
 		_vAmbientLowerColor = Vector3::ZERO;
 		_vAmbientUpperColor = Vector3::UNIT_SCALE * 0.25f;
 		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerScene);
-		_sAmbientLowerProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientLowColor,eSP_Vector3);
-		_sAmbientUpperProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientUpperColor,eSP_Vector3);
+		_sAmbientLowerProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientLowColor,eSP_Float,3);
+		_sAmbientUpperProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientUpperColor,eSP_Float,3);
 
 		EnableDebugDraw = true;
 	}
@@ -44,7 +44,7 @@ namespace Disorder
 		renderObjList.reserve(_vRenderObjects.size());
 		for(size_t i=0;i<_vRenderObjects.size();i++)
 		{
-			if(_vRenderObjects[i]->Overlaps(camera->CameraFrustrum))
+			//if(_vRenderObjects[i]->Overlaps(camera->CameraFrustrum))
 				renderObjList.push_back(_vRenderObjects[i]);
 		}
 	}
@@ -58,8 +58,8 @@ namespace Disorder
 	void SceneManager::UpdateShaderProperty()
 	{
 		_propertyManager->ClearShaderPropertyValue();
-		_sAmbientLowerProperty->SetData(_vAmbientLowerColor);
-		_sAmbientUpperProperty->SetData(_vAmbientUpperColor);
+		_sAmbientLowerProperty->SetData(_vAmbientLowerColor.Ptr());
+		_sAmbientUpperProperty->SetData(_vAmbientUpperColor.Ptr());
 		_propertyManager->UpdateShaderProperty();
 	}
 

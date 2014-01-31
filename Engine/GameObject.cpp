@@ -26,16 +26,17 @@ namespace Disorder
 		_worldMatrix.MakeTransform(_wldPos,_wldScale,_wldRot);
 
 		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerObject);
-		_worldMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sObjectWorld,eSP_Matrix4);	
-		_worldNormalMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sObjectNormal,eSP_Matrix4);
+		_worldMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sObjectWorld,eSP_Float,16);	
+		_worldNormalMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sObjectNormal,eSP_Float,16);
 	}
 
 	void GameObject::UpdateShaderProperty()
 	{
 		_propertyManager->ClearShaderPropertyValue();
 		Matrix4 transMatrix = _worldMatrix.Transpose();
-		_worldMatrixProperty->SetData(transMatrix);
-		_worldNormalMatrixProperty->SetData(transMatrix.GetNormalMatrix());
+		_worldMatrixProperty->SetData((float*)&transMatrix);
+		Matrix4 normalMatrix = transMatrix.GetNormalMatrix();
+		_worldNormalMatrixProperty->SetData((float*)&normalMatrix);
 		_propertyManager->UpdateShaderProperty();
 	}
 

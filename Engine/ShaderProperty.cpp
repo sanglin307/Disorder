@@ -4,100 +4,37 @@
 namespace Disorder
 {
 		//////////////////////////////////////////////////////////////////////////
-	ShaderProperty::ShaderProperty(EShaderProperty type,std::string const& name)
-		:PropertyType(type),PropertyName(name)
+	ShaderProperty::ShaderProperty(EShaderProperty type,unsigned int length,std::string const& name)
+		:PropertyType(type),PropertyName(name),_length(length)
 	{
 		if( PropertyType == eSP_Int )
-			_data = new int;
+			_data = new int[length];
 		else if(PropertyType == eSP_Float )
-			_data = new float;
+			_data = new float[length];
+		else if(PropertyType == eSP_Double )
+			_data = new double[length];
 		else if(PropertyType == eSP_ConstBuffer)
 			_data = new RenderBufferPtr;
 		else if( PropertyType == eSP_SampleState )
 			_data = new SamplerStatePtr;
 		else if( PropertyType == eSP_ShaderResource )
 			_data = new RenderSurfacePtr;
-		else if( PropertyType == eSP_Matrix3 )
-			_data = new Matrix3;
-		else if( PropertyType == eSP_Matrix4 )
-			_data = new Matrix4;
-		else if( PropertyType == eSP_Vector3 )
-			_data = new Vector3;
-		else if( PropertyType == eSP_Vector4 )
-			_data = new Vector4;
 		else
 			BOOST_ASSERT(0);
 	}
 
 	ShaderProperty::~ShaderProperty()
 	{
-		if( PropertyType == eSP_Int )
-			delete (int *)_data;
-		else if(PropertyType == eSP_Float )
-			delete (float *)_data;
+		if( PropertyType == eSP_Int || PropertyType == eSP_Float || PropertyType == eSP_Double )
+			delete[] _data;
 		else if(PropertyType == eSP_ConstBuffer)
 			delete (RenderBufferPtr *)_data;
 		else if( PropertyType == eSP_SampleState )
 			delete (SamplerStatePtr *)_data;
 		else if( PropertyType == eSP_ShaderResource )
 			delete (RenderSurfacePtr *)_data;
-		else if ( PropertyType == eSP_Matrix3 )
-			delete (Matrix3 *)_data;
-		else if( PropertyType == eSP_Matrix4 )
-			delete (Matrix4 *)_data;
-		else if( PropertyType == eSP_Vector3 )
-			delete (Vector3 *)_data;
-		else if( PropertyType == eSP_Vector4 )
-			delete (Vector4 *)_data;
 		else
 			BOOST_ASSERT(0);
-	}
-
-	int ShaderProperty::GetTotalSize()
-	{
-		switch(PropertyType)
-		{
-			case eSP_Int:
-			case eSP_Float:
-				return 4;
-			case eSP_ConstBuffer:
-			case eSP_ShaderResource:
-			case eSP_SampleState:
-				return 6;  // share pointer
-			case eSP_Vector3:
-				return 3 * sizeof(float);
-			case eSP_Vector4:
-				return 4 * sizeof(float);
-			case eSP_Matrix4:
-				return 16 * sizeof(float);
-			case eSP_Matrix3:
-				return 9 * sizeof(float);
-			default:
-				return 0;
-		}
-	}
-
-	int ShaderProperty::GetElementNumber()
-	{
-		switch(PropertyType)
-		{
-			case eSP_Int:
-			case eSP_Float:
-			case eSP_ConstBuffer:
-			case eSP_ShaderResource:
-			case eSP_SampleState:
-				return 1;
-			case eSP_Vector3:
-				return 3;
-			case eSP_Vector4:
-				return 4;
-			case eSP_Matrix4:
-				return 16;
-			case eSP_Matrix3:
-				return 9;
-			default:
-				return 0;
-		}
 	}
  
 	void ShaderProperty::ClearData()
@@ -105,42 +42,39 @@ namespace Disorder
 		switch(PropertyType)
 		{
 			case eSP_Int:
-				SetData(0);
+				memset(_data,0,sizeof(int)*_length);
 				break;
 			case eSP_Float:
-				SetData(0.f);
+				memset(_data,0,sizeof(float)*_length);
+				break;
+			case eSP_Double:
+				memset(_data,0,sizeof(double)*_length);
 				break;
 			case eSP_ConstBuffer:
 			case eSP_ShaderResource:
 			case eSP_SampleState:
-				break;
-			case eSP_Vector3:
-				SetData(Vector3::ZERO);
-				break;
-			case eSP_Vector4:
-				SetData(Vector4::ZERO);
-				break;
-			case eSP_Matrix4:
-				SetData(Matrix4::IDENTITY);
-				break;
-			case eSP_Matrix3:
-				SetData(Matrix3::IDENTITY);
 				break;
 			default:
 				BOOST_ASSERT(0);
 		}
 	}
 
-	void ShaderProperty::SetData(int data)
+	void ShaderProperty::SetData(int* data)
 	{
 		BOOST_ASSERT(PropertyType == eSP_Int);
-		*(int*)_data = data;
+		memcpy(_data,data,sizeof(int)*_length);
 	}
 
-	void ShaderProperty::SetData(float data)
+	void ShaderProperty::SetData(float* data)
 	{
 		BOOST_ASSERT(PropertyType == eSP_Float);
-		*(float*)_data = data;
+		memcpy(_data,data,sizeof(float)*_length);
+	}
+
+	void ShaderProperty::SetData(double* data)
+	{
+		BOOST_ASSERT(PropertyType == eSP_Double);
+		memcpy(_data,data,sizeof(double)*_length);
 	}
 
 	void ShaderProperty::SetData(RenderBufferPtr constBuffer)
@@ -161,33 +95,10 @@ namespace Disorder
 		*(SamplerStatePtr*)_data = sample;
 	}
 
-	void ShaderProperty::SetData(Vector3 const& vec)
-	{
-		BOOST_ASSERT(PropertyType == eSP_Vector3);
-		*(Vector3*)_data = vec;
-	}
 
-	void ShaderProperty::SetData(Vector4 const& vec)
+	ShaderPropertyPtr ShaderProperty::Create(EShaderProperty type,unsigned int length,std::string const& name)
 	{
-		BOOST_ASSERT(PropertyType == eSP_Vector4);
-		*(Vector4*)_data = vec;
-	}
-
-	void ShaderProperty::SetData(Matrix4 const& mat)
-	{
-		BOOST_ASSERT(PropertyType == eSP_Matrix4);
-		*(Matrix4*)_data = mat;
-	}
-
-	void ShaderProperty::SetData(Matrix3 const& mat)
-	{
-		BOOST_ASSERT(PropertyType == eSP_Matrix3);
-		*(Matrix3*)_data = mat;
-	}
-
-	ShaderPropertyPtr ShaderProperty::Create(EShaderProperty type,std::string const& name)
-	{
-		ShaderProperty* pProperty = new ShaderProperty(type,name);
+		ShaderProperty* pProperty = new ShaderProperty(type,length,name);
 		return ShaderPropertyPtr(pProperty);
 	}
 
@@ -196,42 +107,24 @@ namespace Disorder
 		return _data;
 	}
 
-	int ShaderProperty::GetDataAsInt()
+	int* ShaderProperty::GetDataAsInt()
 	{
 		BOOST_ASSERT(PropertyType == eSP_Int);
-		return *(int*)_data;
+		return (int*)_data;
 	}
 
-	float ShaderProperty::GetDataAsFloat()
+	float* ShaderProperty::GetDataAsFloat()
 	{
 		BOOST_ASSERT(PropertyType == eSP_Float);
-		return *(float*)_data;
+		return (float*)_data;
 	}
 
-	Vector3 ShaderProperty::GetDataAsVector3()
+	double* ShaderProperty::GetDataAsDouble()
 	{
-		BOOST_ASSERT(PropertyType == eSP_Vector3 );
-		return *(Vector3*)_data;
+		BOOST_ASSERT(PropertyType == eSP_Double);
+		return (double*)_data;
 	}
-
-	Vector4 ShaderProperty::GetDataAsVector4()
-	{
-		BOOST_ASSERT(PropertyType == eSP_Vector4 );
-		return *(Vector4*)_data;
-	}
-
-	Matrix3 ShaderProperty::GetDataAsMatrix3()
-	{
-		BOOST_ASSERT(PropertyType == eSP_Matrix3 );
-		return *(Matrix3*)_data;
-	}
-
-	Matrix4 ShaderProperty::GetDataAsMatrix4()
-	{
-		BOOST_ASSERT(PropertyType == eSP_Matrix4 );
-		return *(Matrix4*)_data;
-	}
-
+ 
 	RenderBufferPtr ShaderProperty::GetDataAsConstBuffer()
 	{
 		BOOST_ASSERT(PropertyType == eSP_ConstBuffer );
@@ -277,8 +170,9 @@ namespace Disorder
     const std::string ShaderPropertyManager::sDiffuseColor = "DiffuseColor";
 	const std::string ShaderPropertyManager::sEmissiveColor = "EmissiveColor";
     const std::string ShaderPropertyManager::sSpecularColor = "SpecularColor";
-	const std::string ShaderPropertyManager::sReflectionColor = "ReflectionColor";
-	const std::string ShaderPropertyManager::sShininess = "Shininess";
+	const std::string ShaderPropertyManager::sSpecularExp =  "SpecularExp";
+	const std::string ShaderPropertyManager::sTransparency = "Transparency";
+	
 
     // Forward Dirction LightProperty
     const std::string ShaderPropertyManager::sDirectionLightIntensity = "DirectionLightIntensity";
@@ -318,6 +212,9 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sGBufferSpecPowTexture = "GBufferSpecPowTexture";
 	const std::string ShaderPropertyManager::sGBufferPointSampler = "GBufferPointSampler";
 
+	const std::string ShaderPropertyManager::sSurfaceVisTex = "SurfaceVisTex";
+	const std::string ShaderPropertyManager::sSurfaceSampler = "SurfaceSampler";
+
 
 	ShaderPropertyPtr ShaderPropertyManager::GetProperty(std::string const& name)
 	{
@@ -337,12 +234,12 @@ namespace Disorder
 		}
 	}
 
-	ShaderPropertyPtr ShaderPropertyManager::CreateProperty(std::string const& name,EShaderProperty type)
+	ShaderPropertyPtr ShaderPropertyManager::CreateProperty(std::string const& name,EShaderProperty type,unsigned int length)
 	{
 		if( _shaderPropertyMap.find(name) != _shaderPropertyMap.end() )
 			return _shaderPropertyMap.at(name);
 
-		ShaderPropertyPtr shaderProperty = ShaderProperty::Create(type,name);
+		ShaderPropertyPtr shaderProperty = ShaderProperty::Create(type,length,name);
 
 		_shaderPropertyMap.insert(std::pair<std::string,ShaderPropertyPtr>(name,shaderProperty));
 

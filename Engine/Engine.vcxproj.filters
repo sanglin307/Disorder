@@ -50,13 +50,10 @@
     <None Include="..\Resource\FX\ForwardLighting.dsf">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\Resource\FX\GBufferVisual.dsf">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Resource\FX\DeferredShadingCommon.dsf">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\Resource\FX\2DText.dsf">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Resource\FX\SurfaceVisual.dsf">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

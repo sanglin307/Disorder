@@ -12,3 +12,6 @@ lexical_cast,format,string_algo(boost/algorithm/string.hpp),xpressive
 BOOST_ASSERT(BOOST_ENABLE_ASSERT_HANDLER),BOOST_VERIFY,BOOST_STATIC_ASSERT
 
 test
+
+
+Eigen

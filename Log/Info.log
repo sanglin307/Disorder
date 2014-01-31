@@ -1,9 +1,10 @@
 FBX file format version for file MiniGun_CameraLight.fbx is 7,3,0
 Shader Object :BatchLines:VS
 Shader Object :2DText:PS
-Shader Object :GBufferVisual:GBufferVisualPS
-Shader Object :GBufferVisual:GBufferVisualVS
-Shader Object :DeferredShading:LightingPS
+Shader Object :SurfaceVisual:SurfaceVisualPS
+Shader Object :SurfaceVisual:SurfaceVisualVS
+Shader Object :DeferredShading:DeferFourLightPS
+Shader Object :DeferredShading:BaseLightingPS
 Shader Object :2DText:VS
 Shader Object :DeferredShading:LightingVS
 Shader Object :BatchLines:PS
@@ -12,6 +13,9 @@ Shader Object :DeferredShading:RenderSceneVS
 Shader Property Manager Name :Global
  ****** Shader Property :TextTexture
  ****** Shader Property :GBufferPointSampler
+ ****** Shader Property :SurfaceSampler
+ ****** Shader Property :ForwardFourLights
+ ****** Shader Property :SurfaceVisTex
  ****** Shader Property :GBufferColorSpecIntTexture
  ****** Shader Property :GBufferDepthTexture
  ****** Shader Property :TextSampler
@@ -26,14 +30,27 @@ Shader Property Manager Name :SceneProperty
  ****** Shader Property :AmbientUpperColor
  ****** Shader Property :AmbientLowColor
 Shader Property Manager Name :ForwardFourLights
+ ****** Shader Property :ForwardLightColorG
+ ****** Shader Property :ForwardLightColorR
+ ****** Shader Property :ForwardSpotCosInnerConeRcp
+ ****** Shader Property :ForwardLightRangeRcp
+ ****** Shader Property :ForwardSpotCosOuterCone
+ ****** Shader Property :ForwardLightDirZ
+ ****** Shader Property :ForwardLightColorB
+ ****** Shader Property :ForwardCapsuleLen
+ ****** Shader Property :ForwardLightDirY
+ ****** Shader Property :ForwardLightDirX
+ ****** Shader Property :ForwardLightPosZ
+ ****** Shader Property :ForwardLightPosY
+ ****** Shader Property :ForwardLightPosX
 Shader Property Manager Name :DirectionLightProperty
  ****** Shader Property :DirectionLightColor
  ****** Shader Property :DirectionLightDir
  ****** Shader Property :DirectionLightIntensity
 Shader Property Manager Name :MaterialProperty
+ ****** Shader Property :Transparency
+ ****** Shader Property :SpecularExp
  ****** Shader Property :EmissiveColor
- ****** Shader Property :ReflectionColor
- ****** Shader Property :Shininess
  ****** Shader Property :SpecularColor
  ****** Shader Property :DiffuseColor
 Shader Property Manager Name :ObjectTransform

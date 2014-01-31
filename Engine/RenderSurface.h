@@ -1,6 +1,8 @@
 #ifndef _DISORDER_RENDERSURFACE_H_
 #define _DISORDER_RENDERSURFACE_H_
 
+#include "Renderer.h"
+
 namespace Disorder
 {
 	enum RenderSurfaceUsage
@@ -25,7 +27,7 @@ namespace Disorder
 
 	    unsigned int Usage;
 	};
-
+ 
 	class RenderGBuffer
 	{
 	public:
@@ -46,8 +48,15 @@ namespace Disorder
 		ShaderPropertyPtr _GBufferNormalTexture;
 		ShaderPropertyPtr _GBufferSpecPowTexture;
 		ShaderPropertyPtr _GBufferPointSampler;
+		ShaderPropertyPtr _SurfaceVisTex;
+		ShaderPropertyPtr _SurfaceSampler;
 
 		RenderEffectPtr _GBufferVisualEffect;
+
+		SimpleTile _DepthVisTile;
+		SimpleTile _ColorVisTile;
+		SimpleTile _NormalVisTile;
+		SimpleTile _SpecPowVisTile;
 
 
 	};

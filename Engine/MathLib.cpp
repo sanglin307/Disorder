@@ -31,18 +31,21 @@ namespace Disorder
 	}
 
 	// fov use rad, opengl
-   Matrix4 Math::PerspectiveFovRH(float fieldOfViewY,float aspectRatio,float znearPlane,float zfarPlane)
+   Eigen::Matrix4f Math::ProjFovRH(float fieldOfViewY,float aspectRatio,float znearPlane,float zfarPlane)
    {
 	   float h = 1.0f / Math::Tan(fieldOfViewY / 2);
 	   float w = h / aspectRatio;
       
-	   return Matrix4(  w,  0,  0,                                             0,
-                        0,  h,  0,                                             0,
-                        0,  0,  zfarPlane/(znearPlane-zfarPlane),              -1,
-                        0,  0,  znearPlane*zfarPlane/(znearPlane-zfarPlane),   0);
+	   Eigen::Matrix4f ProjMat;
+	   ProjMat <<   w,  0,  0,                                             0,
+                    0,  h,  0,                                             0,
+                    0,  0,  zfarPlane/(znearPlane-zfarPlane),              znearPlane*zfarPlane/(znearPlane-zfarPlane),
+                    0,  0,  -1,   0;
+
+	   return ProjMat;
    }
 
-   Matrix4 Math::ViewMatrixRH(const Vector3 &eye,const Vector3 &center,const Vector3 &up)
+   Eigen::Matrix4f Math::ViewMatrixRH(const Vector3 &eye,const Vector3 &center,const Vector3 &up)
    {
 	   Vector3 zaxis = eye - center;
 	   zaxis.Normalise();
@@ -50,11 +53,15 @@ namespace Disorder
 	   xaxis.Normalise();
 	   Vector3 yaxis = zaxis.Cross(xaxis);
 
-	   return Matrix4(  xaxis.x,         yaxis.x,           zaxis.x,          0,
-                        xaxis.y,         yaxis.y,           zaxis.y,          0,
-                        xaxis.z,         yaxis.z,           zaxis.z,          0,
-						-xaxis.Dot(eye), -yaxis.Dot(eye),   -zaxis.Dot(eye),  1 );
+	   Eigen::Matrix4f ViewMat;
+	   ViewMat <<  xaxis.x,         xaxis.y,           xaxis.z,          -xaxis.Dot(eye),
+                   yaxis.x,         yaxis.y,           yaxis.z,          -yaxis.Dot(eye),
+                   zaxis.x,         zaxis.y,           zaxis.z,          -zaxis.Dot(eye),
+				   0,               0,                 0,                1 ;
+
+	   return ViewMat;
    }
+	
 
      
 }

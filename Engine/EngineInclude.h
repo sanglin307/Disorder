@@ -43,6 +43,12 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+// Eigen
+#include <Eigen/StdVector>
+#include <Eigen/Geometry>
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector3f)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector4f)
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix4f)
 
 //Class pre declare
 namespace Disorder
@@ -85,14 +91,10 @@ namespace Disorder
 	typedef boost::shared_ptr<ShaderProperty> ShaderPropertyPtr;
 	class ShaderPropertyManager;
 	typedef boost::shared_ptr<ShaderPropertyManager> ShaderPropertyManagerPtr;
-	class SurfaceMaterial;
-	typedef boost::shared_ptr<SurfaceMaterial> SurfaceMaterialPtr;
-	class SurfaceLambert;
-	typedef boost::shared_ptr<SurfaceLambert> SurfaceLambertPtr;
-	class SurfacePhong;
-	typedef boost::shared_ptr<SurfacePhong> SurfacePhongPtr;
 	class Texture;
 	typedef boost::shared_ptr<Texture> TexturePtr;
+	class SurfaceMaterial;
+	typedef boost::shared_ptr<SurfaceMaterial> SurfaceMaterialPtr;
 	class RenderEngine;
 	typedef boost::shared_ptr<RenderEngine> RenderEnginePtr;
 	class Renderer;

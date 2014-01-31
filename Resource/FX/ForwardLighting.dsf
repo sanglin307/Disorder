@@ -11,7 +11,7 @@ Material PrepareMaterial(float3 normal, float2 UV)
 	// Sample the texture and convert to linear space
     material.DiffuseColor = DiffuseColor;
 	material.SpecularColor = SpecularColor;
-	material.Shininess = Shininess;
+	material.SpecularExp = SpecularExp;
  
 	return material;
 } 
@@ -38,6 +38,7 @@ VS_OUTPUT RenderSceneVS( VS_INPUT input )
     VS_OUTPUT output;
     output.Position = mul(WorldTransform, float4(input.Position,1.0f));
 	output.PositionWorld = output.Position.xyz;
+	
     output.Position = mul( CameraViewProj,output.Position);
     output.NormalWorld = mul(WorldNormalTransform,float4(input.Normal,1.0)).xyz;
 	

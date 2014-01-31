@@ -80,22 +80,28 @@ namespace Disorder
 		friend class CameraSphereTargetUpdate;
 		friend class CameraFirstPersonUpdate;
 	public:
- 
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+		mutable Eigen::Affine3f ViewMatrix;
+		mutable Eigen::Matrix4f ProjMatrix;
+		mutable Eigen::Matrix4f ViewProjMatrix;
+
+		mutable Eigen::Matrix4f ViewInvMatrix;
+		mutable Eigen::Matrix4f ProjInvMatrix;
+		mutable Eigen::Matrix4f ViewProjInvMatrix;
+
 		void LookAt(Vector3 const& eyePos,Vector3 const& lookAt,Vector3 const& upVec);
-	    void ProjCalculate(float FOV,  float nearPlane,float farPlane);
+	    void ProjCalculate(float FOV, float nearPlane,float farPlane);
 
 		bool KeyboardEvent(OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds);
 		bool MouseEvent(MouseInputEvent const& mouseEvent,float deltaSeconds);
 
 		virtual void Tick(float delta);
-
-		Matrix4 ViewMatrix;
-		Matrix4 ViewInvMatrix;
-		Matrix4 ProjectMatrix;
-		Matrix4 ProjectInvMatrix;
+ 
 		Frustrum CameraFrustrum;
 
 		void SetUpdateStrategy(ECameraUpdateStrategy mode);
+		void ToggleUpdateStratety();
+
 		void DebugDraw();
 
 		void UpdateShaderProperty();
@@ -110,9 +116,7 @@ namespace Disorder
 		void Update(float delta);
 		void UpdateViewMatrix();
 		void UpdateProjectMatrix();
-
-		
-
+ 
 		float _moveSpeed;
 		float _rotateSpeed;
 
@@ -122,15 +126,15 @@ namespace Disorder
         Vector3 _viewVec;
 		Vector3 _xAxis;
 
-		Quaternion _rotation;
+		Eigen::Quaternionf _rotation;
 
 		float _nearPlane;
 		float _farPlane;
 		float _FOV;
 		float _aspectRatio;
 
-		bool _viewMatrixInvalid;
-		bool _projectMatrixInvalid;
+		bool _InvalidViewMatrix;
+		bool _InvalidProjMatrix;
 
 		ECameraUpdateStrategy _updateMode;
 		CameraUpdateStrategyPtr _updateStrategy;

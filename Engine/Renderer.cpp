@@ -32,10 +32,10 @@ namespace Disorder
 		_texture = texture;
  
 	    ShaderPropertyManagerPtr globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
-		ShaderPropertyPtr texProperty = globalProperty->CreateProperty(ShaderPropertyManager::sTextTexture,eSP_ShaderResource);
+		ShaderPropertyPtr texProperty = globalProperty->CreateProperty(ShaderPropertyManager::sTextTexture,eSP_ShaderResource,1);
 	    texProperty->SetData(_texture);
 	 
-		ShaderPropertyPtr Sampler = globalProperty->CreateProperty(ShaderPropertyManager::sTextSampler,eSP_SampleState);
+		ShaderPropertyPtr Sampler = globalProperty->CreateProperty(ShaderPropertyManager::sTextSampler,eSP_SampleState,1);
 		Sampler->SetData(texture->Tex2DResource->Sampler);
  
 	}
@@ -293,6 +293,8 @@ namespace Disorder
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 	}
 
+	 
+
 	void SimpleTile::Render(CameraPtr const& camera)
 	{
 		RenderEnginePtr renderEngine = GEngine->RenderEngine;
@@ -501,14 +503,14 @@ namespace Disorder
 		 GEngine->GameCanvas->DrawLine(original,Vector4(0,1.0f,0,1.0f),yAxis,Vector4(0,1.0f,0,1.0f));
 		 GEngine->GameCanvas->DrawLine(original,Vector4(0,0,1.0f,1.0f),zAxis,Vector4(0,0,1.0f,1.0f));
 
-		 Matrix4 ProjectViewMatrix = camera->ProjectMatrix.Transpose() * camera->ViewMatrix.Transpose();
-		 xAxis = ProjectViewMatrix * xAxis;
-		 yAxis = ProjectViewMatrix * yAxis;
-		 zAxis = ProjectViewMatrix * zAxis;
+	//	 Matrix4 ProjectViewMatrix = camera->ProjectMatrix.Transpose() * camera->ViewMatrix.Transpose();
+	//	 xAxis = ProjectViewMatrix * xAxis;
+	//	 yAxis = ProjectViewMatrix * yAxis;
+	//	 zAxis = ProjectViewMatrix * zAxis;
 
-		 GEngine->GameCanvas->DrawStringDeviceSpace(Vector2(xAxis.x,xAxis.y),35,Vector4(1.0f,0,0,1.0f),std::string("X"));
-		 GEngine->GameCanvas->DrawStringDeviceSpace(Vector2(yAxis.x,yAxis.y),35,Vector4(0,1.0f,0,1.0f),std::string("Y"));
-		 GEngine->GameCanvas->DrawStringDeviceSpace(Vector2(zAxis.x,zAxis.y),35,Vector4(0,0,1.0f,1.0f),std::string("Z"));
+	//	 GEngine->GameCanvas->DrawStringDeviceSpace(Vector2(xAxis.x,xAxis.y),35,Vector4(1.0f,0,0,1.0f),std::string("X"));
+	//	 GEngine->GameCanvas->DrawStringDeviceSpace(Vector2(yAxis.x,yAxis.y),35,Vector4(0,1.0f,0,1.0f),std::string("Y"));
+	//	 GEngine->GameCanvas->DrawStringDeviceSpace(Vector2(zAxis.x,zAxis.y),35,Vector4(0,0,1.0f,1.0f),std::string("Z"));
 
 	  }
 

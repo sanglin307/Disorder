@@ -4,70 +4,43 @@
 
 namespace Disorder
 {
- 
 	class SurfaceMaterial
 	{
 	public:
-        std::string Name;
-		MaterialType Type;
-		std::string ShaderModel;
+         std::string Name;
+		 std::string ShaderModel;
  
-		virtual void UpdateShaderProperty(){};
+		 // input 
+		 Vector3 DiffuseColor;
+		 Vector3 EmissiveColor;
+		 Vector3 SpecularColor;
+		 Vector3 ReflectionColor;
+
+		 float SpecularExp;
+		 float Transparency;
+
+		void UpdateShaderProperty();
 	
         const ShaderPropertyManagerPtr& GetShaderPropertyManager() const
         {
              return _propertyManager;
         }
 
+		static SurfaceMaterialPtr Create(std::string const& name);
+
     protected:
 
 		SurfaceMaterial(std::string const& name);
         ShaderPropertyManagerPtr _propertyManager;
-	};
 
-    class SurfaceLambert : public SurfaceMaterial
-	{
-     public:
-		 
-		 Vector3 DiffuseColor;
-		 Vector3 EmissiveColor;
-		 float Transparency;
+		ShaderPropertyPtr  _DiffuseColorProperty;
+        ShaderPropertyPtr  _EmissiveColorProperty;
+		ShaderPropertyPtr  _SpecularColorProperty;
 
-		 virtual void UpdateShaderProperty();
-
-		 static SurfaceLambertPtr Create(std::string const& name);
-	protected:
-
-		 SurfaceLambert(std::string const& name);
- 
-         ShaderPropertyPtr  DiffuseColorProperty;
-         ShaderPropertyPtr  EmissiveColorProperty;
-         ShaderPropertyPtr  TransparentColorProperty;
-         ShaderPropertyPtr  TransparencyFactorProperty;
-    };
-
-	class SurfacePhong : public SurfaceLambert
-	{
-	public:
-		Vector3 SpecularColor;
-		Vector3 ReflectionColor;
-		float Shininess;
-
-		virtual void UpdateShaderProperty();
-
-		static SurfacePhongPtr Create(std::string const& name);
-	protected:
-
-		SurfacePhong(std::string const& name);
-
-		ShaderPropertyPtr SpecularColorProperty;
-		 
-		ShaderPropertyPtr ReflectionColorProperty;
-		ShaderPropertyPtr ShininessProperty;
-
+		ShaderPropertyPtr  _SpecularExpProperty;
+        ShaderPropertyPtr  _TransparencyFactorProperty;
 	};
  
-
 }
 
 
