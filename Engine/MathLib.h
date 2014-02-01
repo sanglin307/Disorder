@@ -138,11 +138,11 @@ namespace Disorder
 			return float(rand()) / (float)RAND_MAX;
 		}
  
-		static  void ConvertToSphericalCoord(const Vector3& pos,const Vector3& origin,float &radius,float &yAngle,float &zAngle);	
-		static  void ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const Vector3& origin,Vector3& pos);
+		static  void ConvertToSphericalCoord(const Eigen::Vector3f& pos,const Eigen::Vector3f& origin,float &radius,float &yAngle,float &zAngle);	
+		static  void ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const Eigen::Vector3f& origin,Eigen::Vector3f& pos);
 		
 		static Eigen::Matrix4f ProjFovRH(float fieldOfViewY,float aspectRatio,float znearPlane,float zfarPlane);		
-		static Eigen::Matrix4f ViewMatrixRH(const Vector3 &eye,const Vector3 &center,const Vector3 &up);
+		static Eigen::Matrix4f ViewMatrixRH(const Eigen::Vector3f &eye,const Eigen::Vector3f &center,const Eigen::Vector3f &up);
 
 		static const float Math::POS_INFINITY;
         static const float Math::NEG_INFINITY;

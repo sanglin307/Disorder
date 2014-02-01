@@ -279,7 +279,11 @@ namespace Disorder
 		FbxDouble3& target = pCamera->InterestPosition.Get();
 		FbxDouble3& upVec = pCamera->UpVector.Get();
 
-		cameraPtr->LookAt(Vector3(position[0],position[1],position[2]),Vector3(target[0],target[1],target[2]),Vector3(upVec[0],upVec[1],upVec[2]));
+		Eigen::Vector3f vpos((float)position[0],(float)position[1],(float)position[2]);
+		Eigen::Vector3f vtarget((float)target[0],(float)target[1],(float)target[2]);
+		Eigen::Vector3f vup((float)upVec[0],(float)upVec[1],(float)upVec[2]);
+
+		cameraPtr->LookAt(vpos,vtarget,vup);
 		cameraPtr->ProjCalculate((float)pCamera->FieldOfView.Get(),(float)pCamera->NearPlane.Get(),(float)pCamera->FarPlane.Get());
 		gameObject->AddComponent(cameraPtr);
 		

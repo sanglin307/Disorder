@@ -11,21 +11,24 @@ namespace Disorder
 	const float Math::fRad2Deg = float(180.0) / PI;
 
  
-	void Math::ConvertToSphericalCoord(const Vector3& pos,const Vector3& origin,float &radius,float &yAngle,float &zAngle)
+	void Math::ConvertToSphericalCoord(const Eigen::Vector3f& pos,const Eigen::Vector3f& origin,float &radius,float &yAngle,float &zAngle)
 	{
-		Vector3 deltaVec = pos - origin;
-		radius = deltaVec.Length();
-		yAngle = ACosf(deltaVec.y/radius);
-		zAngle = ATan2f(deltaVec.x,deltaVec.z);
+		Eigen::Vector3f deltaVec = pos - origin;
+		radius = deltaVec.norm();
+		yAngle = ACosf(deltaVec.y()/radius);
+		zAngle = ATan2f(deltaVec.x(),deltaVec.z());
 	}
 
-	void Math::ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const Vector3& origin,Vector3& pos)
+	void Math::ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const Eigen::Vector3f& origin,Eigen::Vector3f& pos)
 	{
 		BOOST_ASSERT(radius > 0);
 		float temp = radius * Sinf(yAngle);
-		pos.z = temp * Cosf(zAngle);
-		pos.x = temp * Sinf(zAngle);
-		pos.y = radius * Cosf(yAngle);
+
+		pos << temp * Sinf(zAngle),radius * Cosf(yAngle),temp * Cosf(zAngle);
+
+	/*	pos.z() = temp * Cosf(zAngle);
+		pos.x() = temp * Sinf(zAngle);
+		pos.y() = radius * Cosf(yAngle);*/
 
 		pos += origin;
 	}
@@ -45,18 +48,18 @@ namespace Disorder
 	   return ProjMat;
    }
 
-   Eigen::Matrix4f Math::ViewMatrixRH(const Vector3 &eye,const Vector3 &center,const Vector3 &up)
+   Eigen::Matrix4f Math::ViewMatrixRH(const Eigen::Vector3f &eye,const Eigen::Vector3f &center,const Eigen::Vector3f &up)
    {
-	   Vector3 zaxis = eye - center;
-	   zaxis.Normalise();
-	   Vector3 xaxis = up.Cross(zaxis);
-	   xaxis.Normalise();
-	   Vector3 yaxis = zaxis.Cross(xaxis);
+	   Eigen::Vector3f zaxis = eye - center;
+	   zaxis.normalize();
+	   Eigen::Vector3f xaxis = up.cross(zaxis);
+	   xaxis.normalize();
+	   Eigen::Vector3f yaxis = zaxis.cross(xaxis);
 
 	   Eigen::Matrix4f ViewMat;
-	   ViewMat <<  xaxis.x,         xaxis.y,           xaxis.z,          -xaxis.Dot(eye),
-                   yaxis.x,         yaxis.y,           yaxis.z,          -yaxis.Dot(eye),
-                   zaxis.x,         zaxis.y,           zaxis.z,          -zaxis.Dot(eye),
+	   ViewMat <<  xaxis.x(),         xaxis.y(),           xaxis.z(),          -xaxis.dot(eye),
+                   yaxis.x(),         yaxis.y(),           yaxis.z(),          -yaxis.dot(eye),
+                   zaxis.x(),         zaxis.y(),           zaxis.z(),          -zaxis.dot(eye),
 				   0,               0,                 0,                1 ;
 
 	   return ViewMat;

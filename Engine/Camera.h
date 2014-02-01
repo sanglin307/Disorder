@@ -29,7 +29,7 @@ namespace Disorder
 			return true;
 		}
 
-		virtual void SetTarget(Camera *pCamera,const Vector3& target)
+		virtual void SetTarget(Camera *pCamera,const Eigen::Vector3f& target)
 		{
 			return;
 		}
@@ -60,17 +60,17 @@ namespace Disorder
 		virtual bool MouseEvent(Camera *pCamera,MouseInputEvent const& mouseEvent,float deltaSeconds);
 		virtual bool Update(Camera *pCamera, float deltaSeconds);
 		 
-		static CameraSphereTargetUpdatePtr Create(float fRadius,const Vector3& target);
+		static CameraSphereTargetUpdatePtr Create(float fRadius,const Eigen::Vector3f& target);
 		
-		virtual void SetTarget(Camera *pCamera,const Vector3& target);
+		virtual void SetTarget(Camera *pCamera,const Eigen::Vector3f& target);
 
 	protected:
-		CameraSphereTargetUpdate(float radius,const Vector3& target)
+		CameraSphereTargetUpdate(float radius,const Eigen::Vector3f& target)
 			:_radius(radius),_target(target),_zoomPos(-1)
 		{};
 
 		float _radius;
-		Vector3 _target;
+		Eigen::Vector3f _target;
 		int _zoomPos;
 	};
 
@@ -89,11 +89,15 @@ namespace Disorder
 		mutable Eigen::Matrix4f ProjInvMatrix;
 		mutable Eigen::Matrix4f ViewProjInvMatrix;
 
-		void LookAt(Vector3 const& eyePos,Vector3 const& lookAt,Vector3 const& upVec);
+		void LookAt(Eigen::Vector3f const& eyePos,Eigen::Vector3f const& lookAt,Eigen::Vector3f const& upVec);
 	    void ProjCalculate(float FOV, float nearPlane,float farPlane);
 
 		bool KeyboardEvent(OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds);
 		bool MouseEvent(MouseInputEvent const& mouseEvent,float deltaSeconds);
+
+		Eigen::Vector3f Direction() const;
+		Eigen::Vector3f Up() const;
+		Eigen::Vector3f Right() const;
 
 		virtual void Tick(float delta);
  
@@ -111,23 +115,15 @@ namespace Disorder
 
 		Camera(std::string const& name);
 
-		void LookAt_(Vector3 const& eyePos,Vector3 const& lookAt,Vector3 const& upVec);
+		void LookAt_(Eigen::Vector3f const& eyePos,Eigen::Vector3f const& lookAt,Eigen::Vector3f const& upVec);
 
 		void Update(float delta);
 		void UpdateViewMatrix();
 		void UpdateProjectMatrix();
  
-		float _moveSpeed;
-		float _rotateSpeed;
-
-		Vector3 _eyePos;
-
-		Vector3 _upVec;
-        Vector3 _viewVec;
-		Vector3 _xAxis;
-
+		Eigen::Vector3f _eyePos;
 		Eigen::Quaternionf _rotation;
-
+ 
 		float _nearPlane;
 		float _farPlane;
 		float _FOV;
