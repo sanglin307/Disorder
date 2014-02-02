@@ -25,10 +25,10 @@ namespace Disorder
 	public:
 		
 		ELightType LightType;
-		Vector3   Color;
+		Eigen::Vector3f   Color;
 		float     Intensity; 
 		bool      CastShadows;
-		Vector3   ShadowColor;
+		Eigen::Vector3f   ShadowColor;
 		ELightDecayType DecayType;
 
 		virtual bool Touch(RendererPtr renderObject) = 0;
@@ -44,10 +44,10 @@ namespace Disorder
 		DirectionLight(std::string const& name);
 		
 	public:
-		static Vector3 DefaultDirection;
+		static Eigen::Vector3f DefaultDirection;
 
 		static DirectionLightPtr Create(std::string const& name);
-		Vector3 GetDirection();
+		Eigen::Vector3f GetDirection();
 		virtual bool Touch(RendererPtr renderObject);
 		virtual void DebugDraw();
 	};
@@ -59,7 +59,7 @@ namespace Disorder
 	
 	public:
 		float Range;
-		Vector3 GetPosition();
+		Eigen::Vector3f GetPosition();
 		static PointLightPtr Create(std::string const& name);
 		virtual bool Touch(RendererPtr renderObject);
         virtual void DebugDraw();
@@ -74,8 +74,8 @@ namespace Disorder
 		float Range;
 		float SpotInnerAngle;
 		float SpotOuterAngle;
-		Vector3 GetDirection();
-		Vector3 GetPosition();
+		Eigen::Vector3f GetDirection();
+		Eigen::Vector3f GetPosition();
 		static SpotLightPtr Create(std::string const& name);
 		virtual bool Touch(RendererPtr renderObject);
 		virtual void DebugDraw();

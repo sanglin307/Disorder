@@ -395,21 +395,21 @@ namespace Disorder
 				{
 					//for( int n = 0;n<elementNumber;n++)
 					//{
-						memcpy(pDest,pSrc,sizeof(Vector3));
-						//pDest += sizeof(Vector4);
-						//pSrc += sizeof(Vector3);
+						memcpy(pDest,pSrc,sizeof(Eigen::Vector3f));
+						//pDest += sizeof(Eigen::Vector4f);
+						//pSrc += sizeof(Eigen::Vector3f);
 					//}
 				}
 				else if( taDesc.Columns == 4 )
 				{
-					memcpy(pDest,pSrc,sizeof(Vector4));
+					memcpy(pDest,pSrc,sizeof(Eigen::Vector4f));
 				}
 			}
 			if(taDesc.Class == D3D_SVC_MATRIX_ROWS ||
 				taDesc.Class == D3D_SVC_MATRIX_COLUMNS)
 			{
 				void *pSrc = paDesc->GetData();
-				memcpy(pDest,pSrc,sizeof(Matrix4));
+				memcpy(pDest,pSrc,sizeof(Eigen::Matrix4f));
 			}
 		}
 				

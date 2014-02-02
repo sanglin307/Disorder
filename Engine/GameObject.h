@@ -7,7 +7,7 @@ namespace Disorder
 	class GameObject : public boost::enable_shared_from_this<GameObject>
 	{
 	public:
- 
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		std::string Name;
 
 		
@@ -23,7 +23,7 @@ namespace Disorder
 			_parent = parent;
 		}
 
-		void AddChild(GameObjectPtr const& child,Vector3 const& pos,Quaternion const& rot,Vector3 const& scale);
+		void AddChild(GameObjectPtr const& child,Eigen::Vector3f const& pos,Eigen::Quaternionf const& rot,Eigen::Vector3f const& scale);
 		void AddChild(GameObjectPtr const& child);
 
 		unsigned int GetChildCount()
@@ -36,59 +36,59 @@ namespace Disorder
 		void LocalPitch(float radian);
 		void LocalRoll(float radian);
 		void LocalYaw(float radian);
-		void LocalRotate(Vector3 const& axis, float radian);
-		void LocalTranslate(const Vector3& delta);
-		void LocalScale(const Vector3& delta);
+		void LocalRotate(Eigen::Vector3f const& axis, float radian);
+		void LocalTranslate(const Eigen::Vector3f& delta);
+		void LocalScale(const Eigen::Vector3f& delta);
 
-		void SetLocalRotation(Quaternion const& rot);
-		void SetLocalPosition(Vector3 const& position);
-		void SetLocalScale(Vector3 const& scale);
+		void SetLocalRotation(Eigen::Quaternionf const& rot);
+		void SetLocalPosition(Eigen::Vector3f const& position);
+		void SetLocalScale(Eigen::Vector3f const& scale);
 		
-		const Vector3& GetLocalPosition() const {  return _locPos; }
-		const Quaternion& GetLocalRotation() const {  return _locRot; }
-		const Vector3& GetLocalScale() const    { return _locScale;}
+		const Eigen::Vector3f& GetLocalPosition() const {  return _locPos; }
+		const Eigen::Quaternionf& GetLocalRotation() const {  return _locRot; }
+		const Eigen::Vector3f& GetLocalScale() const    { return _locScale;}
 
-		const Matrix4& GetWorldMatrix() const   { return _worldMatrix;}
+		const Eigen::Affine3f& GetWorldMatrix() const   { return _worldMatrix;}
 
-		const Vector3& GetWorldPosition() const { return _wldPos;}
-		const Quaternion& GetWorldRotation() const { return _wldRot;} 
-		const Vector3& GetWorldScale() const    { return _wldScale;}
+		const Eigen::Vector3f& GetWorldPosition() const { return _wldPos;}
+		const Eigen::Quaternionf& GetWorldRotation() const { return _wldRot;} 
+		const Eigen::Vector3f& GetWorldScale() const    { return _wldScale;}
 
 	    void WorldPitch(float radian);
 		void WorldRoll(float radian);
 		void WorldYaw(float radian);
-		void WorldRotate(const Vector3& axis,float radian);
-		void WorldTranslate(const Vector3& delta);
-		void WorldScale(const Vector3& delta);
-		void SetWorldRotation(Quaternion const& rot);
-		void SetWorldPosition(Vector3 const& position);
+		void WorldRotate(const Eigen::Vector3f& axis,float radian);
+		void WorldTranslate(const Eigen::Vector3f& delta);
+		void WorldScale(const Eigen::Vector3f& delta);
+		void SetWorldRotation(Eigen::Quaternionf const& rot);
+		void SetWorldPosition(Eigen::Vector3f const& position);
  
-		Vector3 WorldToLocalPosition( const Vector3 &worldPos );
-	    Vector3 LocalToWorldPosition( const Vector3 &localPos );
-	    Quaternion WorldToLocalRotation( const Quaternion &worldRot );
-		Quaternion LocalToWorldRotation( const Quaternion &localRot );
+		Eigen::Vector3f WorldToLocalPosition( const Eigen::Vector3f &worldPos );
+	    Eigen::Vector3f LocalToWorldPosition( const Eigen::Vector3f &localPos );
+	    Eigen::Quaternionf WorldToLocalRotation( const Eigen::Quaternionf &worldRot );
+		Eigen::Quaternionf LocalToWorldRotation( const Eigen::Quaternionf &localRot );
 	 
 		void RefreshWorldTransform();
 
 		void UpdateShaderProperty();
 
-		static GameObjectPtr Create(std::string const& name, Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::IDENTITY,Vector3 const& scale = Vector3::UNIT_SCALE);
+		static GameObjectPtr Create(std::string const& name, Eigen::Vector3f const& pos = Eigen::Vector3f::Zero(),Eigen::Quaternionf const& rot = Eigen::Quaternionf::Identity(),Eigen::Vector3f const& scale = Eigen::Vector3f::Constant(1.f));
 	private:
 
-		GameObject(std::string const& name, Vector3 const& pos = Vector3::ZERO,Quaternion const& rot = Quaternion::IDENTITY,Vector3 const& scale = Vector3::UNIT_SCALE);
+		GameObject(std::string const& name, Eigen::Vector3f const& pos = Eigen::Vector3f::Zero(),Eigen::Quaternionf const& rot = Eigen::Quaternionf::Identity(),Eigen::Vector3f const& scale = Eigen::Vector3f::Constant(1.f));
 
 		std::vector<ComponentPtr> _vComponents;
 		boost::weak_ptr<GameObject> _parent;
 		std::map<std::string,GameObjectPtr> _mapChildren;
 		
-	    Vector3 _locPos;
-		Quaternion _locRot;
-		Vector3 _locScale;
+	    Eigen::Vector3f _locPos;
+		Eigen::Quaternionf _locRot;
+		Eigen::Vector3f _locScale;
 
-		Vector3 _wldPos;
-		Quaternion _wldRot;
-		Vector3 _wldScale;
-		Matrix4 _worldMatrix;
+		Eigen::Vector3f _wldPos;
+		Eigen::Quaternionf _wldRot;
+		Eigen::Vector3f _wldScale;
+		Eigen::Affine3f _worldMatrix;
 
 		ShaderPropertyManagerPtr _propertyManager;
 		ShaderPropertyPtr _worldMatrixProperty;

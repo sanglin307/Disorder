@@ -3,8 +3,6 @@
 
 namespace Disorder
 {
-	class Vector3;
-	class Matrix4;
 
 	template< class T > inline T Abs( const T A )
 	{
@@ -137,6 +135,10 @@ namespace Disorder
 		{
 			return float(rand()) / (float)RAND_MAX;
 		}
+
+		// 1 positive,-1 negtive, 0 both side
+        static int GetPlaneSide(const Eigen::Hyperplane<float,3>&plane,const Eigen::Vector3f& centre, const Eigen::Vector3f& halfSize);
+		static int GetPlaneSide(const Eigen::Hyperplane<float,3>&plane,const Eigen::Vector3f& centre, float radius);
  
 		static  void ConvertToSphericalCoord(const Eigen::Vector3f& pos,const Eigen::Vector3f& origin,float &radius,float &yAngle,float &zAngle);	
 		static  void ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const Eigen::Vector3f& origin,Eigen::Vector3f& pos);

@@ -64,7 +64,39 @@ namespace Disorder
 
 	   return ViewMat;
    }
-	
 
+ 
+   
+   int Math::GetPlaneSide(const Eigen::Hyperplane<float,3>&plane,const Eigen::Vector3f& centre, const Eigen::Vector3f& halfSize)
+   {
+	   // Calculate the distance between box centre and the plane
+	   float dist = plane.signedDistance(centre);
+
+       // Calculate the maximise allows absolute distance for
+       // the distance between box centre and plane
+	   float maxAbsDist = Abs<float>(plane.normal().x() * halfSize.x()) + Abs<float>(plane.normal().y() * halfSize.y()) + Abs<float>(plane.normal().z() * halfSize.z());
+
+       if (dist < -maxAbsDist)
+            return -1;
+
+        if (dist > maxAbsDist)
+            return 1;
+
+        return 0;
+
+   }
+	
+   int Math::GetPlaneSide(const Eigen::Hyperplane<float,3>&plane,const Eigen::Vector3f& centre, float fRadius)
+   {
+	   float dist = plane.signedDistance(centre);
+	   if( dist >= fRadius )
+			 return 1;
+
+	   if( dist <= 0-fRadius )
+			 return -1;
+
+       return 0;
+
+   }
      
 }

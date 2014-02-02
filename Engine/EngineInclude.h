@@ -46,6 +46,7 @@
 // Eigen
 #include <Eigen/StdVector>
 #include <Eigen/Geometry>
+EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2f)
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector3f)
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector4f)
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix4f)
@@ -190,10 +191,6 @@ namespace Disorder
 #include "MathLib.h"
 #include "Common.h"
 #include "GameTime.h"
-#include "Quaternion.h"
-#include "Vectors.h"
-#include "Plane.h"
-#include "Matrixs.h"
 #include "Bounds.h"
 #include "Frustrum.h"
 #include "FileSystem.h"

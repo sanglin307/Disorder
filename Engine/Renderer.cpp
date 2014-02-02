@@ -74,7 +74,7 @@ namespace Disorder
 		return _indexs.size() /3;
 	}
 
-	void BatchScreenString::AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord)
+	void BatchScreenString::AddVertex(Eigen::Vector3f const& position,Eigen::Vector4f const& color,Eigen::Vector2f const& texcoord)
 	{
 		if( _vertexs.size() >= _savedVertexBufferSize )
 		{
@@ -206,7 +206,7 @@ namespace Disorder
 		return _indexs.size() /3;
 	}
 
-	void BatchScreenTiles::AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord)
+	void BatchScreenTiles::AddVertex(Eigen::Vector3f const& position,Eigen::Vector4f const& color,Eigen::Vector2f const& texcoord)
 	{
 		if( _vertexs.size() >= _savedVertexBufferSize )
 		{
@@ -329,7 +329,7 @@ namespace Disorder
 
 	}
 	
-	void BatchLines::AddLine(Vector3 const& beginPos,Vector4 const& beginColor,Vector3 const& endPos,Vector4 const& endColor)
+	void BatchLines::AddLine(Eigen::Vector3f const& beginPos,Eigen::Vector4f const& beginColor,Eigen::Vector3f const& endPos,Eigen::Vector4f const& endColor)
 	{
 		if( _vertexs.size() >= _savedVertexBufferSize )
 		{
@@ -428,26 +428,26 @@ namespace Disorder
 
 	 void GeometryRenderer::DrawBoundingBox(CameraPtr const& camera)
 	 {
-		 Vector3 boxVec1 = _geometryObject->BoundingBox.Origin - _geometryObject->BoundingBox.BoxExtent;
-		 Vector3 boxVec2 = Vector3( _geometryObject->BoundingBox.Origin.x + _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y - _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z - _geometryObject->BoundingBox.BoxExtent.z);
-		 Vector3 boxVec3 = Vector3( _geometryObject->BoundingBox.Origin.x + _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y + _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z - _geometryObject->BoundingBox.BoxExtent.z);
-		 Vector3 boxVec4 = Vector3( _geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y + _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z - _geometryObject->BoundingBox.BoxExtent.z);
-		 Vector3 boxVec5 = Vector3( _geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y + _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z + _geometryObject->BoundingBox.BoxExtent.z);
-		 Vector3 boxVec6 = Vector3( _geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y - _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z + _geometryObject->BoundingBox.BoxExtent.z);
-		 Vector3 boxVec7 = Vector3( _geometryObject->BoundingBox.Origin.x + _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y - _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z + _geometryObject->BoundingBox.BoxExtent.z);
-		 Vector3 boxVec8 = _geometryObject->BoundingBox.Origin + _geometryObject->BoundingBox.BoxExtent;
+		 Eigen::Vector3f boxVec1 = _geometryObject->BoundingBox.Origin - _geometryObject->BoundingBox.BoxExtent;
+		 Eigen::Vector3f boxVec2 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x() + _geometryObject->BoundingBox.BoxExtent.x(),
+			                        _geometryObject->BoundingBox.Origin.y() - _geometryObject->BoundingBox.BoxExtent.y(),
+									_geometryObject->BoundingBox.Origin.z() - _geometryObject->BoundingBox.BoxExtent.z());
+		 Eigen::Vector3f boxVec3 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x() + _geometryObject->BoundingBox.BoxExtent.x(),
+			                        _geometryObject->BoundingBox.Origin.y() + _geometryObject->BoundingBox.BoxExtent.y(),
+									_geometryObject->BoundingBox.Origin.z() - _geometryObject->BoundingBox.BoxExtent.z());
+		 Eigen::Vector3f boxVec4 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x() - _geometryObject->BoundingBox.BoxExtent.x(),
+			                        _geometryObject->BoundingBox.Origin.y() + _geometryObject->BoundingBox.BoxExtent.y(),
+									_geometryObject->BoundingBox.Origin.z() - _geometryObject->BoundingBox.BoxExtent.z());
+		 Eigen::Vector3f boxVec5 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x() - _geometryObject->BoundingBox.BoxExtent.x(),
+			                        _geometryObject->BoundingBox.Origin.y() + _geometryObject->BoundingBox.BoxExtent.y(),
+									_geometryObject->BoundingBox.Origin.z() + _geometryObject->BoundingBox.BoxExtent.z());
+		 Eigen::Vector3f boxVec6 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x() - _geometryObject->BoundingBox.BoxExtent.x(),
+			                        _geometryObject->BoundingBox.Origin.y() - _geometryObject->BoundingBox.BoxExtent.y(),
+									_geometryObject->BoundingBox.Origin.z() + _geometryObject->BoundingBox.BoxExtent.z());
+		 Eigen::Vector3f boxVec7 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x() + _geometryObject->BoundingBox.BoxExtent.x(),
+			                        _geometryObject->BoundingBox.Origin.y() - _geometryObject->BoundingBox.BoxExtent.y(),
+									_geometryObject->BoundingBox.Origin.z() + _geometryObject->BoundingBox.BoxExtent.z());
+		 Eigen::Vector3f boxVec8 = _geometryObject->BoundingBox.Origin + _geometryObject->BoundingBox.BoxExtent;
 
 		 GameObjectPtr go = GetBase();
 
@@ -460,7 +460,7 @@ namespace Disorder
 		 boxVec7 = go->GetWorldMatrix() * boxVec7;
 		 boxVec8 = go->GetWorldMatrix() * boxVec8;
 
-		 Vector4 color(1.0f,0,0,1.0f);
+		 Eigen::Vector4f color(1.0f,0,0,1.0f);
 		 GEngine->GameCanvas->DrawLine(boxVec1,color,boxVec2,color);
 		 GEngine->GameCanvas->DrawLine(boxVec2,color,boxVec3,color);
 		 GEngine->GameCanvas->DrawLine(boxVec3,color,boxVec4,color);
@@ -488,29 +488,29 @@ namespace Disorder
 	  {
 		 // draw local axis for debug
 		 GameObjectPtr go = GetBase();
-		 Vector3 original = go->GetLocalPosition();
+		 Eigen::Vector3f original = go->GetLocalPosition();
 		 float AxisLength = 1.0f;
-		 Vector3 xAxis = original + Vector3(AxisLength,0,0);
-		 Vector3 yAxis = original + Vector3(0,AxisLength,0);
-		 Vector3 zAxis = original + Vector3(0,0,AxisLength);
+		 Eigen::Vector3f xAxis = original + Eigen::Vector3f(AxisLength,0,0);
+		 Eigen::Vector3f yAxis = original + Eigen::Vector3f(0,AxisLength,0);
+		 Eigen::Vector3f zAxis = original + Eigen::Vector3f(0,0,AxisLength);
 
 		 original = go->GetWorldMatrix() * original;
 		 xAxis = go->GetWorldMatrix() * xAxis;
 		 yAxis = go->GetWorldMatrix() * yAxis;
 		 zAxis = go->GetWorldMatrix() * zAxis;
 
-		 GEngine->GameCanvas->DrawLine(original,Vector4(1.0f,0,0,1.0f),xAxis,Vector4(1.0f,0,0,1.0f));
-		 GEngine->GameCanvas->DrawLine(original,Vector4(0,1.0f,0,1.0f),yAxis,Vector4(0,1.0f,0,1.0f));
-		 GEngine->GameCanvas->DrawLine(original,Vector4(0,0,1.0f,1.0f),zAxis,Vector4(0,0,1.0f,1.0f));
+		 GEngine->GameCanvas->DrawLine(original,Eigen::Vector4f(1.0f,0,0,1.0f),xAxis,Eigen::Vector4f(1.0f,0,0,1.0f));
+		 GEngine->GameCanvas->DrawLine(original,Eigen::Vector4f(0,1.0f,0,1.0f),yAxis,Eigen::Vector4f(0,1.0f,0,1.0f));
+		 GEngine->GameCanvas->DrawLine(original,Eigen::Vector4f(0,0,1.0f,1.0f),zAxis,Eigen::Vector4f(0,0,1.0f,1.0f));
 
 	//	 Matrix4 ProjectViewMatrix = camera->ProjectMatrix.Transpose() * camera->ViewMatrix.Transpose();
 	//	 xAxis = ProjectViewMatrix * xAxis;
 	//	 yAxis = ProjectViewMatrix * yAxis;
 	//	 zAxis = ProjectViewMatrix * zAxis;
 
-	//	 GEngine->GameCanvas->DrawStringDeviceSpace(Vector2(xAxis.x,xAxis.y),35,Vector4(1.0f,0,0,1.0f),std::string("X"));
-	//	 GEngine->GameCanvas->DrawStringDeviceSpace(Vector2(yAxis.x,yAxis.y),35,Vector4(0,1.0f,0,1.0f),std::string("Y"));
-	//	 GEngine->GameCanvas->DrawStringDeviceSpace(Vector2(zAxis.x,zAxis.y),35,Vector4(0,0,1.0f,1.0f),std::string("Z"));
+	//	 GEngine->GameCanvas->DrawStringDeviceSpace(Eigen::Vector2f(xAxis.x,xAxis.y),35,Eigen::Vector4f(1.0f,0,0,1.0f),std::string("X"));
+	//	 GEngine->GameCanvas->DrawStringDeviceSpace(Eigen::Vector2f(yAxis.x,yAxis.y),35,Eigen::Vector4f(0,1.0f,0,1.0f),std::string("Y"));
+	//	 GEngine->GameCanvas->DrawStringDeviceSpace(Eigen::Vector2f(zAxis.x,zAxis.y),35,Eigen::Vector4f(0,0,1.0f,1.0f),std::string("Z"));
 
 	  }
 

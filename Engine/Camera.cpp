@@ -267,8 +267,8 @@ namespace Disorder
 		ViewMatrix.translation() = - (ViewMatrix.linear() * _eyePos);
 
 		ViewInvMatrix = ViewMatrix.inverse().matrix();
-		ViewProjMatrix =  ProjMatrix * ViewMatrix.matrix();
-		ViewProjInvMatrix = ViewInvMatrix * ProjInvMatrix;
+		ViewProjMatrix.noalias() =  ProjMatrix * ViewMatrix.matrix();
+		ViewProjInvMatrix.noalias() = ViewInvMatrix * ProjInvMatrix;
 		CameraFrustrum.Construct(ViewMatrix.matrix(),ProjMatrix);
 
 		_InvalidViewMatrix = false;
@@ -284,8 +284,8 @@ namespace Disorder
 
 		//GEngine->RenderEngine->AdjustProjMatrix(ProjMatrix);
 		ProjInvMatrix = ProjMatrix.inverse();
-		ViewProjMatrix =  ProjMatrix * ViewMatrix.matrix();
-		ViewProjInvMatrix = ViewInvMatrix * ProjInvMatrix;
+		ViewProjMatrix.noalias() =  ProjMatrix * ViewMatrix.matrix();
+		ViewProjInvMatrix.noalias() = ViewInvMatrix * ProjInvMatrix;
 
 		CameraFrustrum.Construct(ViewMatrix.matrix(),ProjMatrix);
 		_InvalidProjMatrix = false;
@@ -360,13 +360,13 @@ namespace Disorder
 		strstream << "camera: [eyePos](" << (int)_eyePos.x() << "; " <<  (int)_eyePos.y() << "; " <<  (int)_eyePos.z() << ")     [Focus At](" <<  (int)lookAt.x() << ";  "<<  (int)lookAt.y() << ";  " <<  (int)lookAt.z() << ")";
 		if( _updateMode == eFirstPersonMode )
 		{
-			GEngine->GameCanvas->DrawString(0.005f,0.945f,0.04f,Vector4::ONE,"First Person Mode");
+			GEngine->GameCanvas->DrawString(0.005f,0.945f,0.04f,Eigen::Vector4f::Constant(1.f),"First Person Mode");
 		}
 		else if( _updateMode == eSphericalTargetMode )
 		{
-			GEngine->GameCanvas->DrawString(0.005f,0.945f,0.04f,Vector4::ONE,"Spherical Coordinate Mode");
+			GEngine->GameCanvas->DrawString(0.005f,0.945f,0.04f,Eigen::Vector4f::Constant(1.f),"Spherical Coordinate Mode");
 		}
-		GEngine->GameCanvas->DrawString(0.005f,0.965f,0.04f,Vector4::ONE,strstream.str());
+		GEngine->GameCanvas->DrawString(0.005f,0.965f,0.04f,Eigen::Vector4f::Constant(1.f),strstream.str());
  
 	}
 

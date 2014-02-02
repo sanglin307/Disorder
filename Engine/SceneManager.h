@@ -41,7 +41,7 @@ namespace Disorder
 			return _vLightList;
 		}
 
-		void SetAmbientColor(Vector3 const& lowerColor,Vector3 const& upperColor);
+		void SetAmbientColor(Eigen::Vector3f const& lowerColor,Eigen::Vector3f const& upperColor);
 		void UpdateShaderProperty();
 		
 		void DebugDraw();
@@ -62,8 +62,8 @@ namespace Disorder
 
 		SceneImporterPtr _sceneImporter;
 
-		Vector3 _vAmbientLowerColor;
-		Vector3 _vAmbientUpperColor;
+		Eigen::Vector3f _vAmbientLowerColor;
+		Eigen::Vector3f _vAmbientUpperColor;
 
 		ShaderPropertyPtr _sAmbientLowerProperty;
 		ShaderPropertyPtr _sAmbientUpperProperty;

@@ -6,14 +6,15 @@ namespace Disorder
 	class Geometry
 	{
 	public:
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		std::string                             Name;
-		std::vector<Vector3>                    ControllPositions; // Controll point, no duplicate
-		std::vector<int>		                Positions;   // Index to ControllPositions
-		std::vector<Vector4>                    Colors;      
-		std::vector<Vector3>                    Normals;     
-		std::vector<Vector3>                    Tangents;
-		std::vector<Vector3>                    Binormals;  
-		std::vector<Vector2>                    Texcoords;   
+		std::vector<Eigen::Vector3f>                    ControllPositions; // Controll point, no duplicate
+		std::vector<int>		                        Positions;   // Index to ControllPositions
+		std::vector<Eigen::Vector4f>                    Colors;      
+		std::vector<Eigen::Vector3f>                    Normals;     
+		std::vector<Eigen::Vector3f>                    Tangents;
+		std::vector<Eigen::Vector3f>                    Binormals;  
+		std::vector<Eigen::Vector2f>                    Texcoords;   
 		std::vector<unsigned int>				Indices;     // conterclock
 
 		BoxSphereBounds                         BoundingBox;

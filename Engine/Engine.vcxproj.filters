@@ -58,14 +58,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Matrixs.h">
-      <Filter>Mathematics</Filter>
-    </ClInclude>
     <ClInclude Include="Geometry.h">
       <Filter>Geometry</Filter>
-    </ClInclude>
-    <ClInclude Include="Quaternion.h">
-      <Filter>Mathematics</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>GameObject</Filter>
@@ -164,13 +158,7 @@
     <ClInclude Include="RenderEffect.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Vectors.h">
-      <Filter>Mathematics</Filter>
-    </ClInclude>
     <ClInclude Include="Bounds.h">
-      <Filter>Mathematics</Filter>
-    </ClInclude>
-    <ClInclude Include="Plane.h">
       <Filter>Mathematics</Filter>
     </ClInclude>
     <ClInclude Include="RenderPath.h">
@@ -248,9 +236,6 @@
     <ClCompile Include="InputManager.cpp">
       <Filter>GameEngine</Filter>
     </ClCompile>
-    <ClCompile Include="Matrixs.cpp">
-      <Filter>Mathematics</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>RenderSystem</Filter>
     </ClCompile>
@@ -265,12 +250,6 @@
     </ClCompile>
     <ClCompile Include="RenderState.cpp">
       <Filter>RenderSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="Vectors.cpp">
-      <Filter>Mathematics</Filter>
-    </ClCompile>
-    <ClCompile Include="Quaternion.cpp">
-      <Filter>Mathematics</Filter>
     </ClCompile>
     <ClCompile Include="SceneImporter.cpp">
       <Filter>GameEngine</Filter>
@@ -297,9 +276,6 @@
       <Filter>Mathematics</Filter>
     </ClCompile>
     <ClCompile Include="MathLib.cpp">
-      <Filter>Mathematics</Filter>
-    </ClCompile>
-    <ClCompile Include="Plane.cpp">
       <Filter>Mathematics</Filter>
     </ClCompile>
     <ClCompile Include="RenderPath.cpp">

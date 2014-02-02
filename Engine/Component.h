@@ -17,6 +17,7 @@ namespace Disorder
 	class Component
 	{
 	public:
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		Component(std::string const& name,EComponentType componentType);
 
 		virtual ~Component(){};
@@ -37,9 +38,9 @@ namespace Disorder
 		boost::weak_ptr<GameObject> _baseObject;
 
 		// offset transform to gameobject , when using instance, set it to identity
-		Vector3 _vPos;
-		Quaternion _vRot;
-		Vector3 _vScale;
+		Eigen::Vector3f _vPos;
+		Eigen::Quaternionf _vRot;
+		Eigen::Vector3f _vScale;
 	};
 }
 

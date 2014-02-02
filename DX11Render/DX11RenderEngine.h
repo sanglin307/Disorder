@@ -16,7 +16,7 @@ namespace Disorder
 		virtual void OnDrawBegin();
 		virtual void OnDrawEnd();
 
-		virtual void ClearRenderTarget(const RenderSurfacePtr& renderTarget,const Vector4& color );
+		virtual void ClearRenderTarget(const RenderSurfacePtr& renderTarget,const Eigen::Vector4f& color );
 		virtual void ClearDepthStencil(const RenderSurfacePtr& depthBuffer,bool bClearDepth,float depth,bool bClearStencil,unsigned char stencil);
 
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);

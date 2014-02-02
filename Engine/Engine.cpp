@@ -68,7 +68,7 @@ namespace Disorder
 		if( !_bEnable )
 			return;
  
-		Vector4 color(1.0f);
+		Eigen::Vector4f color = Eigen::Vector4f::Constant(1.0f);
 		CanvasPtr canvas = GEngine->GameCanvas;
 
 		std::stringstream strstream;
@@ -98,7 +98,7 @@ namespace Disorder
 	   CanvasPtr canvas = GEngine->GameCanvas;
 	   float x = 10.f;
 	   float y = 10.f;
-	   Vector4 color(1.0f,0,0,1.0f);
+	   Eigen::Vector4f color(1.0f,0,0,1.0f);
 
 	   static int fps = (int)(1/deltaSeconds);
 	   if( timeDelta > 1 )

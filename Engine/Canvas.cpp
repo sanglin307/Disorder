@@ -16,13 +16,13 @@ namespace Disorder
  
 	}
 
-	void Canvas::DrawLine(Vector3 const& beginPos,Vector4 const& beginColor,Vector3 const& endPos,Vector4 const& endColor)
+	void Canvas::DrawLine(Eigen::Vector3f const& beginPos,Eigen::Vector4f const& beginColor,Eigen::Vector3f const& endPos,Eigen::Vector4f const& endColor)
 	{
 		_lineElement.AddLine(beginPos,beginColor,endPos,endColor);
 	}
 
-	void Canvas::DrawTile(Vector3 const& p00, Vector3 const& c00, Vector2 const& t00,Vector3 const& p01, Vector3 const& c01, Vector2 const& t01,
-			      Vector3 const& p10, Vector3 const& c10, Vector2 const& t10,Vector3 const& p11, Vector3 const& c11, Vector2 const& t11,TexturePtr tex)
+	void Canvas::DrawTile(Eigen::Vector3f const& p00, Eigen::Vector3f const& c00, Eigen::Vector2f const& t00,Eigen::Vector3f const& p01, Eigen::Vector3f const& c01, Eigen::Vector2f const& t01,
+			      Eigen::Vector3f const& p10, Eigen::Vector3f const& c10, Eigen::Vector2f const& t10,Eigen::Vector3f const& p11, Eigen::Vector3f const& c11, Eigen::Vector2f const& t11,TexturePtr tex)
 	{
 		if(_tileElementMap.find(tex) == _tileElementMap.end() )
 		{
@@ -66,12 +66,12 @@ namespace Disorder
 		return length/2;
 	}
  
-	void Canvas::DrawString(float xPos,float yPos, float size, Vector4 const& color,std::string const& str)
+	void Canvas::DrawString(float xPos,float yPos, float size, Eigen::Vector4f const& color,std::string const& str)
 	{
 		BOOST_ASSERT(xPos <=1.f && yPos <= 1.0f && size <= 1.0f);
 		//draw string x[-1.0,1.0] and y[-1.0,1.0] z = 0.0
 		
-		Vector2 pos = Vector2((xPos - 0.5f)*2.0f,(yPos - 0.5f)*(-2.0f));
+		Eigen::Vector2f pos = Eigen::Vector2f((xPos - 0.5f)*2.0f,(yPos - 0.5f)*(-2.0f));
 		// we draw char one by one
 		for(unsigned int index=0;index<str.length();index++)
 		{
@@ -79,7 +79,7 @@ namespace Disorder
 
 			if( c == 0x20) // Space
 			{
-				pos.x += size/10;
+				pos.x() += size/10;
 				continue;
 			}
 
@@ -87,12 +87,12 @@ namespace Disorder
 			 
 			// clockwise
 			float drawSizeX = size * rect.aspectRatio * 0.9f ;
-			_stringElement.AddVertex(Vector3(pos.x,pos.y,0.f),color,Vector2(rect.uvRect.left,rect.uvRect.top));
-			_stringElement.AddVertex(Vector3(pos.x+drawSizeX,pos.y,0.f),color,Vector2(rect.uvRect.right,rect.uvRect.top));
-			_stringElement.AddVertex(Vector3(pos.x,pos.y-size,0.f),color,Vector2(rect.uvRect.left,rect.uvRect.bottom));
-			_stringElement.AddVertex(Vector3(pos.x+drawSizeX,pos.y - size,0.f),color,Vector2(rect.uvRect.right,rect.uvRect.bottom));
+			_stringElement.AddVertex(Eigen::Vector3f(pos.x(),pos.y(),0.f),color,Eigen::Vector2f(rect.uvRect.left,rect.uvRect.top));
+			_stringElement.AddVertex(Eigen::Vector3f(pos.x()+drawSizeX,pos.y(),0.f),color,Eigen::Vector2f(rect.uvRect.right,rect.uvRect.top));
+			_stringElement.AddVertex(Eigen::Vector3f(pos.x(),pos.y()-size,0.f),color,Eigen::Vector2f(rect.uvRect.left,rect.uvRect.bottom));
+			_stringElement.AddVertex(Eigen::Vector3f(pos.x()+drawSizeX,pos.y() - size,0.f),color,Eigen::Vector2f(rect.uvRect.right,rect.uvRect.bottom));
 
-			pos.x += drawSizeX;
+			pos.x() += drawSizeX;
 
 		}
 	}

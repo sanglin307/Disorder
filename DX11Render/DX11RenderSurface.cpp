@@ -126,36 +126,36 @@ namespace Disorder
 
 		std::vector<TileTexVertex> tilePos;
 		TileTexVertex vertex;
-		vertex.position = Vector3(-0.55f, -0.55f,0.f);
-		vertex.texcoord = Vector2(1.f,0.f);
+		vertex.position = Eigen::Vector3f(-0.55f, -0.55f,0.f);
+		vertex.texcoord = Eigen::Vector2f(1.f,0.f);
 		tilePos.push_back(vertex);
-		vertex.position = Vector3(-0.95f, -0.55f,0.0f);
-		vertex.texcoord = Vector2(0.f,0.f);
+		vertex.position = Eigen::Vector3f(-0.95f, -0.55f,0.0f);
+		vertex.texcoord = Eigen::Vector2f(0.f,0.f);
 		tilePos.push_back(vertex);
-		vertex.position = Vector3(-0.55f, -0.95f,0.0f);
-		vertex.texcoord = Vector2(1.f,1.0f);
+		vertex.position = Eigen::Vector3f(-0.55f, -0.95f,0.0f);
+		vertex.texcoord = Eigen::Vector2f(1.f,1.0f);
 		tilePos.push_back(vertex);
-		vertex.position = Vector3(-0.95f, -0.95f,0.0f);
-		vertex.texcoord = Vector2(0.0f,1.0f);
+		vertex.position = Eigen::Vector3f(-0.95f, -0.95f,0.0f);
+		vertex.texcoord = Eigen::Vector2f(0.0f,1.0f);
 		tilePos.push_back(vertex);
 		_DepthVisTile = SimpleTile("GBufferDepthTile",tilePos,_GBufferVisualEffect);
 
-		tilePos[0].position = Vector3(-0.05f,-0.55f,0.0f);
-		tilePos[1].position = Vector3(-0.45f,-0.55f,0.0f);
-		tilePos[2].position = Vector3(-0.05f,-0.95f,0.0f);
-		tilePos[3].position = Vector3(-0.45f,-0.95f,0.0f);
+		tilePos[0].position = Eigen::Vector3f(-0.05f,-0.55f,0.0f);
+		tilePos[1].position = Eigen::Vector3f(-0.45f,-0.55f,0.0f);
+		tilePos[2].position = Eigen::Vector3f(-0.05f,-0.95f,0.0f);
+		tilePos[3].position = Eigen::Vector3f(-0.45f,-0.95f,0.0f);
 		_ColorVisTile = SimpleTile("GBufferColorTile",tilePos,_GBufferVisualEffect);
 
-		tilePos[0].position = Vector3(0.45f,-0.55f,0.0f);
-		tilePos[1].position = Vector3(0.05f,-0.55f,0.0f);
-		tilePos[2].position = Vector3(0.45f,-0.95f,0.0f);
-		tilePos[3].position = Vector3(0.05f,-0.95f,0.0f);
+		tilePos[0].position = Eigen::Vector3f(0.45f,-0.55f,0.0f);
+		tilePos[1].position = Eigen::Vector3f(0.05f,-0.55f,0.0f);
+		tilePos[2].position = Eigen::Vector3f(0.45f,-0.95f,0.0f);
+		tilePos[3].position = Eigen::Vector3f(0.05f,-0.95f,0.0f);
 		_NormalVisTile = SimpleTile("GBufferNormalTile",tilePos,_GBufferVisualEffect);
 	
-		tilePos[0].position = Vector3(0.95f,-0.55f,0.0f);
-		tilePos[1].position = Vector3(0.55f,-0.55f,0.0f);
-		tilePos[2].position = Vector3(0.95f,-0.95f,0.0f);
-		tilePos[3].position = Vector3(0.55f,-0.95f,0.0f);
+		tilePos[0].position = Eigen::Vector3f(0.95f,-0.55f,0.0f);
+		tilePos[1].position = Eigen::Vector3f(0.55f,-0.55f,0.0f);
+		tilePos[2].position = Eigen::Vector3f(0.95f,-0.95f,0.0f);
+		tilePos[3].position = Eigen::Vector3f(0.55f,-0.95f,0.0f);
 		_SpecPowVisTile = SimpleTile("GBufferSpeclTile",tilePos,_GBufferVisualEffect);
  
 	}

@@ -617,10 +617,10 @@ namespace Disorder
 		    _pImmediateContext->OMSetRenderTargets(1,&pView,dxDepthStencil->DepthStencilView.get());
 	}
 
-	void DX11RenderEngine::ClearRenderTarget(const RenderSurfacePtr& renderTarget,const Vector4& color )
+	void DX11RenderEngine::ClearRenderTarget(const RenderSurfacePtr& renderTarget,const Eigen::Vector4f& color )
 	{
 		DX11RenderSurfacePtr dxRenderTarget = boost::dynamic_pointer_cast<DX11RenderSurface>(renderTarget);
-		_pImmediateContext->ClearRenderTargetView(dxRenderTarget->RenderTargetView.get(), color.Ptr() );
+		_pImmediateContext->ClearRenderTargetView(dxRenderTarget->RenderTargetView.get(), color.data() );
 	}
 
 	void DX11RenderEngine::ClearDepthStencil(const RenderSurfacePtr& depthBuffer,bool bClearDepth,float depth,bool bClearStencil,unsigned char stencil)

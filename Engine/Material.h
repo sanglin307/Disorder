@@ -11,10 +11,10 @@ namespace Disorder
 		 std::string ShaderModel;
  
 		 // input 
-		 Vector3 DiffuseColor;
-		 Vector3 EmissiveColor;
-		 Vector3 SpecularColor;
-		 Vector3 ReflectionColor;
+		 Eigen::Vector3f DiffuseColor;
+		 Eigen::Vector3f EmissiveColor;
+		 Eigen::Vector3f SpecularColor;
+		 Eigen::Vector3f ReflectionColor;
 
 		 float SpecularExp;
 		 float Transparency;

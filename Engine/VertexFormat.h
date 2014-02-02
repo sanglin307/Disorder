@@ -5,21 +5,24 @@ namespace Disorder
 {
 	struct BatchTileVertex
 	{
-		Vector3 position;
-		Vector4 color;
-		Vector2 texcoord;
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+		Eigen::Vector3f position;
+		Eigen::Vector4f color;
+		Eigen::Vector2f texcoord;
 	};
 
 	struct BatchLineVertex
 	{
-		Vector3 position;
-		Vector4 color;
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+		Eigen::Vector3f position;
+		Eigen::Vector4f color;
 	};
 
 	struct TileTexVertex
 	{
-		Vector3 position;
-		Vector2 texcoord;
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+		Eigen::Vector3f position;
+		Eigen::Vector2f texcoord;
 	};
 
 

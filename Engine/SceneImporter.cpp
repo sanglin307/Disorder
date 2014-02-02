@@ -158,7 +158,7 @@ namespace Disorder
 		FbxAxisSystem::EFrontVector frontVec = rAxisSystem.GetFrontVector(frontSign);
 
 		FbxColor ambient = rGlobalSetting.GetAmbientColor();
-		level->SetAmbientColor(Vector4(ambient.mRed,ambient.mGreen,ambient.mBlue,ambient.mAlpha));
+		level->SetAmbientColor(Eigen::Vector4f((float)ambient.mRed,(float)ambient.mGreen,(float)ambient.mBlue,(float)ambient.mAlpha));
  
 	}
 
@@ -298,7 +298,7 @@ namespace Disorder
 		// Vertex read
 		for(int i=0;i<vertexCount;i++)
 		{
-			geometry->ControllPositions.push_back(Vector3(lControlPoints[i][0],lControlPoints[i][1],lControlPoints[i][2]));
+			geometry->ControllPositions.push_back(Eigen::Vector3f((float)lControlPoints[i][0],(float)lControlPoints[i][1],(float)lControlPoints[i][2]));
 		}
  
 		// calculate bounding box
@@ -334,7 +334,7 @@ namespace Disorder
 								case FbxGeometryElement::eDirect:
 									{
 										FbxColor fColor = leVtxc->GetDirectArray().GetAt(lControlPointIndex);
-										Vector4 color(fColor.mRed,fColor.mGreen,fColor.mBlue,fColor.mAlpha);
+										Eigen::Vector4f color((float)fColor.mRed,(float)fColor.mGreen,(float)fColor.mBlue,(float)fColor.mAlpha);
 										geometry->Colors.push_back(color);
 										break;
 									}
@@ -342,7 +342,7 @@ namespace Disorder
 									{
 										int id = leVtxc->GetIndexArray().GetAt(lControlPointIndex);
 										FbxColor fColor = leVtxc->GetDirectArray().GetAt(id);
-										Vector4 color(fColor.mRed,fColor.mGreen,fColor.mBlue,fColor.mAlpha);
+										Eigen::Vector4f color((float)fColor.mRed,(float)fColor.mGreen,(float)fColor.mBlue,(float)fColor.mAlpha);
 										geometry->Colors.push_back(color);
 										break;
 									}
@@ -359,7 +359,7 @@ namespace Disorder
 									case FbxGeometryElement::eDirect:
 										{
 											FbxColor fColor = leVtxc->GetDirectArray().GetAt(vertexId);
-											Vector4 color(fColor.mRed,fColor.mGreen,fColor.mBlue,fColor.mAlpha);
+											Eigen::Vector4f color((float)fColor.mRed,(float)fColor.mGreen,(float)fColor.mBlue,(float)fColor.mAlpha);
 											geometry->Colors.push_back(color);
 										}
 										break;
@@ -367,7 +367,7 @@ namespace Disorder
 										{
 											int id = leVtxc->GetIndexArray().GetAt(vertexId);
 											FbxColor fColor = leVtxc->GetDirectArray().GetAt(id);
-											Vector4 color(fColor.mRed,fColor.mGreen,fColor.mBlue,fColor.mAlpha);
+											Eigen::Vector4f color((float)fColor.mRed,(float)fColor.mGreen,(float)fColor.mBlue,(float)fColor.mAlpha);
 											geometry->Colors.push_back(color);
 										}
 										break;
@@ -399,7 +399,7 @@ namespace Disorder
 							case FbxGeometryElement::eDirect:
 								{
 									FbxVector2 uv = leUV->GetDirectArray().GetAt(lControlPointIndex);
-									Vector2 vuv(uv[0],uv[1]);
+									Eigen::Vector2f vuv((float)uv[0],(float)uv[1]);
 									geometry->Texcoords.push_back(vuv);
 								}
 								break;
@@ -407,7 +407,7 @@ namespace Disorder
 								{
 									int id = leUV->GetIndexArray().GetAt(lControlPointIndex);
 									FbxVector2 uv = leUV->GetDirectArray().GetAt(id);
-									Vector2 vuv(uv[0],uv[1]);
+									Eigen::Vector2f vuv((float)uv[0],(float)uv[1]);
 									geometry->Texcoords.push_back(vuv);
 								}
 								break;
@@ -426,7 +426,7 @@ namespace Disorder
 								case FbxGeometryElement::eIndexToDirect:
 									{
 										FbxVector2 uv = leUV->GetDirectArray().GetAt(lTextureUVIndex);
-										Vector2 vuv(uv[0],uv[1]);
+										Eigen::Vector2f vuv((float)uv[0],(float)uv[1]);
 										geometry->Texcoords.push_back(vuv);
 									}
 									break;
@@ -458,7 +458,7 @@ namespace Disorder
 								{
 									FbxVector4 normal = leNormal->GetDirectArray().GetAt(vertexId);
 									normal.Normalize();
-									Vector3 vNormal(normal[0],normal[1],normal[2]);
+									Eigen::Vector3f vNormal((float)normal[0],(float)normal[1],(float)normal[2]);
 									geometry->Normals.push_back(vNormal);
 								}
 								break;
@@ -467,7 +467,7 @@ namespace Disorder
 									int id = leNormal->GetIndexArray().GetAt(vertexId);
 									FbxVector4 normal = leNormal->GetDirectArray().GetAt(id);
 									normal.Normalize();
-									Vector3 vNormal(normal[0],normal[1],normal[2]);
+									Eigen::Vector3f vNormal((float)normal[0],(float)normal[1],(float)normal[2]);
 									geometry->Normals.push_back(vNormal);
 								}
 								break;
@@ -484,7 +484,7 @@ namespace Disorder
 								{
 									FbxVector4 normal = leNormal->GetDirectArray().GetAt(lControlPointIndex);
 									normal.Normalize();
-								    Vector3 vNormal(normal[0],normal[1],normal[2]);
+								    Eigen::Vector3f vNormal((float)normal[0],(float)normal[1],(float)normal[2]);
 								    geometry->Normals.push_back(vNormal);
 								}
 								break;
@@ -493,7 +493,7 @@ namespace Disorder
 									int id = leNormal->GetIndexArray().GetAt(lControlPointIndex);
 									FbxVector4 normal = leNormal->GetDirectArray().GetAt(id);
 									normal.Normalize();
-									Vector3 vNormal(normal[0],normal[1],normal[2]);
+									Eigen::Vector3f vNormal((float)normal[0],(float)normal[1],(float)normal[2]);
 									geometry->Normals.push_back(vNormal);
 								}
 								break;
@@ -520,7 +520,7 @@ namespace Disorder
 								{
 									FbxVector4 tangent = leTangent->GetDirectArray().GetAt(vertexId);
 									tangent.Normalize();
-									Vector3 vTangent(tangent[0],tangent[1],tangent[2]);
+									Eigen::Vector3f vTangent((float)tangent[0],(float)tangent[1],(float)tangent[2]);
 									geometry->Tangents.push_back(vTangent);
 								}
 								break;
@@ -529,7 +529,7 @@ namespace Disorder
 									int id = leTangent->GetIndexArray().GetAt(vertexId);
 									FbxVector4 tangent = leTangent->GetDirectArray().GetAt(id);
 									tangent.Normalize();
-									Vector3 vTangent(tangent[0],tangent[1],tangent[2]);
+									Eigen::Vector3f vTangent((float)tangent[0],(float)tangent[1],(float)tangent[2]);
 									geometry->Tangents.push_back(vTangent);
 								}
 								break;
@@ -546,7 +546,7 @@ namespace Disorder
 								{
 									FbxVector4 tangent = leTangent->GetDirectArray().GetAt(lControlPointIndex);
 									tangent.Normalize();
-									Vector3 vTangent(tangent[0],tangent[1],tangent[2]);
+									Eigen::Vector3f vTangent((float)tangent[0],(float)tangent[1],(float)tangent[2]);
 									geometry->Tangents.push_back(vTangent);
 								}
 								break;
@@ -555,7 +555,7 @@ namespace Disorder
 									int id = leTangent->GetIndexArray().GetAt(lControlPointIndex);
 									FbxVector4 tangent = leTangent->GetDirectArray().GetAt(id);
 									tangent.Normalize();
-									Vector3 vTangent(tangent[0],tangent[1],tangent[2]);
+									Eigen::Vector3f vTangent((float)tangent[0],(float)tangent[1],(float)tangent[2]);
 									geometry->Tangents.push_back(vTangent);
 								}
 								break;
@@ -584,7 +584,7 @@ namespace Disorder
 								{
 									FbxVector4 binormal = leBinormal->GetDirectArray().GetAt(vertexId);
 									binormal.Normalize();
-									Vector3 vBinormal(binormal[0],binormal[1],binormal[2]);
+									Eigen::Vector3f vBinormal((float)binormal[0],(float)binormal[1],(float)binormal[2]);
 									geometry->Binormals.push_back(vBinormal);
 								}
 								break;
@@ -593,7 +593,7 @@ namespace Disorder
 									int id = leBinormal->GetIndexArray().GetAt(vertexId);
 									FbxVector4 binormal = leBinormal->GetDirectArray().GetAt(id);
 									binormal.Normalize();
-									Vector3 vBinormal(binormal[0],binormal[1],binormal[2]);
+									Eigen::Vector3f vBinormal((float)binormal[0],(float)binormal[1],(float)binormal[2]);
 									geometry->Binormals.push_back(vBinormal);
 								}
 								break;
@@ -610,7 +610,7 @@ namespace Disorder
 								{
 									FbxVector4 binormal = leBinormal->GetDirectArray().GetAt(lControlPointIndex);
 									binormal.Normalize();
-									Vector3 vBinormal(binormal[0],binormal[1],binormal[2]);
+									Eigen::Vector3f vBinormal((float)binormal[0],(float)binormal[1],(float)binormal[2]);
 									geometry->Binormals.push_back(vBinormal);
 								}
 								break;
@@ -619,7 +619,7 @@ namespace Disorder
 									int id = leBinormal->GetIndexArray().GetAt(lControlPointIndex);
 									FbxVector4 binormal = leBinormal->GetDirectArray().GetAt(id);
 									binormal.Normalize();
-									Vector3 vBinormal(binormal[0],binormal[1],binormal[2]);
+									Eigen::Vector3f vBinormal((float)binormal[0],(float)binormal[1],(float)binormal[2]);
 									geometry->Binormals.push_back(vBinormal);
 								}
 								break;
@@ -675,9 +675,9 @@ namespace Disorder
 		 {
 			 PointLightPtr lightObj = PointLight::Create(gameObject->Name);
 			 lightObj->Range = 10;
-			 lightObj->Color.x = (float)lLight->Color.Get()[0];
-		     lightObj->Color.y = (float)lLight->Color.Get()[1];
-		     lightObj->Color.z = (float)lLight->Color.Get()[2];
+			 lightObj->Color.x() = (float)lLight->Color.Get()[0];
+		     lightObj->Color.y()= (float)lLight->Color.Get()[1];
+		     lightObj->Color.z() = (float)lLight->Color.Get()[2];
 
 		     lightObj->Intensity = (float)lLight->Intensity.Get()/100.f;
 			 gameObject->AddComponent(lightObj);
@@ -685,9 +685,9 @@ namespace Disorder
 		 else if(lLight->LightType.Get() == FbxLight::eDirectional )
 		 {
 			 DirectionLightPtr lightObj = DirectionLight::Create(gameObject->Name);
-			 lightObj->Color.x = (float)lLight->Color.Get()[0];
-		     lightObj->Color.y = (float)lLight->Color.Get()[1];
-		     lightObj->Color.z = (float)lLight->Color.Get()[2];
+			 lightObj->Color.x() = (float)lLight->Color.Get()[0];
+		     lightObj->Color.y() = (float)lLight->Color.Get()[1];
+		     lightObj->Color.z() = (float)lLight->Color.Get()[2];
 
 		     lightObj->Intensity = (float)lLight->Intensity.Get()/100.f;
 			 gameObject->AddComponent(lightObj);
@@ -696,9 +696,9 @@ namespace Disorder
 		 {
 			 SpotLightPtr lightObj = SpotLight::Create(gameObject->Name);
 			 lightObj->Range = 10;
-			 lightObj->Color.x = (float)lLight->Color.Get()[0];
-		     lightObj->Color.y = (float)lLight->Color.Get()[1];
-		     lightObj->Color.z = (float)lLight->Color.Get()[2];
+			 lightObj->Color.x() = (float)lLight->Color.Get()[0];
+		     lightObj->Color.y() = (float)lLight->Color.Get()[1];
+		     lightObj->Color.z() = (float)lLight->Color.Get()[2];
 
 		     lightObj->Intensity = (float)lLight->Intensity.Get()/100.f;
 			 lightObj->SpotInnerAngle = (float)lLight->InnerAngle.Get();
@@ -887,19 +887,19 @@ namespace Disorder
 					FbxSurfacePhong* lPhoneMaterial = (FbxSurfacePhong *) lMaterial;
  
 					// Display the Diffuse Color
-					material->DiffuseColor.x = (float)lPhoneMaterial->Diffuse.Get()[0];
-					material->DiffuseColor.y = (float)lPhoneMaterial->Diffuse.Get()[1];
-					material->DiffuseColor.z = (float)lPhoneMaterial->Diffuse.Get()[2];
+					material->DiffuseColor.x() = (float)lPhoneMaterial->Diffuse.Get()[0];
+					material->DiffuseColor.y() = (float)lPhoneMaterial->Diffuse.Get()[1];
+					material->DiffuseColor.z() = (float)lPhoneMaterial->Diffuse.Get()[2];
 
 					// Display the Specular Color (unique to Phong materials)
-					material->SpecularColor.x = (float)lPhoneMaterial->Specular.Get()[0];
-					material->SpecularColor.y = (float)lPhoneMaterial->Specular.Get()[1];
-					material->SpecularColor.z = (float)lPhoneMaterial->Specular.Get()[2];
+					material->SpecularColor.x() = (float)lPhoneMaterial->Specular.Get()[0];
+					material->SpecularColor.y() = (float)lPhoneMaterial->Specular.Get()[1];
+					material->SpecularColor.z() = (float)lPhoneMaterial->Specular.Get()[2];
 
 					// Display the Emissive Color
-					material->EmissiveColor.x = (float)lPhoneMaterial->Emissive.Get()[0];
-					material->EmissiveColor.y = (float)lPhoneMaterial->Emissive.Get()[1];
-					material->EmissiveColor.z = (float)lPhoneMaterial->Emissive.Get()[2];
+					material->EmissiveColor.x() = (float)lPhoneMaterial->Emissive.Get()[0];
+					material->EmissiveColor.y() = (float)lPhoneMaterial->Emissive.Get()[1];
+					material->EmissiveColor.z() = (float)lPhoneMaterial->Emissive.Get()[2];
 
 					//Opacity is Transparency factor now
 					material->Transparency = (float)(lPhoneMaterial->TransparencyFactor.Get());
@@ -919,14 +919,14 @@ namespace Disorder
 					FbxSurfaceLambert* lLambertMaterial = (FbxSurfaceLambert *)lMaterial;
 
 					// Display the Diffuse Color
-					material->DiffuseColor.x = (float)lLambertMaterial->Diffuse.Get()[0];
-					material->DiffuseColor.y = (float)lLambertMaterial->Diffuse.Get()[1];
-					material->DiffuseColor.z = (float)lLambertMaterial->Diffuse.Get()[2];
+					material->DiffuseColor.x() = (float)lLambertMaterial->Diffuse.Get()[0];
+					material->DiffuseColor.y() = (float)lLambertMaterial->Diffuse.Get()[1];
+					material->DiffuseColor.z() = (float)lLambertMaterial->Diffuse.Get()[2];
 
 					// Display the Emissive
-					material->EmissiveColor.x = (float)lLambertMaterial->Emissive.Get()[0];
-					material->EmissiveColor.y = (float)lLambertMaterial->Emissive.Get()[1];
-					material->EmissiveColor.z = (float)lLambertMaterial->Emissive.Get()[2];
+					material->EmissiveColor.x() = (float)lLambertMaterial->Emissive.Get()[0];
+					material->EmissiveColor.y() = (float)lLambertMaterial->Emissive.Get()[1];
+					material->EmissiveColor.z() = (float)lLambertMaterial->Emissive.Get()[2];
 
 					// Display the Opacity
 					material->Transparency = (float)(lLambertMaterial->TransparencyFactor.Get());
@@ -997,14 +997,13 @@ namespace Disorder
 		// now we don't take care of pose information
 		FbxVector4 lGeometryPostion = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);
 		FbxVector4 lTmpVector = pNode->EvaluateLocalTranslation();
-		Vector3 position(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
+		Eigen::Vector3f position((float)lTmpVector[0],(float)lTmpVector[1],(float)lTmpVector[2]);
 		lTmpVector =  pNode->EvaluateLocalRotation();
-		Matrix3 rotMatrix;
-		rotMatrix.FromEulerAnglesXYZ((float)lTmpVector[0]*Math::fDeg2Rad,(float)lTmpVector[1]*Math::fDeg2Rad,(float)lTmpVector[2]*Math::fDeg2Rad);
-		Quaternion rot;
-		rot.FromRotationMatrix(rotMatrix);
+		Eigen::Quaternionf rot =  Eigen::AngleAxisf((float)lTmpVector[0]*Math::fDeg2Rad,Eigen::Vector3f::UnitX()) *   
+					              Eigen::AngleAxisf((float)lTmpVector[1]*Math::fDeg2Rad,Eigen::Vector3f::UnitY()) *  
+								  Eigen::AngleAxisf((float)lTmpVector[2]*Math::fDeg2Rad,Eigen::Vector3f::UnitZ());    
 		lTmpVector = pNode->EvaluateLocalScaling();
-		Vector3 scale(lTmpVector[0],lTmpVector[1],lTmpVector[2]);
+		Eigen::Vector3f scale((float)lTmpVector[0],(float)lTmpVector[1],(float)lTmpVector[2]);
 		std::string name(pNode->GetName());
 		GameObjectPtr gameObject = GameObject::Create(name,position,rot,scale);
 		return gameObject;

@@ -6,6 +6,7 @@ namespace Disorder
 	class Renderer : public Component
 	{
 	public:
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		Renderer(std::string const& name);
 		virtual ~Renderer(){};
 
@@ -67,13 +68,13 @@ namespace Disorder
 
 		void SetTexture(RenderSurfacePtr const& texture);
 		 
-		void AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord);
+		void AddVertex(Eigen::Vector3f const& position,Eigen::Vector4f const& color,Eigen::Vector2f const& texcoord);
 		virtual void Render(CameraPtr const& camera);
  
 		unsigned int GetCurrentDrawTriNumber();
 
 	protected:
-		std::vector<BatchTileVertex> _vertexs;
+		std::vector<BatchTileVertex,Eigen::aligned_allocator<BatchTileVertex>> _vertexs;
 		std::vector<WORD> _indexs;
 		unsigned int _savedVertexBufferSize;
 		unsigned int _savedIndexBufferSize;
@@ -89,7 +90,7 @@ namespace Disorder
 
 		void SetTexture(RenderSurfacePtr const& texture);
 		 
-		void AddVertex(Vector3 const& position,Vector4 const& color,Vector2 const& texcoord);
+		void AddVertex(Eigen::Vector3f const& position,Eigen::Vector4f const& color,Eigen::Vector2f const& texcoord);
 		virtual void Render(CameraPtr const& camera);
 
 		 
@@ -97,7 +98,7 @@ namespace Disorder
 
 	protected:
 		BatchScreenTiles(std::string const& name);
-		std::vector<BatchTileVertex> _vertexs;
+		std::vector<BatchTileVertex,Eigen::aligned_allocator<BatchTileVertex>> _vertexs;
 		std::vector<WORD> _indexs;
 		unsigned int _savedVertexBufferSize;
 		unsigned int _savedIndexBufferSize;
@@ -108,12 +109,12 @@ namespace Disorder
 	{
 	public:
 		BatchLines(std::string const& name);
-		void AddLine(Vector3 const& beginPos,Vector4 const& beginColor,Vector3 const& endPos,Vector4 const& endColor);
+		void AddLine(Eigen::Vector3f const& beginPos,Eigen::Vector4f const& beginColor,Eigen::Vector3f const& endPos,Eigen::Vector4f const& endColor);
 		virtual void Render(CameraPtr const& camera);
 
 	 
 	private:
-		std::vector<BatchLineVertex> _vertexs;
+		std::vector<BatchLineVertex,Eigen::aligned_allocator<BatchLineVertex>> _vertexs;
 		unsigned int _savedVertexBufferSize;
 	};
 
