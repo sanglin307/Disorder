@@ -24,18 +24,22 @@ namespace Disorder
 		std::vector<D3D11_INPUT_ELEMENT_DESC> vElementDes;
 
 		int inputSlot = 0;
-
+		unsigned int offset = 0;
 		for(unsigned int index=0;index<shaderReflection->InputSignatureParameters.size();index++)
 		{
 			D3D11_INPUT_ELEMENT_DESC desc;
 			desc.SemanticName = shaderReflection->InputSignatureParameters[index].SemanticName.c_str();
 			desc.SemanticIndex = shaderReflection->InputSignatureParameters[index].SemanticIndex;
-			desc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 			desc.Format =  pLayout->GetInputFormat(shaderReflection->InputSignatureParameters[index].ComponentType,shaderReflection->InputSignatureParameters[index].Mask);
 			if( soloBuffer )
-			    desc.InputSlot = 0;
+			{
+			   desc.InputSlot = 0;
+			   desc.AlignedByteOffset = offset;
+			   offset += 16; // 128bit
+			}
 			else
 			{
+				desc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 				desc.InputSlot = inputSlot;
 				inputSlot++;
 			}

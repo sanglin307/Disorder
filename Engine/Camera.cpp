@@ -269,7 +269,7 @@ namespace Disorder
 		ViewInvMatrix = ViewMatrix.inverse().matrix();
 		ViewProjMatrix.noalias() =  ProjMatrix * ViewMatrix.matrix();
 		ViewProjInvMatrix.noalias() = ViewInvMatrix * ProjInvMatrix;
-		CameraFrustrum.Construct(ViewMatrix.matrix(),ProjMatrix);
+		CameraFrustrum.Construct(ViewProjInvMatrix);
 
 		_InvalidViewMatrix = false;
 
@@ -282,12 +282,12 @@ namespace Disorder
  
 		ProjMatrix = Math::ProjFovRH(_FOV,_aspectRatio,_nearPlane,_farPlane);
 
-		//GEngine->RenderEngine->AdjustProjMatrix(ProjMatrix);
+		GEngine->RenderEngine->AdjustProjMatrix(ProjMatrix);
 		ProjInvMatrix = ProjMatrix.inverse();
 		ViewProjMatrix.noalias() =  ProjMatrix * ViewMatrix.matrix();
 		ViewProjInvMatrix.noalias() = ViewInvMatrix * ProjInvMatrix;
 
-		CameraFrustrum.Construct(ViewMatrix.matrix(),ProjMatrix);
+		CameraFrustrum.Construct(ViewProjInvMatrix);
 		_InvalidProjMatrix = false;
 
 	}
@@ -367,7 +367,6 @@ namespace Disorder
 			GEngine->GameCanvas->DrawString(0.005f,0.945f,0.04f,Eigen::Vector4f::Constant(1.f),"Spherical Coordinate Mode");
 		}
 		GEngine->GameCanvas->DrawString(0.005f,0.965f,0.04f,Eigen::Vector4f::Constant(1.f),strstream.str());
- 
 	}
 
 	void Camera::Update(float delta)

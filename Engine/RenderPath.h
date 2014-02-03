@@ -62,6 +62,7 @@ namespace Disorder
 	class DeferredShading : public RenderPath
 	{
 	public:
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		virtual void Render();
 		static DeferredShadingPtr Create();
 	protected:

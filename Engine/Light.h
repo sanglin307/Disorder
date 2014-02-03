@@ -23,7 +23,7 @@ namespace Disorder
 	class Light : public Component
 	{
 	public:
-		
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		ELightType LightType;
 		Eigen::Vector3f   Color;
 		float     Intensity; 

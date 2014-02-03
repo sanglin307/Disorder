@@ -14,6 +14,7 @@ namespace Disorder
 		typedef boost::unordered_map<std::string,CameraPtr> CameraMap;
 
 	public:
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		void Init();
 		void Exit();
 	    void Tick(float deltaSeconds);

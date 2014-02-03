@@ -52,7 +52,8 @@ namespace Disorder
 
 		const RenderBufferPtr & vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
 		void* vertexBuffer = renderEngine->Map(vertexRenderBuffer,BA_Write_Only);
-		memcpy(vertexBuffer,_vertexs.data(),_vertexs.size()*sizeof(BatchTileVertex));
+		unsigned int length = _vertexs.size()*sizeof(BatchTileVertex);
+		memcpy(vertexBuffer,_vertexs.data(),length);
 		renderEngine->UnMap(vertexRenderBuffer);
 
 		const RenderBufferPtr & indexRenderBuffer = _renderLayout->GetIndexBuffer();

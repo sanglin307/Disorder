@@ -7,6 +7,7 @@ namespace Disorder
 	class SurfaceMaterial
 	{
 	public:
+		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
          std::string Name;
 		 std::string ShaderModel;
  

@@ -44,7 +44,7 @@ namespace Disorder
 		renderObjList.reserve(_vRenderObjects.size());
 		for(size_t i=0;i<_vRenderObjects.size();i++)
 		{
-			//if(_vRenderObjects[i]->Overlaps(camera->CameraFrustrum))
+			if(_vRenderObjects[i]->Overlaps(camera->CameraFrustrum))
 				renderObjList.push_back(_vRenderObjects[i]);
 		}
 	}
