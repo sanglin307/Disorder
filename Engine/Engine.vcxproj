@@ -27,7 +27,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -43,6 +43,9 @@
     <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
     <IncludePath>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;..\..\External\oiio\src\include;$(FBXSDK)\include;..\..\External\openEXR\lib\include;..\..\External\eigen3.2;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;..\..\External\oiio\src\include;$(FBXSDK)\include;..\..\External\openEXR\lib\include;..\..\External\eigen3.2;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -51,8 +54,11 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FBXSDK_NEW_API;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>EngineInclude.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Zm160 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Zm170 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -73,7 +79,10 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FBXSDK_NEW_API;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>EngineInclude.h</PrecompiledHeaderFile>
+      <AdditionalOptions>-Zm170 %(AdditionalOptions)</AdditionalOptions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

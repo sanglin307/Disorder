@@ -86,11 +86,8 @@ namespace Disorder
 
    void EngineStat::Tick(float deltaSeconds)
    {
-	   if( !_bEnable )
-		   return;
-
 	   static int frameCount = 0;
-	   static float timeDelta = 0.0f;
+	   static double timeDelta = 0.0;
 
 	   timeDelta += deltaSeconds;
 	   frameCount ++;
@@ -105,11 +102,11 @@ namespace Disorder
 	   {
 		   fps = (int)(frameCount/timeDelta);
 		   frameCount = 0;
-		   timeDelta = 0.0f;
+		   timeDelta = 0.0;
 	   }
 
 	    std::stringstream strstream;
-		strstream << "Fps:" << fps;
+		strstream << "Fps:" << fps << "  Frame Delta:"<< deltaSeconds;
 		canvas->DrawString(0.01f,0.01f,0.04f,color,strstream.str());
 		strstream.clear();
 

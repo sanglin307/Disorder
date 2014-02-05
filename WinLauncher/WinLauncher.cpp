@@ -1,7 +1,7 @@
 #include "WinLauncher.h"
 
 
-void PeekMessage()
+void AppPeekMessage()
 {
 	MSG Msg;
 	while( PeekMessage(&Msg,NULL,0,0,PM_REMOVE) )
@@ -49,7 +49,7 @@ int WINAPI WinMain( HINSTANCE hInInstance, HINSTANCE hPrevInstance, char*, INT n
     while( !Disorder::GIsRequestingExit )
 	{
 	    Disorder::GMainLoop->Tick();
-		PeekMessage();
+		AppPeekMessage();
 	}
 
 	Disorder::GMainLoop->Exit();

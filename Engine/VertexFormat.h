@@ -3,7 +3,7 @@
 
 namespace Disorder
 {
-	struct BatchTileVertex
+	_declspec(align(16)) struct BatchTileVertex
 	{
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		Eigen::Vector3f position;
@@ -11,14 +11,14 @@ namespace Disorder
 		Eigen::Vector2f texcoord;
 	};
 
-	struct BatchLineVertex
+	_declspec(align(16)) struct BatchLineVertex
 	{
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		Eigen::Vector3f position;
 		Eigen::Vector4f color;
 	};
 
-	struct TileTexVertex
+	_declspec(align(16)) struct TileTexVertex
 	{
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		Eigen::Vector3f position;

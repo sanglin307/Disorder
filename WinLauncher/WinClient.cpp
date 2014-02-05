@@ -49,7 +49,14 @@ namespace Disorder
 		Cls.lpszMenuName    = NULL;
 
 		 
-		BOOST_ASSERT(RegisterClassExW(&Cls));
+		if(!RegisterClassExW(&Cls))
+		{
+			DWORD result = GetLastError();
+			std::stringstream str;
+			str << "Window Class registe Error and code is:"<< result;
+			GLogger->Error(str.str());
+			return;
+		}
 			 
 		DWORD WindowStyle;
 		WindowStyle = WS_OVERLAPPEDWINDOW;
@@ -62,9 +69,17 @@ namespace Disorder
 		INT WindowPosY = (ScreenHeight - WindowHeight ) / 2;
  
 		// Create the window
-		HWND windows = CreateWindowW(winClassName,winClassName, WindowStyle, WindowPosX, WindowPosY, WindowWidth, WindowHeight, NULL, NULL, GAppInstance, NULL);
+		HWND windows = CreateWindowW(winClassName,TEXT("DWindows"), WindowStyle, WindowPosX, WindowPosY, WindowWidth, WindowHeight, NULL, NULL, GAppInstance, NULL);
 		BOOST_ASSERT(windows);
- 
+        if( !windows )
+		{
+			DWORD result = GetLastError();
+			std::stringstream str;
+			str << "Window create error and code is:"<< result;
+			GLogger->Error(str.str());
+			return;
+		}
+
 		ShowWindow( windows, SW_SHOWNORMAL );
  
 		UpdateWindow(windows);
@@ -95,8 +110,7 @@ namespace Disorder
 					std::list<InputListenerPtr>::iterator inputIter = _inputListenerList.begin();
 					while( inputIter != _inputListenerList.end() )
 					{
-						if( (*inputIter)->KeyboardEvent(iterKey->key,iterKey->text,iterKey->state,delta) )
-							break;
+						(*inputIter)->KeyboardEvent(iterKey->key,iterKey->text,iterKey->state,delta);
 						inputIter++;
 					}
 
@@ -114,9 +128,7 @@ namespace Disorder
 					std::list<InputListenerPtr>::iterator inputIter = _inputListenerList.begin();
 					while( inputIter != _inputListenerList.end() )
 					{
-						if( (*inputIter)->MouseEvent(*iterKey,delta) )
-							break;
-
+						(*inputIter)->MouseEvent(*iterKey,delta);
 						inputIter++;
 					}
 
@@ -154,7 +166,7 @@ namespace Disorder
 	LONG APIENTRY WinClient::StaticWndProc( HWND hWnd, UINT Message, UINT wParam, LONG lParam )
 	{	
 		// Prevent power management
-		if (Message == WM_POWERBROADCAST)
+		/*if (Message == WM_POWERBROADCAST)
 		{
 			switch( wParam )
 			{
@@ -162,7 +174,7 @@ namespace Disorder
 				case PBT_APMQUERYSTANDBY:
 					return BROADCAST_QUERY_DENY;
 			}
-		}
+		}*/
  
 		if(_Viewports.empty())
 		{

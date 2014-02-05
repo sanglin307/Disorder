@@ -44,7 +44,7 @@ namespace Disorder
 		void Init();
 		void Exit();
 
-		float GetMaxTickRate(float delta) { return 200.f;}
+		int GetMaxTickRate(float delta) { return 0;}
 		void Tick(float deltaSeconds);
 
 		

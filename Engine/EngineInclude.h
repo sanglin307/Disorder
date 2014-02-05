@@ -146,8 +146,6 @@ namespace Disorder
 	typedef boost::shared_ptr<BlendState> BlendStatePtr;
 	class DepthStencilState;
 	typedef boost::shared_ptr<DepthStencilState> DepthStencilStatePtr;
-	class BatchScreenTiles;
-	typedef boost::shared_ptr<BatchScreenTiles> BatchScreenTilesPtr;
 	class Canvas;
 	typedef boost::shared_ptr<Canvas> CanvasPtr;
 	class FileSystem;

@@ -302,17 +302,12 @@ namespace Disorder
 		_FourLightEffect->BindDepthStencilState(noDepthState);
 
 
-		std::vector<TileTexVertex> tilePos;
-		TileTexVertex vertex;
-		vertex.position = Eigen::Vector3f(-1.f, 1.f,0.f);
-		tilePos.push_back(vertex);
-		vertex.position = Eigen::Vector3f(-1.0f, -1.0f,0.0f);
-		tilePos.push_back(vertex);
-		vertex.position = Eigen::Vector3f(1.0f, 1.0f,0.0f);
-		tilePos.push_back(vertex);
-		vertex.position = Eigen::Vector3f(1.0f, -1.0f,0.0f);
-		tilePos.push_back(vertex);
-		_LightingTile = SimpleTile("DeferLightingTile",tilePos,_LightingEffect);
+		TileTexVertex vertex[4];
+		vertex[0].position = Eigen::Vector3f(-1.f, 1.f,0.f);
+		vertex[1].position = Eigen::Vector3f(-1.0f, -1.0f,0.0f);
+		vertex[2].position = Eigen::Vector3f(1.0f, 1.0f,0.0f);
+		vertex[3].position = Eigen::Vector3f(1.0f, -1.0f,0.0f);
+		_LightingTile = SimpleTile("DeferLightingTile",vertex,_LightingEffect);
 
 		DepthStencilDesc nodepthWriteDesc;
 		nodepthWriteDesc.DepthEnable = true;

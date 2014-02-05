@@ -65,56 +65,44 @@ namespace Disorder
 	   
 	public:
 		BatchScreenString(std::string const& name);
+		~BatchScreenString();
 
 		void SetTexture(RenderSurfacePtr const& texture);
-		 
-		void AddVertex(Eigen::Vector3f const& position,Eigen::Vector4f const& color,Eigen::Vector2f const& texcoord);
+		
+		BatchTileVertex* PrepareAddVertex();
+		void EndAddVertex();
+
 		virtual void Render(CameraPtr const& camera);
  
 		unsigned int GetCurrentDrawTriNumber();
 
 	protected:
-		std::vector<BatchTileVertex,Eigen::aligned_allocator<BatchTileVertex>> _vertexs;
-		std::vector<WORD> _indexs;
+		BatchTileVertex* _vertexs;
+	    unsigned int _vertexNum;
+
+		unsigned short* _indexs;
+	    unsigned int _indexNum;
+
 		unsigned int _savedVertexBufferSize;
 		unsigned int _savedIndexBufferSize;
 		RenderSurfacePtr _texture;
 	};
 
-	class BatchScreenTiles : public Renderer
-	{
-	   
-	public:
-		
-		static BatchScreenTilesPtr Create(std::string const& name);
-
-		void SetTexture(RenderSurfacePtr const& texture);
-		 
-		void AddVertex(Eigen::Vector3f const& position,Eigen::Vector4f const& color,Eigen::Vector2f const& texcoord);
-		virtual void Render(CameraPtr const& camera);
-
-		 
-		unsigned int GetCurrentDrawTriNumber();
-
-	protected:
-		BatchScreenTiles(std::string const& name);
-		std::vector<BatchTileVertex,Eigen::aligned_allocator<BatchTileVertex>> _vertexs;
-		std::vector<WORD> _indexs;
-		unsigned int _savedVertexBufferSize;
-		unsigned int _savedIndexBufferSize;
-		RenderSurfacePtr _texture;
-	};
-
+	 
 	class BatchLines : public Renderer
 	{
 	public:
 		BatchLines(std::string const& name);
 		void AddLine(Eigen::Vector3f const& beginPos,Eigen::Vector4f const& beginColor,Eigen::Vector3f const& endPos,Eigen::Vector4f const& endColor);
 		virtual void Render(CameraPtr const& camera);
+		~BatchLines();
 
+		BatchLineVertex* PrepareAddVertex();
+		void EndAddVertex();
 	 
 	private:
-		std::vector<BatchLineVertex,Eigen::aligned_allocator<BatchLineVertex>> _vertexs;
+		BatchLineVertex* _vertexs;
+		unsigned int _vertexNum;
 		unsigned int _savedVertexBufferSize;
 	};
 
@@ -122,7 +110,7 @@ namespace Disorder
 	{
 	public:
 		SimpleTile();
-		SimpleTile(std::string const& name,const std::vector<TileTexVertex>& positions,const RenderEffectPtr& renderEffect);
+		SimpleTile(std::string const& name,const TileTexVertex* positions,const RenderEffectPtr& renderEffect);
 		 
 		virtual void Render(CameraPtr const& camera);
 	};

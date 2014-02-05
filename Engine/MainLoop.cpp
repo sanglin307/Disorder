@@ -24,17 +24,17 @@ namespace Disorder
 
 		BOOST_ASSERT(delta >= 0);
  
-		float maxTickRate	= GEngine->GetMaxTickRate( delta );
-		float waitTime		= 0.f;
+		int maxTickRate	= GEngine->GetMaxTickRate( delta );
+		double waitTime		= 0;
 		 
 		if( maxTickRate > 0 )
 		{
-			waitTime = Max(1.f/maxTickRate-delta, 0.f );
+			waitTime = Max(1.0/maxTickRate-delta, 0.0 );
 		}
  
 		if( waitTime > 0 )
 		{
-			sysSleep(waitTime);
+			sysSleep((float)waitTime);
 		}
  
 		GameTime::FrameDelta = currentTime - lastTime;
