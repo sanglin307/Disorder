@@ -299,8 +299,9 @@ namespace Disorder
 		// Vertex read
 		for(int i=0;i<vertexCount;i++)
 		{
-			//geometry->ControllPositions.push_back(Eigen::Vector3f((float)lControlPoints[i][0],(float)lControlPoints[i][1],(float)lControlPoints[i][2]));
-			geometry->ControllPositions[i] << (float)lControlPoints[i][0],(float)lControlPoints[i][1],(float)lControlPoints[i][2];
+			geometry->ControllPositions[i].x = (float)lControlPoints[i][0]; 
+			geometry->ControllPositions[i].y = (float)lControlPoints[i][1];
+			geometry->ControllPositions[i].z = (float)lControlPoints[i][2];
 		}
  
 		// calculate bounding box
@@ -359,14 +360,20 @@ namespace Disorder
 								case FbxGeometryElement::eDirect:
 									{
 										FbxColor fColor = leVtxc->GetDirectArray().GetAt(lControlPointIndex);
-										geometry->Colors[vertexId] << (float)fColor.mRed,(float)fColor.mGreen,(float)fColor.mBlue,(float)fColor.mAlpha;
+										geometry->Colors[vertexId].x = (float)fColor.mRed;
+										geometry->Colors[vertexId].y = (float)fColor.mGreen;
+										geometry->Colors[vertexId].z = (float)fColor.mBlue;
+										geometry->Colors[vertexId].w = (float)fColor.mAlpha;
 										break;
 									}
 								case FbxGeometryElement::eIndexToDirect:
 									{
 										int id = leVtxc->GetIndexArray().GetAt(lControlPointIndex);
 										FbxColor fColor = leVtxc->GetDirectArray().GetAt(id);
-										geometry->Colors[vertexId] << (float)fColor.mRed,(float)fColor.mGreen,(float)fColor.mBlue,(float)fColor.mAlpha;
+										geometry->Colors[vertexId].x = (float)fColor.mRed;
+										geometry->Colors[vertexId].y = (float)fColor.mGreen;
+										geometry->Colors[vertexId].z = (float)fColor.mBlue;
+										geometry->Colors[vertexId].w = (float)fColor.mAlpha;
 										break;
 									}
 								default:
@@ -382,14 +389,20 @@ namespace Disorder
 									case FbxGeometryElement::eDirect:
 										{
 											FbxColor fColor = leVtxc->GetDirectArray().GetAt(vertexId);
-											geometry->Colors[vertexId] << (float)fColor.mRed,(float)fColor.mGreen,(float)fColor.mBlue,(float)fColor.mAlpha;
+											geometry->Colors[vertexId].x = (float)fColor.mRed;
+											geometry->Colors[vertexId].y = (float)fColor.mGreen;
+											geometry->Colors[vertexId].z = (float)fColor.mBlue;
+											geometry->Colors[vertexId].w = (float)fColor.mAlpha;
 										}
 										break;
 									case FbxGeometryElement::eIndexToDirect:
 										{
 											int id = leVtxc->GetIndexArray().GetAt(vertexId);
 											FbxColor fColor = leVtxc->GetDirectArray().GetAt(id);
-											geometry->Colors[vertexId] << (float)fColor.mRed,(float)fColor.mGreen,(float)fColor.mBlue,(float)fColor.mAlpha;
+											geometry->Colors[vertexId].x = (float)fColor.mRed;
+											geometry->Colors[vertexId].y = (float)fColor.mGreen;
+											geometry->Colors[vertexId].z = (float)fColor.mBlue;
+											geometry->Colors[vertexId].w = (float)fColor.mAlpha;
 										}
 										break;
 									default:
@@ -420,14 +433,16 @@ namespace Disorder
 							case FbxGeometryElement::eDirect:
 								{
 									FbxVector2 uv = leUV->GetDirectArray().GetAt(lControlPointIndex);
-									geometry->Texcoords[vertexId] << (float)uv[0] , (float)uv[1];
+									geometry->Texcoords[vertexId].x = (float)uv[0];
+									geometry->Texcoords[vertexId].y = (float)uv[1];
 								}
 								break;
 							case FbxGeometryElement::eIndexToDirect:
 								{
 									int id = leUV->GetIndexArray().GetAt(lControlPointIndex);
 									FbxVector2 uv = leUV->GetDirectArray().GetAt(id);
-									geometry->Texcoords[vertexId] << (float)uv[0] , (float)uv[1];
+									geometry->Texcoords[vertexId].x = (float)uv[0];
+									geometry->Texcoords[vertexId].y = (float)uv[1];
 								}
 								break;
 							default:
@@ -445,7 +460,8 @@ namespace Disorder
 								case FbxGeometryElement::eIndexToDirect:
 									{
 										FbxVector2 uv = leUV->GetDirectArray().GetAt(lTextureUVIndex);
-										geometry->Texcoords[vertexId] << (float)uv[0] , (float)uv[1];
+										geometry->Texcoords[vertexId].x = (float)uv[0];
+									    geometry->Texcoords[vertexId].y = (float)uv[1];
 									}
 									break;
 								default:
@@ -478,7 +494,9 @@ namespace Disorder
 								{
 									FbxVector4 normal = leNormal->GetDirectArray().GetAt(vertexId);
 									normal.Normalize();
-									geometry->Normals[vertexId] << (float)normal[0],(float)normal[1],(float)normal[2];
+									geometry->Normals[vertexId].x = (float)normal[0];
+									geometry->Normals[vertexId].y = (float)normal[1];
+									geometry->Normals[vertexId].z = (float)normal[2];
 								}
 								break;
 							case FbxGeometryElement::eIndexToDirect:
@@ -486,7 +504,9 @@ namespace Disorder
 									int id = leNormal->GetIndexArray().GetAt(vertexId);
 									FbxVector4 normal = leNormal->GetDirectArray().GetAt(id);
 									normal.Normalize();
-									geometry->Normals[vertexId] << (float)normal[0],(float)normal[1],(float)normal[2];
+									geometry->Normals[vertexId].x = (float)normal[0];
+									geometry->Normals[vertexId].y = (float)normal[1];
+									geometry->Normals[vertexId].z = (float)normal[2];
 								}
 								break;
 							default:
@@ -502,7 +522,9 @@ namespace Disorder
 								{
 									FbxVector4 normal = leNormal->GetDirectArray().GetAt(lControlPointIndex);
 									normal.Normalize();
-								   geometry->Normals[vertexId] << (float)normal[0],(float)normal[1],(float)normal[2];
+                                    geometry->Normals[vertexId].x = (float)normal[0];
+									geometry->Normals[vertexId].y = (float)normal[1];
+									geometry->Normals[vertexId].z = (float)normal[2];
 								}
 								break;
 							case FbxGeometryElement::eIndexToDirect:
@@ -510,7 +532,9 @@ namespace Disorder
 									int id = leNormal->GetIndexArray().GetAt(lControlPointIndex);
 									FbxVector4 normal = leNormal->GetDirectArray().GetAt(id);
 									normal.Normalize();
-									geometry->Normals[vertexId] << (float)normal[0],(float)normal[1],(float)normal[2];
+									geometry->Normals[vertexId].x = (float)normal[0];
+									geometry->Normals[vertexId].y = (float)normal[1];
+									geometry->Normals[vertexId].z = (float)normal[2];
 								}
 								break;
 							default:
@@ -538,7 +562,9 @@ namespace Disorder
 								{
 									FbxVector4 tangent = leTangent->GetDirectArray().GetAt(vertexId);
 									tangent.Normalize();
-									geometry->Tangents[vertexId] << (float)tangent[0],(float)tangent[1],(float)tangent[2];
+									geometry->Tangents[vertexId].x = (float)tangent[0];
+									geometry->Tangents[vertexId].y = (float)tangent[1];
+									geometry->Tangents[vertexId].z = (float)tangent[2]; 
 								}
 								break;
 							case FbxGeometryElement::eIndexToDirect:
@@ -546,7 +572,9 @@ namespace Disorder
 									int id = leTangent->GetIndexArray().GetAt(vertexId);
 									FbxVector4 tangent = leTangent->GetDirectArray().GetAt(id);
 									tangent.Normalize();
-									geometry->Tangents[vertexId] << (float)tangent[0],(float)tangent[1],(float)tangent[2];
+									geometry->Tangents[vertexId].x = (float)tangent[0];
+									geometry->Tangents[vertexId].y = (float)tangent[1];
+									geometry->Tangents[vertexId].z = (float)tangent[2]; 
 								}
 								break;
 							default:
@@ -562,7 +590,9 @@ namespace Disorder
 								{
 									FbxVector4 tangent = leTangent->GetDirectArray().GetAt(lControlPointIndex);
 									tangent.Normalize();
-								    geometry->Tangents[vertexId] << (float)tangent[0],(float)tangent[1],(float)tangent[2];
+								    geometry->Tangents[vertexId].x = (float)tangent[0];
+									geometry->Tangents[vertexId].y = (float)tangent[1];
+									geometry->Tangents[vertexId].z = (float)tangent[2]; 
 								}
 								break;
 							case FbxGeometryElement::eIndexToDirect:
@@ -570,7 +600,9 @@ namespace Disorder
 									int id = leTangent->GetIndexArray().GetAt(lControlPointIndex);
 									FbxVector4 tangent = leTangent->GetDirectArray().GetAt(id);
 									tangent.Normalize();
-									geometry->Tangents[vertexId] << (float)tangent[0],(float)tangent[1],(float)tangent[2];
+									geometry->Tangents[vertexId].x = (float)tangent[0];
+									geometry->Tangents[vertexId].y = (float)tangent[1];
+									geometry->Tangents[vertexId].z = (float)tangent[2]; 
 								}
 								break;
 							default:
@@ -601,7 +633,9 @@ namespace Disorder
 									FbxVector4 binormal = leBinormal->GetDirectArray().GetAt(vertexId);
 									binormal.Normalize();
 									 
-									geometry->Binormals[vertexId] << (float)binormal[0],(float)binormal[1],(float)binormal[2];
+									geometry->Binormals[vertexId].x = (float)binormal[0]; 
+									geometry->Binormals[vertexId].y = (float)binormal[1];
+									geometry->Binormals[vertexId].z = (float)binormal[2];
 								}
 								break;
 							case FbxGeometryElement::eIndexToDirect:
@@ -609,7 +643,9 @@ namespace Disorder
 									int id = leBinormal->GetIndexArray().GetAt(vertexId);
 									FbxVector4 binormal = leBinormal->GetDirectArray().GetAt(id);
 									binormal.Normalize();
-									geometry->Binormals[vertexId] << (float)binormal[0],(float)binormal[1],(float)binormal[2];
+									geometry->Binormals[vertexId].x = (float)binormal[0]; 
+									geometry->Binormals[vertexId].y = (float)binormal[1];
+									geometry->Binormals[vertexId].z = (float)binormal[2];
 								}
 								break;
 							default:
@@ -625,7 +661,9 @@ namespace Disorder
 								{
 									FbxVector4 binormal = leBinormal->GetDirectArray().GetAt(lControlPointIndex);
 									binormal.Normalize();
-									geometry->Binormals[vertexId] << (float)binormal[0],(float)binormal[1],(float)binormal[2];
+									geometry->Binormals[vertexId].x = (float)binormal[0]; 
+									geometry->Binormals[vertexId].y = (float)binormal[1];
+									geometry->Binormals[vertexId].z = (float)binormal[2];
 								}
 								break;
 							case FbxGeometryElement::eIndexToDirect:
@@ -633,7 +671,9 @@ namespace Disorder
 									int id = leBinormal->GetIndexArray().GetAt(lControlPointIndex);
 									FbxVector4 binormal = leBinormal->GetDirectArray().GetAt(id);
 									binormal.Normalize();
-									geometry->Binormals[vertexId] << (float)binormal[0],(float)binormal[1],(float)binormal[2];
+									geometry->Binormals[vertexId].x = (float)binormal[0]; 
+									geometry->Binormals[vertexId].y = (float)binormal[1];
+									geometry->Binormals[vertexId].z = (float)binormal[2];
 								}
 								break;
 							default:

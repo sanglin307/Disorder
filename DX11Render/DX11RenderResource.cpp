@@ -121,10 +121,10 @@ namespace Disorder
 				pBuffer->_bufferSize = pBuffer->_elementSize*data->Positions.size();
 				for(unsigned int index=0;index<data->Positions.size();++index)
 				{
-					Eigen::Vector3f& vec = data->ControllPositions[data->Positions[index]];
-					vData.push_back(vec.x());
-					vData.push_back(vec.y());
-					vData.push_back(vec.z());
+					Vector3f& vec = data->ControllPositions[data->Positions[index]];
+					vData.push_back(vec.x);
+					vData.push_back(vec.y);
+					vData.push_back(vec.z);
 				}
 			}
 			else if(sematic.compare(RenderLayout::COLOR) == 0 )
@@ -132,11 +132,11 @@ namespace Disorder
 				pBuffer->_bufferSize = pBuffer->_elementSize*data->Colors.size();
 				for(unsigned int index=0;index<data->Colors.size();++index)
 				{
-					Eigen::Vector4f& vec = data->Colors[index];
-					vData.push_back(vec.x());
-					vData.push_back(vec.y());
-					vData.push_back(vec.z());
-					vData.push_back(vec.w());
+					Vector4f& vec = data->Colors[index];
+					vData.push_back(vec.x);
+					vData.push_back(vec.y);
+					vData.push_back(vec.z);
+					vData.push_back(vec.w);
 				}
 			}
 			else if(sematic.compare(RenderLayout::NORMAL) == 0 )
@@ -144,10 +144,10 @@ namespace Disorder
 				pBuffer->_bufferSize = pBuffer->_elementSize*data->Normals.size();
 				for(unsigned int index=0;index<data->Normals.size();++index)
 				{
-					Eigen::Vector3f& vec = data->Normals[index];
-					vData.push_back(vec.x());
-					vData.push_back(vec.y());
-					vData.push_back(vec.z());
+					Vector3f& vec = data->Normals[index];
+					vData.push_back(vec.x);
+					vData.push_back(vec.y);
+					vData.push_back(vec.z);
 				}
 			}
 			else if(sematic.compare(RenderLayout::TEXCOORD) == 0 )
@@ -155,9 +155,9 @@ namespace Disorder
 				pBuffer->_bufferSize = pBuffer->_elementSize*data->Texcoords.size();
 				for(unsigned int index=0;index<data->Texcoords.size();++index)
 				{
-					Eigen::Vector2f& vec = data->Texcoords[index];
-					vData.push_back(vec.x());
-					vData.push_back(vec.y());
+					Vector2f& vec = data->Texcoords[index];
+					vData.push_back(vec.x);
+					vData.push_back(vec.y);
 				}
 			}
 			else

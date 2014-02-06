@@ -59,7 +59,7 @@ namespace Disorder
 		}
 			 
 		DWORD WindowStyle;
-		WindowStyle = WS_OVERLAPPEDWINDOW;
+		WindowStyle = WS_OVERLAPPED|WS_CAPTION|WS_THICKFRAME|WS_MINIMIZEBOX|WS_MAXIMIZEBOX;
 		// Obtain width and height of primary monitor.
 		INT ScreenWidth  = ::GetSystemMetrics( SM_CXSCREEN );
 		INT ScreenHeight = ::GetSystemMetrics( SM_CYSCREEN );
@@ -69,7 +69,7 @@ namespace Disorder
 		INT WindowPosY = (ScreenHeight - WindowHeight ) / 2;
  
 		// Create the window
-		HWND windows = CreateWindowW(winClassName,TEXT("DWindows"), WindowStyle, WindowPosX, WindowPosY, WindowWidth, WindowHeight, NULL, NULL, GAppInstance, NULL);
+		HWND windows = CreateWindowW(winClassName,winClassName, WindowStyle, WindowPosX, WindowPosY, WindowWidth, WindowHeight, NULL, NULL, GAppInstance, NULL);
 		BOOST_ASSERT(windows);
         if( !windows )
 		{

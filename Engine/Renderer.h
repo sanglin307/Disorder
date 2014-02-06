@@ -93,7 +93,7 @@ namespace Disorder
 	{
 	public:
 		BatchLines(std::string const& name);
-		void AddLine(Eigen::Vector3f const& beginPos,Eigen::Vector4f const& beginColor,Eigen::Vector3f const& endPos,Eigen::Vector4f const& endColor);
+		void AddLine(Vector3f const& beginPos,Vector4f const& beginColor,Vector3f const& endPos,Vector4f const& endColor);
 		virtual void Render(CameraPtr const& camera);
 		~BatchLines();
 

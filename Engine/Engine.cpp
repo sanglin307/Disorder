@@ -68,14 +68,14 @@ namespace Disorder
 		if( !_bEnable )
 			return;
  
-		Eigen::Vector4f color = Eigen::Vector4f::Constant(1.0f);
+		 
 		CanvasPtr canvas = GEngine->GameCanvas;
 
 		std::stringstream strstream;
 		strstream << "Drawed triangle num:" << GDrawTriNumber;
 		std::string drawstr = strstream.str();
 		float length = canvas->GetStringLength(0.04f,drawstr);
-		canvas->DrawString(0.98f - length ,0.01f,0.04f,color,drawstr);
+		canvas->DrawString(0.98f - length ,0.01f,0.04f,Vector4f::ONE,drawstr);
    }
 
    EnginePtr Engine::Create()
@@ -95,7 +95,7 @@ namespace Disorder
 	   CanvasPtr canvas = GEngine->GameCanvas;
 	   float x = 10.f;
 	   float y = 10.f;
-	   Eigen::Vector4f color(1.0f,0,0,1.0f);
+	   Vector4f color(1.0f,0,0,1.0f);
 
 	   static int fps = (int)(1/deltaSeconds);
 	   if( timeDelta > 1 )

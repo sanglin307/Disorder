@@ -34,8 +34,8 @@ namespace Disorder
 			if( soloBuffer )
 			{
 			   desc.InputSlot = 0;
-			   desc.AlignedByteOffset = offset;
-			   offset += 16; // 128bit
+			   desc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+			   offset += shaderReflection->InputSignatureParameters[index].GetElementSize(); // 128bit
 			}
 			else
 			{

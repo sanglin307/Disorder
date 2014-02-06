@@ -187,6 +187,7 @@ namespace Disorder
 //project related
 #include "Singleton.h"
 #include "MathLib.h"
+#include "Vectors.h"
 #include "Common.h"
 #include "GameTime.h"
 #include "Bounds.h"

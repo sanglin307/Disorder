@@ -9,9 +9,21 @@ namespace Disorder
 
 	bool Frustrum::Overlaps(BoxBounds & bounds) const
 	{
+		if( !bounds.IsValid() )
+		{
+			BOOST_ASSERT(0);
+			return false;
+		}
+
+		Vector3f center;
+		Vector3f extend;
+		bounds.GetCenterAndExtents(center,extend);
+		Eigen::Vector3f eCenter(center.x,center.y,center.z);
+		Eigen::Vector3f eExtend(extend.x,extend.y,extend.z);
+		
 		for(int i=0;i<6;i++)
 		{
-			int side = bounds.GetPlaneSide(_Planes[i]);
+			int side = Math::GetPlaneSide(_Planes[i],eCenter,eExtend);
 			if( side > 0 )
 				return false;
 		}
@@ -21,9 +33,10 @@ namespace Disorder
 
 	bool Frustrum::Overlaps(SphereBounds const& bounds) const
 	{
+		Eigen::Vector3f eCenter(bounds.Origin.x,bounds.Origin.y,bounds.Origin.z);
 		for(int i=0;i<6;i++)
 		{
-			int side = Math::GetPlaneSide(_Planes[i],bounds.Origin,bounds.Radius);
+			int side = Math::GetPlaneSide(_Planes[i],eCenter,bounds.Radius);
 			if( side > 0 )
 				return false;
 		}
@@ -34,9 +47,10 @@ namespace Disorder
 
 	bool Frustrum::Inside(SphereBounds const& bounds) const
 	{
+		Eigen::Vector3f eCenter(bounds.Origin.x,bounds.Origin.y,bounds.Origin.z);
 		for(int i=0;i<6;i++)
 		{
-			int side = Math::GetPlaneSide(_Planes[i],bounds.Origin,bounds.Radius);
+			int side = Math::GetPlaneSide(_Planes[i],eCenter,bounds.Radius);
 			if( side >= 0 )
 				return false;
 		}
@@ -46,9 +60,21 @@ namespace Disorder
 
 	bool Frustrum::Inside(BoxBounds & bounds) const
 	{
+		if( !bounds.IsValid() )
+		{
+			BOOST_ASSERT(0);
+			return false;
+		}
+
+		Vector3f center;
+		Vector3f extend;
+		bounds.GetCenterAndExtents(center,extend);
+		Eigen::Vector3f eCenter(center.x,center.y,center.z);
+		Eigen::Vector3f eExtend(extend.x,extend.y,extend.z);
+
 		for(int i=0;i<6;i++)
 		{
-			int side = bounds.GetPlaneSide(_Planes[i]);
+			int side = Math::GetPlaneSide(_Planes[i],eCenter,eExtend);
 			if( side >= 0 )
 				return false;
 		}
@@ -90,7 +116,7 @@ namespace Disorder
 
 	void Frustrum::Draw()
 	{
-		Eigen::Vector4f color(1.0f,0,1,1.0f);
+		Vector4f color(1.0f,0,1,1.0f);
 
 		GEngine->GameCanvas->DrawLine(_Points[0],color,_Points[1],color);
 		GEngine->GameCanvas->DrawLine(_Points[1],color,_Points[2],color);
@@ -107,13 +133,13 @@ namespace Disorder
 		GEngine->GameCanvas->DrawLine(_Points[2],color,_Points[6],color);
 		GEngine->GameCanvas->DrawLine(_Points[3],color,_Points[7],color);
 
-		color = Eigen::Vector4f(0,1.f,0,1.f);
+		/*color = Vector4f(0,1.f,0,1.f);
 		GEngine->GameCanvas->DrawLine(_Points[0],color,_Points[0] + _Planes[PS_Near].normal(),Eigen::Vector4f(0,0,0,1.0f));
 		GEngine->GameCanvas->DrawLine(_Points[4],color,_Points[4] + _Planes[PS_Far].normal(),Eigen::Vector4f(0,0,0,1.0f));
 		GEngine->GameCanvas->DrawLine(_Points[0],color,_Points[0] + _Planes[PS_Left].normal(),Eigen::Vector4f(0,0,0,1.0f));
 		GEngine->GameCanvas->DrawLine(_Points[2],color,_Points[2] + _Planes[PS_Right].normal(),Eigen::Vector4f(0,0,0,1.0f));
 		GEngine->GameCanvas->DrawLine(_Points[1],color,_Points[1] + _Planes[PS_Top].normal(),Eigen::Vector4f(0,0,0,1.0f));
-		GEngine->GameCanvas->DrawLine(_Points[3],color,_Points[3] + _Planes[PS_Bottom].normal(),Eigen::Vector4f(0,0,0,1.0f));
+		GEngine->GameCanvas->DrawLine(_Points[3],color,_Points[3] + _Planes[PS_Bottom].normal(),Eigen::Vector4f(0,0,0,1.0f));*/
 	}
 
 }

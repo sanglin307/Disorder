@@ -188,7 +188,7 @@ namespace Disorder
 			obj->PostRender(mainCamera);
 		}
 
-		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,Eigen::Vector4f::Constant(1.0f),"Forward Lighting Mode");
+		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,Vector4f::ONE,"Forward Lighting Mode");
 
 		GSceneManager->DebugDraw();
 
@@ -303,10 +303,10 @@ namespace Disorder
 
 
 		TileTexVertex vertex[4];
-		vertex[0].position = Eigen::Vector3f(-1.f, 1.f,0.f);
-		vertex[1].position = Eigen::Vector3f(-1.0f, -1.0f,0.0f);
-		vertex[2].position = Eigen::Vector3f(1.0f, 1.0f,0.0f);
-		vertex[3].position = Eigen::Vector3f(1.0f, -1.0f,0.0f);
+		vertex[0].position = Vector3f(-1.f, 1.f,0.f);
+		vertex[1].position = Vector3f(-1.0f, -1.0f,0.0f);
+		vertex[2].position = Vector3f(1.0f, 1.0f,0.0f);
+		vertex[3].position = Vector3f(1.0f, -1.0f,0.0f);
 		_LightingTile = SimpleTile("DeferLightingTile",vertex,_LightingEffect);
 
 		DepthStencilDesc nodepthWriteDesc;
@@ -420,13 +420,10 @@ namespace Disorder
 			}
 		}
 
-		if( GSceneManager->EnableDebugDraw )
-		    GEngine->RenderSurfaceCache->GBuffer->DebugVisual();
-
 		GEngine->RenderEngine->SetEffect(NULL);
 		
 		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,depthSurfacePtr,true);
-		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,Eigen::Vector4f::Constant(1.0f),"Deferred Shading Mode");
+		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,Vector4f::ONE,"Deferred Shading Mode");
 		GSceneManager->DebugDraw();
 
 		// before we call canvas draw ,we should check if we should add stat info to canvas.
@@ -437,6 +434,9 @@ namespace Disorder
 		}
 
 		GEngine->GameCanvas->Render(mainCamera);
+
+		if( GSceneManager->EnableDebugDraw )
+		    GEngine->RenderSurfaceCache->GBuffer->DebugVisual();
 
 		GEngine->RenderEngine->OnDrawEnd();
 

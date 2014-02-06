@@ -9,8 +9,8 @@ namespace Disorder
 	public:
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		float GetStringLength(float fsize,std::string const& str);
-		void DrawString(float xPos,float yPos, float size, Eigen::Vector4f const& color,std::string const& str);	  // xPos,yPos in [ 0.f ,1.f]	 
-		void DrawLine(Eigen::Vector3f const& beginPos,Eigen::Vector4f const& beginColor,Eigen::Vector3f const& endPos,Eigen::Vector4f const& endColor);
+		void DrawString(float xPos,float yPos, float size, Vector4f const& color,std::string const& str);	  // xPos,yPos in [ 0.f ,1.f]	 
+		void DrawLine(Vector3f const& beginPos,Vector4f const& beginColor,Vector3f const& endPos,Vector4f const& endColor);
 
 		void Render(CameraPtr const& camera);
 
