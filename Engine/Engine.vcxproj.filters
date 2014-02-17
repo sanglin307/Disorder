@@ -188,6 +188,9 @@
     <ClInclude Include="Vectors.h">
       <Filter>Mathematics</Filter>
     </ClInclude>
+    <ClInclude Include="Matrixs.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -305,7 +308,7 @@
     <ClCompile Include="RenderEngine.cpp">
       <Filter>RenderSystem</Filter>
     </ClCompile>
-    <ClCompile Include="Vectors.cpp">
+    <ClCompile Include="Matrixs.cpp">
       <Filter>Mathematics</Filter>
     </ClCompile>
   </ItemGroup>

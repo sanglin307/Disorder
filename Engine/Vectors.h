@@ -8,74 +8,52 @@ namespace Disorder
 	//// we don't use huge Eigen related vector inside mesh     /////////////////////// 
 	///////////////////////////////////////////////////////////////////////////////////
 
-    class  Vector2f
+	template <typename T>
+    class  TVector2
     {
     public:
-        float x, y;
+        T x, y;
 
     public:
-        inline Vector2f()
+        inline TVector2()
         {
         }
 
-		inline Vector2f(const Eigen::Vector2f& vec)
+		inline TVector2(const Eigen::Vector2f& vec)
 		{
-			x = vec.x();
-			y = vec.y();
+			x = (T)(vec.x());
+			y = (T)(vec.y());
 		}
 
-		inline Vector2f(const double fX, const double fY )
+		inline TVector2(const T fX, const T fY )
 		{
-			x = (float)fX;
-			y = (float)fY;
+			x = fX;
+			y = fY;
 		}
-
-        inline Vector2f(const float fX, const float fY )
-            : x( fX ), y( fY )
-        {
-        }
-
-        inline explicit Vector2f( const float scaler )
+ 
+        inline explicit TVector2( const T scaler )
             : x( scaler), y( scaler )
         {
         }
-
-        inline explicit Vector2f( const float afCoordinate[2] )
-            : x( afCoordinate[0] ),
-              y( afCoordinate[1] )
-        {
-        }
-
-        inline explicit Vector2f( const int afCoordinate[2] )
-        {
-            x = (float)afCoordinate[0];
-            y = (float)afCoordinate[1];
-        }
-
-        inline explicit Vector2f( float* const r )
-            : x( r[0] ), y( r[1] )
-        {
-        }
  
-		inline float operator [] ( const size_t i ) const
+      
+		inline T operator [] ( const size_t i ) const
         {
-            BOOST_ASSERT( i < 2 );
             return *(&x+i);
         }
 
-		inline float& operator [] ( const size_t i )
+		inline T& operator [] ( const size_t i )
         {
-            BOOST_ASSERT( i < 2 );
             return *(&x+i);
         }
 
 		/// Pointer accessor for direct copying
-		inline float* Ptr()
+		inline T* Ptr()
 		{
 			return &x;
 		}
 		/// Pointer accessor for direct copying
-		inline const float* Ptr() const
+		inline const T* Ptr() const
 		{
 			return &x;
 		}
@@ -84,7 +62,7 @@ namespace Disorder
             @param
                 rkVector The other vector
         */
-        inline Vector2f& operator = ( const Vector2f& rkVector )
+        inline TVector2& operator = ( const TVector2& rkVector )
         {
             x = rkVector.x;
             y = rkVector.y;
@@ -92,15 +70,15 @@ namespace Disorder
             return *this;
         }
 
-		inline Vector2f& operator = ( const Eigen::Vector2f& rkVector )
+		inline TVector2& operator = ( const Eigen::Vector2f& rkVector )
         {
-            x = rkVector.x();
-            y = rkVector.y();
+            x = (T)(rkVector.x());
+            y = (T)(rkVector.y());
 
             return *this;
         }
 
-		inline Vector2f& operator = ( const float fScalar)
+		inline TVector2& operator = ( const T fScalar)
 		{
 			x = fScalar;
 			y = fScalar;
@@ -108,118 +86,114 @@ namespace Disorder
 			return *this;
 		}
 
-        inline bool operator == ( const Vector2f& rkVector ) const
+        inline bool operator == ( const TVector2& rkVector ) const
         {
             return ( x == rkVector.x && y == rkVector.y );
         }
 
-        inline bool operator != ( const Vector2f& rkVector ) const
+        inline bool operator != ( const TVector2& rkVector ) const
         {
             return ( x != rkVector.x || y != rkVector.y  );
         }
 
         // arithmetic operations
-        inline Vector2f operator + ( const Vector2f& rkVector ) const
+        inline TVector2 operator + ( const TVector2& rkVector ) const
         {
-            return Vector2f(
+            return TVector2(
                 x + rkVector.x,
                 y + rkVector.y);
         }
 
-        inline Vector2f operator - ( const Vector2f& rkVector ) const
+        inline TVector2 operator - ( const TVector2& rkVector ) const
         {
-            return Vector2f(
+            return TVector2(
                 x - rkVector.x,
                 y - rkVector.y);
         }
 
-        inline Vector2f operator * ( const float fScalar ) const
+        inline TVector2 operator * ( const T fScalar ) const
         {
-            return Vector2f(
+            return TVector2(
                 x * fScalar,
                 y * fScalar);
         }
 
-        inline Vector2f operator * ( const Vector2f& rhs) const
+        inline TVector2 operator * ( const TVector2& rhs) const
         {
-            return Vector2f(
+            return TVector2(
                 x * rhs.x,
                 y * rhs.y);
         }
 
-        inline Vector2f operator / ( const float fScalar ) const
-        {
-            BOOST_ASSERT( fScalar != 0.0 );
-
-            float fInv = 1.0f / fScalar;
-
-            return Vector2f(
-                x * fInv,
-                y * fInv);
+        inline TVector2 operator / ( const T fScalar ) const
+		{
+            return TVector2(
+                x / fScalar,
+                y / fScalar);
         }
 
-        inline Vector2f operator / ( const Vector2f& rhs) const
+        inline TVector2 operator / ( const TVector2& rhs) const
         {
-            return Vector2f(
+            return TVector2(
                 x / rhs.x,
                 y / rhs.y);
         }
 
-        inline const Vector2f& operator + () const
+        inline const TVector2& operator + () const
         {
             return *this;
         }
 
-        inline Vector2f operator - () const
+        inline TVector2 operator - () const
         {
-            return Vector2f(-x, -y);
+            return TVector2(-x, -y);
         }
 
         // overloaded operators to help Vector2f
-        inline friend Vector2f operator * ( const float fScalar, const Vector2f& rkVector )
+        inline friend TVector2 operator * ( const T fScalar, const TVector2& rkVector )
         {
-            return Vector2f(
+            return TVector2(
                 fScalar * rkVector.x,
                 fScalar * rkVector.y);
         }
 
-        inline friend Vector2f operator / ( const float fScalar, const Vector2f& rkVector )
+        inline friend TVector2 operator / ( const T fScalar, const TVector2& rkVector )
         {
-            return Vector2f(
+            return TVector2(
                 fScalar / rkVector.x,
                 fScalar / rkVector.y);
         }
 
-        inline friend Vector2f operator + (const Vector2f& lhs, const float rhs)
+        inline friend TVector2 operator + (const TVector2& lhs, const T rhs)
         {
-            return Vector2f(
+            return TVector2(
                 lhs.x + rhs,
                 lhs.y + rhs);
         }
 
-        inline friend Vector2f operator + (const float lhs, const Vector2f& rhs)
+        inline friend TVector2 operator + (const T lhs, const TVector2& rhs)
         {
-            return Vector2f(
+            return TVector2(
                 lhs + rhs.x,
                 lhs + rhs.y);
         }
 
-        inline friend Vector2f operator - (const Vector2f& lhs, const float rhs)
+        inline friend TVector2 operator - (const TVector2& lhs, const T rhs)
         {
             return Vector2f(
                 lhs.x - rhs,
                 lhs.y - rhs);
         }
 
-        inline friend Vector2f operator - (const float lhs, const Vector2f& rhs)
+        inline friend TVector2 operator - (const T lhs, const TVector2& rhs)
         {
-            return Vector2f(
+            return TVector2(
                 lhs - rhs.x,
                 lhs - rhs.y);
         }
 
         // arithmetic updates
-        inline Vector2f& operator += ( const Vector2f& rkVector )
+        inline TVector2& operator += ( const TVector2& rkVector )
         {
             x += rkVector.x;
             y += rkVector.y;
@@ -227,7 +201,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector2f& operator += ( const float fScaler )
+        inline TVector2& operator += ( const T fScaler )
         {
             x += fScaler;
             y += fScaler;
@@ -235,7 +209,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector2f& operator -= ( const Vector2f& rkVector )
+        inline TVector2& operator -= ( const TVector2& rkVector )
         {
             x -= rkVector.x;
             y -= rkVector.y;
@@ -243,7 +217,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector2f& operator -= ( const float fScaler )
+        inline TVector2& operator -= ( const T fScaler )
         {
             x -= fScaler;
             y -= fScaler;
@@ -251,7 +225,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector2f& operator *= ( const float fScalar )
+        inline TVector2& operator *= ( const T fScalar )
         {
             x *= fScalar;
             y *= fScalar;
@@ -259,7 +233,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector2f& operator *= ( const Vector2f& rkVector )
+        inline TVector2& operator *= ( const TVector2& rkVector )
         {
             x *= rkVector.x;
             y *= rkVector.y;
@@ -267,19 +241,15 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector2f& operator /= ( const float fScalar )
+        inline TVector2& operator /= ( const T fScalar )
         {
-            BOOST_ASSERT( fScalar != 0.0 );
-
-            float fInv = 1.0f / fScalar;
-
-            x *= fInv;
-            y *= fInv;
+            x /= fScalar;
+            y /= fScalar;
 
             return *this;
         }
 
-        inline Vector2f& operator /= ( const Vector2f& rkVector )
+        inline TVector2& operator /= ( const TVector2& rkVector )
         {
             x /= rkVector.x;
             y /= rkVector.y;
@@ -287,255 +257,162 @@ namespace Disorder
             return *this;
         }
  
-        inline float Length () const
+        inline T Length () const
         {
-            return Math::Sqrtf( x * x + y * y );
+			return (T)sqrt( x * x + y * y );
         }
  
-        inline float SquaredLength () const
+        inline T SquaredLength () const
         {
             return x * x + y * y;
         }
 
       
-        inline float Distance(const Vector2f& rhs) const
+        inline T Distance(const TVector2& rhs) const
         {
             return (*this - rhs).Length();
         }
 
        
-        inline float SquaredDistance(const Vector2f& rhs) const
+        inline T SquaredDistance(const TVector2& rhs) const
         {
 			return (*this - rhs).SquaredLength();
         }
 
        
-        inline float Dot(const Vector2f& vec) const
+        inline T Dot(const TVector2& vec) const
         {
             return x * vec.x + y * vec.y;
         }
  
-        inline float Normalise()
+        inline T Normalise()
         {
-            float fLength = Math::Sqrtf( x * x + y * y);
+            T fLength = Length();
  
-			if ( fLength > float(0.0f) && fLength != 1.0f )
+			if ( fLength > 0 && fLength != 1.0f )
             {
-                float fInvLength = 1.0f / fLength;
+                T fInvLength = 1.0f / fLength;
                 x *= fInvLength;
                 y *= fInvLength;
             }
 
             return fLength;
         }
-
  
-        inline Vector2f MidPoint( const Vector2f& vec ) const
-        {
-            return Vector2f(
-                ( x + vec.x ) * 0.5f,
-                ( y + vec.y ) * 0.5f );
-        }
-
-        inline bool operator < ( const Vector2f& rhs ) const
+        inline bool operator < ( const TVector2& rhs ) const
         {
             if( x < rhs.x && y < rhs.y )
                 return true;
             return false;
         }
 
-        inline bool operator > ( const Vector2f& rhs ) const
+        inline bool operator > ( const TVector2& rhs ) const
         {
             if( x > rhs.x && y > rhs.y )
                 return true;
             return false;
         }
  
-        inline Vector2f Perpendicular(void) const
+        inline TVector2 Perpendicular(void) const
         {
-            return Vector2f (-y, x);
+            return TVector2 (-y, x);
         }
  
 		// equal to the area of parallelogram
-        inline float Cross( const Vector2f& rkVector ) const
+        inline T Cross( const TVector2& rkVector ) const
         {
             return x * rkVector.y - y * rkVector.x;
         }
-
-        /** Generates a new random vector which deviates from this vector by a
-            given angle in a random direction.
-            @remarks
-                This method assumes that the random number generator has already
-                been seeded appropriately.
-            @param
-                angle The angle at which to deviate in radians, the angle is the max one
-            @param
-                up Any vector perpendicular to this one (which could generated
-                by cross-product of this vector and any other non-colinear
-                vector). If you choose not to provide this the function will
-                derive one on it's own, however if you provide one yourself the
-                function will be faster (this allows you to reuse up vectors if
-                you call this method more than once)
-            @return
-                A random vector which deviates from this vector by angle. This
-                vector will not be normalised, normalise it if you wish
-                afterwards.
-        */
-        inline Vector2f RandomDeviant(float angle) const
-        {
-
-            angle *=  Math::UnitRandom() * Math::TWO_PI;
-            float cosa = cos(angle);
-            float sina = sin(angle);
-            return  Vector2f(cosa * x - sina * y,
-                            sina * x + cosa * y);
-        }
-
+ 
         /** Returns true if this vector is zero length. */
         inline bool IsZeroLength(void) const
         {
-            float sqlen = (x * x) + (y * y);
-            return (sqlen < (1e-06 * 1e-06));
+            T sqlen = (x * x) + (y * y);
+            return (sqlen < 1e-08);
 
         }
  
         /** Calculates a reflection vector to the plane with the given normal .
         @remarks NB assumes 'this' is pointing AWAY FROM the plane, invert if it is not.
         */
-        inline Vector2f Reflect(const Vector2f& normal) const
+        inline TVector2 Reflect(const TVector2& normal) const
         {
-			return Vector2f( *this - ( 2 * this->Dot(normal) * normal ) );
+			return TVector2( *this - ( 2 * this->Dot(normal) * normal ) );
         }
 
 	    /// Check whether this vector contains valid values
 		inline bool IsNaN() const
 		{
-			return Math::IsNaN(x) || Math::IsNaN(y);
+			return _isnan(x) || _isnan(y);
 		}
 
 		/**	 Gets the angle between 2 vectors.
 		@remarks
 			Vectors do not have to be unit-length but must represent directions.
 		*/
-		inline float AngleBetween(const Vector2f& other) const
+		inline T AngleBetween(const TVector2& other) const
 		{		
-			float lenProduct = Length() * other.Length();
+			T lenProduct = Length() * other.Length();
 			// Divide by zero check
 			if(lenProduct < 1e-6f)
 				lenProduct = 1e-6f;
 		
-			float f = Dot(other) / lenProduct;
+			T f = Dot(other) / lenProduct;
 	
-			f = Clamp<float>(f, -1.0f, 1.0f);
-			return Math::ACosf(f);
+			f = Clamp<T>(f, -1.0, 1.0);
+			return acos(f);
 		}
-
-		/**	 Gets the oriented angle between 2 vectors.
-		@remarks
-			Vectors do not have to be unit-length but must represent directions.
-			The angle is comprised between 0 and 2 PI.
-		*/
-		inline float AngleTo(const Vector2f& other) const
-		{
-			float angle = AngleBetween(other);
-		
-			if (Cross(other)<0)			
-				angle = (float)Math::TWO_PI - angle;		
-
-			return angle;
-		}
-
-		static const Vector2f ZERO;
-        static const Vector2f UNIT_X;
-        static const Vector2f UNIT_Y;
-        static const Vector2f NEGATIVE_UNIT_X;
-        static const Vector2f NEGATIVE_UNIT_Y;
-        static const Vector2f UNIT_SCALE;
 
     };
 
-    class Vector3f
+	typedef TVector2<float> Vector2f;
+	typedef TVector2<double> Vector2d;
+	typedef TVector2<int> Vector2i;
+
+	template <typename T> 
+    class TVector3
     {
     public:
-		float x, y, z;
+		T x, y, z;
 
     public:
-        inline Vector3f()
+        inline TVector3()
         {
         }
-
-		 
-		inline Vector3f( const double dX, const double dY, const double dZ )
-		{
-			x = (float)dX;
-			y = (float)dY;
-			z = (float)dZ;
-		}
  
-		 inline Vector3f( const Eigen::Vector3f& vec )
+		 inline TVector3( const Eigen::Vector3f& vec )
 			 : x( vec.x() ), y( vec.y() ), z( vec.z() )
         {
         }
 
-        inline Vector3f( const float fX, const float fY, const float fZ )
+        inline TVector3( const T fX, const T fY, const T fZ )
             : x( fX ), y( fY ), z( fZ )
         {
         }
-
-        inline explicit Vector3f( const float afCoordinate[3] )
-            : x( afCoordinate[0] ),
-              y( afCoordinate[1] ),
-              z( afCoordinate[2] )
-        {
-        }
-
-        inline explicit Vector3f( const int afCoordinate[3] )
-        {
-            x = (float)afCoordinate[0];
-            y = (float)afCoordinate[1];
-            z = (float)afCoordinate[2];
-        }
-
-        inline explicit Vector3f( float* const r )
-            : x( r[0] ), y( r[1] ), z( r[2] )
-        {
-        }
-
-        inline explicit Vector3f( const float scaler )
+ 
+        inline explicit TVector3( const T scaler )
             : x( scaler )
             , y( scaler )
             , z( scaler )
         {
         }
-
-
-		/** Exchange the contents of this vector with another. 
-		*/
-		inline void Swap(Vector3f& other)
-		{
-			Disorder::Swap<float>(x, other.x);
-			Disorder::Swap<float>(y, other.y);
-			Disorder::Swap<float>(z, other.z);
-		}
-
-		inline float operator [] ( const size_t i ) const
+ 
+		inline T operator [] ( const size_t i ) const
         {
-            BOOST_ASSERT( i < 3 );
             return *(&x+i);
         }
 
-		inline float& operator [] ( const size_t i )
+		inline T& operator [] ( const size_t i )
         {
-            BOOST_ASSERT( i < 3 );
             return *(&x+i);
         }
 		/// Pointer accessor for direct copying
-		inline float* Ptr()
+		inline T* Ptr()
 		{
 			return &x;
 		}
 		/// Pointer accessor for direct copying
-		inline const float* Ptr() const
+		inline const T* Ptr() const
 		{
 			return &x;
 		}
@@ -544,7 +421,7 @@ namespace Disorder
             @param
                 rkVector The other vector
         */
-        inline Vector3f& operator = ( const Vector3f& rkVector )
+        inline TVector3& operator = ( const TVector3& rkVector )
         {
             x = rkVector.x;
             y = rkVector.y;
@@ -553,16 +430,16 @@ namespace Disorder
             return *this;
         }
 
-		 inline Vector3f& operator = ( const Eigen::Vector3f& rkVector )
+		 inline TVector3& operator = ( const Eigen::Vector3f& rkVector )
         {
-            x = rkVector.x();
-            y = rkVector.y();
-            z = rkVector.z();
+            x = (T)(rkVector.x());
+            y = (T)(rkVector.y());
+            z = (T)(rkVector.z());
 
             return *this;
         }
 
-        inline Vector3f& operator = ( const float fScaler )
+        inline TVector3& operator = ( const T fScaler )
         {
             x = fScaler;
             y = fScaler;
@@ -571,130 +448,130 @@ namespace Disorder
             return *this;
         }
 
-        inline bool operator == ( const Vector3f& rkVector ) const
+        inline bool operator == ( const TVector3& rkVector ) const
         {
             return ( x == rkVector.x && y == rkVector.y && z == rkVector.z );
         }
 
-        inline bool operator != ( const Vector3f& rkVector ) const
+        inline bool operator != ( const TVector3& rkVector ) const
         {
             return ( x != rkVector.x || y != rkVector.y || z != rkVector.z );
         }
 
         // arithmetic operations
-        inline Vector3f operator + ( const Vector3f& rkVector ) const
+        inline TVector3 operator + ( const TVector3& rkVector ) const
         {
-            return Vector3f(
+            return TVector3(
                 x + rkVector.x,
                 y + rkVector.y,
                 z + rkVector.z);
         }
 
-        inline Vector3f operator - ( const Vector3f& rkVector ) const
+        inline TVector3 operator - ( const TVector3& rkVector ) const
         {
-            return Vector3f(
+            return TVector3(
                 x - rkVector.x,
                 y - rkVector.y,
                 z - rkVector.z);
         }
 
-        inline Vector3f operator * ( const float fScalar ) const
+        inline TVector3 operator * ( const T fScalar ) const
         {
-            return Vector3f(
+            return TVector3(
                 x * fScalar,
                 y * fScalar,
                 z * fScalar);
         }
 
-        inline Vector3f operator * ( const Vector3f& rhs) const
+        inline TVector3 operator * ( const TVector3& rhs) const
         {
-            return Vector3f(
+            return TVector3(
                 x * rhs.x,
                 y * rhs.y,
                 z * rhs.z);
         }
 
-        inline Vector3f operator / ( const float fScalar ) const
+        inline TVector3 operator / ( const T fScalar ) const
         {
             BOOST_ASSERT( fScalar != 0.0 );
 
-            float fInv = 1.0f / fScalar;
+            T fInv = 1.0f / fScalar;
 
-            return Vector3f(
+            return TVector3(
                 x * fInv,
                 y * fInv,
                 z * fInv);
         }
 
-        inline Vector3f operator / ( const Vector3f& rhs) const
+        inline TVector3 operator / ( const TVector3& rhs) const
         {
-            return Vector3f(
+            return TVector3(
                 x / rhs.x,
                 y / rhs.y,
                 z / rhs.z);
         }
 
-        inline const Vector3f& operator + () const
+        inline const TVector3& operator + () const
         {
             return *this;
         }
 
-        inline Vector3f operator - () const
+        inline TVector3 operator - () const
         {
-            return Vector3f(-x, -y, -z);
+            return TVector3(-x, -y, -z);
         }
 
         // overloaded operators to help Vector3f
-        inline friend Vector3f operator * ( const float fScalar, const Vector3f& rkVector )
+        inline friend TVector3 operator * ( const T fScalar, const TVector3& rkVector )
         {
-            return Vector3f(
+            return TVector3(
                 fScalar * rkVector.x,
                 fScalar * rkVector.y,
                 fScalar * rkVector.z);
         }
 
-        inline friend Vector3f operator / ( const float fScalar, const Vector3f& rkVector )
+        inline friend TVector3 operator / ( const T fScalar, const TVector3& rkVector )
         {
-            return Vector3f(
+            return TVector3(
                 fScalar / rkVector.x,
                 fScalar / rkVector.y,
                 fScalar / rkVector.z);
         }
 
-        inline friend Vector3f operator + (const Vector3f& lhs, const float rhs)
+        inline friend TVector3 operator + (const TVector3& lhs, const T rhs)
         {
-            return Vector3f(
+            return TVector3(
                 lhs.x + rhs,
                 lhs.y + rhs,
                 lhs.z + rhs);
         }
 
-        inline friend Vector3f operator + (const float lhs, const Vector3f& rhs)
+        inline friend TVector3 operator + (const T lhs, const TVector3& rhs)
         {
-            return Vector3f(
+            return TVector3(
                 lhs + rhs.x,
                 lhs + rhs.y,
                 lhs + rhs.z);
         }
 
-        inline friend Vector3f operator - (const Vector3f& lhs, const float rhs)
+        inline friend TVector3 operator - (const TVector3& lhs, const T rhs)
         {
-            return Vector3f(
+            return TVector3(
                 lhs.x - rhs,
                 lhs.y - rhs,
                 lhs.z - rhs);
         }
 
-        inline friend Vector3f operator - (const float lhs, const Vector3f& rhs)
+        inline friend TVector3 operator - (const T lhs, const TVector3& rhs)
         {
-            return Vector3f(
+            return TVector3(
                 lhs - rhs.x,
                 lhs - rhs.y,
                 lhs - rhs.z);
         }
 
         // arithmetic updates
-        inline Vector3f& operator += ( const Vector3f& rkVector )
+        inline TVector3& operator += ( const TVector3& rkVector )
         {
             x += rkVector.x;
             y += rkVector.y;
@@ -703,7 +580,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector3f& operator += ( const float fScalar )
+        inline TVector3& operator += ( const T fScalar )
         {
             x += fScalar;
             y += fScalar;
@@ -711,7 +588,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector3f& operator -= ( const Vector3f& rkVector )
+        inline TVector3& operator -= ( const TVector3& rkVector )
         {
             x -= rkVector.x;
             y -= rkVector.y;
@@ -720,7 +597,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector3f& operator -= ( const float fScalar )
+        inline TVector3& operator -= ( const T fScalar )
         {
             x -= fScalar;
             y -= fScalar;
@@ -728,7 +605,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector3f& operator *= ( const float fScalar )
+        inline TVector3& operator *= ( const T fScalar )
         {
             x *= fScalar;
             y *= fScalar;
@@ -736,7 +613,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector3f& operator *= ( const Vector3f& rkVector )
+        inline TVector3& operator *= ( const TVector3& rkVector )
         {
             x *= rkVector.x;
             y *= rkVector.y;
@@ -745,11 +622,11 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector3f& operator /= ( const float fScalar )
+        inline TVector3& operator /= ( const T fScalar )
         {
             BOOST_ASSERT( fScalar != 0.0 );
 
-            float fInv = 1.0f / fScalar;
+            T fInv = 1.0f / fScalar;
 
             x *= fInv;
             y *= fInv;
@@ -758,7 +635,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector3f& operator /= ( const Vector3f& rkVector )
+        inline TVector3& operator /= ( const TVector3& rkVector )
         {
             x /= rkVector.x;
             y /= rkVector.y;
@@ -767,48 +644,48 @@ namespace Disorder
             return *this;
         }
  
-        inline float Length () const
+        inline T Length () const
         {
-			return Math::Sqrtf( x * x + y * y + z * z );
+			return sqrt( x * x + y * y + z * z );
         }
 
         
-        inline float SquaredLength () const
+        inline T SquaredLength () const
         {
             return x * x + y * y + z * z;
         }
 
         
-        inline float Distance(const Vector3f& rhs) const
+        inline T Distance(const TVector3& rhs) const
         {
             return (*this - rhs).Length();
         }
 
         
-        inline float SquaredDistance(const Vector3f& rhs) const
+        inline T SquaredDistance(const TVector3& rhs) const
         {
             return (*this - rhs).SquaredLength();
         }
 
         
-        inline float Dot(const Vector3f& vec) const
+        inline T Dot(const TVector3& vec) const
         {
             return x * vec.x + y * vec.y + z * vec.z;
         }
  
-        inline float AbsDot(const Vector3f& vec) const
+        inline T AbsDot(const TVector3& vec) const
         {
-            return Abs<float>(x * vec.x) + Abs<float>(y * vec.y) + Abs<float>(z * vec.z);
+            return Abs(x * vec.x) + Abs(y * vec.y) + Abs(z * vec.z);
         }
 
        
-        inline float Normalise()
+        inline T Normalise()
         {
-			float fLength = Math::Sqrtf( x * x + y * y + z * z );
+			T fLength = sqrt( x * x + y * y + z * z );
 
-			if ( fLength > float(0.0f) && fLength != 1.0f )
+			if ( fLength > 0.0f && fLength != 1.0f )
             {
-                float fInvLength = 1.0f / fLength;
+                T fInvLength = 1.0f / fLength;
                 x *= fInvLength;
                 y *= fInvLength;
                 z *= fInvLength;
@@ -817,25 +694,15 @@ namespace Disorder
             return fLength;
         }
  
-        inline Vector3f Cross( const Vector3f& rkVector ) const
+        inline TVector3 Cross( const TVector3& rkVector ) const
         {
-            return Vector3f(
+            return TVector3(
                 y * rkVector.z - z * rkVector.y,
                 z * rkVector.x - x * rkVector.z,
                 x * rkVector.y - y * rkVector.x);
         }
-
-        
-        inline Vector3f MidPoint( const Vector3f& vec ) const
-        {
-            return Vector3f(
-                ( x + vec.x ) * 0.5f,
-                ( y + vec.y ) * 0.5f,
-                ( z + vec.z ) * 0.5f );
-        }
-
-      
-        inline bool operator < ( const Vector3f& rhs ) const
+ 
+        inline bool operator < ( const TVector3& rhs ) const
         {
             if( x < rhs.x && y < rhs.y && z < rhs.z )
                 return true;
@@ -843,7 +710,7 @@ namespace Disorder
         }
 
         
-        inline bool operator > ( const Vector3f& rhs ) const
+        inline bool operator > ( const TVector3& rhs ) const
         {
             if( x > rhs.x && y > rhs.y && z > rhs.z )
                 return true;
@@ -851,11 +718,11 @@ namespace Disorder
         }
  
         
-        inline Vector3f Perpendicular(void) const
+        inline TVector3 Perpendicular(void) const
         {
-            static const float fSquareZero = (float)(1e-06 * 1e-06);
+            static const T fSquareZero = (T)(1e-06 * 1e-06);
 
-			Vector3f perp = this->Cross( Vector3f::UNIT_X );
+			TVector3 perp = this->Cross( TVector3<T>(1,0,0) );
 
             // Check length
             if( perp.SquaredLength() < fSquareZero )
@@ -863,8 +730,9 @@ namespace Disorder
                 /* This vector is the Y axis multiplied by a scalar, so we have
                    to use another axis.
                 */
-				perp = this->Cross( Vector3f::UNIT_Y );
+				perp = this->Cross( TVector3<T>(0,1,0) );
             }
+
 			perp.Normalise();
 
             return perp;
@@ -872,35 +740,35 @@ namespace Disorder
        
 		/** Gets the angle between 2 vectors.
 		*/
-		inline float AngleBetween(const Vector3f& dest) const
+		inline T AngleBetween(const TVector3& dest) const
 		{
-			float lenProduct = Length() * dest.Length();
+			T lenProduct = Length() * dest.Length();
 
 			// Divide by zero check
 			if(lenProduct < 1e-6f)
 				lenProduct = 1e-6f;
 
-		    float f = Dot(dest) / lenProduct;
+		    T f = Dot(dest) / lenProduct;
 
-			f = Clamp<float>(f, (float)-1.0, (float)1.0);
-			return Math::ACosf(f);
+			f = Clamp(f, -1.0, 1.0);
+			return acos(f);
 
 		}
 
         /** Returns true if this vector is zero length. */
         inline bool IsZeroLength(void) const
         {
-            float sqlen = (x * x) + (y * y) + (z * z);
-            return (sqlen < (1e-06 * 1e-06));
+            T sqlen = (x * x) + (y * y) + (z * z);
+            return (sqlen < (1e-08));
 
         }
  
         /** Calculates a reflection vector to the plane with the given normal .
         @remarks NB assumes 'this' is pointing AWAY FROM the plane, invert if it is not.
         */
-        inline Vector3f Reflect(const Vector3f& normal) const
+        inline TVector3 Reflect(const TVector3& normal) const
         {
-            return Vector3f( *this - ( 2 * this->Dot(normal) * normal ) );
+            return TVector3( *this - ( 2 * this->Dot(normal) * normal ) );
         }
 
 		/** Returns whether this vector is within a positional tolerance
@@ -909,11 +777,11 @@ namespace Disorder
 		@param tolerance The amount that each element of the vector may vary by
 			and still be considered equal
 		*/
-		inline bool PositionEquals(const Vector3f& rhs, float tolerance = 1e-03) const
+		inline bool PositionEquals(const TVector3& rhs, float tolerance = 1e-03) const
 		{
-			return Math::FloatEqual(x, rhs.x, tolerance) &&
-				Math::FloatEqual(y, rhs.y, tolerance) &&
-				Math::FloatEqual(z, rhs.z, tolerance);
+			return Math::FloatEqual((float)x, (float)rhs.x, tolerance) &&
+				Math::FloatEqual((float)y, (float)rhs.y, tolerance) &&
+				Math::FloatEqual((float)z, (float)rhs.z, tolerance);
 
 		}
 
@@ -924,101 +792,51 @@ namespace Disorder
 			still be considered equal
 		@note Both vectors should be normalised.
 		*/
-		inline bool DirectionEquals(const Vector3f& rhs,
+		inline bool DirectionEquals(const TVector3& rhs,
 			const float& tolerance) const
 		{
-			float dot = Dot(rhs);
-			float angle = Math::ACosf(dot);
+			T dot = Dot(rhs);
+			T angle = acos(dot);
 
-			return Abs<float>(angle) <= tolerance;
+			return Abs(angle) <= tolerance;
 
 		}
 
 		/// Check whether this vector contains valid values
 	 	inline bool IsNaN() const
 		{
-			return Math::IsNaN(x) || Math::IsNaN(y) || Math::IsNaN(z);
+			return _isnan(x) || _isnan(y) || _isnan(z);
 		}
-
-		/// Extract the primary (dominant) axis from this direction vector
-		inline Vector3f PrimaryAxis() const
-		{
-			float absx = Abs<float>(x);
-			float absy = Abs<float>(y);
-			float absz = Abs<float>(z);
-			if (absx > absy)
-				if (absx > absz)
-					return x > 0 ? Vector3f::UNIT_X : Vector3f::NEGATIVE_UNIT_X;
-				else
-					return z > 0 ? Vector3f::UNIT_Z : Vector3f::NEGATIVE_UNIT_Z;
-			else // absx <= absy
-				if (absy > absz)
-					return y > 0 ? Vector3f::UNIT_Y : Vector3f::NEGATIVE_UNIT_Y;
-				else
-					return z > 0 ? Vector3f::UNIT_Z : Vector3f::NEGATIVE_UNIT_Z;
-		}
-
-		// special points
-        static const Vector3f ZERO;
-        static const Vector3f UNIT_X;
-        static const Vector3f UNIT_Y;
-        static const Vector3f UNIT_Z;
-        static const Vector3f NEGATIVE_UNIT_X;
-        static const Vector3f NEGATIVE_UNIT_Y;
-        static const Vector3f NEGATIVE_UNIT_Z;
-        static const Vector3f UNIT_SCALE;
-    };
  
-    class  Vector4f
+    };
+
+	typedef TVector3<float> Vector3f;
+	typedef TVector3<double> Vector3d;
+	typedef TVector3<int>  Vector3i;
+ 
+	template<typename T>
+    class TVector4
     {
     public:
-        float x, y, z, w;
+        T x, y, z, w;
 
     public:
-        inline Vector4f()
+        inline TVector4()
         {
         }
 
-        inline Vector4f( const float fX, const float fY, const float fZ, const float fW )
+        inline TVector4( const T fX, const T fY, const T fZ, const T fW )
             : x( fX ), y( fY ), z( fZ ), w( fW)
         {
         }
 
-		inline Vector4f( const Eigen::Vector4f& vec)
+		inline TVector4( const Eigen::Vector4f& vec)
 			: x( vec.x() ), y( vec.y() ), z( vec.z() ), w( vec.w() )
         {
         }
+ 
 
-		inline Vector4f( const double dX, const double dY, const double dZ, const double dW )
-		{
-			x = (float)dX;
-			y = (float)dY;
-			z = (float)dZ;
-			w = (float)dW;
-		}
-
-        inline explicit Vector4f( const float afCoordinate[4] )
-            : x( afCoordinate[0] ),
-              y( afCoordinate[1] ),
-              z( afCoordinate[2] ),
-              w( afCoordinate[3] )
-        {
-        }
-
-        inline explicit Vector4f( const int afCoordinate[4] )
-        {
-            x = (float)afCoordinate[0];
-            y = (float)afCoordinate[1];
-            z = (float)afCoordinate[2];
-            w = (float)afCoordinate[3];
-        }
-
-        inline explicit Vector4f( float* const r )
-            : x( r[0] ), y( r[1] ), z( r[2] ), w( r[3] )
-        {
-        }
-
-        inline explicit Vector4f( const float scaler )
+        inline explicit TVector4( const T scaler )
             : x( scaler )
             , y( scaler )
             , z( scaler )
@@ -1026,48 +844,34 @@ namespace Disorder
         {
         }
 
-        inline explicit Vector4f(const Vector3f& rhs)
-            : x(rhs.x), y(rhs.y), z(rhs.z), w(1.0f)
+        inline explicit TVector4(const TVector3<T>& rhs)
+            : x(rhs.x), y(rhs.y), z(rhs.z), w((T)1)
         {
         }
-
-		/** Exchange the contents of this vector with another. 
-		*/
-		inline void Swap(Vector4f& other)
-		{
-			Disorder::Swap<float>(x, other.x);
-			Disorder::Swap<float>(y, other.y);
-			Disorder::Swap<float>(z, other.z);
-			Disorder::Swap<float>(w, other.w);
-		}
-	
-		inline float operator [] ( const size_t i ) const
+ 
+		inline T operator [] ( const size_t i ) const
         {
-            BOOST_ASSERT( i < 4 );
-
             return *(&x+i);
         }
 
-		inline float& operator [] ( const size_t i )
-        {
-            BOOST_ASSERT( i < 4 );
-
+		inline T& operator [] ( const size_t i )
+		{
             return *(&x+i);
         }
 
 		/// Pointer accessor for direct copying
-		inline float* Ptr()
+		inline T* Ptr()
 		{
 			return &x;
 		}
 		/// Pointer accessor for direct copying
-		inline const float* Ptr() const
+		inline const T* Ptr() const
 		{
 			return &x;
 		}
 
  
-        inline Vector4f& operator = ( const Vector4f& rkVector )
+        inline TVector4& operator = ( const TVector4& rkVector )
         {
             x = rkVector.x;
             y = rkVector.y;
@@ -1077,7 +881,7 @@ namespace Disorder
             return *this;
         }
 
-		 inline Vector4f& operator = ( const Eigen::Vector4f& rkVector )
+		 inline TVector4& operator = ( const Eigen::Vector4f& rkVector )
         {
             x = rkVector.x();
             y = rkVector.y();
@@ -1087,7 +891,7 @@ namespace Disorder
             return *this;
         }
 
-		inline Vector4f& operator = ( const float fScalar)
+		inline TVector4& operator = ( const T fScalar)
 		{
 			x = fScalar;
 			y = fScalar;
@@ -1096,7 +900,7 @@ namespace Disorder
 			return *this;
 		}
 
-        inline bool operator == ( const Vector4f& rkVector ) const
+        inline bool operator == ( const TVector4& rkVector ) const
         {
             return ( x == rkVector.x &&
                 y == rkVector.y &&
@@ -1104,7 +908,7 @@ namespace Disorder
                 w == rkVector.w );
         }
 
-        inline bool operator != ( const Vector4f& rkVector ) const
+        inline bool operator != ( const TVector4& rkVector ) const
         {
             return ( x != rkVector.x ||
                 y != rkVector.y ||
@@ -1112,132 +916,132 @@ namespace Disorder
                 w != rkVector.w );
         }
 
-        inline Vector4f& operator = (const Vector3f& rhs)
+        inline TVector4& operator = (const TVector3<T>& rhs)
         {
             x = rhs.x;
             y = rhs.y;
             z = rhs.z;
-            w = 1.0f;
+            w = (T)1;
             return *this;
         }
 
         // arithmetic operations
-        inline Vector4f operator + ( const Vector4f& rkVector ) const
+        inline TVector4 operator + ( const TVector4& rkVector ) const
         {
-            return Vector4f(
+            return TVector4(
                 x + rkVector.x,
                 y + rkVector.y,
                 z + rkVector.z,
                 w + rkVector.w);
         }
 
-        inline Vector4f operator - ( const Vector4f& rkVector ) const
+        inline TVector4 operator - ( const TVector4& rkVector ) const
         {
-            return Vector4f(
+            return TVector4(
                 x - rkVector.x,
                 y - rkVector.y,
                 z - rkVector.z,
                 w - rkVector.w);
         }
 
-        inline Vector4f operator * ( const float fScalar ) const
+        inline TVector4 operator * ( const T fScalar ) const
         {
-            return Vector4f(
+            return TVector4(
                 x * fScalar,
                 y * fScalar,
                 z * fScalar,
                 w * fScalar);
         }
 
-        inline Vector4f operator * ( const Vector4f& rhs) const
+        inline TVector4 operator * ( const TVector4& rhs) const
         {
-            return Vector4f(
+            return TVector4(
                 rhs.x * x,
                 rhs.y * y,
                 rhs.z * z,
                 rhs.w * w);
         }
 
-        inline Vector4f operator / ( const float fScalar ) const
+        inline TVector4 operator / ( const T fScalar ) const
         {
             BOOST_ASSERT( fScalar != 0.0 );
 
-            float fInv = 1.0f / fScalar;
+            T fInv = 1.0f / fScalar;
 
-            return Vector4f(
+            return TVector4(
                 x * fInv,
                 y * fInv,
                 z * fInv,
                 w * fInv);
         }
 
-        inline Vector4f operator / ( const Vector4f& rhs) const
+        inline TVector4 operator / ( const TVector4& rhs) const
         {
-            return Vector4f(
+            return TVector4(
                 x / rhs.x,
                 y / rhs.y,
                 z / rhs.z,
                 w / rhs.w);
         }
 
-        inline const Vector4f& operator + () const
+        inline const TVector4& operator + () const
         {
             return *this;
         }
 
-        inline Vector4f operator - () const
+        inline TVector4 operator - () const
         {
-            return Vector4f(-x, -y, -z, -w);
+            return TVector4(-x, -y, -z, -w);
         }
 
-        inline friend Vector4f operator * ( const float fScalar, const Vector4f& rkVector )
+        inline friend TVector4 operator * ( const T fScalar, const TVector4& rkVector )
         {
-            return Vector4f(
+            return TVector4(
                 fScalar * rkVector.x,
                 fScalar * rkVector.y,
                 fScalar * rkVector.z,
                 fScalar * rkVector.w);
         }
 
-        inline friend Vector4f operator / ( const float fScalar, const Vector4f& rkVector )
+        inline friend TVector4 operator / ( const T fScalar, const TVector4& rkVector )
         {
-            return Vector4f(
+            return TVector4(
                 fScalar / rkVector.x,
                 fScalar / rkVector.y,
                 fScalar / rkVector.z,
                 fScalar / rkVector.w);
         }
 
-        inline friend Vector4f operator + (const Vector4f& lhs, const float rhs)
+        inline friend TVector4 operator + (const TVector4& lhs, const T rhs)
         {
-            return Vector4f(
+            return TVector4(
                 lhs.x + rhs,
                 lhs.y + rhs,
                 lhs.z + rhs,
                 lhs.w + rhs);
         }
 
-        inline friend Vector4f operator + (const float lhs, const Vector4f& rhs)
+        inline friend TVector4 operator + (const T lhs, const TVector4& rhs)
         {
-            return Vector4f(
+            return TVector4(
                 lhs + rhs.x,
                 lhs + rhs.y,
                 lhs + rhs.z,
                 lhs + rhs.w);
         }
 
-        inline friend Vector4f operator - (const Vector4f& lhs, float rhs)
+        inline friend TVector4 operator - (const TVector4& lhs, T rhs)
         {
-            return Vector4f(
+            return TVector4(
                 lhs.x - rhs,
                 lhs.y - rhs,
                 lhs.z - rhs,
                 lhs.w - rhs);
         }
 
-        inline friend Vector4f operator - (const float lhs, const Vector4f& rhs)
+        inline friend TVector4 operator - (const T lhs, const TVector4& rhs)
         {
-            return Vector4f(
+            return TVector4(
                 lhs - rhs.x,
                 lhs - rhs.y,
                 lhs - rhs.z,
@@ -1245,7 +1049,7 @@ namespace Disorder
         }
 
         // arithmetic updates
-        inline Vector4f& operator += ( const Vector4f& rkVector )
+        inline TVector4& operator += ( const TVector4& rkVector )
         {
             x += rkVector.x;
             y += rkVector.y;
@@ -1255,7 +1059,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector4f& operator -= ( const Vector4f& rkVector )
+        inline TVector4& operator -= ( const TVector4& rkVector )
         {
             x -= rkVector.x;
             y -= rkVector.y;
@@ -1265,7 +1069,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector4f& operator *= ( const float fScalar )
+        inline TVector4& operator *= ( const T fScalar )
         {
             x *= fScalar;
             y *= fScalar;
@@ -1274,7 +1078,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector4f& operator += ( const float fScalar )
+        inline TVector4& operator += ( const T fScalar )
         {
             x += fScalar;
             y += fScalar;
@@ -1283,7 +1087,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector4f& operator -= ( const float fScalar )
+        inline TVector4& operator -= ( const T fScalar )
         {
             x -= fScalar;
             y -= fScalar;
@@ -1292,7 +1096,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector4f& operator *= ( const Vector4f& rkVector )
+        inline TVector4& operator *= ( const TVector4& rkVector )
         {
             x *= rkVector.x;
             y *= rkVector.y;
@@ -1302,11 +1106,11 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector4f& operator /= ( const float fScalar )
+        inline TVector4& operator /= ( const T fScalar )
         {
             BOOST_ASSERT( fScalar != 0.0 );
 
-            float fInv = 1.0f / fScalar;
+            T fInv = 1.0f / fScalar;
 
             x *= fInv;
             y *= fInv;
@@ -1316,7 +1120,7 @@ namespace Disorder
             return *this;
         }
 
-        inline Vector4f& operator /= ( const Vector4f& rkVector )
+        inline TVector4& operator /= ( const TVector4& rkVector )
         {
             x /= rkVector.x;
             y /= rkVector.y;
@@ -1327,19 +1131,20 @@ namespace Disorder
         }
 
          
-        inline float Dot(const Vector4f& vec) const
+        inline T Dot(const TVector4& vec) const
         {
             return x * vec.x + y * vec.y + z * vec.z + w * vec.w;
         }
 		/// Check whether this vector contains valid values
 		inline bool IsNaN() const
 		{
-			return Math::IsNaN(x) || Math::IsNaN(y) || Math::IsNaN(z) || Math::IsNaN(w);
+			return _isnan(x) || _isnan(y) || _isnan(z) || _isnan(w);
 		}
         
-        // special
-        static const Vector4f ZERO;
-		static const Vector4f ONE;
     };
+
+	typedef TVector4<float> Vector4f;
+	typedef TVector4<double> Vector4d;
+	typedef TVector4<int> Vector4i;
  }
 #endif

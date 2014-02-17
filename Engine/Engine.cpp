@@ -75,7 +75,7 @@ namespace Disorder
 		strstream << "Drawed triangle num:" << GDrawTriNumber;
 		std::string drawstr = strstream.str();
 		float length = canvas->GetStringLength(0.04f,drawstr);
-		canvas->DrawString(0.98f - length ,0.01f,0.04f,Vector4f::ONE,drawstr);
+		canvas->DrawString(0.98f - length ,0.01f,0.04f,Vector4f(1.f,1.f,1.f,1.f),drawstr);
    }
 
    EnginePtr Engine::Create()

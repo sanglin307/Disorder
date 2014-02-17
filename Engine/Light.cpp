@@ -47,7 +47,7 @@ namespace Disorder
 		Eigen::Vector3f beginPos = go->GetWorldPosition();
 		Eigen::Vector3f endPos = beginPos + GetDirection() * 2;
 			
-		GEngine->GameCanvas->DrawLine(beginPos,Vector4f::ONE,endPos,Vector4f(0,0,0,1.f));
+		GEngine->GameCanvas->DrawLine(beginPos,Vector4f(1.f,1.f,1.f,1.f),endPos,Vector4f(0,0,0,1.f));
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	PointLight::PointLight(std::string const& name)

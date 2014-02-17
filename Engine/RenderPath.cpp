@@ -188,7 +188,7 @@ namespace Disorder
 			obj->PostRender(mainCamera);
 		}
 
-		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,Vector4f::ONE,"Forward Lighting Mode");
+		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,Vector4f(1.f,1.f,1.f,1.f),"Forward Lighting Mode");
 
 		GSceneManager->DebugDraw();
 
@@ -423,7 +423,7 @@ namespace Disorder
 		GEngine->RenderEngine->SetEffect(NULL);
 		
 		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,depthSurfacePtr,true);
-		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,Vector4f::ONE,"Deferred Shading Mode");
+		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,Vector4f(1.f,1.f,1.f,1.f),"Deferred Shading Mode");
 		GSceneManager->DebugDraw();
 
 		// before we call canvas draw ,we should check if we should add stat info to canvas.
