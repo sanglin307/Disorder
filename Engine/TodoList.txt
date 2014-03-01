@@ -3,3 +3,6 @@
 . Animiation (FBX : ConvertPivotAnimationRecursive)
 . camera , spot and direction light can set target to fbxNode(fbxMaker) ( Node Target Management of fbx)
 . Octree
+
+
+http://www.j3d.org/matrix_faq/matrfaq_latest.html#Q60

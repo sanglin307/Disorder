@@ -13,7 +13,7 @@ namespace Disorder
 		virtual void OnDrawBegin(){};
 		virtual void OnDrawEnd(){};
 
-		virtual void AdjustProjMatrix(Eigen::Matrix4f &matrix){};
+		virtual void AdjustProjMatrix(const glm::mat4 &matrix){};
 
 		virtual void CreateViewport(void *hWnd) = 0;
 

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -28,7 +28,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -43,7 +43,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
-    <IncludePath>$(DXSDK_DIR)\Include;..\Engine;$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;..\..\External\oiio\src\include;..\..\External\openEXR\lib\include;..\..\External\eigen3.2;$(IncludePath)</IncludePath>
+    <IncludePath>$(DXSDK_DIR)\Include;..\Engine;$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;..\..\External\oiio\src\include;..\..\External\openEXR\lib\include;..\..\External\eigen3.2;..\..\External\glm-0.9.5;$(IncludePath)</IncludePath>
     <LibraryPath>$(DXSDK_DIR)\Lib\x86;..\..\External\ois-v1-3\lib;..\..\External\freetype-2.4.10\objs\win32\vc2010;..\..\External\oiio\build\libOpenImageIO\Debug;$(FBXSDK)\lib\vs2010\x86;$(BOOST_ROOT)\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -98,12 +98,10 @@
   <ItemGroup>
     <ClCompile Include="WinLauncher.cpp" />
     <ClCompile Include="WinClient.cpp" />
-    <ClCompile Include="WinFileSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WinLauncher.h" />
     <ClInclude Include="WinClient.h" />
-    <ClInclude Include="WinFileSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DX11Render\DX11Render.vcxproj">

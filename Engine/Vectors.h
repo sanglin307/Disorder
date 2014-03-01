@@ -390,6 +390,13 @@ namespace Disorder
         {
         }
  
+		inline TVector3( const glm::vec3& vec )
+        {
+			x = vec.x;
+			y = vec.y;
+			z = vec.z;
+        }
+
         inline explicit TVector3( const T scaler )
             : x( scaler )
             , y( scaler )
@@ -438,6 +445,13 @@ namespace Disorder
 
             return *this;
         }
+
+		 inline TVector3& operator = (const glm::vec3& vec )
+		 {
+			 x = vec.x;
+			 y = vec.y;
+			 z = vec.z;
+		 }
 
         inline TVector3& operator = ( const T fScaler )
         {

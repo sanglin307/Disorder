@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -27,7 +27,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -41,7 +41,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
-    <IncludePath>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;..\..\External\oiio\src\include;$(FBXSDK)\include;..\..\External\openEXR\lib\include;..\..\External\eigen3.2;$(IncludePath)</IncludePath>
+    <IncludePath>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;..\..\External\oiio\src\include;$(FBXSDK)\include;..\..\External\openEXR\lib\include;..\..\External\eigen3.2;..\..\External\glm-0.9.5;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;..\..\External\oiio\src\include;$(FBXSDK)\include;..\..\External\openEXR\lib\include;..\..\External\eigen3.2;$(IncludePath)</IncludePath>
@@ -54,7 +54,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FBXSDK_NEW_API;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>EngineInclude.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Zm170 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-Zm183 %(AdditionalOptions)</AdditionalOptions>
       <TreatWarningAsError>true</TreatWarningAsError>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -129,6 +129,7 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Matrixs.h" />
+    <ClInclude Include="Quaternion.h" />
     <ClInclude Include="RenderEngine.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderDefine.h" />
@@ -178,7 +179,6 @@
     <ClCompile Include="MainLoop.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MathLib.cpp" />
-    <ClCompile Include="Matrixs.cpp" />
     <ClCompile Include="RenderEffect.cpp" />
     <ClCompile Include="RenderEngine.cpp" />
     <ClCompile Include="Renderer.cpp" />

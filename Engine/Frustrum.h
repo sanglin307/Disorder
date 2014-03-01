@@ -19,7 +19,7 @@ namespace Disorder
 	public:
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		Frustrum();
-		void Construct(const Eigen::Matrix4f& viewProjInvMatrix);
+		void Construct(const Matrix4f& viewProjInvMatrix);
 		bool Overlaps(BoxBounds & bounds) const;
 		bool Overlaps(SphereBounds const& bounds) const;
 
@@ -28,7 +28,7 @@ namespace Disorder
 		void Draw();
 	private:
 		Eigen::Hyperplane<float,3> _Planes[6];
-		Eigen::Vector3f _Points[8]; // clock-wise, near - far
+		Vector3f _Points[8]; // clock-wise, near - far
 	};
 
 }

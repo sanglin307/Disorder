@@ -4,7 +4,7 @@
 namespace Disorder
 {
  
-	CameraSphereTargetUpdatePtr CameraSphereTargetUpdate::Create(float fRadius,const Eigen::Vector3f& target)
+	CameraSphereTargetUpdatePtr CameraSphereTargetUpdate::Create(float fRadius,const glm::vec3& target)
 	{
 		CameraSphereTargetUpdate *pTarget = new CameraSphereTargetUpdate(fRadius,target);
 		return CameraSphereTargetUpdatePtr(pTarget);
@@ -40,16 +40,18 @@ namespace Disorder
 				float speed = GConfig->pCameraConfig->mFreeMode.MoveSpeed;
 				if( mouseEvent.RelativeX != 0 )
 				{
-					Eigen::Vector3f moveDelta = pCamera->Right() * speed * deltaSeconds * (float)mouseEvent.RelativeX;
-					pCamera->_eyePos -= moveDelta;
+					glm::vec3 moveDelta = pCamera->Right() * speed * deltaSeconds * (float)mouseEvent.RelativeX;
+					pCamera->EyePos -= moveDelta;
+				
 					_target -= moveDelta;
 					pCamera->_InvalidViewMatrix = true;
 				}
 
 				if( mouseEvent.RelativeY != 0 )
 				{
-					Eigen::Vector3f moveDelta = pCamera->Up() * speed * deltaSeconds * (float)mouseEvent.RelativeY;
-					pCamera->_eyePos += moveDelta;
+					glm::vec3 moveDelta = pCamera->Up() * speed * deltaSeconds * (float)mouseEvent.RelativeY;
+					pCamera->EyePos += moveDelta;
+					
 					_target += moveDelta;
 					pCamera->_InvalidViewMatrix = true;
 				}
@@ -63,11 +65,13 @@ namespace Disorder
 
 				float speed = GConfig->pCameraConfig->mFreeMode.RotateSpeed;
 
-				Math::ConvertToSphericalCoord(pCamera->_eyePos,_target,_radius,yAngle,zAngle);
+			
 
+				Math::ConvertToSphericalCoord(pCamera->EyePos,_target,_radius,yAngle,zAngle);
+ 
 				if( mouseEvent.RelativeX != 0 && mouseEvent.buttonDown(OIS::MB_Left) )
-				{				
-					zAngle += deltaSeconds * speed * mouseEvent.RelativeX;	  
+				{
+					zAngle += deltaSeconds * speed * mouseEvent.RelativeX;	 
 				}
 
 				if( mouseEvent.RelativeY != 0 && mouseEvent.buttonDown(OIS::MB_Left) )
@@ -100,11 +104,11 @@ namespace Disorder
 
 				if( yAngle > Math::PI - limit )
 					yAngle = Math::PI - limit;
-
-
-				Eigen::Vector3f finalPos;
+ 
+				glm::vec3 finalPos;
 				Math::ConvertFromSphericalCoord(_radius,yAngle,zAngle,_target,finalPos);
-				pCamera->LookAt_(finalPos,_target,Eigen::Vector3f::UnitY());
+ 
+				pCamera->LookAt_(finalPos,_target,glm::vec3(0,1,0));
 				return true;
 			}		
 	
@@ -114,11 +118,11 @@ namespace Disorder
 		return false;
 	}
 
-	void CameraSphereTargetUpdate::SetTarget(Camera *pCamera,const Eigen::Vector3f& target)
+	void CameraSphereTargetUpdate::SetTarget(Camera *pCamera,const glm::vec3& target)
 	{
-		Eigen::Vector3f viewVec = target - pCamera->_eyePos;
-		viewVec.normalize();
-		_target = pCamera->_eyePos + viewVec * _radius ;
+		glm::vec3 viewVec = target - pCamera->EyePos;
+		viewVec = glm::normalize(viewVec);
+		_target = pCamera->EyePos + viewVec * _radius ;
 	}
 
 	bool CameraSphereTargetUpdate::Update(Camera *pCamera, float deltaSeconds)
@@ -139,27 +143,40 @@ namespace Disorder
 	{
 		if( mouseEvent.buttonDown(OIS::MB_Left) )
 		{
-			Eigen::Vector3f eulerAngle = pCamera->ViewMatrix.linear().eulerAngles(0,1,2); //.toRotationMatrixGetPitch(false);
+			Eigen::Matrix3f RotMatrix;
+			RotMatrix << pCamera->ViewMatrix[0][0],pCamera->ViewMatrix[1][0],pCamera->ViewMatrix[2][0],
+				         pCamera->ViewMatrix[0][1],pCamera->ViewMatrix[1][1],pCamera->ViewMatrix[2][1],
+						 pCamera->ViewMatrix[0][2],pCamera->ViewMatrix[1][2],pCamera->ViewMatrix[2][2];
+			
+			Eigen::Vector3f eulerAngle = RotMatrix.eulerAngles(0,1,2);  
+			//glm::vec3 euler = glm::eulerAngles(pCamera->Rotation);
+		
 			float speed = GConfig->pCameraConfig->mFreeMode.RotateSpeed;
 			if( mouseEvent.RelativeX != 0 )
 			{
 				eulerAngle.y() += mouseEvent.RelativeX * speed * deltaSeconds;
+				//euler.y += mouseEvent.RelativeX * speed * deltaSeconds;
 			}
 
 			if( mouseEvent.RelativeY != 0 )
 			{
 				eulerAngle.x() += mouseEvent.RelativeY * speed * deltaSeconds;    
+				//euler.x += mouseEvent.RelativeY * speed * deltaSeconds;    
 			}
 
 			if( mouseEvent.RelativeY != 0 || mouseEvent.RelativeX != 0 )
 			{
  
-				pCamera->_rotation = Eigen::AngleAxisf(eulerAngle.x(),Eigen::Vector3f::UnitX()) *   
+				Eigen::Quaternionf q  =  Eigen::AngleAxisf(eulerAngle.x(),Eigen::Vector3f::UnitX()) *   
 					                 Eigen::AngleAxisf(eulerAngle.y(),Eigen::Vector3f::UnitY()) *  
 									 Eigen::AngleAxisf(eulerAngle.z(),Eigen::Vector3f::UnitZ());    
-				 
-				pCamera->_rotation = pCamera->_rotation.conjugate();
- 
+				
+				//glm::quat q = glm::toQuat(glm::orientate3(euler));
+			 //  glm::quat q2 = glm::conjugate(q);
+			   //glm::quat q3 = glm::inverse(q);
+			  // pCamera->Rotation = q;
+				q = q.conjugate();
+				pCamera->Rotation = glm::quat(q.w(),q.x(),q.y(),q.z());
 				pCamera->_InvalidViewMatrix = true;
 		        
 			}
@@ -176,37 +193,37 @@ namespace Disorder
 		float speed = GConfig->pCameraConfig->mFreeMode.MoveSpeed ;
 		if( inputManager->IsKeyDown(OIS::KC_W) )
 		{
-			pCamera->_eyePos = pCamera->_eyePos + pCamera->Direction() * speed * deltaSeconds;
+			pCamera->EyePos = pCamera->EyePos - pCamera->Direction() * speed * deltaSeconds;		 
 			pCamera->_InvalidViewMatrix = true;
 		}
 
 		if( inputManager->IsKeyDown(OIS::KC_S) )
 		{
-			pCamera->_eyePos = pCamera->_eyePos - pCamera->Direction() * speed * deltaSeconds;
+			pCamera->EyePos = pCamera->EyePos + pCamera->Direction() * speed * deltaSeconds;
 			pCamera->_InvalidViewMatrix = true;
 		}
 
 		if( inputManager->IsKeyDown(OIS::KC_A) )
 		{
-			pCamera->_eyePos = pCamera->_eyePos - pCamera->Right() * speed * deltaSeconds;
+			pCamera->EyePos = pCamera->EyePos - pCamera->Right() * speed * deltaSeconds;
 			pCamera->_InvalidViewMatrix = true;
 		}
 
 		if( inputManager->IsKeyDown(OIS::KC_D) )
 		{
-			pCamera->_eyePos = pCamera->_eyePos + pCamera->Right() * speed * deltaSeconds;
+			pCamera->EyePos = pCamera->EyePos + pCamera->Right() * speed * deltaSeconds;			 
 			pCamera->_InvalidViewMatrix = true;
 		}
 
 		if( inputManager->IsKeyDown(OIS::KC_Q) )
 		{
-			pCamera->_eyePos = pCamera->_eyePos + pCamera->Up() * speed * deltaSeconds;
+			pCamera->EyePos = pCamera->EyePos + pCamera->Up() * speed * deltaSeconds;			 
 			pCamera->_InvalidViewMatrix = true;
 		}
 
 		if( inputManager->IsKeyDown(OIS::KC_E) )
 		{
-			pCamera->_eyePos = pCamera->_eyePos - pCamera->Up() * speed * deltaSeconds;
+			pCamera->EyePos = pCamera->EyePos - pCamera->Up() * speed * deltaSeconds;		 
 			pCamera->_InvalidViewMatrix = true;
 		}
 
@@ -228,7 +245,7 @@ namespace Disorder
 		_FOV = GConfig->pCameraConfig->FOV * Math::fDeg2Rad;
 		_aspectRatio = GConfig->pRenderConfig->SizeX*1.0f/GConfig->pRenderConfig->SizeY;
 
-		LookAt_(Eigen::Vector3f::Zero(),Eigen::Vector3f(0.0f,0.0f,-1.0f),Eigen::Vector3f(0.f,1.f,0.f));
+		LookAt_(glm::vec3(0,0,0),glm::vec3(0.0f,0.0f,-1.0f),glm::vec3(0.f,1.f,0.f));
 		ProjCalculate(_FOV,_nearPlane,_farPlane);
 
 		SetUpdateStrategy(eSphericalTargetMode);
@@ -246,13 +263,13 @@ namespace Disorder
 
 	void Camera::UpdateShaderProperty()
 	{
-		_viewMatrixProperty->SetData(ViewMatrix.data());
-		_projMatrixProperty->SetData(ProjMatrix.data());
-		_viewProjMatrixProperty->SetData(ViewProjMatrix.data());
-		_viewInvProperty->SetData(ViewInvMatrix.data());
-		_projInvProperty->SetData(ProjInvMatrix.data());
-		_viewProjInvProperty->SetData(ViewProjInvMatrix.data());
-		_positionProperty->SetData(_eyePos.data());
+		_viewMatrixProperty->SetData(glm::value_ptr(ViewMatrix));
+		_projMatrixProperty->SetData(glm::value_ptr(ProjMatrix));
+		_viewProjMatrixProperty->SetData(glm::value_ptr(ViewProjMatrix));
+		_viewInvProperty->SetData(glm::value_ptr(ViewInvMatrix));
+		_projInvProperty->SetData(glm::value_ptr(ProjInvMatrix));
+		_viewProjInvProperty->SetData(glm::value_ptr(ViewProjInvMatrix));
+		_positionProperty->SetData(glm::value_ptr(EyePos));
 		_propertyManager->UpdateShaderProperty();
 
 	}
@@ -262,14 +279,17 @@ namespace Disorder
 		if( !_InvalidViewMatrix )
 			return;
 
-		Eigen::Quaternionf q = _rotation.conjugate();
-        ViewMatrix.linear() = q.toRotationMatrix();
-		ViewMatrix.translation() = - (ViewMatrix.linear() * _eyePos);
+		glm::mat3 mat = glm::mat3_cast(Rotation);
+		_Right = glm::column(mat,0);
+		_Up = glm::column(mat,1);
+		_Direction = glm::column(mat,2);
+	 
+		ViewMatrix = Math::ViewMatrixRH(EyePos,_Right,_Up,_Direction);
+		ViewInvMatrix = glm::inverse(ViewMatrix);
+		ViewProjMatrix =   ProjMatrix * ViewMatrix;
+		ViewProjInvMatrix = ViewInvMatrix * ProjInvMatrix ;
 
-		ViewInvMatrix = ViewMatrix.inverse().matrix();
-		ViewProjMatrix.noalias() =  ProjMatrix * ViewMatrix.matrix();
-		ViewProjInvMatrix.noalias() = ViewInvMatrix * ProjInvMatrix;
-		CameraFrustrum.Construct(ViewProjInvMatrix);
+		//CameraFrustrum.Construct(ViewProjInvMatrix);
 
 		_InvalidViewMatrix = false;
 
@@ -281,13 +301,13 @@ namespace Disorder
 			return;
  
 		ProjMatrix = Math::ProjFovRH(_FOV,_aspectRatio,_nearPlane,_farPlane);
-
 		GEngine->RenderEngine->AdjustProjMatrix(ProjMatrix);
-		ProjInvMatrix = ProjMatrix.inverse();
-		ViewProjMatrix.noalias() =  ProjMatrix * ViewMatrix.matrix();
-		ViewProjInvMatrix.noalias() = ViewInvMatrix * ProjInvMatrix;
 
-		CameraFrustrum.Construct(ViewProjInvMatrix);
+		ProjInvMatrix = glm::inverse(ProjMatrix);
+		ViewProjMatrix =  ProjMatrix * ViewMatrix;
+		ViewProjInvMatrix = ViewInvMatrix * ProjInvMatrix  ;
+
+	//	CameraFrustrum.Construct(ViewProjInvMatrix);
 		_InvalidProjMatrix = false;
 
 	}
@@ -348,7 +368,7 @@ namespace Disorder
 		}
 		else if( _updateMode == eSphericalTargetMode )
 		{
-			_updateStrategy = CameraSphereTargetUpdate::Create(10,_eyePos + Direction() * 10);
+			_updateStrategy = CameraSphereTargetUpdate::Create(10,EyePos + Direction() * glm::vec3(10));
 		}
 
 	}
@@ -356,8 +376,8 @@ namespace Disorder
 	void Camera::DebugDraw()
 	{
 		std::stringstream strstream;
-		Eigen::Vector3f lookAt = _eyePos + Direction() * 50;
-		strstream << "camera: [eyePos](" << (int)_eyePos.x() << "; " <<  (int)_eyePos.y() << "; " <<  (int)_eyePos.z() << ")     [Focus At](" <<  (int)lookAt.x() << ";  "<<  (int)lookAt.y() << ";  " <<  (int)lookAt.z() << ")";
+		glm::vec3 lookAt = EyePos + Direction() * glm::vec3(50);
+		strstream << "camera: [eyePos](" << (int)EyePos.x << "; " <<  (int)EyePos.y << "; " <<  (int)EyePos.z << ")     [Focus At](" <<  (int)lookAt.x << ";  "<<  (int)lookAt.y << ";  " <<  (int)lookAt.z << ")";
 		if( _updateMode == eFirstPersonMode )
 		{
 			GEngine->GameCanvas->DrawString(0.005f,0.945f,0.04f,Vector4f(1.f,1.f,1.f,1.f),"First Person Mode");
@@ -382,23 +402,25 @@ namespace Disorder
 		
 	}
 
-	void Camera::LookAt(Eigen::Vector3f const& eyePos,Eigen::Vector3f const& lookAt,Eigen::Vector3f const& upVec)
+	void Camera::LookAt(const glm::vec3& eyePos,const glm::vec3& lookAt,const glm::vec3& upVec)
 	{
 		 LookAt_(eyePos,lookAt,upVec);	
 		 _updateStrategy->SetTarget(this,lookAt);
 	}
 
-	void Camera::LookAt_(Eigen::Vector3f const& eyePos,Eigen::Vector3f const& lookAt,Eigen::Vector3f const& upVec)
+	void Camera::LookAt_(const glm::vec3& eyePos,const glm::vec3& lookAt,const glm::vec3& upVec)
 	{
-		 _eyePos = eyePos;
-         Eigen::Matrix3f camAxes;
-		 Eigen::Vector3f newDirection = lookAt - eyePos;
-		 camAxes.col(2) = (-newDirection).normalized();
-		 camAxes.col(0) = upVec.cross( camAxes.col(2) ).normalized();
-		 camAxes.col(1) = camAxes.col(2).cross( camAxes.col(0) ).normalized();
-		 _rotation = Eigen::Quaternionf(camAxes);
+		EyePos = eyePos;
+		_Direction = eyePos - lookAt;
+		_Direction = glm::normalize(_Direction);
+		_Right = glm::cross(upVec,_Direction);
+		_Right = glm::normalize(_Right);
+	    _Up = glm::cross(_Direction,_Right);
+ 
+		glm::mat3 mat(_Right,_Up,_Direction);
+		Rotation = glm::quat_cast(mat);
 
-		 _InvalidViewMatrix = true;
+		_InvalidViewMatrix = true;
 	}
 
 	void Camera::ProjCalculate(float FOV,  float nearPlane,float farPlane)
@@ -411,19 +433,5 @@ namespace Disorder
 		_InvalidProjMatrix = true;
 	}	
 
-	Eigen::Vector3f Camera::Direction() const
-	{
-		return - (_rotation * Eigen::Vector3f::UnitZ());
-	}
-
-	Eigen::Vector3f Camera::Up() const
-	{
-		return _rotation * Eigen::Vector3f::UnitY();
-	}
-
-	Eigen::Vector3f Camera::Right() const
-	{
-		return _rotation * Eigen::Vector3f::UnitX();
-	}
-
+	
 }

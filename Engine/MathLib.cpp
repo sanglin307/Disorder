@@ -11,58 +11,69 @@ namespace Disorder
 	const float Math::fRad2Deg = float(180.0) / PI;
 
  
-	void Math::ConvertToSphericalCoord(const Eigen::Vector3f& pos,const Eigen::Vector3f& origin,float &radius,float &yAngle,float &zAngle)
+	void Math::ConvertToSphericalCoord(const glm::vec3& pos,const glm::vec3& origin,float &radius,float &yAngle,float &zAngle)
 	{
-		Eigen::Vector3f deltaVec = pos - origin;
-		radius = deltaVec.norm();
-		yAngle = ACosf(deltaVec.y()/radius);
-		zAngle = ATan2f(deltaVec.x(),deltaVec.z());
+		glm::vec3 deltaVec = pos - origin;
+		radius = glm::length(deltaVec);
+		yAngle = ACosf(deltaVec.y/radius);
+		zAngle = ATan2f(deltaVec.x,deltaVec.z);
 	}
 
-	void Math::ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const Eigen::Vector3f& origin,Eigen::Vector3f& pos)
+	void Math::ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const glm::vec3& origin,glm::vec3& pos)
 	{
 		BOOST_ASSERT(radius > 0);
 		float temp = radius * Sinf(yAngle);
 
-		pos << temp * Sinf(zAngle),radius * Cosf(yAngle),temp * Cosf(zAngle);
-
-	/*	pos.z() = temp * Cosf(zAngle);
-		pos.x() = temp * Sinf(zAngle);
-		pos.y() = radius * Cosf(yAngle);*/
+		pos.z = temp * Cosf(zAngle);
+		pos.x = temp * Sinf(zAngle);
+		pos.y = radius * Cosf(yAngle);
 
 		pos += origin;
 	}
 
 	// fov use rad, opengl
-   Eigen::Matrix4f Math::ProjFovRH(float fieldOfViewY,float aspectRatio,float znearPlane,float zfarPlane)
+   glm::mat4 Math::ProjFovRH(float fieldOfViewY,float aspectRatio,float znearPlane,float zfarPlane)
    {
 	   float h = 1.0f / Math::Tan(fieldOfViewY / 2);
 	   float w = h / aspectRatio;
       
-	   Eigen::Matrix4f ProjMat;
+	/*   Eigen::Matrix4f ProjMat;
 	   ProjMat <<   w,  0,  0,                                             0,
                     0,  h,  0,                                             0,
                     0,  0,  zfarPlane/(znearPlane-zfarPlane),              znearPlane*zfarPlane/(znearPlane-zfarPlane),
-                    0,  0,  -1,   0;
+                    0,  0,  -1,   0;*/
 
-	   return ProjMat;
+	   return glm::mat4( w,  0,  0,                                         0,
+                        0,  h,  0,                                         0,
+                        0,  0,  zfarPlane/(znearPlane-zfarPlane),         -1,
+                        0,  0,  znearPlane*zfarPlane/(znearPlane-zfarPlane),0);
    }
 
-   Eigen::Matrix4f Math::ViewMatrixRH(const Eigen::Vector3f &eye,const Eigen::Vector3f &center,const Eigen::Vector3f &up)
+   glm::mat4 Math::ViewMatrixRH(const glm::vec3 &eye,const glm::vec3 &xAxis,const glm::vec3 &yAxis,const glm::vec3 &zAxis)
    {
-	   Eigen::Vector3f zaxis = eye - center;
-	   zaxis.normalize();
-	   Eigen::Vector3f xaxis = up.cross(zaxis);
-	   xaxis.normalize();
-	   Eigen::Vector3f yaxis = zaxis.cross(xaxis);
+ 
+	    return glm::mat4(
+		           xAxis.x,         yAxis.x,           zAxis.x,          0,
+                   xAxis.y,         yAxis.y,           zAxis.y,         0,
+                   xAxis.z,         yAxis.z,           zAxis.z,          0,
+				   glm::dot(-xAxis,eye),   glm::dot(-yAxis,eye),   glm::dot(-zAxis,eye),  1 );
+   }
 
-	   Eigen::Matrix4f ViewMat;
+   glm::mat4 Math::ViewMatrixRH(const glm::vec3 &eye,const glm::vec3 &center,const glm::vec3 &up)
+   {
+	   glm::vec3 zaxis = eye - center;
+	   zaxis = glm::normalize(zaxis);
+	   glm::vec3 xaxis = glm::cross(up,zaxis);
+	   xaxis = glm::normalize(xaxis);
+	   glm::vec3 yaxis = glm::cross(zaxis,xaxis);
+
+	  /* Eigen::Matrix4f ViewMat;
 	   ViewMat <<  xaxis.x(),         xaxis.y(),           xaxis.z(),          -xaxis.dot(eye),
                    yaxis.x(),         yaxis.y(),           yaxis.z(),          -yaxis.dot(eye),
                    zaxis.x(),         zaxis.y(),           zaxis.z(),          -zaxis.dot(eye),
-				   0,               0,                 0,                1 ;
+				   0,               0,                 0,                1 ;*/
 
-	   return ViewMat;
+	   return ViewMatrixRH(eye,xaxis,yaxis,zaxis);
    }
 
  

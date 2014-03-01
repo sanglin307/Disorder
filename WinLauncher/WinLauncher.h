@@ -8,15 +8,12 @@ namespace Disorder
 {
    class WindowsViewport;
    typedef boost::shared_ptr<WindowsViewport> WindowsViewportPtr;
-   class WinFileSystem;
-   typedef boost::shared_ptr<WinFileSystem> WinFileSystemPtr;
    class WinClient;
    typedef boost::shared_ptr<WinClient> WinClientPtr;
 
 }
 
 #include "WinClient.h"
-#include "WinFileSystem.h"
 
 
 #endif

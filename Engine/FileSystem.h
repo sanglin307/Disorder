@@ -23,12 +23,15 @@ namespace Disorder
 	class FileSystem
 	{
 	public:
-		virtual FileObjectPtr OpenFile(std::string const& fileName,std::string const& fileFlag) = 0;
-		virtual void WriteFile(FileObjectPtr const& fileHandler,std::string const& content) = 0;
-		virtual std::string ReadFile(FileObjectPtr const& fileHandler) = 0;
-		virtual void Flush(FileObjectPtr const& fileHandler) = 0;
+		virtual FileObjectPtr OpenFile(std::string const& fileName,std::string const& fileFlag);
+		virtual void WriteFile(FileObjectPtr const& fileHandler,std::string const& content);
+		virtual std::string ReadFile(FileObjectPtr const& fileHandler);
+		virtual void Flush(FileObjectPtr const& fileHandler);
 
+		static FileSystemPtr Create();
 
+	protected:
+		FileSystem(){}
 	};
 
 

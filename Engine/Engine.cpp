@@ -7,6 +7,7 @@ namespace Disorder
 
    Engine::Engine()
    {
+	   FileManager = FileSystem::Create();
    }
 
    Engine::~Engine()
@@ -36,7 +37,7 @@ namespace Disorder
 
    void Engine::Tick(float deltaSeconds)
    {
-	   Stat.Tick(deltaSeconds);
+	 
 	   //Client first
 	   GameClient->Tick(deltaSeconds);
  
@@ -45,6 +46,8 @@ namespace Disorder
 
 	   //tick camera here
 	   GSceneManager->Tick(deltaSeconds);
+
+	   Stat.Tick(deltaSeconds);
 
 	   //Draw Evertything~
 	   GameClient->GetViewport(0)->Render();

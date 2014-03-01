@@ -263,14 +263,14 @@ namespace Disorder
 			return true;
 		}
 
-        TMatrix3 Inverse (float fTolerance = 1e-06) const
+        inline TMatrix3 Inverse (float fTolerance = 1e-06) const
 		{
 			TMatrix3 kInverse;
             Inverse(kInverse,fTolerance);
             return kInverse;
 		}
 
-        T Determinant () const
+        inline T Determinant () const
 		{
 			T fCofactor00 = m[1][1]*m[2][2] - m[1][2]*m[2][1];
 			T fCofactor10 = m[1][2]*m[2][0] - m[1][0]*m[2][2];
@@ -279,8 +279,113 @@ namespace Disorder
 			T fDet = m[0][0]*fCofactor00 + m[0][1]*fCofactor10 + m[0][2]*fCofactor20;
 			return fDet;
 		}
+
+		inline void QDUDecomposition (TMatrix3& rkQ, TVector3<T>& rkD, TVector3<T>& rkU) const
+		{
+			// Factor M = QR = QDU where Q is orthogonal, D is diagonal,
+			// and U is upper triangular with ones on its diagonal.  Algorithm uses
+			// Gram-Schmidt orthogonalization (the QR algorithm).
+			//
+			// If M = [ m0 | m1 | m2 ] and Q = [ q0 | q1 | q2 ], then
+			//
+			//   q0 = m0/|m0|
+			//   q1 = (m1-(q0*m1)q0)/|m1-(q0*m1)q0|
+			//   q2 = (m2-(q0*m2)q0-(q1*m2)q1)/|m2-(q0*m2)q0-(q1*m2)q1|
+			//
+			// where |V| indicates length of vector V and A*B indicates dot
+			// product of vectors A and B.  The matrix R has entries
+			//
+			//   r00 = q0*m0  r01 = q0*m1  r02 = q0*m2
+			//   r10 = 0      r11 = q1*m1  r12 = q1*m2
+			//   r20 = 0      r21 = 0      r22 = q2*m2
+			//
+			// so D = diag(r00,r11,r22) and U has entries u01 = r01/r00,
+			// u02 = r02/r00, and u12 = r12/r11.
+
+			// Q = rotation
+			// D = scaling
+			// U = shear
+
+			// D stores the three diagonal entries r00, r11, r22
+			// U stores the entries U[0] = u01, U[1] = u02, U[2] = u12
+
+			// build orthogonal matrix Q
+			float fInvLength = m[0][0]*m[0][0] + m[1][0]*m[1][0] + m[2][0]*m[2][0];
+			if (!Math::FloatEqual(fInvLength,0)) fInvLength = 1.0f/Math::Sqrtf(fInvLength);
+
+			kQ[0][0] = m[0][0]*fInvLength;
+			kQ[1][0] = m[1][0]*fInvLength;
+			kQ[2][0] = m[2][0]*fInvLength;
+
+			float fDot = kQ[0][0]*m[0][1] + kQ[1][0]*m[1][1] +
+				kQ[2][0]*m[2][1];
+			kQ[0][1] = m[0][1]-fDot*kQ[0][0];
+			kQ[1][1] = m[1][1]-fDot*kQ[1][0];
+			kQ[2][1] = m[2][1]-fDot*kQ[2][0];
+			fInvLength = kQ[0][1]*kQ[0][1] + kQ[1][1]*kQ[1][1] + kQ[2][1]*kQ[2][1];
+			if (!Math::FloatEqual(fInvLength,0)) fInvLength = 1.0f/Math::Sqrtf(fInvLength);
+        
+			kQ[0][1] *= fInvLength;
+			kQ[1][1] *= fInvLength;
+			kQ[2][1] *= fInvLength;
+
+			fDot = kQ[0][0]*m[0][2] + kQ[1][0]*m[1][2] +
+				kQ[2][0]*m[2][2];
+			kQ[0][2] = m[0][2]-fDot*kQ[0][0];
+			kQ[1][2] = m[1][2]-fDot*kQ[1][0];
+			kQ[2][2] = m[2][2]-fDot*kQ[2][0];
+			fDot = kQ[0][1]*m[0][2] + kQ[1][1]*m[1][2] +
+				kQ[2][1]*m[2][2];
+			kQ[0][2] -= fDot*kQ[0][1];
+			kQ[1][2] -= fDot*kQ[1][1];
+			kQ[2][2] -= fDot*kQ[2][1];
+			fInvLength = kQ[0][2]*kQ[0][2] + kQ[1][2]*kQ[1][2] + kQ[2][2]*kQ[2][2];
+			if (!Math::FloatEqual(fInvLength,0)) fInvLength = 1.0f/Math::Sqrtf(fInvLength);
+
+			kQ[0][2] *= fInvLength;
+			kQ[1][2] *= fInvLength;
+			kQ[2][2] *= fInvLength;
+
+			// guarantee that orthogonal matrix has determinant 1 (no reflections)
+			float fDet = kQ[0][0]*kQ[1][1]*kQ[2][2] + kQ[0][1]*kQ[1][2]*kQ[2][0] +
+				kQ[0][2]*kQ[1][0]*kQ[2][1] - kQ[0][2]*kQ[1][1]*kQ[2][0] -
+				kQ[0][1]*kQ[1][0]*kQ[2][2] - kQ[0][0]*kQ[1][2]*kQ[2][1];
+
+			if ( fDet < 0.0 )
+			{
+				for (size_t iRow = 0; iRow < 3; iRow++)
+					for (size_t iCol = 0; iCol < 3; iCol++)
+						kQ[iRow][iCol] = -kQ[iRow][iCol];
+			}
+
+			// build "right" matrix R
+			Matrix3 kR;
+			kR[0][0] = kQ[0][0]*m[0][0] + kQ[1][0]*m[1][0] +
+				kQ[2][0]*m[2][0];
+			kR[0][1] = kQ[0][0]*m[0][1] + kQ[1][0]*m[1][1] +
+				kQ[2][0]*m[2][1];
+			kR[1][1] = kQ[0][1]*m[0][1] + kQ[1][1]*m[1][1] +
+				kQ[2][1]*m[2][1];
+			kR[0][2] = kQ[0][0]*m[0][2] + kQ[1][0]*m[1][2] +
+				kQ[2][0]*m[2][2];
+			kR[1][2] = kQ[0][1]*m[0][2] + kQ[1][1]*m[1][2] +
+				kQ[2][1]*m[2][2];
+			kR[2][2] = kQ[0][2]*m[0][2] + kQ[1][2]*m[1][2] +
+				kQ[2][2]*m[2][2];
+
+			// the scaling component
+			kD[0] = kR[0][0];
+			kD[1] = kR[1][1];
+			kD[2] = kR[2][2];
+
+			// the shear component
+			float fInvD0 = 1.0f/kD[0];
+			kU[0] = kR[0][1]*fInvD0;
+			kU[1] = kR[0][2]*fInvD0;
+			kU[2] = kR[1][2]/kD[1];
+		}
  
-        void Rotate (const TVector3<T>& rkAxis, const float& fRadians)
+        inline void Rotate (const TVector3<T>& rkAxis, const float& fRadians)
 		{
 			T fCos = cosf(fRadians);
 			T fSin = sinf(fRadians);
@@ -309,36 +414,330 @@ namespace Disorder
         // The matrix must be orthonormal.  The decomposition is yaw*pitch*roll
         // where yaw is rotation about the Up vector, pitch is rotation about the
         // Right axis, and roll is rotation about the Direction axis.
-        bool ToEulerAnglesXYZ (float& rfYAngle, float& rfPAngle,
-            float& rfRAngle) const;
-        bool ToEulerAnglesXZY (float& rfYAngle, float& rfPAngle,
-            float& rfRAngle) const;
-        bool ToEulerAnglesYXZ (float& rfYAngle, float& rfPAngle,
-            float& rfRAngle) const;
-        bool ToEulerAnglesYZX (float& rfYAngle, float& rfPAngle,
-            float& rfRAngle) const;
-        bool ToEulerAnglesZXY (float& rfYAngle, float& rfPAngle,
-            float& rfRAngle) const;
-        bool ToEulerAnglesZYX (float& rfYAngle, float& rfPAngle,
-            float& rfRAngle) const;
-        void FromEulerAnglesXYZ (const float& fYAngle, const float& fPAngle, const float& fRAngle);
-        void FromEulerAnglesXZY (const float& fYAngle, const float& fPAngle, const float& fRAngle);
-        void FromEulerAnglesYXZ (const float& fYAngle, const float& fPAngle, const float& fRAngle);
-        void FromEulerAnglesYZX (const float& fYAngle, const float& fPAngle, const float& fRAngle);
-        void FromEulerAnglesZXY (const float& fYAngle, const float& fPAngle, const float& fRAngle);
-        void FromEulerAnglesZYX (const float& fYAngle, const float& fPAngle, const float& fRAngle);
-        /// Eigensolver, matrix must be symmetric
-        void EigenSolveSymmetric (float afEigenvalue[3],
-            Vector3 akEigenvector[3]) const;
+        inline bool ToEulerAnglesXYZ (float& rfYAngle, float& rfPAngle, float& rfRAngle) const
+		{
+			// rot =  cy*cz          -cy*sz           sy
+			//        cz*sx*sy+cx*sz  cx*cz-sx*sy*sz -cy*sx
+			//       -cx*cz*sy+sx*sz  cz*sx+cx*sy*sz  cx*cy
 
-        static void TensorProduct (const Vector3& rkU, const Vector3& rkV,
-            Matrix3& rkProduct);
+			rfPAngle = float(asin(m[0][2]));
+			if ( rfPAngle < float(Math::HALF_PI) )
+			{
+				if ( rfPAngle > float(-Math::HALF_PI) )
+				{
+					rfYAngle = Math::ATan2f(-m[1][2],m[2][2]);
+					rfRAngle = Math::ATan2f(-m[0][1],m[0][0]);
+					return true;
+				}
+				else
+				{
+					// WARNING.  Not a unique solution.
+					float fRmY = Math::ATan2f(m[1][0],m[1][1]);
+					rfRAngle = 0.f;  // any angle works
+					rfYAngle = rfRAngle - fRmY;
+					return false;
+				}
+			}
+			else
+			{
+				// WARNING.  Not a unique solution.
+				float fRpY = Math::ATan2f(m[1][0],m[1][1]);
+				rfRAngle = 0.f;  // any angle works
+				rfYAngle = fRpY - rfRAngle;
+				return false;
+			}
+		}
 
+        inline bool ToEulerAnglesXZY (float& rfYAngle, float& rfPAngle,float& rfRAngle) const
+		{
+			// rot =  cy*cz          -sz              cz*sy
+			//        sx*sy+cx*cy*sz  cx*cz          -cy*sx+cx*sy*sz
+			//       -cx*sy+cy*sx*sz  cz*sx           cx*cy+sx*sy*sz
+
+			rfPAngle = Math::ASinf(-m[0][1]);
+			if ( rfPAngle < float(Math::HALF_PI) )
+			{
+				if ( rfPAngle > float(-Math::HALF_PI) )
+				{
+					rfYAngle = Math::ATan2f(m[2][1],m[1][1]);
+					rfRAngle = Math::ATan2f(m[0][2],m[0][0]);
+					return true;
+				}
+				else
+				{
+					// WARNING.  Not a unique solution.
+					float fRmY = Math::ATan2f(-m[2][0],m[2][2]);
+					rfRAngle = float(0.0);  // any angle works
+					rfYAngle = rfRAngle - fRmY;
+					return false;
+				}
+			}
+			else
+			{
+				// WARNING.  Not a unique solution.
+				float fRpY = Math::ATan2f(-m[2][0],m[2][2]);
+				rfRAngle = float(0.0);  // any angle works
+				rfYAngle = fRpY - rfRAngle;
+				return false;
+			}
+		}
+
+        inline bool ToEulerAnglesYXZ (float& rfYAngle, float& rfPAngle, float& rfRAngle) const
+		{
+			 // rot =  cy*cz+sx*sy*sz  cz*sx*sy-cy*sz  cx*sy
+			//        cx*sz           cx*cz          -sx
+			//       -cz*sy+cy*sx*sz  cy*cz*sx+sy*sz  cx*cy
+
+			rfPAngle = Math::ASinf(-m[1][2]);
+			if ( rfPAngle < float(Math::HALF_PI) )
+			{
+				if ( rfPAngle > float(-Math::HALF_PI) )
+				{
+					rfYAngle = Math::ATan2f(m[0][2],m[2][2]);
+					rfRAngle = Math::ATan2f(m[1][0],m[1][1]);
+					return true;
+				}
+				else
+				{
+					// WARNING.  Not a unique solution.
+					float fRmY = Math::ATan2f(-m[0][1],m[0][0]);
+					rfRAngle = float(0.0);  // any angle works
+					rfYAngle = rfRAngle - fRmY;
+					return false;
+				}
+			}
+			else
+			{
+				// WARNING.  Not a unique solution.
+				float fRpY = Math::ATan2f(-m[0][1],m[0][0]);
+				rfRAngle = float(0.0);  // any angle works
+				rfYAngle = fRpY - rfRAngle;
+				return false;
+			}
+		}
+
+        inline bool ToEulerAnglesYZX (float& rfYAngle, float& rfPAngle,float& rfRAngle) const
+		{
+			 // rot =  cy*cz           sx*sy-cx*cy*sz  cx*sy+cy*sx*sz
+			//        sz              cx*cz          -cz*sx
+			//       -cz*sy           cy*sx+cx*sy*sz  cx*cy-sx*sy*sz
+
+			rfPAngle = Math::ASinf(m[1][0]);
+			if ( rfPAngle < float(Math::HALF_PI) )
+			{
+				if ( rfPAngle > float(-Math::HALF_PI) )
+				{
+					rfYAngle = Math::ATan2f(-m[2][0],m[0][0]);
+					rfRAngle = Math::ATan2f(-m[1][2],m[1][1]);
+					return true;
+				}
+				else
+				{
+					// WARNING.  Not a unique solution.
+					float fRmY = Math::ATan2f(m[2][1],m[2][2]);
+					rfRAngle = float(0.0);  // any angle works
+					rfYAngle = rfRAngle - fRmY;
+					return false;
+				}
+			}
+			else
+			{
+				// WARNING.  Not a unique solution.
+				float fRpY = Math::ATan2f(m[2][1],m[2][2]);
+				rfRAngle = float(0.0);  // any angle works
+				rfYAngle = fRpY - rfRAngle;
+				return false;
+			}
+		}
+
+        inline bool ToEulerAnglesZXY (float& rfYAngle, float& rfPAngle,float& rfRAngle) const
+		{
+			// rot =  cy*cz-sx*sy*sz -cx*sz           cz*sy+cy*sx*sz
+			//        cz*sx*sy+cy*sz  cx*cz          -cy*cz*sx+sy*sz
+			//       -cx*sy           sx              cx*cy
+
+			rfPAngle = Math::ASinf(m[2][1]);
+			if ( rfPAngle < float(Math::HALF_PI) )
+			{
+				if ( rfPAngle > float(-Math::HALF_PI) )
+				{
+					rfYAngle = Math::ATan2f(-m[0][1],m[1][1]);
+					rfRAngle = Math::ATan2f(-m[2][0],m[2][2]);
+					return true;
+				}
+				else
+				{
+					// WARNING.  Not a unique solution.
+					float fRmY = Math::ATan2f(m[0][2],m[0][0]);
+					rfRAngle = float(0.0);  // any angle works
+					rfYAngle = rfRAngle - fRmY;
+					return false;
+				}
+			}
+			else
+			{
+				// WARNING.  Not a unique solution.
+				float fRpY = Math::ATan2f(m[0][2],m[0][0]);
+				rfRAngle = float(0.0);  // any angle works
+				rfYAngle = fRpY - rfRAngle;
+				return false;
+			}
+
+		}
+
+        inline bool ToEulerAnglesZYX (float& rfYAngle, float& rfPAngle, float& rfRAngle) const
+		{
+			 // rot =  cy*cz           cz*sx*sy-cx*sz  cx*cz*sy+sx*sz
+			//        cy*sz           cx*cz+sx*sy*sz -cz*sx+cx*sy*sz
+			//       -sy              cy*sx           cx*cy
+
+			rfPAngle = Math::ASinf(-m[2][0]);
+			if ( rfPAngle < float(Math::HALF_PI) )
+			{
+				if ( rfPAngle > float(-Math::HALF_PI) )
+				{
+					rfYAngle = Math::ATan2f(m[1][0],m[0][0]);
+					rfRAngle = Math::ATan2f(m[2][1],m[2][2]);
+					return true;
+				}
+				else
+				{
+					// WARNING.  Not a unique solution.
+					float fRmY = Math::ATan2f(-m[0][1],m[0][2]);
+					rfRAngle = float(0.0);  // any angle works
+					rfYAngle = rfRAngle - fRmY;
+					return false;
+				}
+			}
+			else
+			{
+				// WARNING.  Not a unique solution.
+				float fRpY = Math::ATan2f(-m[0][1],m[0][2]);
+				rfRAngle = float(0.0);  // any angle works
+				rfYAngle = fRpY - rfRAngle;
+				return false;
+			}
+		}
+
+        void EulerAnglesXYZ (const float fYAngle, const float fPAngle, const float fRAngle)
+		{
+			float fCos, fSin;
+
+			fCos = cos(fYAngle);
+			fSin = sin(fYAngle);
+			Matrix3 kXMat(1.0,0.0,0.0,0.0,fCos,-fSin,0.0,fSin,fCos);
+
+			fCos = Math::Cosf(fPAngle);
+			fSin = Math::Sinf(fPAngle);
+			Matrix3 kYMat(fCos,0.0,fSin,0.0,1.0,0.0,-fSin,0.0,fCos);
+
+			fCos = Math::Cosf(fRAngle);
+			fSin = Math::Sinf(fRAngle);
+			Matrix3 kZMat(fCos,-fSin,0.0,fSin,fCos,0.0,0.0,0.0,1.0);
+
+			*this = kXMat*(kYMat*kZMat);
+		}
+
+        void EulerAnglesXZY (const float fYAngle, const float fPAngle, const float fRAngle)
+		{
+			float fCos, fSin;
+
+			fCos = Math::Cosf(fYAngle);
+			fSin = Math::Sinf(fYAngle);
+			Matrix3 kXMat(1.0,0.0,0.0,0.0,fCos,-fSin,0.0,fSin,fCos);
+
+			fCos = Math::Cosf(fPAngle);
+			fSin = Math::Sinf(fPAngle);
+			Matrix3 kZMat(fCos,-fSin,0.0,fSin,fCos,0.0,0.0,0.0,1.0);
+
+			fCos = Math::Cosf(fRAngle);
+			fSin = Math::Sinf(fRAngle);
+			Matrix3 kYMat(fCos,0.0,fSin,0.0,1.0,0.0,-fSin,0.0,fCos);
+
+			*this = kXMat*(kZMat*kYMat);
+		}
+
+        void EulerAnglesYXZ (const float fYAngle, const float fPAngle, const float fRAngle)
+		{
+			float fCos, fSin;
+
+			fCos = Math::Cosf(fYAngle);
+			fSin = Math::Sinf(fYAngle);
+			Matrix3 kYMat(fCos,0.0,fSin,0.0,1.0,0.0,-fSin,0.0,fCos);
+
+			fCos = Math::Cosf(fPAngle);
+			fSin = Math::Sinf(fPAngle);
+			Matrix3 kXMat(1.0,0.0,0.0,0.0,fCos,-fSin,0.0,fSin,fCos);
+
+			fCos = Math::Cosf(fRAngle);
+			fSin = Math::Sinf(fRAngle);
+			Matrix3 kZMat(fCos,-fSin,0.0,fSin,fCos,0.0,0.0,0.0,1.0);
+
+			*this = kYMat*(kXMat*kZMat);
+		}
+
+        void EulerAnglesYZX (const float fYAngle, const float fPAngle, const float fRAngle)
+		{
+			float fCos, fSin;
+
+			fCos = Math::Cosf(fYAngle);
+			fSin = Math::Sinf(fYAngle);
+			Matrix3 kYMat(fCos,0.0,fSin,0.0,1.0,0.0,-fSin,0.0,fCos);
+
+			fCos = Math::Cosf(fPAngle);
+			fSin = Math::Sinf(fPAngle);
+			Matrix3 kZMat(fCos,-fSin,0.0,fSin,fCos,0.0,0.0,0.0,1.0);
+
+			fCos = Math::Cosf(fRAngle);
+			fSin = Math::Sinf(fRAngle);
+			Matrix3 kXMat(1.0,0.0,0.0,0.0,fCos,-fSin,0.0,fSin,fCos);
+
+			*this = kYMat*(kZMat*kXMat);
+		}
+
+        void EulerAnglesZXY (const float fYAngle, const float fPAngle, const float fRAngle)
+		{
+			float fCos, fSin;
+
+			fCos = Math::Cosf(fYAngle);
+			fSin = Math::Sinf(fYAngle);
+			Matrix3 kZMat(fCos,-fSin,0.0,fSin,fCos,0.0,0.0,0.0,1.0);
+
+			fCos = Math::Cosf(fPAngle);
+			fSin = Math::Sinf(fPAngle);
+			Matrix3 kXMat(1.0,0.0,0.0,0.0,fCos,-fSin,0.0,fSin,fCos);
+
+			fCos = Math::Cosf(fRAngle);
+			fSin = Math::Sinf(fRAngle);
+			Matrix3 kYMat(fCos,0.0,fSin,0.0,1.0,0.0,-fSin,0.0,fCos);
+
+			*this = kZMat*(kXMat*kYMat);
+		}
+
+        void EulerAnglesZYX (const float fYAngle, const float fPAngle, const float fRAngle)
+		{
+			float fCos, fSin;
+
+			fCos = Math::Cosf(fYAngle);
+			fSin = Math::Sinf(fYAngle);
+			Matrix3 kZMat(fCos,-fSin,0.0,fSin,fCos,0.0,0.0,0.0,1.0);
+
+			fCos = Math::Cosf(fPAngle);
+			fSin = Math::Sinf(fPAngle);
+			Matrix3 kYMat(fCos,0.0,fSin,0.0,1.0,0.0,-fSin,0.0,fCos);
+
+			fCos = Math::Cosf(fRAngle);
+			fSin = Math::Sinf(fRAngle);
+			Matrix3 kXMat(1.0,0.0,0.0,0.0,fCos,-fSin,0.0,fSin,fCos);
+
+			*this = kZMat*(kYMat*kXMat);
+		}
+       
 		/** Determines if this matrix involves a scaling. */
 		inline bool HasScale() const
 		{
 			// check magnitude of column vectors (==local axes)
-			float t = m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0];
+			float t = (float)(m[0][0] * m[0][0] + m[1][0] * m[1][0] + m[2][0] * m[2][0]);
 			if (!Math::FloatEqual(t, 1.0, (float)1e-04))
 				return true;
 			t = m[0][1] * m[0][1] + m[1][1] * m[1][1] + m[2][1] * m[2][1];
@@ -350,95 +749,45 @@ namespace Disorder
 
 			return false;
 		}
- 
-        static const float EPSILON;
-        static const Matrix3 ZERO;
-        static const Matrix3 IDENTITY;
 
     protected:
-        // support for eigensolver
-        void Tridiagonal (float afDiag[3], float afSubDiag[3]);
-        bool QLAlgorithm (float afDiag[3], float afSubDiag[3]);
+ 
+        T m[3][3];
 
-        // support for singular value decomposition
-        static const float msSvdEpsilon;
-        static const unsigned int msSvdMaxIterations;
-        static void Bidiagonalize (Matrix3& kA, Matrix3& kL,
-            Matrix3& kR);
-        static void GolubKahanStep (Matrix3& kA, Matrix3& kL,
-            Matrix3& kR);
-
-        // support for spectral norm
-        static float MaxCubicRoot (float afCoeff[3]);
-
-        float m[3][3];
-
-        // for faster access
-        friend class Matrix4;
+     
     };
 
+	typedef TMatrix3<float> Matrix3f;
 
-	//------------------------------------------------------------------------------------------------------------------------
-		/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
-	/** Class encapsulating a standard 4x4 homogeneous matrix.
-        @remarks
-            OGRE uses column vectors when applying matrix multiplications,
-            This means a vector is represented as a single column, 4-row
-            matrix. This has the effect that the transformations implemented
-            by the matrices happens right-to-left e.g. if vector V is to be
-            transformed by M1 then M2 then M3, the calculation would be
-            M3 * M2 * M1 * V. The order that matrices are concatenated is
-            vital since matrix multiplication is not commutative, i.e. you
-            can get a different result if you concatenate in the wrong order.
-        @par
-            The use of column vectors and right-to-left ordering is the
-            standard in most mathematical texts, and is the same as used in
-            OpenGL. It is, however, the opposite of Direct3D, which has
-            inexplicably chosen to differ from the accepted standard and uses
-            row vectors and left-to-right matrix multiplication.
-        @par
-            OGRE deals with the differences between D3D and OpenGL etc.
-            internally when operating through different render systems. OGRE
-            users only need to conform to standard maths conventions, i.e.
-            right-to-left matrix multiplication, (OGRE transposes matrices it
-            passes to D3D to compensate).
-        @par
-            The generic form M * V which shows the layout of the matrix 
-            entries is shown below:
-            <pre>
-                [ m[0][0]  m[0][1]  m[0][2]  m[0][3] ]   {x}
-                | m[1][0]  m[1][1]  m[1][2]  m[1][3] | * {y}
-                | m[2][0]  m[2][1]  m[2][2]  m[2][3] |   {z}
-                [ m[3][0]  m[3][1]  m[3][2]  m[3][3] ]   {1}
-            </pre>
-    */
-    class Matrix4
+	template <typename T>
+    class TMatrix4
     {
     protected:
         /// The matrix entries, indexed by [row][col].
         union {
-            float m[4][4];
-            float _m[16];
+            T m[4][4];
+            T _m[16];
         };
+
+		inline T MINOR(const size_t r0, const size_t r1, const size_t r2, 
+								const size_t c0, const size_t c1, const size_t c2)
+		{
+			return m[r0][c0] * (m[r1][c1] * m[r2][c2] - m[r2][c1] * m[r1][c2]) -
+				m[r0][c1] * (m[r1][c0] * m[r2][c2] - m[r2][c0] * m[r1][c2]) +
+				m[r0][c2] * (m[r1][c0] * m[r2][c1] - m[r2][c0] * m[r1][c1]);
+		}
+
     public:
-        /** Default constructor.
-            @note
-                It does <b>NOT</b> initialize the matrix for efficiency.
-        */
-        inline Matrix4()
+  
+        inline TMatrix4()
         {
         }
 
-        inline Matrix4(
-            float m00, float m01, float m02, float m03,
-            float m10, float m11, float m12, float m13,
-            float m20, float m21, float m22, float m23,
-            float m30, float m31, float m32, float m33 )
+        inline TMatrix4(
+            T m00, T m01, T m02, T m03,
+            T m10, T m11, T m12, T m13,
+            T m20, T m21, T m22, T m23,
+            T m30, T m31, T m32, T m33 )
         {
             m[0][0] = m00;
             m[0][1] = m01;
@@ -461,61 +810,43 @@ namespace Disorder
         /** Creates a standard 4x4 transformation matrix with a zero translation part from a rotation/scaling 3x3 matrix.
          */
 
-        inline Matrix4(const Matrix3& m3x3)
+        inline TMatrix4(const TMatrix3<T>& m3x3)
         {
-          operator=(IDENTITY);
-          operator=(m3x3);
+           memset(_m,0,sizeof(T)*16);
+           operator=(m3x3);
+		   m[3][3] = 1;
         }
 
         /** Creates a standard 4x4 transformation matrix with a zero translation part from a rotation/scaling Quaternion.
          */
         
-        inline Matrix4(const Quaternion& rot)
+        inline TMatrix4(const TQuaternion<T>& rot)
         {
-          Matrix3 m3x3;
-          rot.ToRotationMatrix(m3x3);
-          operator=(IDENTITY);
-          operator=(m3x3);
+            TMatrix3 m3x3;
+            rot.ToRotationMatrix(m3x3);
+            memset(_m,0,sizeof(T)*16);
+            operator=(m3x3);
+			m[3][3] = 1;
         }
-        
-
-		/** Exchange the contents of this matrix with another. 
-		*/
-		inline void Swap(Matrix4& other)
+ 
+		inline T* Data()
 		{
-			std::swap(m[0][0], other.m[0][0]);
-			std::swap(m[0][1], other.m[0][1]);
-			std::swap(m[0][2], other.m[0][2]);
-			std::swap(m[0][3], other.m[0][3]);
-			std::swap(m[1][0], other.m[1][0]);
-			std::swap(m[1][1], other.m[1][1]);
-			std::swap(m[1][2], other.m[1][2]);
-			std::swap(m[1][3], other.m[1][3]);
-			std::swap(m[2][0], other.m[2][0]);
-			std::swap(m[2][1], other.m[2][1]);
-			std::swap(m[2][2], other.m[2][2]);
-			std::swap(m[2][3], other.m[2][3]);
-			std::swap(m[3][0], other.m[3][0]);
-			std::swap(m[3][1], other.m[3][1]);
-			std::swap(m[3][2], other.m[3][2]);
-			std::swap(m[3][3], other.m[3][3]);
+			return _m;
 		}
 
-		inline float* operator [] ( size_t iRow )
+		inline T* operator [] ( size_t iRow )
         {
-            BOOST_ASSERT( iRow < 4 );
             return m[iRow];
         }
 
-        inline const float *operator [] ( size_t iRow ) const
+        inline const T *operator [] ( size_t iRow ) const
         {
-            BOOST_ASSERT( iRow < 4 );
             return m[iRow];
         }
 
-        inline Matrix4 Concatenate(const Matrix4 &m2) const
+        inline TMatrix4 Concatenate(const TMatrix4 &m2) const
         {
-            Matrix4 r;
+            TMatrix4 r;
             r.m[0][0] = m[0][0] * m2.m[0][0] + m[0][1] * m2.m[1][0] + m[0][2] * m2.m[2][0] + m[0][3] * m2.m[3][0];
             r.m[0][1] = m[0][0] * m2.m[0][1] + m[0][1] * m2.m[1][1] + m[0][2] * m2.m[2][1] + m[0][3] * m2.m[3][1];
             r.m[0][2] = m[0][0] * m2.m[0][2] + m[0][1] * m2.m[1][2] + m[0][2] * m2.m[2][2] + m[0][3] * m2.m[3][2];
@@ -541,7 +872,7 @@ namespace Disorder
 
         /** Matrix concatenation using '*'.
         */
-        inline Matrix4 operator * ( const Matrix4 &m2 ) const
+        inline TMatrix4 operator * ( const TMatrix4 &m2 ) const
         {
             return Concatenate( m2 );
         }
@@ -555,11 +886,11 @@ namespace Disorder
                 and then all the tree elements of the resulting 3-D vector are
                 divided by the resulting <i>w</i>.
         */
-        inline Vector3 operator * ( const Vector3 &v ) const
+        inline TVector3<T> operator * ( const TVector3<T> &v ) const
         {
-            Vector3 r;
+            TVector3<T> r;
 
-            float fInvW = 1.0f / ( m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] );
+            T fInvW = (T)(1.0 / ( m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] ));
 
             r.x = ( m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] ) * fInvW;
             r.y = ( m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] ) * fInvW;
@@ -567,16 +898,18 @@ namespace Disorder
 
             return r;
         }
-        inline Vector4 operator * (const Vector4& v) const
+
+        inline TVector4<T> operator * (const TVector4<T>& v) const
         {
-            return Vector4(
+            return TVector4<T>(
                 m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w, 
                 m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w,
                 m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w,
                 m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w
                 );
         }
-        inline Plane operator * (const Plane& p) const
+
+     /*   inline Plane operator * (const Plane& p) const
         {
             Plane ret;
 			Matrix4 invTrans = Inverse().Transpose();
@@ -588,14 +921,14 @@ namespace Disorder
 			ret.D = v4.w / ret.Normal.Normalise();
 
             return ret;
-        }
+        }*/
 
 
         /** Matrix addition.
         */
-        inline Matrix4 operator + ( const Matrix4 &m2 ) const
+        inline TMatrix4 operator + ( const TMatrix4 &m2 ) const
         {
-            Matrix4 r;
+            TMatrix4 r;
 
             r.m[0][0] = m[0][0] + m2.m[0][0];
             r.m[0][1] = m[0][1] + m2.m[0][1];
@@ -622,9 +955,9 @@ namespace Disorder
 
         /** Matrix subtraction.
         */
-        inline Matrix4 operator - ( const Matrix4 &m2 ) const
+        inline TMatrix4 operator - ( const TMatrix4 &m2 ) const
         {
-            Matrix4 r;
+            TMatrix4 r;
             r.m[0][0] = m[0][0] - m2.m[0][0];
             r.m[0][1] = m[0][1] - m2.m[0][1];
             r.m[0][2] = m[0][2] - m2.m[0][2];
@@ -650,45 +983,45 @@ namespace Disorder
 
         /** Tests 2 matrices for equality.
         */
-        inline bool operator == ( const Matrix4& m2 ) const
+        inline bool operator == ( const TMatrix4& m2 ) const
         {
-            if( 
-                m[0][0] != m2.m[0][0] || m[0][1] != m2.m[0][1] || m[0][2] != m2.m[0][2] || m[0][3] != m2.m[0][3] ||
+            if( m[0][0] != m2.m[0][0] || m[0][1] != m2.m[0][1] || m[0][2] != m2.m[0][2] || m[0][3] != m2.m[0][3] ||
                 m[1][0] != m2.m[1][0] || m[1][1] != m2.m[1][1] || m[1][2] != m2.m[1][2] || m[1][3] != m2.m[1][3] ||
                 m[2][0] != m2.m[2][0] || m[2][1] != m2.m[2][1] || m[2][2] != m2.m[2][2] || m[2][3] != m2.m[2][3] ||
                 m[3][0] != m2.m[3][0] || m[3][1] != m2.m[3][1] || m[3][2] != m2.m[3][2] || m[3][3] != m2.m[3][3] )
                 return false;
+
             return true;
         }
 
         /** Tests 2 matrices for inequality.
         */
-        inline bool operator != ( const Matrix4& m2 ) const
+        inline bool operator != ( const TMatrix4& m2 ) const
         {
-            if( 
-                m[0][0] != m2.m[0][0] || m[0][1] != m2.m[0][1] || m[0][2] != m2.m[0][2] || m[0][3] != m2.m[0][3] ||
+            if( m[0][0] != m2.m[0][0] || m[0][1] != m2.m[0][1] || m[0][2] != m2.m[0][2] || m[0][3] != m2.m[0][3] ||
                 m[1][0] != m2.m[1][0] || m[1][1] != m2.m[1][1] || m[1][2] != m2.m[1][2] || m[1][3] != m2.m[1][3] ||
                 m[2][0] != m2.m[2][0] || m[2][1] != m2.m[2][1] || m[2][2] != m2.m[2][2] || m[2][3] != m2.m[2][3] ||
                 m[3][0] != m2.m[3][0] || m[3][1] != m2.m[3][1] || m[3][2] != m2.m[3][2] || m[3][3] != m2.m[3][3] )
                 return true;
+
             return false;
         }
 
         /** Assignment from 3x3 matrix.
         */
-        inline void operator = ( const Matrix3& mat3 )
+        inline void operator = ( const TMatrix3<T>& mat3 )
         {
             m[0][0] = mat3.m[0][0]; m[0][1] = mat3.m[0][1]; m[0][2] = mat3.m[0][2];
             m[1][0] = mat3.m[1][0]; m[1][1] = mat3.m[1][1]; m[1][2] = mat3.m[1][2];
             m[2][0] = mat3.m[2][0]; m[2][1] = mat3.m[2][1]; m[2][2] = mat3.m[2][2];
         }
 
-        inline Matrix4 Transpose(void) const
+        inline TMatrix4 Transpose(void) const
         {
-            return Matrix4(m[0][0], m[1][0], m[2][0], m[3][0],
-                           m[0][1], m[1][1], m[2][1], m[3][1],
-                           m[0][2], m[1][2], m[2][2], m[3][2],
-                           m[0][3], m[1][3], m[2][3], m[3][3]);
+            return TMatrix4(m[0][0], m[1][0], m[2][0], m[3][0],
+                            m[0][1], m[1][1], m[2][1], m[3][1],
+                            m[0][2], m[1][2], m[2][2], m[3][2],
+                            m[0][3], m[1][3], m[2][3], m[3][3]);
         }
 
         /*
@@ -698,7 +1031,7 @@ namespace Disorder
         */
         /** Sets the translation transformation part of the matrix.
         */
-        inline void SetTrans( const Vector3& v )
+        inline void Translate( const TVector3<T>& v )
         {
             m[0][3] = v.x;
             m[1][3] = v.y;
@@ -707,15 +1040,15 @@ namespace Disorder
 
         /** Extracts the translation transformation part of the matrix.
          */
-        inline Vector3 GetTrans() const
+        inline TVector3<T> GetTranslate() const
         {
-          return Vector3(m[0][3], m[1][3], m[2][3]);
+          return TVector3<T>(m[0][3], m[1][3], m[2][3]);
         }
         
 
         /** Builds a translation matrix
         */
-        inline void MakeTrans( const Vector3& v )
+        inline void MakeTranslate( const TVector3<T>& v )
         {
             m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = v.x;
             m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = v.y;
@@ -723,42 +1056,14 @@ namespace Disorder
             m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
         }
 
-        inline void MakeTrans( float tx, float ty, float tz )
+        inline void MakeTranslate( T tx, T ty, T tz )
         {
             m[0][0] = 1.0; m[0][1] = 0.0; m[0][2] = 0.0; m[0][3] = tx;
             m[1][0] = 0.0; m[1][1] = 1.0; m[1][2] = 0.0; m[1][3] = ty;
             m[2][0] = 0.0; m[2][1] = 0.0; m[2][2] = 1.0; m[2][3] = tz;
             m[3][0] = 0.0; m[3][1] = 0.0; m[3][2] = 0.0; m[3][3] = 1.0;
         }
-
-        /** Gets a translation matrix.
-        */
-        inline static Matrix4 GetTrans( const Vector3& v )
-        {
-            Matrix4 r;
-
-            r.m[0][0] = 1.0; r.m[0][1] = 0.0; r.m[0][2] = 0.0; r.m[0][3] = v.x;
-            r.m[1][0] = 0.0; r.m[1][1] = 1.0; r.m[1][2] = 0.0; r.m[1][3] = v.y;
-            r.m[2][0] = 0.0; r.m[2][1] = 0.0; r.m[2][2] = 1.0; r.m[2][3] = v.z;
-            r.m[3][0] = 0.0; r.m[3][1] = 0.0; r.m[3][2] = 0.0; r.m[3][3] = 1.0;
-
-            return r;
-        }
-
-        /** Gets a translation matrix - variation for not using a vector.
-        */
-        inline static Matrix4 GetTrans( float t_x, float t_y, float t_z )
-        {
-            Matrix4 r;
-
-            r.m[0][0] = 1.0; r.m[0][1] = 0.0; r.m[0][2] = 0.0; r.m[0][3] = t_x;
-            r.m[1][0] = 0.0; r.m[1][1] = 1.0; r.m[1][2] = 0.0; r.m[1][3] = t_y;
-            r.m[2][0] = 0.0; r.m[2][1] = 0.0; r.m[2][2] = 1.0; r.m[2][3] = t_z;
-            r.m[3][0] = 0.0; r.m[3][1] = 0.0; r.m[3][2] = 0.0; r.m[3][3] = 1.0;
-
-            return r;
-        }
-
+ 
         /*
         -----------------------------------------------------------------------
         Scale Transformation
@@ -766,7 +1071,7 @@ namespace Disorder
         */
         /** Sets the scale part of the matrix.
         */
-        inline void SetScale( const Vector3& v )
+        inline void Scale( const TVector3<T>& v )
         {
             m[0][0] = v.x;
             m[1][1] = v.y;
@@ -781,7 +1086,7 @@ namespace Disorder
 			return false;
 		}
 
-		inline Matrix4 GetNormalMatrix()
+		inline TMatrix4 GetNormalMatrix()
 		{
 			if(Math::FloatEqual(m[0][0], m[1][1], (float)1e-04) && Math::FloatEqual(m[0][0], m[2][2], (float)1e-04) )
 			{
@@ -794,7 +1099,7 @@ namespace Disorder
 
         /** Gets a scale matrix.
         */
-        inline static Matrix4 GetScale( const Vector3& v )
+        inline static TMatrix4 GetScaleMatrix( const TVector3<T>& v )
         {
             Matrix4 r;
             r.m[0][0] = v.x; r.m[0][1] = 0.0; r.m[0][2] = 0.0; r.m[0][3] = 0.0;
@@ -807,7 +1112,7 @@ namespace Disorder
 
         /** Gets a scale matrix - variation for not using a vector.
         */
-        inline static Matrix4 GetScale( float s_x, float s_y, float s_z )
+        inline static TMatrix4 GetScaleMatrix( T s_x, T s_y, T s_z )
         {
             Matrix4 r;
             r.m[0][0] = s_x; r.m[0][1] = 0.0; r.m[0][2] = 0.0; r.m[0][3] = 0.0;
@@ -821,7 +1126,7 @@ namespace Disorder
         /** Extracts the rotation / scaling part of the Matrix as a 3x3 matrix. 
         @param m3x3 Destination Matrix3
         */
-        inline void Extract3x3Matrix(Matrix3& m3x3) const
+        inline void Extract3x3Matrix(TMatrix3<T>& m3x3) const
         {
             m3x3.m[0][0] = m[0][0];
             m3x3.m[0][1] = m[0][1];
@@ -860,34 +1165,117 @@ namespace Disorder
 
 		/** Extracts the rotation / scaling part as a quaternion from the Matrix.
          */
-        inline Quaternion ExtractQuaternion() const
+        inline TQuaternion<T> ExtractQuaternion() const
         {
-          Matrix3 m3x3;
-          Extract3x3Matrix(m3x3);
-          return Quaternion(m3x3);
+           TMatrix3<T> m3x3;
+           Extract3x3Matrix(m3x3);
+           return TQuaternion<T>(m3x3);
         }
-
-		static const Matrix4 ZERO;
-		static const Matrix4 ZEROAFFINE;
-		static const Matrix4 IDENTITY;
-        /** Useful little matrix which takes 2D clipspace {-1, 1} to {0,1}
-            and inverts the Y. */
-        static const Matrix4 CLIPSPACE2DTOIMAGESPACE;
-
-        inline Matrix4 operator*(float scalar) const
+ 
+        inline TMatrix4 operator*(T scalar) const
         {
-            return Matrix4(
-                scalar*m[0][0], scalar*m[0][1], scalar*m[0][2], scalar*m[0][3],
-                scalar*m[1][0], scalar*m[1][1], scalar*m[1][2], scalar*m[1][3],
-                scalar*m[2][0], scalar*m[2][1], scalar*m[2][2], scalar*m[2][3],
-                scalar*m[3][0], scalar*m[3][1], scalar*m[3][2], scalar*m[3][3]);
+            return TMatrix4( scalar*m[0][0], scalar*m[0][1], scalar*m[0][2], scalar*m[0][3],
+							 scalar*m[1][0], scalar*m[1][1], scalar*m[1][2], scalar*m[1][3],
+							 scalar*m[2][0], scalar*m[2][1], scalar*m[2][2], scalar*m[2][3],
+							 scalar*m[3][0], scalar*m[3][1], scalar*m[3][2], scalar*m[3][3]);
         }
+ 
+		//-----------------------------------------------------------------------
+		inline TMatrix4 Adjoint() const
+		{
+			return TMatrix4(
+				         MINOR(1, 2, 3, 1, 2, 3),
+						-MINOR( 0, 2, 3, 1, 2, 3),
+						 MINOR( 0, 1, 3, 1, 2, 3),
+						-MINOR( 0, 1, 2, 1, 2, 3),
 
-        
+						-MINOR( 1, 2, 3, 0, 2, 3),
+						 MINOR( 0, 2, 3, 0, 2, 3),
+						-MINOR( 0, 1, 3, 0, 2, 3),
+						 MINOR( 0, 1, 2, 0, 2, 3),
+
+						 MINOR( 1, 2, 3, 0, 1, 3),
+						-MINOR( 0, 2, 3, 0, 1, 3),
+						 MINOR( 0, 1, 3, 0, 1, 3),
+						-MINOR( 0, 1, 2, 0, 1, 3),
+
+						-MINOR( 1, 2, 3, 0, 1, 2),
+						 MINOR(0, 2, 3, 0, 1, 2),
+						-MINOR( 0, 1, 3, 0, 1, 2),
+						 MINOR( 0, 1, 2, 0, 1, 2));
+		}
+
+		//-----------------------------------------------------------------------
+		inline float Determinant() const
+		{
+			return m[0][0] * MINOR(1, 2, 3, 1, 2, 3) -
+				   m[0][1] * MINOR(1, 2, 3, 0, 2, 3) +
+				   m[0][2] * MINOR(1, 2, 3, 0, 1, 3) -
+				   m[0][3] * MINOR(1, 2, 3, 0, 1, 2);
+		}
 		
-		Matrix4 Adjoint() const;
-		float Determinant() const;
-		Matrix4 Inverse() const;
+ 
+		inline TMatrix4 Inverse() const
+		{
+			T m00 = m[0][0], m01 = m[0][1], m02 = m[0][2], m03 = m[0][3];
+			T m10 = m[1][0], m11 = m[1][1], m12 = m[1][2], m13 = m[1][3];
+			T m20 = m[2][0], m21 = m[2][1], m22 = m[2][2], m23 = m[2][3];
+			T m30 = m[3][0], m31 = m[3][1], m32 = m[3][2], m33 = m[3][3];
+
+			T v0 = m20 * m31 - m21 * m30;
+			T v1 = m20 * m32 - m22 * m30;
+			T v2 = m20 * m33 - m23 * m30;
+			T v3 = m21 * m32 - m22 * m31;
+			T v4 = m21 * m33 - m23 * m31;
+			T v5 = m22 * m33 - m23 * m32;
+
+			T t00 = + (v5 * m11 - v4 * m12 + v3 * m13);
+			T t10 = - (v5 * m10 - v2 * m12 + v1 * m13);
+			T t20 = + (v4 * m10 - v2 * m11 + v0 * m13);
+			T t30 = - (v3 * m10 - v1 * m11 + v0 * m12);
+
+			T invDet = 1 / (t00 * m00 + t10 * m01 + t20 * m02 + t30 * m03);
+
+			T d00 = t00 * invDet;
+			T d10 = t10 * invDet;
+			T d20 = t20 * invDet;
+			T d30 = t30 * invDet;
+
+			T d01 = - (v5 * m01 - v4 * m02 + v3 * m03) * invDet;
+			T d11 = + (v5 * m00 - v2 * m02 + v1 * m03) * invDet;
+			T d21 = - (v4 * m00 - v2 * m01 + v0 * m03) * invDet;
+			T d31 = + (v3 * m00 - v1 * m01 + v0 * m02) * invDet;
+
+			v0 = m10 * m31 - m11 * m30;
+			v1 = m10 * m32 - m12 * m30;
+			v2 = m10 * m33 - m13 * m30;
+			v3 = m11 * m32 - m12 * m31;
+			v4 = m11 * m33 - m13 * m31;
+			v5 = m12 * m33 - m13 * m32;
+
+			T d02 = + (v5 * m01 - v4 * m02 + v3 * m03) * invDet;
+			T d12 = - (v5 * m00 - v2 * m02 + v1 * m03) * invDet;
+			T d22 = + (v4 * m00 - v2 * m01 + v0 * m03) * invDet;
+			T d32 = - (v3 * m00 - v1 * m01 + v0 * m02) * invDet;
+
+			v0 = m21 * m10 - m20 * m11;
+			v1 = m22 * m10 - m20 * m12;
+			v2 = m23 * m10 - m20 * m13;
+			v3 = m22 * m11 - m21 * m12;
+			v4 = m23 * m11 - m21 * m13;
+			v5 = m23 * m12 - m22 * m13;
+
+			T d03 = - (v5 * m01 - v4 * m02 + v3 * m03) * invDet;
+			T d13 = + (v5 * m00 - v2 * m02 + v1 * m03) * invDet;
+			T d23 = - (v4 * m00 - v2 * m01 + v0 * m03) * invDet;
+			T d33 = + (v3 * m00 - v1 * m01 + v0 * m02) * invDet;
+
+			return TMatrix4(
+				d00, d01, d02, d03,
+				d10, d11, d12, d13,
+				d20, d21, d22, d23,
+				d30, d31, d32, d33);
+		}
 
         /** Building a Matrix4 from orientation / scale / position.
         @remarks
@@ -895,18 +1283,83 @@ namespace Disorder
             of orientation axes, scale does not affect size of translation, rotation and scaling are always
             centered on the origin.
         */
-        void MakeTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
-		void MakeTransform(const Vector3& position, const Vector3& scale, const Vector3& orientation);
+        void MakeTransform(const TVector3<T>& position, const TVector3<T>& scale, const TQuaternion<T>& orientation)
+		{
+			// Ordering:
+			//    1. Scale
+			//    2. Rotate
+			//    3. Translate
+
+			TMatrix3<T> rot3x3;
+			orientation.ToRotationMatrix(rot3x3);
+
+			// Set up final matrix with scale, rotation and translation
+			m[0][0] = scale.x * rot3x3[0][0]; m[0][1] = scale.y * rot3x3[0][1]; m[0][2] = scale.z * rot3x3[0][2]; m[0][3] = position.x;
+			m[1][0] = scale.x * rot3x3[1][0]; m[1][1] = scale.y * rot3x3[1][1]; m[1][2] = scale.z * rot3x3[1][2]; m[1][3] = position.y;
+			m[2][0] = scale.x * rot3x3[2][0]; m[2][1] = scale.y * rot3x3[2][1]; m[2][2] = scale.z * rot3x3[2][2]; m[2][3] = position.z;
+
+			// No projection term
+			m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
+		}
+
+		inline void MakeTransform(const TVector3<T>& position, const TVector3<T>& scale, const TVector3<T>& orientation)
+		{
+			TMatrix3 rot3x3;
+			rot3x3.EulerAnglesXYZ(orientation.x,orientation.y,orientation.z);
+			 // Set up final matrix with scale, rotation and translation
+			m[0][0] = scale.x * rot3x3[0][0]; m[0][1] = scale.y * rot3x3[0][1]; m[0][2] = scale.z * rot3x3[0][2]; m[0][3] = position.x;
+			m[1][0] = scale.x * rot3x3[1][0]; m[1][1] = scale.y * rot3x3[1][1]; m[1][2] = scale.z * rot3x3[1][2]; m[1][3] = position.y;
+			m[2][0] = scale.x * rot3x3[2][0]; m[2][1] = scale.y * rot3x3[2][1]; m[2][2] = scale.z * rot3x3[2][2]; m[2][3] = position.z;
+
+			// No projection term
+			m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
+		}
         /** Building an inverse Matrix4 from orientation / scale / position.
         @remarks
             As makeTransform except it build the inverse given the same data as makeTransform, so
             performing -translation, -rotate, 1/scale in that order.
         */
-        void MakeInverseTransform(const Vector3& position, const Vector3& scale, const Quaternion& orientation);
+        inline void MakeInverseTransform(const TVector3<T>& position, const TVector3<T>& scale, const TQuaternion<T>& orientation)
+		{
+			 // Invert the parameters
+			TVector3<T> invTranslate = -position;
+			TVector3<T> invScale(1 / scale.x, 1 / scale.y, 1 / scale.z);
+			TQuaternion<T> invRot = orientation.Inverse();
+
+			// Because we're inverting, order is translation, rotation, scale
+			// So make translation relative to scale & rotation
+			invTranslate = invRot * invTranslate; // rotate
+			invTranslate *= invScale; // scale
+
+			// Next, make a 3x3 rotation matrix
+			TMatrix3<T> rot3x3;
+			invRot.ToRotationMatrix(rot3x3);
+
+			// Set up final matrix with scale, rotation and translation
+			m[0][0] = invScale.x * rot3x3[0][0]; m[0][1] = invScale.x * rot3x3[0][1]; m[0][2] = invScale.x * rot3x3[0][2]; m[0][3] = invTranslate.x;
+			m[1][0] = invScale.y * rot3x3[1][0]; m[1][1] = invScale.y * rot3x3[1][1]; m[1][2] = invScale.y * rot3x3[1][2]; m[1][3] = invTranslate.y;
+			m[2][0] = invScale.z * rot3x3[2][0]; m[2][1] = invScale.z * rot3x3[2][1]; m[2][2] = invScale.z * rot3x3[2][2]; m[2][3] = invTranslate.z;		
+
+			// No projection term
+			m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
+		}
 
         /** Decompose a Matrix4 to orientation / scale / position.
         */
-        void Decomposition(Vector3& position, Vector3& scale, Quaternion& orientation) const;
+        inline void Decomposition(TVector3<T>& position, TVector3<T>& scale, TQuaternion<T>& orientation) const
+		{
+			BOOST_ASSERT(IsAffine());
+
+			TMatrix3<T> m3x3;
+			Extract3x3Matrix(m3x3);
+
+			Matrix3 matQ;
+			Vector3 vecU;
+			m3x3.QDUDecomposition( matQ, scale, vecU ); 
+
+			orientation = Quaternion( matQ );
+			position = TVector3<T>( m[0][3], m[1][3], m[2][3] );
+		}
 
         /** Check whether or not the matrix is affine matrix.
             @remarks
@@ -922,17 +1375,59 @@ namespace Disorder
             @note
                 The matrix must be an affine matrix. @see Matrix4::isAffine.
         */
-        Matrix4 InverseAffine(void) const;
+        TMatrix4 InverseAffine(void) const
+		{
+			 BOOST_ASSERT(IsAffine());
+
+			T m10 = m[1][0], m11 = m[1][1], m12 = m[1][2];
+			T m20 = m[2][0], m21 = m[2][1], m22 = m[2][2];
+
+			T t00 = m22 * m11 - m21 * m12;
+			T t10 = m20 * m12 - m22 * m10;
+			T t20 = m21 * m10 - m20 * m11;
+
+			T m00 = m[0][0], m01 = m[0][1], m02 = m[0][2];
+
+			T invDet = 1 / (m00 * t00 + m01 * t10 + m02 * t20);
+
+			t00 *= invDet; t10 *= invDet; t20 *= invDet;
+
+			m00 *= invDet; m01 *= invDet; m02 *= invDet;
+
+			T r00 = t00;
+			T r01 = m02 * m21 - m01 * m22;
+			T r02 = m01 * m12 - m02 * m11;
+
+			T r10 = t10;
+			T r11 = m00 * m22 - m02 * m20;
+			T r12 = m02 * m10 - m00 * m12;
+
+			T r20 = t20;
+			T r21 = m01 * m20 - m00 * m21;
+			T r22 = m00 * m11 - m01 * m10;
+
+			T m03 = m[0][3], m13 = m[1][3], m23 = m[2][3];
+
+			T r03 = - (r00 * m03 + r01 * m13 + r02 * m23);
+			T r13 = - (r10 * m03 + r11 * m13 + r12 * m23);
+			T r23 = - (r20 * m03 + r21 * m13 + r22 * m23);
+
+			return TMatrix4(
+				r00, r01, r02, r03,
+				r10, r11, r12, r13,
+				r20, r21, r22, r23,
+				  0,   0,   0,   1);
+		}
 
         /** Concatenate two affine matrices.
             @note
                 The matrices must be affine matrix. @see Matrix4::isAffine.
         */
-        inline Matrix4 ConcatenateAffine(const Matrix4 &m2) const
+        inline TMatrix4 ConcatenateAffine(const TMatrix4 &m2) const
         {
             BOOST_ASSERT(IsAffine() && m2.IsAffine());
 
-            return Matrix4(
+            return TMatrix4(
                 m[0][0] * m2.m[0][0] + m[0][1] * m2.m[1][0] + m[0][2] * m2.m[2][0],
                 m[0][0] * m2.m[0][1] + m[0][1] * m2.m[1][1] + m[0][2] * m2.m[2][1],
                 m[0][0] * m2.m[0][2] + m[0][1] * m2.m[1][2] + m[0][2] * m2.m[2][2],
@@ -958,7 +1453,7 @@ namespace Disorder
             @note
                 The matrix must be an affine matrix. @see Matrix4::isAffine.
         */
-        inline Vector3 TransformAffine(const Vector3& v) const
+        inline TVector3<T> TransformAffine(const TVector3<T>& v) const
         {
             BOOST_ASSERT(IsAffine());
 
@@ -972,11 +1467,11 @@ namespace Disorder
             @note
                 The matrix must be an affine matrix. @see Matrix4::isAffine.
         */
-        inline Vector4 TransformAffine(const Vector4& v) const
+        inline TVector4<T> TransformAffine(const TVector4<T>& v) const
         {
             BOOST_ASSERT(IsAffine());
 
-            return Vector4(
+            return TVector4<T>(
                 m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w, 
                 m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w,
                 m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w,
@@ -984,19 +1479,7 @@ namespace Disorder
         }
     };
 
-    /* Removed from Vector4 and made a non-member here because otherwise
-       OgreMatrix4.h and OgreVector4.h have to try to include and inline each 
-       other, which frankly doesn't work ;)
-   */
-    inline Vector4 operator * (const Vector4& v, const Matrix4& mat)
-    {
-        return Vector4(
-            v.x*mat[0][0] + v.y*mat[1][0] + v.z*mat[2][0] + v.w*mat[3][0],
-            v.x*mat[0][1] + v.y*mat[1][1] + v.z*mat[2][1] + v.w*mat[3][1],
-            v.x*mat[0][2] + v.y*mat[1][2] + v.z*mat[2][2] + v.w*mat[3][2],
-            v.x*mat[0][3] + v.y*mat[1][3] + v.z*mat[2][3] + v.w*mat[3][3]
-            );
-    }
+	typedef TMatrix4<float> Matrix4f;
  
 }
 

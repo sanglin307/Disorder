@@ -18,18 +18,12 @@
     <ClCompile Include="WinClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WinFileSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="WinLauncher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WinClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WinFileSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WinLauncher.h">

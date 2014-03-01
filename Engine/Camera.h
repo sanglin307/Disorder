@@ -29,7 +29,7 @@ namespace Disorder
 			return true;
 		}
 
-		virtual void SetTarget(Camera *pCamera,const Eigen::Vector3f& target)
+		virtual void SetTarget(Camera *pCamera,const glm::vec3& target)
 		{
 			return;
 		}
@@ -60,17 +60,17 @@ namespace Disorder
 		virtual bool MouseEvent(Camera *pCamera,MouseInputEvent const& mouseEvent,float deltaSeconds);
 		virtual bool Update(Camera *pCamera, float deltaSeconds);
 		 
-		static CameraSphereTargetUpdatePtr Create(float fRadius,const Eigen::Vector3f& target);
+		static CameraSphereTargetUpdatePtr Create(float fRadius,const glm::vec3& target);
 		
-		virtual void SetTarget(Camera *pCamera,const Eigen::Vector3f& target);
+		virtual void SetTarget(Camera *pCamera,const glm::vec3& target);
 
 	protected:
-		CameraSphereTargetUpdate(float radius,const Eigen::Vector3f& target)
+		CameraSphereTargetUpdate(float radius,const glm::vec3& target)
 			:_radius(radius),_target(target),_zoomPos(-1)
 		{};
 
 		float _radius;
-		Eigen::Vector3f _target;
+		glm::vec3 _target;
 		int _zoomPos;
 	};
 
@@ -80,24 +80,35 @@ namespace Disorder
 		friend class CameraSphereTargetUpdate;
 		friend class CameraFirstPersonUpdate;
 	public:
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-		mutable Eigen::Affine3f ViewMatrix;
-		mutable Eigen::Matrix4f ProjMatrix;
-		mutable Eigen::Matrix4f ViewProjMatrix;
+    
+		glm::mat4 ViewMatrix;
+		glm::mat4 ProjMatrix;
+		glm::mat4 ViewProjMatrix;
 
-		mutable Eigen::Matrix4f ViewInvMatrix;
-		mutable Eigen::Matrix4f ProjInvMatrix;
-		mutable Eigen::Matrix4f ViewProjInvMatrix;
-
-		void LookAt(Eigen::Vector3f const& eyePos,Eigen::Vector3f const& lookAt,Eigen::Vector3f const& upVec);
+		glm::mat4 ViewInvMatrix;
+		glm::mat4 ProjInvMatrix;
+		glm::mat4 ViewProjInvMatrix;
+ 
+		void LookAt(const glm::vec3& eyePos,const glm::vec3& lookAt,const glm::vec3& upVec);
 	    void ProjCalculate(float FOV, float nearPlane,float farPlane);
 
 		bool KeyboardEvent(OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds);
 		bool MouseEvent(MouseInputEvent const& mouseEvent,float deltaSeconds);
 
-		Eigen::Vector3f Direction() const;
-		Eigen::Vector3f Up() const;
-		Eigen::Vector3f Right() const;
+		const glm::vec3& Direction() const
+		{
+			return _Direction;
+		}
+
+		const glm::vec3& Up() const
+		{
+			return _Up;
+		}
+
+		const glm::vec3& Right() const
+		{
+			return _Right;
+		}
 
 		virtual void Tick(float delta);
  
@@ -115,14 +126,18 @@ namespace Disorder
 
 		Camera(std::string const& name);
 
-		void LookAt_(Eigen::Vector3f const& eyePos,Eigen::Vector3f const& lookAt,Eigen::Vector3f const& upVec);
+		void LookAt_(const glm::vec3& eyePos,const glm::vec3& lookAt,const glm::vec3& upVec);
 
 		void Update(float delta);
 		void UpdateViewMatrix();
 		void UpdateProjectMatrix();
  
-		Eigen::Vector3f _eyePos;
-		Eigen::Quaternionf _rotation;
+		glm::vec3 EyePos;
+		glm::quat Rotation;
+
+		glm::vec3 _Direction;
+		glm::vec3 _Up;
+		glm::vec3 _Right;
  
 		float _nearPlane;
 		float _farPlane;

@@ -191,6 +191,9 @@
     <ClInclude Include="Matrixs.h">
       <Filter>Mathematics</Filter>
     </ClInclude>
+    <ClInclude Include="Quaternion.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -307,9 +310,6 @@
     </ClCompile>
     <ClCompile Include="RenderEngine.cpp">
       <Filter>RenderSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="Matrixs.cpp">
-      <Filter>Mathematics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

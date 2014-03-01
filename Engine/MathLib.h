@@ -140,11 +140,12 @@ namespace Disorder
         static int GetPlaneSide(const Eigen::Hyperplane<float,3>&plane,const Eigen::Vector3f& centre, const Eigen::Vector3f& halfSize);
 		static int GetPlaneSide(const Eigen::Hyperplane<float,3>&plane,const Eigen::Vector3f& centre, float radius);
  
-		static  void ConvertToSphericalCoord(const Eigen::Vector3f& pos,const Eigen::Vector3f& origin,float &radius,float &yAngle,float &zAngle);	
-		static  void ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const Eigen::Vector3f& origin,Eigen::Vector3f& pos);
+		static  void ConvertToSphericalCoord(const glm::vec3& pos,const glm::vec3& origin,float &radius,float &yAngle,float &zAngle);	
+		static  void ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const glm::vec3& origin,glm::vec3& pos);
 		
-		static Eigen::Matrix4f ProjFovRH(float fieldOfViewY,float aspectRatio,float znearPlane,float zfarPlane);		
-		static Eigen::Matrix4f ViewMatrixRH(const Eigen::Vector3f &eye,const Eigen::Vector3f &center,const Eigen::Vector3f &up);
+		static glm::mat4 ProjFovRH(float fieldOfViewY,float aspectRatio,float znearPlane,float zfarPlane);		
+		static glm::mat4 ViewMatrixRH(const glm::vec3 &eye,const glm::vec3 &center,const glm::vec3 &up);
+		static glm::mat4 ViewMatrixRH(const glm::vec3 &eye,const glm::vec3 &xAxis,const glm::vec3 &yAxis,const glm::vec3 &zAxis);
 
 		static const float Math::POS_INFINITY;
         static const float Math::NEG_INFINITY;

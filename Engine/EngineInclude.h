@@ -43,6 +43,15 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+
+//GLM
+#ifdef _DEBUG
+#define GLM_MESSAGES
+#endif
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+
 // Eigen
 #include <Eigen/StdVector>
 #include <Eigen/Geometry>
@@ -186,8 +195,10 @@ namespace Disorder
 
 //project related
 #include "Singleton.h"
-#include "MathLib.h"
 #include "Vectors.h"
+#include "Quaternion.h"
+#include "Matrixs.h"
+#include "MathLib.h"
 #include "Common.h"
 #include "GameTime.h"
 #include "Bounds.h"
