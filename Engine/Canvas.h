@@ -7,10 +7,10 @@ namespace Disorder
 	class Canvas
 	{
 	public:
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+       
 		float GetStringLength(float fsize,std::string const& str);
-		void DrawString(float xPos,float yPos, float size, Vector4f const& color,std::string const& str);	  // xPos,yPos in [ 0.f ,1.f]	 
-		void DrawLine(Vector3f const& beginPos,Vector4f const& beginColor,Vector3f const& endPos,Vector4f const& endColor);
+		void DrawString(float xPos, float yPos, float size, glm::vec4 const& color, std::string const& str);	  // xPos,yPos in [ 0.f ,1.f]	 
+		void DrawLine(glm::vec3 const& beginPos, glm::vec4 const& beginColor, glm::vec3 const& endPos, glm::vec4 const& endColor);
 
 		void Render(CameraPtr const& camera);
 

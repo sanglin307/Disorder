@@ -5,21 +5,21 @@ namespace Disorder
 {
 	struct BatchTileVertex
 	{
-		Vector3f position;
-		Vector4f color;
-	    Vector2f texcoord;
+		glm::vec3 position;
+		glm::vec4 color;
+		glm::vec2 texcoord;
 	};
 
 	struct BatchLineVertex
 	{
-		Vector3f position;
-		Vector4f color;
+		glm::vec3 position;
+		glm::vec4 color;
 	};
 
 	struct TileTexVertex
 	{
-		Vector3f position;
-		Vector2f texcoord;
+		glm::vec3 position;
+		glm::vec2 texcoord;
 	};
 
 

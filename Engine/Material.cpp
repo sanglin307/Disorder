@@ -16,9 +16,9 @@ namespace Disorder
 		_SpecularExpProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sSpecularExp,eSP_Float,1);
 		_TransparencyFactorProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sTransparency,eSP_Float,1);
 
-		DiffuseColor = Eigen::Vector3f::Constant(0.6f);
-		EmissiveColor = Eigen::Vector3f::Constant(0.f);
-		SpecularColor = Eigen::Vector3f::Constant(0.f);
+		DiffuseColor = glm::vec3(0.6f);
+		EmissiveColor = glm::vec3(0.f);
+		SpecularColor = glm::vec3(0.f);
 		SpecularExp = 1.0f;
 		Transparency = 0.0f;
 	}
@@ -33,9 +33,9 @@ namespace Disorder
 	{	
 		BOOST_ASSERT(SpecularExp <= 10.0f);  // because defer shading have the 8bit precision, so ...
 		_propertyManager->ClearShaderPropertyValue();
-		_DiffuseColorProperty->SetData(DiffuseColor.data());
-		_EmissiveColorProperty->SetData(EmissiveColor.data());
-		_SpecularColorProperty->SetData(SpecularColor.data());
+		_DiffuseColorProperty->SetData(glm::value_ptr(DiffuseColor));
+		_EmissiveColorProperty->SetData(glm::value_ptr(EmissiveColor));
+		_SpecularColorProperty->SetData(glm::value_ptr(SpecularColor));
 		_SpecularExpProperty->SetData(&SpecularExp);
 		_TransparencyFactorProperty->SetData(&Transparency);
 		_propertyManager->UpdateShaderProperty();

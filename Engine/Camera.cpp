@@ -149,19 +149,23 @@ namespace Disorder
 						 pCamera->ViewMatrix[0][2],pCamera->ViewMatrix[1][2],pCamera->ViewMatrix[2][2];
 			
 			Eigen::Vector3f eulerAngle = RotMatrix.eulerAngles(0,1,2);  
-			//glm::vec3 euler = glm::eulerAngles(pCamera->Rotation);
-		
+			glm::vec3 euler = glm::eulerAngles(pCamera->Rotation);
+
+			glm::quat rot2 = glm::angleAxis(euler.x, glm::vec3(1, 0, 0)) *
+				glm::angleAxis(euler.y, glm::vec3(0, 1, 0)) *
+				glm::angleAxis(euler.z, glm::vec3(0, 0, 1));
+
 			float speed = GConfig->pCameraConfig->mFreeMode.RotateSpeed;
 			if( mouseEvent.RelativeX != 0 )
 			{
 				eulerAngle.y() += mouseEvent.RelativeX * speed * deltaSeconds;
-				//euler.y += mouseEvent.RelativeX * speed * deltaSeconds;
+				euler.y += mouseEvent.RelativeX * speed * deltaSeconds;
 			}
 
 			if( mouseEvent.RelativeY != 0 )
 			{
 				eulerAngle.x() += mouseEvent.RelativeY * speed * deltaSeconds;    
-				//euler.x += mouseEvent.RelativeY * speed * deltaSeconds;    
+				euler.x += mouseEvent.RelativeY * speed * deltaSeconds;    
 			}
 
 			if( mouseEvent.RelativeY != 0 || mouseEvent.RelativeX != 0 )
@@ -171,6 +175,11 @@ namespace Disorder
 					                 Eigen::AngleAxisf(eulerAngle.y(),Eigen::Vector3f::UnitY()) *  
 									 Eigen::AngleAxisf(eulerAngle.z(),Eigen::Vector3f::UnitZ());    
 				
+				glm::quat rot = glm::angleAxis(euler.x, glm::vec3(1, 0, 0)) *
+					glm::angleAxis(euler.y, glm::vec3(0, 1, 0)) *
+					glm::angleAxis(euler.z, glm::vec3(0, 0, 1));
+
+				rot = glm::conjugate(rot);
 				//glm::quat q = glm::toQuat(glm::orientate3(euler));
 			 //  glm::quat q2 = glm::conjugate(q);
 			   //glm::quat q3 = glm::inverse(q);
@@ -380,13 +389,13 @@ namespace Disorder
 		strstream << "camera: [eyePos](" << (int)EyePos.x << "; " <<  (int)EyePos.y << "; " <<  (int)EyePos.z << ")     [Focus At](" <<  (int)lookAt.x << ";  "<<  (int)lookAt.y << ";  " <<  (int)lookAt.z << ")";
 		if( _updateMode == eFirstPersonMode )
 		{
-			GEngine->GameCanvas->DrawString(0.005f,0.945f,0.04f,Vector4f(1.f,1.f,1.f,1.f),"First Person Mode");
+			GEngine->GameCanvas->DrawString(0.005f, 0.945f, 0.04f, glm::vec4(1.f), "First Person Mode");
 		}
 		else if( _updateMode == eSphericalTargetMode )
 		{
-			GEngine->GameCanvas->DrawString(0.005f,0.945f,0.04f,Vector4f(1.f,1.f,1.f,1.f),"Spherical Coordinate Mode");
+			GEngine->GameCanvas->DrawString(0.005f, 0.945f, 0.04f, glm::vec4(1.f), "Spherical Coordinate Mode");
 		}
-		GEngine->GameCanvas->DrawString(0.005f,0.965f,0.04f,Vector4f(1.f,1.f,1.f,1.f),strstream.str());
+		GEngine->GameCanvas->DrawString(0.005f,0.965f,0.04f,glm::vec4(1.f),strstream.str());
 	}
 
 	void Camera::Update(float delta)

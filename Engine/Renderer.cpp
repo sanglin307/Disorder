@@ -256,7 +256,7 @@ namespace Disorder
 		_vertexNum += 2;
 	}
 
-	void BatchLines::AddLine(Vector3f const& beginPos,Vector4f const& beginColor,Vector3f const& endPos,Vector4f const& endColor)
+	void BatchLines::AddLine(glm::vec3 const& beginPos, glm::vec4 const& beginColor, glm::vec3 const& endPos, glm::vec4 const& endColor)
 	{
 		if( _vertexNum >= _savedVertexBufferSize )
 		{
@@ -359,57 +359,76 @@ namespace Disorder
 
 	 void GeometryRenderer::DrawBoundingBox(CameraPtr const& camera)
 	 {
-		 Eigen::Vector3f boxVec1 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y - _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z - _geometryObject->BoundingBox.BoxExtent.z);
-		 Eigen::Vector3f boxVec2 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x + _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y - _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z - _geometryObject->BoundingBox.BoxExtent.z);
-		 Eigen::Vector3f boxVec3 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x + _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y + _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z - _geometryObject->BoundingBox.BoxExtent.z);
-		 Eigen::Vector3f boxVec4 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y + _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z - _geometryObject->BoundingBox.BoxExtent.z);
-		 Eigen::Vector3f boxVec5 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y + _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z + _geometryObject->BoundingBox.BoxExtent.z);
-		 Eigen::Vector3f boxVec6 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y - _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z + _geometryObject->BoundingBox.BoxExtent.z);
-		 Eigen::Vector3f boxVec7 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x + _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y - _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z + _geometryObject->BoundingBox.BoxExtent.z);
-		 Eigen::Vector3f boxVec8 = Eigen::Vector3f( _geometryObject->BoundingBox.Origin.x + _geometryObject->BoundingBox.BoxExtent.x,
-			                        _geometryObject->BoundingBox.Origin.y + _geometryObject->BoundingBox.BoxExtent.y,
-									_geometryObject->BoundingBox.Origin.z + _geometryObject->BoundingBox.BoxExtent.z);
+		 glm::vec4 boxVec1( _geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
+			                _geometryObject->BoundingBox.Origin.y - _geometryObject->BoundingBox.BoxExtent.y,
+						    _geometryObject->BoundingBox.Origin.z - _geometryObject->BoundingBox.BoxExtent.z,1);
+		 glm::vec4 boxVec2(_geometryObject->BoundingBox.Origin.x + _geometryObject->BoundingBox.BoxExtent.x,
+			               _geometryObject->BoundingBox.Origin.y - _geometryObject->BoundingBox.BoxExtent.y,
+						   _geometryObject->BoundingBox.Origin.z - _geometryObject->BoundingBox.BoxExtent.z,1);
+		 glm::vec4 boxVec3(_geometryObject->BoundingBox.Origin.x + _geometryObject->BoundingBox.BoxExtent.x,
+			               _geometryObject->BoundingBox.Origin.y + _geometryObject->BoundingBox.BoxExtent.y,
+						   _geometryObject->BoundingBox.Origin.z - _geometryObject->BoundingBox.BoxExtent.z,1);
+		 glm::vec4 boxVec4(_geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
+			               _geometryObject->BoundingBox.Origin.y + _geometryObject->BoundingBox.BoxExtent.y,
+						   _geometryObject->BoundingBox.Origin.z - _geometryObject->BoundingBox.BoxExtent.z,1);
+		 glm::vec4 boxVec5(_geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
+			               _geometryObject->BoundingBox.Origin.y + _geometryObject->BoundingBox.BoxExtent.y,
+						   _geometryObject->BoundingBox.Origin.z + _geometryObject->BoundingBox.BoxExtent.z,1);
+		 glm::vec4 boxVec6(_geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
+			               _geometryObject->BoundingBox.Origin.y - _geometryObject->BoundingBox.BoxExtent.y,
+						   _geometryObject->BoundingBox.Origin.z + _geometryObject->BoundingBox.BoxExtent.z,1);
+		 glm::vec4 boxVec7(_geometryObject->BoundingBox.Origin.x + _geometryObject->BoundingBox.BoxExtent.x,
+			               _geometryObject->BoundingBox.Origin.y - _geometryObject->BoundingBox.BoxExtent.y,
+						   _geometryObject->BoundingBox.Origin.z + _geometryObject->BoundingBox.BoxExtent.z,1);
+		 glm::vec4 boxVec8(_geometryObject->BoundingBox.Origin.x + _geometryObject->BoundingBox.BoxExtent.x,
+			               _geometryObject->BoundingBox.Origin.y + _geometryObject->BoundingBox.BoxExtent.y,
+						   _geometryObject->BoundingBox.Origin.z + _geometryObject->BoundingBox.BoxExtent.z,1);
 
 		 GameObjectPtr go = GetBase();
+		 const glm::mat4& worldMat = go->GetWorldMatrix();
+		 boxVec1 = worldMat * boxVec1;
+		 boxVec2 = worldMat * boxVec2;
+		 boxVec3 = worldMat * boxVec3;
+		 boxVec4 = worldMat * boxVec4;
+		 boxVec5 = worldMat * boxVec5;
+		 boxVec6 = worldMat * boxVec6;
+		 boxVec7 = worldMat * boxVec7;
+		 boxVec8 = worldMat * boxVec8;
 
-		 boxVec1 = go->GetWorldMatrix() * boxVec1;
-		 boxVec2 = go->GetWorldMatrix() * boxVec2;
-		 boxVec3 = go->GetWorldMatrix() * boxVec3;
-		 boxVec4 = go->GetWorldMatrix() * boxVec4;
-		 boxVec5 = go->GetWorldMatrix() * boxVec5;
-		 boxVec6 = go->GetWorldMatrix() * boxVec6;
-		 boxVec7 = go->GetWorldMatrix() * boxVec7;
-		 boxVec8 = go->GetWorldMatrix() * boxVec8;
+		 boxVec1 = boxVec1 / boxVec1.w;
+		 boxVec2 = boxVec2 / boxVec2.w;
+		 boxVec3 = boxVec3 / boxVec3.w;
+		 boxVec4 = boxVec4 / boxVec4.w;
+		 boxVec5 = boxVec5 / boxVec5.w;
+		 boxVec6 = boxVec6 / boxVec6.w;
+		 boxVec7 = boxVec7 / boxVec7.w;
+		 boxVec8 = boxVec8 / boxVec8.w;
+	 
 
-		 Vector4f color(1.0f,0,0,1.0f);
-		 GEngine->GameCanvas->DrawLine(boxVec1,color,boxVec2,color);
-		 GEngine->GameCanvas->DrawLine(boxVec2,color,boxVec3,color);
-		 GEngine->GameCanvas->DrawLine(boxVec3,color,boxVec4,color);
-		 GEngine->GameCanvas->DrawLine(boxVec4,color,boxVec1,color);
+		 glm::vec3 b1(boxVec1.x, boxVec1.y, boxVec1.z);
+		 glm::vec3 b2(boxVec2.x, boxVec2.y, boxVec2.z);
+		 glm::vec3 b3(boxVec3.x, boxVec3.y, boxVec3.z);
+		 glm::vec3 b4(boxVec4.x, boxVec4.y, boxVec4.z);
+		 glm::vec3 b5(boxVec5.x, boxVec5.y, boxVec5.z);
+		 glm::vec3 b6(boxVec6.x, boxVec6.y, boxVec6.z);
+		 glm::vec3 b7(boxVec7.x, boxVec7.y, boxVec7.z);
+		 glm::vec3 b8(boxVec8.x, boxVec8.y, boxVec8.z);
 
-		 GEngine->GameCanvas->DrawLine(boxVec4,color,boxVec5,color);
-	     GEngine->GameCanvas->DrawLine(boxVec1,color,boxVec6,color);
-		 GEngine->GameCanvas->DrawLine(boxVec2,color,boxVec7,color);
-	     GEngine->GameCanvas->DrawLine(boxVec3,color,boxVec8,color);
+		 glm::vec4 color(1.0f,0,0,1.0f);
+		 GEngine->GameCanvas->DrawLine(b1,color,b2,color);
+		 GEngine->GameCanvas->DrawLine(b2,color,b3,color);
+		 GEngine->GameCanvas->DrawLine(b3,color,b4,color);
+		 GEngine->GameCanvas->DrawLine(b4,color,b1,color);
 
-		 GEngine->GameCanvas->DrawLine(boxVec5,color,boxVec6,color);
-		 GEngine->GameCanvas->DrawLine(boxVec6,color,boxVec7,color);
-	     GEngine->GameCanvas->DrawLine(boxVec7,color,boxVec8,color);		
-	     GEngine->GameCanvas->DrawLine(boxVec8,color,boxVec5,color);
+		 GEngine->GameCanvas->DrawLine(b4,color,b5,color);
+	     GEngine->GameCanvas->DrawLine(b1,color,b6,color);
+		 GEngine->GameCanvas->DrawLine(b2,color,b7,color);
+	     GEngine->GameCanvas->DrawLine(b3,color,b8,color);
+
+		 GEngine->GameCanvas->DrawLine(b5,color,b6,color);
+		 GEngine->GameCanvas->DrawLine(b6,color,b7,color);
+	     GEngine->GameCanvas->DrawLine(b7,color,b8,color);		
+	     GEngine->GameCanvas->DrawLine(b8,color,b5,color);
 	 }
 	
 	 void GeometryRenderer::DebugDraw()
@@ -423,20 +442,35 @@ namespace Disorder
 	  {
 		 // draw local axis for debug
 		 GameObjectPtr go = GetBase();
-		 Eigen::Vector3f original = go->GetLocalPosition();
+		 glm::vec3 original = go->GetLocalPosition();
 		 float AxisLength = 1.0f;
-		 Eigen::Vector3f xAxis = original + Eigen::Vector3f(AxisLength,0,0);
-		 Eigen::Vector3f yAxis = original + Eigen::Vector3f(0,AxisLength,0);
-		 Eigen::Vector3f zAxis = original + Eigen::Vector3f(0,0,AxisLength);
+		 glm::vec3 xAxis = original + glm::vec3(AxisLength, 0, 0);
+		 glm::vec3 yAxis = original + glm::vec3(0, AxisLength, 0);
+		 glm::vec3 zAxis = original + glm::vec3(0, 0, AxisLength);
 
-		 original = go->GetWorldMatrix() * original;
-		 xAxis = go->GetWorldMatrix() * xAxis;
-		 yAxis = go->GetWorldMatrix() * yAxis;
-		 zAxis = go->GetWorldMatrix() * zAxis;
+		 glm::vec4 x(xAxis.x, xAxis.y, xAxis.z, 1);
+		 glm::vec4 y(yAxis.x, yAxis.y, yAxis.z, 1);
+		 glm::vec4 z(zAxis.x, zAxis.y, zAxis.z, 1);
+		 glm::vec4 o(original.x, original.y, original.z, 1);
 
-		 GEngine->GameCanvas->DrawLine(original,Vector4f(1.0f,0,0,1.0f),xAxis,Vector4f(1.0f,0,0,1.0f));
-		 GEngine->GameCanvas->DrawLine(original,Vector4f(0,1.0f,0,1.0f),yAxis,Vector4f(0,1.0f,0,1.0f));
-		 GEngine->GameCanvas->DrawLine(original,Vector4f(0,0,1.0f,1.0f),zAxis,Vector4f(0,0,1.0f,1.0f));
+		 o = go->GetWorldMatrix() * o;
+		 x = go->GetWorldMatrix() * x;
+		 y = go->GetWorldMatrix() * y;
+		 z = go->GetWorldMatrix() * z;
+
+		 o = o / o.w;
+		 x = x / x.w;
+		 y = y / y.w;
+		 z = z / z.w;
+
+		 original.x = o.x; original.y = o.y; original.z = o.z;
+		 xAxis.x = x.x; xAxis.y = x.y; xAxis.z = x.z;
+		 yAxis.x = y.x; yAxis.y = y.y; yAxis.z = y.z;
+		 zAxis.x = z.x; zAxis.y = z.y; zAxis.z = z.z;
+
+		 GEngine->GameCanvas->DrawLine(original, glm::vec4(1.0f, 0, 0, 1.0f), xAxis, glm::vec4(1.0f, 0, 0, 1.0f));
+		 GEngine->GameCanvas->DrawLine(original, glm::vec4(0, 1.0f, 0, 1.0f), yAxis, glm::vec4(0, 1.0f, 0, 1.0f));
+		 GEngine->GameCanvas->DrawLine(original, glm::vec4(0, 0, 1.0f, 1.0f), zAxis, glm::vec4(0, 0, 1.0f, 1.0f));
 
 	//	 Matrix4 ProjectViewMatrix = camera->ProjectMatrix.Transpose() * camera->ViewMatrix.Transpose();
 	//	 xAxis = ProjectViewMatrix * xAxis;

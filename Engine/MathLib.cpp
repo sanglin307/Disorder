@@ -36,12 +36,6 @@ namespace Disorder
    {
 	   float h = 1.0f / Math::Tan(fieldOfViewY / 2);
 	   float w = h / aspectRatio;
-      
-	/*   Eigen::Matrix4f ProjMat;
-	   ProjMat <<   w,  0,  0,                                             0,
-                    0,  h,  0,                                             0,
-                    0,  0,  zfarPlane/(znearPlane-zfarPlane),              znearPlane*zfarPlane/(znearPlane-zfarPlane),
-                    0,  0,  -1,   0;*/
 
 	   return glm::mat4( w,  0,  0,                                         0,
                         0,  h,  0,                                         0,
@@ -67,47 +61,8 @@ namespace Disorder
 	   xaxis = glm::normalize(xaxis);
 	   glm::vec3 yaxis = glm::cross(zaxis,xaxis);
 
-	  /* Eigen::Matrix4f ViewMat;
-	   ViewMat <<  xaxis.x(),         xaxis.y(),           xaxis.z(),          -xaxis.dot(eye),
-                   yaxis.x(),         yaxis.y(),           yaxis.z(),          -yaxis.dot(eye),
-                   zaxis.x(),         zaxis.y(),           zaxis.z(),          -zaxis.dot(eye),
-				   0,               0,                 0,                1 ;*/
-
 	   return ViewMatrixRH(eye,xaxis,yaxis,zaxis);
    }
 
- 
-   
-   int Math::GetPlaneSide(const Eigen::Hyperplane<float,3>&plane,const Eigen::Vector3f& centre, const Eigen::Vector3f& halfSize)
-   {
-	   // Calculate the distance between box centre and the plane
-	   float dist = plane.signedDistance(centre);
-
-       // Calculate the maximise allows absolute distance for
-       // the distance between box centre and plane
-	   float maxAbsDist = Abs<float>(plane.normal().x() * halfSize.x()) + Abs<float>(plane.normal().y() * halfSize.y()) + Abs<float>(plane.normal().z() * halfSize.z());
-
-       if (dist < -maxAbsDist)
-            return -1;
-
-        if (dist > maxAbsDist)
-            return 1;
-
-        return 0;
-
-   }
-	
-   int Math::GetPlaneSide(const Eigen::Hyperplane<float,3>&plane,const Eigen::Vector3f& centre, float fRadius)
-   {
-	   float dist = plane.signedDistance(centre);
-	   if( dist >= fRadius )
-			 return 1;
-
-	   if( dist <= 0-fRadius )
-			 return -1;
-
-       return 0;
-
-   }
      
 }

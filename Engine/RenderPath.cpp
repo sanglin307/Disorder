@@ -37,9 +37,9 @@ namespace Disorder
 		DirectionLightPtr dLight = directionLightArray[0];
 		_DirectionLightPropertyManager->ClearShaderPropertyValue();
 		_DirectionLightIntensityProperty->SetData(&(dLight->Intensity));
-		Eigen::Vector3f dir = dLight->GetDirection();
-		_DirectionLightDirProperty->SetData(dir.data());
-		_DirectionLightColorProperty->SetData(dLight->Color.data());
+		glm::vec3 dir = dLight->GetDirection();
+		_DirectionLightDirProperty->SetData(glm::value_ptr(dir));
+		_DirectionLightColorProperty->SetData(glm::value_ptr(dLight->Color));
 
 		_DirectionLightPropertyManager->UpdateShaderProperty();
 	}
@@ -51,19 +51,19 @@ namespace Disorder
 
 		BOOST_ASSERT(lightArray.size() <= 4);
 	
-		Eigen::Vector4f LightPosX = Eigen::Vector4f::Constant(0.f);
-		Eigen::Vector4f LightPosY = Eigen::Vector4f::Constant(0.f);
-		Eigen::Vector4f LightPosZ = Eigen::Vector4f::Constant(0.f);
-		Eigen::Vector4f LightDirX = Eigen::Vector4f::Constant(0.f);
-		Eigen::Vector4f LightDirY = Eigen::Vector4f::Constant(0.f);
-		Eigen::Vector4f LightDirZ = Eigen::Vector4f::Constant(0.f);
-		Eigen::Vector4f LightRangeRcp = Eigen::Vector4f::Constant(0.f);
-		Eigen::Vector4f SpotCosOuterCone = Eigen::Vector4f::Constant(-2.f);
-		Eigen::Vector4f SpotCosInnerConeRcp = Eigen::Vector4f::Constant(1.f);
-		Eigen::Vector4f CapsuleLen = Eigen::Vector4f::Constant(0.f);
-		Eigen::Vector4f LightColorR = Eigen::Vector4f::Constant(0.f);
-		Eigen::Vector4f LightColorG = Eigen::Vector4f::Constant(0.f);
-		Eigen::Vector4f LightColorB = Eigen::Vector4f::Constant(0.f);
+		glm::vec4 LightPosX(0.f);
+		glm::vec4 LightPosY(0.f); 
+		glm::vec4 LightPosZ(0.f); 
+		glm::vec4 LightDirX(0.f);  
+		glm::vec4 LightDirY(0.f);  
+		glm::vec4 LightDirZ(0.f); 
+		glm::vec4 LightRangeRcp(0.f);  
+		glm::vec4 SpotCosOuterCone(-2.f); 
+		glm::vec4 SpotCosInnerConeRcp(1.f); 
+		glm::vec4 CapsuleLen(0.f);  
+		glm::vec4 LightColorR(0.f);  
+		glm::vec4 LightColorG(0.f);  
+		glm::vec4 LightColorB(0.f); 
 
 		for(size_t i=0;i<lightArray.size();i++)
 		{
@@ -71,32 +71,32 @@ namespace Disorder
 			if(light->LightType == LT_Point )
 			{
 				PointLightPtr pLight = boost::dynamic_pointer_cast<PointLight>(light);
-				Eigen::Vector3f pos = pLight->GetPosition();
-				LightPosX[i] = pos.x();
-				LightPosY[i] = pos.y();
-				LightPosZ[i] = pos.z();
+				glm::vec3 pos = pLight->GetPosition();
+				LightPosX[i] = pos.x;
+				LightPosY[i] = pos.y;
+				LightPosZ[i] = pos.z;
 				LightRangeRcp[i] = 1.0f / pLight->Range;
-				LightColorR[i] = pLight->Color.x();
-				LightColorG[i] = pLight->Color.y();
-				LightColorB[i] = pLight->Color.z();
+				LightColorR[i] = pLight->Color.x;
+				LightColorG[i] = pLight->Color.y;
+				LightColorB[i] = pLight->Color.z;
 			}
 			else if(light->LightType == LT_Spot )
 			{
 				SpotLightPtr sLight = boost::dynamic_pointer_cast<SpotLight>(light);
-				Eigen::Vector3f pos = sLight->GetPosition();
-				LightPosX[i] = pos.x();
-				LightPosY[i] = pos.y();
-				LightPosZ[i] = pos.z();
-				Eigen::Vector3f dir = sLight->GetDirection();
-				LightDirX[i] = dir.x();
-				LightDirY[i] = dir.y();
-				LightDirZ[i] = dir.z();
+				glm::vec3 pos = sLight->GetPosition();
+				LightPosX[i] = pos.x;
+				LightPosY[i] = pos.y;
+				LightPosZ[i] = pos.z;
+				glm::vec3 dir = sLight->GetDirection();
+				LightDirX[i] = dir.x;
+				LightDirY[i] = dir.y;
+				LightDirZ[i] = dir.z;
 				LightRangeRcp[i] = 1.0f / sLight->Range;
 				SpotCosInnerConeRcp[i] = 1.0f / Math::Cosf(sLight->SpotInnerAngle);
 				SpotCosOuterCone[i] = Math::Cosf(sLight->SpotOuterAngle);
-				LightColorR[i] = sLight->Color.x();
-				LightColorG[i] = sLight->Color.y();
-				LightColorB[i] = sLight->Color.z();
+				LightColorR[i] = sLight->Color.x;
+				LightColorG[i] = sLight->Color.y;
+				LightColorB[i] = sLight->Color.z;
 			}
 			else
 			{
@@ -106,19 +106,19 @@ namespace Disorder
 		}
 
 		_LightFourPropertyManager->ClearShaderPropertyValue();
-		ForwardLightPosX->SetData(LightPosX.data());
-		ForwardLightPosY->SetData(LightPosY.data());
-		ForwardLightPosZ->SetData(LightPosZ.data());
-		ForwardLightDirX->SetData(LightDirX.data());
-		ForwardLightDirY->SetData(LightDirY.data());
-		ForwardLightDirZ->SetData(LightDirZ.data());
-		ForwardLightRangeRcp->SetData(LightRangeRcp.data());
-		ForwardSpotCosOuterCone->SetData(SpotCosOuterCone.data());
-		ForwardSpotCosInnerConeRcp->SetData(SpotCosInnerConeRcp.data());
-		ForwardCapsuleLen->SetData(CapsuleLen.data());
-		ForwardLightColorR->SetData(LightColorR.data());
-		ForwardLightColorG->SetData(LightColorG.data());
-		ForwardLightColorB->SetData(LightColorB.data());
+		ForwardLightPosX->SetData(glm::value_ptr(LightPosX));
+		ForwardLightPosY->SetData(glm::value_ptr(LightPosY));
+		ForwardLightPosZ->SetData(glm::value_ptr(LightPosZ));
+		ForwardLightDirX->SetData(glm::value_ptr(LightDirX));
+		ForwardLightDirY->SetData(glm::value_ptr(LightDirY));
+		ForwardLightDirZ->SetData(glm::value_ptr(LightDirZ));
+		ForwardLightRangeRcp->SetData(glm::value_ptr(LightRangeRcp));
+		ForwardSpotCosOuterCone->SetData(glm::value_ptr(SpotCosOuterCone));
+		ForwardSpotCosInnerConeRcp->SetData(glm::value_ptr(SpotCosInnerConeRcp));
+		ForwardCapsuleLen->SetData(glm::value_ptr(CapsuleLen));
+		ForwardLightColorR->SetData(glm::value_ptr(LightColorR));
+		ForwardLightColorG->SetData(glm::value_ptr(LightColorG));
+		ForwardLightColorB->SetData(glm::value_ptr(LightColorB));
 		_LightFourPropertyManager->UpdateShaderProperty();
 
 	}
@@ -134,7 +134,7 @@ namespace Disorder
 		GEngine->RenderEngine->OnDrawBegin();
 
 		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,GEngine->RenderSurfaceCache->DepthStencilBuffer);
-		GEngine->RenderEngine->ClearRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,Eigen::Vector4f(0.f,0.f,0.f,1.0f));
+		GEngine->RenderEngine->ClearRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,glm::vec4(0.f,0.f,0.f,1.0f));
 		GEngine->RenderEngine->ClearDepthStencil(GEngine->RenderSurfaceCache->DepthStencilBuffer,true,1.0f,false,0);
  
 		GSceneManager->UpdateShaderProperty();
@@ -188,7 +188,7 @@ namespace Disorder
 			obj->PostRender(mainCamera);
 		}
 
-		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,Vector4f(1.f,1.f,1.f,1.f),"Forward Lighting Mode");
+		GEngine->GameCanvas->DrawString(0.005f, 0.04f, 0.04f, glm::vec4(1.f), "Forward Lighting Mode");
 
 		GSceneManager->DebugDraw();
 
@@ -303,10 +303,10 @@ namespace Disorder
 
 
 		TileTexVertex vertex[4];
-		vertex[0].position = Vector3f(-1.f, 1.f,0.f);
-		vertex[1].position = Vector3f(-1.0f, -1.0f,0.0f);
-		vertex[2].position = Vector3f(1.0f, 1.0f,0.0f);
-		vertex[3].position = Vector3f(1.0f, -1.0f,0.0f);
+		vertex[0].position = glm::vec3(-1.f, 1.f, 0.f);
+		vertex[1].position = glm::vec3(-1.0f, -1.0f, 0.0f);
+		vertex[2].position = glm::vec3(1.0f, 1.0f, 0.0f);
+		vertex[3].position = glm::vec3(1.0f, -1.0f, 0.0f);
 		_LightingTile = SimpleTile("DeferLightingTile",vertex,_LightingEffect);
 
 		DepthStencilDesc nodepthWriteDesc;
@@ -342,9 +342,9 @@ namespace Disorder
 		RenderSurfacePtr specularSurfacePtr = GEngine->RenderSurfaceCache->GBuffer->SpecularDataBuffer;
 
 		GEngine->RenderEngine->ClearDepthStencil(depthSurfacePtr,true,1.f,true,0);
-		GEngine->RenderEngine->ClearRenderTarget(colorSurfacePtr,Eigen::Vector4f::Constant(0.f));
-		GEngine->RenderEngine->ClearRenderTarget(normalSurfacePtr,Eigen::Vector4f::Constant(0.f));
-		GEngine->RenderEngine->ClearRenderTarget(specularSurfacePtr,Eigen::Vector4f::Constant(0.f));
+		GEngine->RenderEngine->ClearRenderTarget(colorSurfacePtr,glm::vec4(0.f));
+		GEngine->RenderEngine->ClearRenderTarget(normalSurfacePtr, glm::vec4(0.f));
+		GEngine->RenderEngine->ClearRenderTarget(specularSurfacePtr, glm::vec4(0.f));
 
 		std::vector<RenderSurfacePtr> vRenderSurface;
 		vRenderSurface.push_back(colorSurfacePtr);
@@ -370,7 +370,7 @@ namespace Disorder
 	
 		//lighting pass
 		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,GEngine->RenderSurfaceCache->DepthStencilBuffer);
-		GEngine->RenderEngine->ClearRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,Eigen::Vector4f(0.f,0.f,0.f,1.0f));
+		GEngine->RenderEngine->ClearRenderTarget(GEngine->RenderSurfaceCache->RenderTarget, glm::vec4(0.f, 0.f, 0.f, 1.0f));
 		GEngine->RenderEngine->ClearDepthStencil(GEngine->RenderSurfaceCache->DepthStencilBuffer,true,1.0f,false,0);
 	
 		const std::vector<LightPtr>& vLights = GSceneManager->GetLightsList();
@@ -423,7 +423,7 @@ namespace Disorder
 		GEngine->RenderEngine->SetEffect(NULL);
 		
 		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,depthSurfacePtr,true);
-		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,Vector4f(1.f,1.f,1.f,1.f),"Deferred Shading Mode");
+		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,glm::vec4(1.f),"Deferred Shading Mode");
 		GSceneManager->DebugDraw();
 
 		// before we call canvas draw ,we should check if we should add stat info to canvas.
@@ -438,6 +438,7 @@ namespace Disorder
 		if( GSceneManager->EnableDebugDraw )
 		    GEngine->RenderSurfaceCache->GBuffer->DebugVisual();
 
+		GEngine->RenderEngine->SetEffect(NULL);
 		GEngine->RenderEngine->OnDrawEnd();
 
 	}

@@ -46,7 +46,7 @@
 
 //GLM
 #ifdef _DEBUG
-#define GLM_MESSAGES
+//#define GLM_MESSAGES
 #endif
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -195,9 +195,7 @@ namespace Disorder
 
 //project related
 #include "Singleton.h"
-#include "Vectors.h"
-#include "Quaternion.h"
-#include "Matrixs.h"
+#include "Plane.h"
 #include "MathLib.h"
 #include "Common.h"
 #include "GameTime.h"

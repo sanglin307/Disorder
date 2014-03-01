@@ -14,7 +14,7 @@ namespace Disorder
 		typedef boost::unordered_map<std::string,CameraPtr> CameraMap;
 
 	public:
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	 
 		void Init();
 		void Exit();
 	    void Tick(float deltaSeconds);
@@ -42,7 +42,12 @@ namespace Disorder
 			return _vLightList;
 		}
 
-		void SetAmbientColor(Eigen::Vector3f const& lowerColor,Eigen::Vector3f const& upperColor);
+		void SetAmbientColor(glm::vec3 const& lowerColor, glm::vec3 const& upperColor)
+		{
+			_vAmbientLowerColor = lowerColor;
+			_vAmbientUpperColor = upperColor;
+		}
+
 		void UpdateShaderProperty();
 		
 		void DebugDraw();
@@ -63,8 +68,8 @@ namespace Disorder
 
 		SceneImporterPtr _sceneImporter;
 
-		Eigen::Vector3f _vAmbientLowerColor;
-		Eigen::Vector3f _vAmbientUpperColor;
+		glm::vec3 _vAmbientLowerColor;
+		glm::vec3 _vAmbientUpperColor;
 
 		ShaderPropertyPtr _sAmbientLowerProperty;
 		ShaderPropertyPtr _sAmbientUpperProperty;

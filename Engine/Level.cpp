@@ -17,7 +17,7 @@ namespace Disorder
 	Level::Level(std::string const& levelName)
 		:Name(levelName)
 	{
-		_vAmbientColor = Eigen::Vector4f(0.0f,0.0f,0.0f,1.0f);
+		_vAmbientColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	Level::~Level()

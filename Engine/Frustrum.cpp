@@ -4,7 +4,7 @@ namespace Disorder
 {
 	Frustrum::Frustrum()
 	{	
-		memset(_Points,0,8*sizeof(Eigen::Vector3f));
+		memset(_Points,0,8*sizeof(glm::vec3));
 	}
 
 	bool Frustrum::Overlaps(BoxBounds & bounds) const
@@ -15,16 +15,14 @@ namespace Disorder
 			return false;
 		}
 
-		Vector3f center;
-		Vector3f extend;
+		glm::vec3 center;
+		glm::vec3 extend;
 		bounds.GetCenterAndExtents(center,extend);
-		Eigen::Vector3f eCenter(center.x,center.y,center.z);
-		Eigen::Vector3f eExtend(extend.x,extend.y,extend.z);
 		
 		for(int i=0;i<6;i++)
 		{
-			int side = Math::GetPlaneSide(_Planes[i],eCenter,eExtend);
-			if( side > 0 )
+			Plane::Side side = _Planes[i].GetSide(center, extend);
+			if( side == Plane::POSITIVE_SIDE )
 				return false;
 		}
 
@@ -33,25 +31,24 @@ namespace Disorder
 
 	bool Frustrum::Overlaps(SphereBounds const& bounds) const
 	{
-		Eigen::Vector3f eCenter(bounds.Origin.x,bounds.Origin.y,bounds.Origin.z);
+		glm::vec3 eCenter(bounds.Origin.x, bounds.Origin.y, bounds.Origin.z);
 		for(int i=0;i<6;i++)
 		{
-			int side = Math::GetPlaneSide(_Planes[i],eCenter,bounds.Radius);
-			if( side > 0 )
+			Plane::Side side = _Planes[i].GetSide(eCenter, bounds.Radius);
+			if( side == Plane::POSITIVE_SIDE )
 				return false;
 		}
 
 		return true;
 	}
-
-
+ 
 	bool Frustrum::Inside(SphereBounds const& bounds) const
 	{
-		Eigen::Vector3f eCenter(bounds.Origin.x,bounds.Origin.y,bounds.Origin.z);
+		glm::vec3 eCenter(bounds.Origin.x, bounds.Origin.y, bounds.Origin.z);
 		for(int i=0;i<6;i++)
 		{
-			int side = Math::GetPlaneSide(_Planes[i],eCenter,bounds.Radius);
-			if( side >= 0 )
+			Plane::Side side = _Planes[i].GetSide(eCenter, bounds.Radius);
+			if( side != Plane::NEGATIVE_SIDE )
 				return false;
 		}
 
@@ -66,16 +63,14 @@ namespace Disorder
 			return false;
 		}
 
-		Vector3f center;
-		Vector3f extend;
+		glm::vec3 center;
+		glm::vec3 extend;
 		bounds.GetCenterAndExtents(center,extend);
-		Eigen::Vector3f eCenter(center.x,center.y,center.z);
-		Eigen::Vector3f eExtend(extend.x,extend.y,extend.z);
 
 		for(int i=0;i<6;i++)
 		{
-			int side = Math::GetPlaneSide(_Planes[i],eCenter,eExtend);
-			if( side >= 0 )
+			Plane::Side side = _Planes[i].GetSide(center, extend);
+			if( side != Plane::NEGATIVE_SIDE )
 				return false;
 		}
 
@@ -83,36 +78,41 @@ namespace Disorder
 	}
  
 
-	void Frustrum::Construct(const Matrix4f& viewProjInvMatrix)
+	void Frustrum::Construct(const glm::mat4& viewProjInvMatrix)
 	{
 		//near
-		_Points[0] = Vector3f(-1.f,1.0f,0.f);
-		_Points[1] = Vector3f(1.f,1.f,0.f);
-		_Points[2] = Vector3f(1.f,-1.f,0.f);
-		_Points[3] = Vector3f(-1.f,-1.f,0.f);
+		_Points[0] = glm::vec3(-1.f, 1.0f, 0.f);
+		_Points[1] = glm::vec3(1.f, 1.f, 0.f);
+		_Points[2] = glm::vec3(1.f, -1.f, 0.f);
+		_Points[3] = glm::vec3(-1.f, -1.f, 0.f);
 
 		// far
-		_Points[4] = Vector3f(-1.f,1.0f,1.0f);
-		_Points[5] = Vector3f(1.f,1.f,1.f);
-		_Points[6] = Vector3f(1.f,-1.f,1.f);
-		_Points[7] = Vector3f(-1.f,-1.f,1.f);
+		_Points[4] = glm::vec3(-1.f, 1.0f, 1.0f);
+		_Points[5] = glm::vec3(1.f, 1.f, 1.f);
+		_Points[6] = glm::vec3(1.f, -1.f, 1.f);
+		_Points[7] = glm::vec3(-1.f, -1.f, 1.f);
  
 		for(int i=0;i<8;i++ )
 		{ 
-			_Points[i] =  viewProjInvMatrix * _Points[i];
+			glm::vec4 temp(_Points[i].x, _Points[i].y, _Points[i].z, 1);
+			temp = viewProjInvMatrix * temp;
+			temp = temp / temp.w;
+			_Points[i].x = temp.x;
+			_Points[i].y = temp.y;
+			_Points[i].z = temp.z;
 		}
 
-	/*	_Planes[PS_Near]   = Eigen::Hyperplane<float,3>::Through(_Points[0],_Points[1],_Points[2]);
-		_Planes[PS_Far]    = Eigen::Hyperplane<float,3>::Through(_Points[4],_Points[6],_Points[5]);
-		_Planes[PS_Left]   = Eigen::Hyperplane<float,3>::Through(_Points[0],_Points[7],_Points[4]);
-		_Planes[PS_Right]  = Eigen::Hyperplane<float,3>::Through(_Points[2],_Points[5],_Points[6]);
-		_Planes[PS_Top]    = Eigen::Hyperplane<float,3>::Through(_Points[1],_Points[4],_Points[5]);
-		_Planes[PS_Bottom] = Eigen::Hyperplane<float,3>::Through(_Points[3],_Points[6],_Points[7]);*/
+		_Planes[PS_Near]   = Plane(_Points[0],_Points[1],_Points[2]);
+		_Planes[PS_Far]    = Plane(_Points[4], _Points[6], _Points[5]);
+		_Planes[PS_Left]   = Plane(_Points[0], _Points[7], _Points[4]);
+		_Planes[PS_Right]  = Plane(_Points[2], _Points[5], _Points[6]);
+		_Planes[PS_Top]    = Plane(_Points[1], _Points[4], _Points[5]);
+		_Planes[PS_Bottom] = Plane(_Points[3], _Points[6], _Points[7]);
 	}
 
 	void Frustrum::Draw()
 	{
-		Vector4f color(1.0f,0,1,1.0f);
+		glm::vec4 color(1.0f,0,1,1.0f);
 
 		GEngine->GameCanvas->DrawLine(_Points[0],color,_Points[1],color);
 		GEngine->GameCanvas->DrawLine(_Points[1],color,_Points[2],color);

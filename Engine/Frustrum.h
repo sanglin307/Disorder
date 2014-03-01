@@ -17,9 +17,8 @@ namespace Disorder
 		};
  
 	public:
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 		Frustrum();
-		void Construct(const Matrix4f& viewProjInvMatrix);
+		void Construct(const glm::mat4& viewProjInvMatrix);
 		bool Overlaps(BoxBounds & bounds) const;
 		bool Overlaps(SphereBounds const& bounds) const;
 
@@ -27,8 +26,8 @@ namespace Disorder
 		bool Inside(BoxBounds & bounds) const;
 		void Draw();
 	private:
-		Eigen::Hyperplane<float,3> _Planes[6];
-		Vector3f _Points[8]; // clock-wise, near - far
+		Plane _Planes[6];
+		glm::vec3 _Points[8]; // clock-wise, near - far
 	};
 
 }

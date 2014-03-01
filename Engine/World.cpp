@@ -19,17 +19,7 @@ namespace Disorder
 		 {
 			 GSceneManager->CreateDefaultCamera();
 		 }
-
-    	/* GameObjectPtr go = GameObject::Create("test",Eigen::Vector3f(0.0f,4,-4.0f));
- 		 LightPtr light = Light::Create("DefaultLight");
-    	 light->Color = Eigen::Vector3f(1.0f,1.0f,1.0f);
- 		 
- 		 light->LightType = LT_Directional;
- 		 light->Intensity = 1.0f;
- 		 light->Range = 1000;
- 		 go->AddComponent(light);
-
- 		 level->AddGameObject(go);*/
+ 
 
 		 GEngine->RenderResourceMgr->DumpContent();
 	 }

@@ -7,19 +7,19 @@ namespace Disorder
 	{
 		typedef std::list<GameObjectPtr> GameObjectContainer;
 	public:
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+        
 		void AddGameObject(GameObjectPtr const& gameObject);
 
 		void Init();
 		void Exit();
 
 		void Tick(float deltaSeconds);
-		void SetAmbientColor(Eigen::Vector4f const& color)
+		void SetAmbientColor(glm::vec4 const& color)
 		{
 			_vAmbientColor = color;
 		}
 
-		const Eigen::Vector4f& GetAmbientColor() const
+		const glm::vec4& GetAmbientColor() const
 		{
 			return _vAmbientColor;
 		}
@@ -34,7 +34,7 @@ namespace Disorder
 		Level(std::string const& levelName);
 
 		GameObjectContainer _vGameObjects;
-		Eigen::Vector4f     _vAmbientColor;
+		glm::vec4     _vAmbientColor;
  
 	};
 }

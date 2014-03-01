@@ -185,13 +185,7 @@
     <ClInclude Include="RenderDefine.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Vectors.h">
-      <Filter>Mathematics</Filter>
-    </ClInclude>
-    <ClInclude Include="Matrixs.h">
-      <Filter>Mathematics</Filter>
-    </ClInclude>
-    <ClInclude Include="Quaternion.h">
+    <ClInclude Include="Plane.h">
       <Filter>Mathematics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -310,6 +304,9 @@
     </ClCompile>
     <ClCompile Include="RenderEngine.cpp">
       <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Mathematics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

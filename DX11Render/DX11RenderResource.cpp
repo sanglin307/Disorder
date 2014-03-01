@@ -121,7 +121,7 @@ namespace Disorder
 				pBuffer->_bufferSize = pBuffer->_elementSize*data->Positions.size();
 				for(unsigned int index=0;index<data->Positions.size();++index)
 				{
-					Vector3f& vec = data->ControllPositions[data->Positions[index]];
+					glm::vec3& vec = data->ControllPositions[data->Positions[index]];
 					vData.push_back(vec.x);
 					vData.push_back(vec.y);
 					vData.push_back(vec.z);
@@ -132,7 +132,7 @@ namespace Disorder
 				pBuffer->_bufferSize = pBuffer->_elementSize*data->Colors.size();
 				for(unsigned int index=0;index<data->Colors.size();++index)
 				{
-					Vector4f& vec = data->Colors[index];
+					glm::vec4& vec = data->Colors[index];
 					vData.push_back(vec.x);
 					vData.push_back(vec.y);
 					vData.push_back(vec.z);
@@ -144,7 +144,7 @@ namespace Disorder
 				pBuffer->_bufferSize = pBuffer->_elementSize*data->Normals.size();
 				for(unsigned int index=0;index<data->Normals.size();++index)
 				{
-					Vector3f& vec = data->Normals[index];
+					glm::vec3& vec = data->Normals[index];
 					vData.push_back(vec.x);
 					vData.push_back(vec.y);
 					vData.push_back(vec.z);
@@ -155,7 +155,7 @@ namespace Disorder
 				pBuffer->_bufferSize = pBuffer->_elementSize*data->Texcoords.size();
 				for(unsigned int index=0;index<data->Texcoords.size();++index)
 				{
-					Vector2f& vec = data->Texcoords[index];
+					glm::vec2& vec = data->Texcoords[index];
 					vData.push_back(vec.x);
 					vData.push_back(vec.y);
 				}

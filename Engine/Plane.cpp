@@ -6,7 +6,7 @@ namespace Disorder
 	//-----------------------------------------------------------------------
 	Plane::Plane ()
 	{
-		Normal = Vector3::ZERO;
+		Normal = glm::vec3(0);
 		D = 0.0f;
 	}
 	//-----------------------------------------------------------------------
@@ -16,7 +16,7 @@ namespace Disorder
 		D = rhs.D;
 	}
 	//-----------------------------------------------------------------------
-	Plane::Plane (const Vector3& rkNormal, float fConstant)
+	Plane::Plane(const glm::vec3& rkNormal, float fConstant)
 	{
 		Normal = rkNormal;
 		D = -fConstant;
@@ -27,23 +27,23 @@ namespace Disorder
 	{
 	}
 	//-----------------------------------------------------------------------
-	Plane::Plane (const Vector3& rkNormal, const Vector3& rkPoint)
+	Plane::Plane(const glm::vec3& rkNormal, const glm::vec3& rkPoint)
 	{
 		Redefine(rkNormal, rkPoint);
 	}
 	//-----------------------------------------------------------------------
-	Plane::Plane (const Vector3& rkPoint0, const Vector3& rkPoint1,
-		const Vector3& rkPoint2)
+	Plane::Plane(const glm::vec3& rkPoint0, const glm::vec3& rkPoint1,
+		const glm::vec3& rkPoint2)
 	{
 		Redefine(rkPoint0, rkPoint1, rkPoint2);
 	}
 	//-----------------------------------------------------------------------
-	float Plane::GetDistance (const Vector3& rkPoint) const
+	float Plane::GetDistance(const glm::vec3& rkPoint) const
 	{
-		return Normal.Dot(rkPoint) + D;
+		return glm::dot(Normal,rkPoint) + D;
 	}
 	//-----------------------------------------------------------------------
-	Plane::Side Plane::GetSide (const Vector3& rkPoint) const
+	Plane::Side Plane::GetSide(const glm::vec3& rkPoint) const
 	{
 		float fDistance = GetDistance(rkPoint);
 
@@ -66,7 +66,7 @@ namespace Disorder
         return GetSide(box.GetCenter(), box.GetExtent());
 	}
     //-----------------------------------------------------------------------
-	Plane::Side Plane::GetSide (const Vector3& centre, float fRadius) const
+	Plane::Side Plane::GetSide(const glm::vec3& centre, float fRadius) const
 	{
 		 float dist = GetDistance(centre);
 		 if( dist >= fRadius )
@@ -78,14 +78,14 @@ namespace Disorder
 		 return Plane::BOTH_SIDE;
 	}
 
-    Plane::Side Plane::GetSide (const Vector3& centre, const Vector3& halfSize) const
+	Plane::Side Plane::GetSide(const glm::vec3& centre, const glm::vec3& halfSize) const
     {
         // Calculate the distance between box centre and the plane
         float dist = GetDistance(centre);
 
         // Calculate the maximise allows absolute distance for
         // the distance between box centre and plane
-        float maxAbsDist = Normal.AbsDot(halfSize);
+		float maxAbsDist = abs(Normal.x * halfSize.x) + abs(Normal.y * halfSize.y) + abs(Normal.z * halfSize.z);
 
         if (dist < -maxAbsDist)
             return Plane::NEGATIVE_SIDE;
@@ -96,26 +96,26 @@ namespace Disorder
         return Plane::BOTH_SIDE;
     }
 	//-----------------------------------------------------------------------
-	void Plane::Redefine(const Vector3& rkPoint0, const Vector3& rkPoint1,
-		const Vector3& rkPoint2)
+	void Plane::Redefine(const glm::vec3& rkPoint0, const glm::vec3& rkPoint1,
+		const glm::vec3& rkPoint2)
 	{
-		Vector3 kEdge1 = rkPoint1 - rkPoint0;
-		Vector3 kEdge2 = rkPoint2 - rkPoint0;
-		Normal = kEdge1.Cross(kEdge2);
-		Normal.Normalise();
-		D = -Normal.Dot(rkPoint0);
+		glm::vec3 kEdge1 = rkPoint1 - rkPoint0;
+		glm::vec3 kEdge2 = rkPoint2 - rkPoint0;
+		Normal = glm::cross(kEdge1,kEdge2);
+		Normal = glm::normalize(Normal);
+		D = glm::dot(-Normal,rkPoint0);
 	}
 	//-----------------------------------------------------------------------
-	void Plane::Redefine(const Vector3& rkNormal, const Vector3& rkPoint)
+	void Plane::Redefine(const glm::vec3& rkNormal, const glm::vec3& rkPoint)
 	{
 		Normal = rkNormal;
-		D = -rkNormal.Dot(rkPoint);
+		D = glm::dot(-rkNormal,rkPoint);
 	}
 	//-----------------------------------------------------------------------
-	Vector3 Plane::ProjectVector(const Vector3& p) const
+	glm::vec3 Plane::ProjectVector(const glm::vec3& p) const
 	{
 		// We know plane normal is unit length, so use simple method
-		Matrix3 xform;
+		glm::mat3 xform;
 		xform[0][0] = 1.0f - Normal.x * Normal.x;
 		xform[0][1] = -Normal.x * Normal.y;
 		xform[0][2] = -Normal.x * Normal.z;
@@ -131,7 +131,7 @@ namespace Disorder
 	//-----------------------------------------------------------------------
     float Plane::Normalise(void)
     {
-        float fLength = Normal.Length();
+        float fLength = glm::length(Normal);
 
         if ( fLength > float(0.0f) )
         {

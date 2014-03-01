@@ -7,15 +7,15 @@ namespace Disorder
 		:Component(name,CT_Light)
 	{
 		LightType = LT_None;
-		Color = Eigen::Vector3f::Constant(1.0f);
+		Color = glm::vec3(1.0f);
 		Intensity = 0.8f; 
 		CastShadows = false;
-		ShadowColor = Eigen::Vector3f::Constant(0.f);
+		ShadowColor = glm::vec3(0.f);
 	}
  
 	//////////////////////////////////////////////////////////////////////////////////
 
-	Eigen::Vector3f DirectionLight::DefaultDirection(0.0f,0.0f,-1.0f);
+	glm::vec3 DirectionLight::DefaultDirection(0.0f, 0.0f, -1.0f);
  
 
 	DirectionLight::DirectionLight(std::string const& name)
@@ -35,7 +35,7 @@ namespace Disorder
 		return true;
 	}
 
-	Eigen::Vector3f DirectionLight::GetDirection()
+	glm::vec3 DirectionLight::GetDirection()
 	{
 		GameObjectPtr go = GetBase();
 		return go->GetWorldRotation() * DirectionLight::DefaultDirection;
@@ -44,10 +44,10 @@ namespace Disorder
 	void DirectionLight::DebugDraw()
 	{
 		GameObjectPtr go = GetBase();
-		Eigen::Vector3f beginPos = go->GetWorldPosition();
-		Eigen::Vector3f endPos = beginPos + GetDirection() * 2;
+		glm::vec3 beginPos = go->GetWorldPosition();
+		glm::vec3 endPos = beginPos + GetDirection() * 2.f;
 			
-		GEngine->GameCanvas->DrawLine(beginPos,Vector4f(1.f,1.f,1.f,1.f),endPos,Vector4f(0,0,0,1.f));
+		GEngine->GameCanvas->DrawLine(beginPos, glm::vec4(1.f, 1.f, 1.f, 1.f), endPos, glm::vec4(0, 0, 0, 1.f));
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	PointLight::PointLight(std::string const& name)
@@ -57,7 +57,7 @@ namespace Disorder
 		Range = 10.0f;
 	}
 
-	Eigen::Vector3f PointLight::GetPosition()
+	glm::vec3 PointLight::GetPosition()
 	{
 		GameObjectPtr lightGo = GetBase();
 		return lightGo->GetWorldPosition();
@@ -73,7 +73,7 @@ namespace Disorder
 	{
 		GameObjectPtr lightGo = GetBase();
 		GameObjectPtr renderGo = renderObject->GetBase(); 
-		return Range * Range > (lightGo->GetWorldPosition() - renderGo->GetWorldPosition()).squaredNorm();
+		return Range * Range > glm::distance2(lightGo->GetWorldPosition(),renderGo->GetWorldPosition());
 	}
 
 	void PointLight::DebugDraw()
@@ -91,7 +91,7 @@ namespace Disorder
 		
 	}
 
-	Eigen::Vector3f SpotLight::GetPosition()
+	glm::vec3 SpotLight::GetPosition()
 	{
 		GameObjectPtr lightGo = GetBase();
 		return lightGo->GetWorldPosition();
@@ -103,7 +103,7 @@ namespace Disorder
 		return SpotLightPtr(pLight);
 	}
 
-	Eigen::Vector3f SpotLight::GetDirection()
+	glm::vec3 SpotLight::GetDirection()
 	{
 		GameObjectPtr go = GetBase();
 		return go->GetWorldRotation() * DirectionLight::DefaultDirection;
@@ -118,15 +118,15 @@ namespace Disorder
 		GameObjectPtr lightGo = GetBase();
 		GameObjectPtr renderGo = renderObject->GetBase();
 		 
-		Eigen::Vector3f renderPos = renderGo->GetWorldPosition();
-		Eigen::Vector3f lightPos = lightGo->GetWorldPosition();
-		bool bRange = Range * Range > (lightPos - renderPos).squaredNorm();
+		glm::vec3 renderPos = renderGo->GetWorldPosition();
+		glm::vec3 lightPos = lightGo->GetWorldPosition();
+		bool bRange = Range * Range > glm::distance2(lightPos,renderPos);
 		if( bRange == false )
 			return false;
 
-		Eigen::Vector3f renderDirect = renderPos - lightPos;
-		Eigen::Vector3f Dir = GetDirection();
-		float angle = Math::ACosf(Dir.dot(renderDirect)/(Dir.norm()*renderDirect.norm()));
+		glm::vec3 renderDirect = renderPos - lightPos;
+		glm::vec3 Dir = GetDirection();
+		float angle = glm::angle(Dir, renderDirect);  
 		return angle < SpotOuterAngle;
  
 	}

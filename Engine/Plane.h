@@ -31,12 +31,12 @@ namespace Disorder
         Plane ();
         Plane (const Plane& rhs);
         /** Construct a plane through a normal, and a distance to move the plane along the normal.*/
-        Plane (const Vector3& rkNormal, float fConstant);
+        Plane (const glm::vec3& rkNormal, float fConstant);
 		/** Construct a plane using the 4 constants directly **/
 		Plane (float a, float b, float c, float d);
-        Plane (const Vector3& rkNormal, const Vector3& rkPoint);
-        Plane (const Vector3& rkPoint0, const Vector3& rkPoint1,
-            const Vector3& rkPoint2);
+		Plane(const glm::vec3& rkNormal, const glm::vec3& rkPoint);
+		Plane(const glm::vec3& rkPoint0, const glm::vec3& rkPoint1,
+			const glm::vec3& rkPoint2);
 
         /** The "positive side" of the plane is the half space to which the
             plane normal points. The "negative side" is the other half
@@ -50,7 +50,7 @@ namespace Disorder
             BOTH_SIDE
         };
 		 
-        Side GetSide (const Vector3& rkPoint) const;
+		Side GetSide(const glm::vec3& rkPoint) const;
 
         /**
         Returns the side where the alignedBox is. The flag BOTH_SIDE indicates an intersecting box.
@@ -67,9 +67,9 @@ namespace Disorder
             NEGATIVE_SIDE if the box complete lies on the "negative side" of the plane,
             and BOTH_SIDE if the box intersects the plane.
         */
-        Side GetSide (const Vector3& centre, const Vector3& halfSize) const;
+		Side GetSide(const glm::vec3& centre, const glm::vec3& halfSize) const;
 
-		Side GetSide (const Vector3& centre, float fRadius) const;
+		Side GetSide(const glm::vec3& centre, float fRadius) const;
 
         /** This is a pseudodistance. The sign of the return value is
             positive if the point is on the positive side of the plane,
@@ -79,14 +79,14 @@ namespace Disorder
             The absolute value of the return value is the true distance only
             when the plane normal is a unit length vector.
         */
-        float GetDistance (const Vector3& rkPoint) const;
+		float GetDistance(const glm::vec3& rkPoint) const;
 
         /** Redefine this plane based on 3 points. */
-        void Redefine(const Vector3& rkPoint0, const Vector3& rkPoint1,
-            const Vector3& rkPoint2);
+		void Redefine(const glm::vec3& rkPoint0, const glm::vec3& rkPoint1,
+			const glm::vec3& rkPoint2);
 
 		/** Redefine this plane based on a normal and a point. */
-		void Redefine(const Vector3& rkNormal, const Vector3& rkPoint);
+		void Redefine(const glm::vec3& rkNormal, const glm::vec3& rkPoint);
 
 		/** Project a vector onto the plane. 
 		@remarks This gives you the element of the input vector that is perpendicular 
@@ -95,7 +95,7 @@ namespace Disorder
 			from the original vector, since parallel + perpendicular = original.
 		@param v The input vector
 		*/
-		Vector3 ProjectVector(const Vector3& v) const;
+		glm::vec3 ProjectVector(const glm::vec3& v) const;
 
         /** Normalises the plane.
             @remarks
@@ -108,7 +108,7 @@ namespace Disorder
         */
         float Normalise(void);
 
-		Vector3 Normal;
+		glm::vec3 Normal;
         float D;
 
         /// Comparison operator

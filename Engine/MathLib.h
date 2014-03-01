@@ -136,10 +136,6 @@ namespace Disorder
 			return float(rand()) / (float)RAND_MAX;
 		}
 
-		// 1 positive,-1 negtive, 0 both side
-        static int GetPlaneSide(const Eigen::Hyperplane<float,3>&plane,const Eigen::Vector3f& centre, const Eigen::Vector3f& halfSize);
-		static int GetPlaneSide(const Eigen::Hyperplane<float,3>&plane,const Eigen::Vector3f& centre, float radius);
- 
 		static  void ConvertToSphericalCoord(const glm::vec3& pos,const glm::vec3& origin,float &radius,float &yAngle,float &zAngle);	
 		static  void ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const glm::vec3& origin,glm::vec3& pos);
 		

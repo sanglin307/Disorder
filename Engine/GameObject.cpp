@@ -7,13 +7,13 @@ namespace Disorder
 		_vComponents.clear();
 	}
 
-	GameObjectPtr GameObject::Create(std::string const& name, Eigen::Vector3f const& pos,Eigen::Quaternionf const& rot,Eigen::Vector3f const& scale)
+	GameObjectPtr GameObject::Create(std::string const& name, glm::vec3 const& pos, glm::quat const& rot, glm::vec3 const& scale)
 	{
 		GameObject *pGo = new GameObject(name,pos,rot,scale);
 		return GameObjectPtr(pGo);
 	}
 
-	GameObject::GameObject(std::string const& name, Eigen::Vector3f const& pos,Eigen::Quaternionf const& rot,Eigen::Vector3f const& scale)
+	GameObject::GameObject(std::string const& name, glm::vec3 const& pos, glm::quat const& rot, glm::vec3 const& scale)
 		:Name(name)
 	{
 		_locPos = pos;
@@ -23,7 +23,7 @@ namespace Disorder
 		_wldRot = _locRot;
 		_wldScale = _locScale;
 
-		_worldMatrix = Eigen::Translation3f(_wldPos) * Eigen::Scaling(_wldScale) * _wldRot;
+		_worldMatrix = glm::translate(_wldPos) * glm::scale(_wldScale) * glm::toMat4(_wldRot);
 
 		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerObject);
 		_worldMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sObjectWorld,eSP_Float,16);	
@@ -33,9 +33,9 @@ namespace Disorder
 	void GameObject::UpdateShaderProperty()
 	{
 		_propertyManager->ClearShaderPropertyValue();
-		_worldMatrixProperty->SetData(_worldMatrix.data());
-		Eigen::Matrix4f normalMatrix = _worldMatrix.matrix().inverse().transpose();
-		_worldNormalMatrixProperty->SetData(normalMatrix.data());
+		_worldMatrixProperty->SetData(glm::value_ptr(_worldMatrix));
+		glm::mat4 normalMatrix = glm::inverseTranspose(_worldMatrix);
+		_worldNormalMatrixProperty->SetData(glm::value_ptr(normalMatrix));
 		_propertyManager->UpdateShaderProperty();
 	}
 
@@ -96,50 +96,50 @@ namespace Disorder
  
 	void GameObject::LocalPitch(float radian)
 	{
-		LocalRotate(Eigen::Vector3f::UnitX(),radian);
+		LocalRotate(glm::vec3(1.f,0,0), radian);
 	}
 
 	void GameObject::LocalRoll(float radian)
 	{
-		LocalRotate(Eigen::Vector3f::UnitZ(),radian);
+		LocalRotate(glm::vec3(0,0,1), radian);
 	}
 
 	void GameObject::LocalYaw(float radian)
 	{
-		LocalRotate(Eigen::Vector3f::UnitY(),radian);
+		LocalRotate(glm::vec3(0,1,0), radian);
 	}
 
-	void GameObject::LocalRotate(Eigen::Vector3f const& axis, float radian)
+	void GameObject::LocalRotate(glm::vec3 const& axis, float radian)
 	{
-		_locRot = Eigen::AngleAxisf(radian,axis) * _locRot;
+		_locRot = glm::angleAxis(radian,axis) * _locRot;
 		RefreshWorldTransform();
 	}
 
-	void GameObject::LocalTranslate(const Eigen::Vector3f& delta)
+	void GameObject::LocalTranslate(const glm::vec3& delta)
 	{
 		_locPos += _locRot * delta;
 		RefreshWorldTransform();
 	}
 
-	void GameObject::LocalScale(const Eigen::Vector3f& delta)
+	void GameObject::LocalScale(const glm::vec3& delta)
 	{
-		_locScale = _locScale.eval().cwiseProduct(delta);
+		_locScale = _locScale * delta;
 		RefreshWorldTransform();
 	}
 
-	void GameObject::SetLocalRotation(Eigen::Quaternionf const& rot)
+	void GameObject::SetLocalRotation(glm::quat const& rot)
 	{
 		_locRot = rot;
 		RefreshWorldTransform();
 	}
  
-	void GameObject::SetLocalPosition(Eigen::Vector3f const& position)
+	void GameObject::SetLocalPosition(glm::vec3 const& position)
 	{
 		_locPos = position;
 		RefreshWorldTransform();
 	}
 
-	void GameObject::SetLocalScale(Eigen::Vector3f const& scale)
+	void GameObject::SetLocalScale(glm::vec3 const& scale)
 	{
 		_locScale = scale;
 		RefreshWorldTransform();
@@ -150,13 +150,13 @@ namespace Disorder
 		GameObjectPtr parent = _parent.lock();
 		if(parent != NULL )
 		{
-			const Eigen::Quaternionf& parentRot = parent->GetWorldRotation();
-			const Eigen::Vector3f& parentScale = parent->GetWorldScale();
+			const glm::quat& parentRot = parent->GetWorldRotation();
+			const glm::vec3& parentScale = parent->GetWorldScale();
 
 			_wldRot = parentRot * _locRot;
-			_wldScale = parentScale.cwiseProduct(_locScale);
+			_wldScale = parentScale / _locScale;
 		 
-			_wldPos = parentRot * ( parentScale.cwiseProduct(_locPos) );
+			_wldPos = parentRot * ( parentScale / _locPos);
 			_wldPos += parent->GetWorldPosition();
 		}
 		else
@@ -166,7 +166,7 @@ namespace Disorder
 			_wldScale = _locScale;
 		}
 
-		_worldMatrix = Eigen::Translation3f(_wldPos) * Eigen::Scaling(_wldScale) * _wldRot;
+		_worldMatrix = glm::translate(_wldPos) * glm::scale(_wldScale) * glm::toMat4(_wldRot);
 
 		for(std::map<std::string,GameObjectPtr>::const_iterator iter=_mapChildren.begin();iter != _mapChildren.end();iter++)
 		{
@@ -178,31 +178,31 @@ namespace Disorder
 
 	 void GameObject::WorldPitch(float radian)
 	 {
-		 WorldRotate(Eigen::Vector3f::UnitX(),radian);
+		 WorldRotate(glm::vec3(1,0,0), radian);
 	 }
 
 	void GameObject::WorldRoll(float radian)
 	{
-		WorldRotate(Eigen::Vector3f::UnitZ(),radian);
+		WorldRotate(glm::vec3(0,0,1), radian);
 	}
 
 	void GameObject::WorldYaw(float radian)
 	{
-		WorldRotate(Eigen::Vector3f::UnitY(),radian);
+		WorldRotate(glm::vec3(0,1,0), radian);
 	}
 
-	void GameObject::WorldRotate(const Eigen::Vector3f& axis,float radian)
+	void GameObject::WorldRotate(const glm::vec3& axis, float radian)
 	{
-		_locRot = _locRot * _wldRot.conjugate() * Eigen::AngleAxisf(radian,axis) * _wldRot;
+		_locRot = _locRot * glm::conjugate(_wldRot) * glm::angleAxis(radian,axis) * _wldRot;
 		RefreshWorldTransform();
 	}
 	
-	void GameObject::WorldTranslate(const Eigen::Vector3f& delta)
+	void GameObject::WorldTranslate(const glm::vec3& delta)
 	{
 		GameObjectPtr parent = _parent.lock();
 		if( parent )
 		{
-			_locPos += (parent->GetWorldRotation().conjugate() * delta).cwiseQuotient(parent->GetWorldScale());
+			_locPos += (glm::conjugate(parent->GetWorldRotation()) * delta) / parent->GetWorldScale();
 		}
 		else
 			_locPos += delta;
@@ -211,27 +211,27 @@ namespace Disorder
 	}
  
  
-	Eigen::Vector3f GameObject::WorldToLocalPosition( const Eigen::Vector3f &worldPos )
+	glm::vec3 GameObject::WorldToLocalPosition(const glm::vec3 &worldPos)
 	{
-		return _wldRot.conjugate() * (worldPos - _wldPos).cwiseQuotient(_wldScale);
+		return glm::conjugate(_wldRot) * ((worldPos - _wldPos) /_wldScale);
 	}
 	 
-	Eigen::Vector3f GameObject::LocalToWorldPosition( const Eigen::Vector3f &localPos )
+	glm::vec3 GameObject::LocalToWorldPosition(const glm::vec3 &localPos)
 	{
-		return (_wldRot * (localPos.cwiseProduct(_wldScale))) + _wldPos;
+		return (_wldRot * (localPos * _wldScale)) + _wldPos;
 	}
 	 
-	Eigen::Quaternionf GameObject::WorldToLocalRotation( const Eigen::Quaternionf &worldRot )
+	glm::quat GameObject::WorldToLocalRotation(const glm::quat &worldRot)
 	{
-		return _wldRot.conjugate() * worldRot;
+		return glm::conjugate(_wldRot) * worldRot;
 	}
  
-	Eigen::Quaternionf GameObject::LocalToWorldRotation( const Eigen::Quaternionf &localRot )
+	glm::quat GameObject::LocalToWorldRotation( const glm::quat &localRot )
 	{
 		return _wldRot * localRot;
 	}
 
-	void GameObject::SetWorldPosition(Eigen::Vector3f const& position)
+	void GameObject::SetWorldPosition(glm::vec3 const& position)
 	{
 		GameObjectPtr parent = _parent.lock();
 		if( parent )
@@ -242,7 +242,7 @@ namespace Disorder
 			SetLocalPosition(position);
 	}
 
-	void GameObject::SetWorldRotation(Eigen::Quaternionf const& rot)
+	void GameObject::SetWorldRotation(glm::quat const& rot)
 	{
 		GameObjectPtr parent = _parent.lock();
 		if( parent )
@@ -258,7 +258,7 @@ namespace Disorder
 		AddChild(child,child->GetLocalPosition(),child->GetLocalRotation(),child->GetLocalScale());
 	}
 
-	void GameObject::AddChild(GameObjectPtr const& child,Eigen::Vector3f const& pos,Eigen::Quaternionf const& rot,Eigen::Vector3f const& scale)
+	void GameObject::AddChild(GameObjectPtr const& child, glm::vec3 const& pos, glm::quat const& rot, glm::vec3 const& scale)
 	{
 		child->SetParent(shared_from_this());
 		child->SetLocalPosition(pos);

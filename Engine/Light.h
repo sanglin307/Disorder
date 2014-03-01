@@ -23,12 +23,12 @@ namespace Disorder
 	class Light : public Component
 	{
 	public:
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	 
 		ELightType LightType;
-		Eigen::Vector3f   Color;
+		glm::vec3   Color;
 		float     Intensity; 
 		bool      CastShadows;
-		Eigen::Vector3f   ShadowColor;
+		glm::vec3   ShadowColor;
 		ELightDecayType DecayType;
 
 		virtual bool Touch(RendererPtr renderObject) = 0;
@@ -44,10 +44,10 @@ namespace Disorder
 		DirectionLight(std::string const& name);
 		
 	public:
-		static Eigen::Vector3f DefaultDirection;
+		static glm::vec3 DefaultDirection;
 
 		static DirectionLightPtr Create(std::string const& name);
-		Eigen::Vector3f GetDirection();
+		glm::vec3 GetDirection();
 		virtual bool Touch(RendererPtr renderObject);
 		virtual void DebugDraw();
 	};
@@ -59,7 +59,7 @@ namespace Disorder
 	
 	public:
 		float Range;
-		Eigen::Vector3f GetPosition();
+		glm::vec3 GetPosition();
 		static PointLightPtr Create(std::string const& name);
 		virtual bool Touch(RendererPtr renderObject);
         virtual void DebugDraw();
@@ -74,8 +74,8 @@ namespace Disorder
 		float Range;
 		float SpotInnerAngle;
 		float SpotOuterAngle;
-		Eigen::Vector3f GetDirection();
-		Eigen::Vector3f GetPosition();
+		glm::vec3 GetDirection();
+		glm::vec3 GetPosition();
 		static SpotLightPtr Create(std::string const& name);
 		virtual bool Touch(RendererPtr renderObject);
 		virtual void DebugDraw();

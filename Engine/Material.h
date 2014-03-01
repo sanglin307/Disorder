@@ -7,15 +7,15 @@ namespace Disorder
 	class SurfaceMaterial
 	{
 	public:
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	 
          std::string Name;
 		 std::string ShaderModel;
  
 		 // input 
-		 Eigen::Vector3f DiffuseColor;
-		 Eigen::Vector3f EmissiveColor;
-		 Eigen::Vector3f SpecularColor;
-		 Eigen::Vector3f ReflectionColor;
+		 glm::vec3 DiffuseColor;
+		 glm::vec3 EmissiveColor;
+		 glm::vec3 SpecularColor;
+		 glm::vec3 ReflectionColor;
 
 		 float SpecularExp;
 		 float Transparency;

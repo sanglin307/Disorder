@@ -130,36 +130,36 @@ namespace Disorder
 		_GBufferVisualEffect->BindDepthStencilState(_DepthWriteState);
 
 		TileTexVertex vertex[4];
-		vertex[0].position = Vector3f(-0.55f, -0.55f,0.f);
-		vertex[0].texcoord = Vector2f(1.f,0.f);
+		vertex[0].position = glm::vec3(-0.55f, -0.55f, 0.f);
+		vertex[0].texcoord = glm::vec2(1.f, 0.f);
  
-		vertex[1].position = Vector3f(-0.95f, -0.55f,0.0f);
-		vertex[1].texcoord = Vector2f(0.f,0.f);
+		vertex[1].position = glm::vec3(-0.95f, -0.55f, 0.0f);
+		vertex[1].texcoord = glm::vec2(0.f, 0.f);
  
-		vertex[2].position = Vector3f(-0.55f, -0.95f,0.0f);
-		vertex[2].texcoord = Vector2f(1.f,1.0f);
+		vertex[2].position = glm::vec3(-0.55f, -0.95f, 0.0f);
+		vertex[2].texcoord = glm::vec2(1.f, 1.0f);
  
-		vertex[3].position = Vector3f(-0.95f, -0.95f,0.0f);
-		vertex[3].texcoord = Vector2f(0.0f,1.0f);
+		vertex[3].position = glm::vec3(-0.95f, -0.95f, 0.0f);
+		vertex[3].texcoord = glm::vec2(0.0f, 1.0f);
  
 		_DepthVisTile = SimpleTile("GBufferDepthTile",vertex,_GBufferVisualEffect);
 
-		vertex[0].position = Vector3f(-0.05f,-0.55f,0.0f);
-		vertex[1].position = Vector3f(-0.45f,-0.55f,0.0f);
-		vertex[2].position = Vector3f(-0.05f,-0.95f,0.0f);
-		vertex[3].position = Vector3f(-0.45f,-0.95f,0.0f);
+		vertex[0].position = glm::vec3(-0.05f, -0.55f, 0.0f);
+		vertex[1].position = glm::vec3(-0.45f, -0.55f, 0.0f);
+		vertex[2].position = glm::vec3(-0.05f, -0.95f, 0.0f);
+		vertex[3].position = glm::vec3(-0.45f, -0.95f, 0.0f);
 		_ColorVisTile = SimpleTile("GBufferColorTile",vertex,_GBufferVisualEffect);
 
-		vertex[0].position = Vector3f(0.45f,-0.55f,0.0f);
-		vertex[1].position = Vector3f(0.05f,-0.55f,0.0f);
-		vertex[2].position = Vector3f(0.45f,-0.95f,0.0f);
-		vertex[3].position = Vector3f(0.05f,-0.95f,0.0f);
+		vertex[0].position = glm::vec3(0.45f, -0.55f, 0.0f);
+		vertex[1].position = glm::vec3(0.05f, -0.55f, 0.0f);
+		vertex[2].position = glm::vec3(0.45f, -0.95f, 0.0f);
+		vertex[3].position = glm::vec3(0.05f, -0.95f, 0.0f);
 		_NormalVisTile = SimpleTile("GBufferNormalTile",vertex,_GBufferVisualEffect);
 	
-		vertex[0].position = Vector3f(0.95f,-0.55f,0.0f);
-		vertex[1].position = Vector3f(0.55f,-0.55f,0.0f);
-		vertex[2].position = Vector3f(0.95f,-0.95f,0.0f);
-		vertex[3].position = Vector3f(0.55f,-0.95f,0.0f);
+		vertex[0].position = glm::vec3(0.95f, -0.55f, 0.0f);
+		vertex[1].position = glm::vec3(0.55f, -0.55f, 0.0f);
+		vertex[2].position = glm::vec3(0.95f, -0.95f, 0.0f);
+		vertex[3].position = glm::vec3(0.55f, -0.95f, 0.0f);
 		_SpecPowVisTile = SimpleTile("GBufferSpeclTile",vertex,_GBufferVisualEffect);
 
 		

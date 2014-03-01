@@ -392,24 +392,19 @@ namespace Disorder
 			{
 				BYTE *pSrc = (BYTE*)(paDesc->GetData());
 				if( taDesc.Columns == 3 ) // 128bit pack
-				{
-					//for( int n = 0;n<elementNumber;n++)
-					//{
-						memcpy(pDest,pSrc,sizeof(Eigen::Vector3f));
-						//pDest += sizeof(Eigen::Vector4f);
-						//pSrc += sizeof(Eigen::Vector3f);
-					//}
+				{ 
+				   memcpy(pDest,pSrc,sizeof(glm::vec3));	 
 				}
 				else if( taDesc.Columns == 4 )
 				{
-					memcpy(pDest,pSrc,sizeof(Eigen::Vector4f));
+					memcpy(pDest,pSrc,sizeof(glm::vec4));
 				}
 			}
 			if(taDesc.Class == D3D_SVC_MATRIX_ROWS ||
 				taDesc.Class == D3D_SVC_MATRIX_COLUMNS)
 			{
 				void *pSrc = paDesc->GetData();
-				memcpy(pDest,pSrc,sizeof(Eigen::Matrix4f));
+				memcpy(pDest,pSrc,sizeof(glm::mat4));
 			}
 		}
 				

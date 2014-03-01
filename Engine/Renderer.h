@@ -6,7 +6,7 @@ namespace Disorder
 	class Renderer : public Component
 	{
 	public:
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	 
 		Renderer(std::string const& name);
 		virtual ~Renderer(){};
 
@@ -93,7 +93,7 @@ namespace Disorder
 	{
 	public:
 		BatchLines(std::string const& name);
-		void AddLine(Vector3f const& beginPos,Vector4f const& beginColor,Vector3f const& endPos,Vector4f const& endColor);
+		void AddLine(glm::vec3 const& beginPos, glm::vec4 const& beginColor, glm::vec3 const& endPos, glm::vec4 const& endColor);
 		virtual void Render(CameraPtr const& camera);
 		~BatchLines();
 

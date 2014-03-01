@@ -7,13 +7,13 @@ namespace Disorder
 	{
 	public:
 		std::string                              Name;
-		std::vector<Vector3f>                    ControllPositions; // Controll point, no duplicate
+		std::vector<glm::vec3>                   ControllPositions; // Controll point, no duplicate
 		std::vector<int>		                 Positions;   // Index to ControllPositions
-		std::vector<Vector4f>                    Colors;      
-		std::vector<Vector3f>                    Normals;     
-		std::vector<Vector3f>                    Tangents;
-		std::vector<Vector3f>                    Binormals;  
-		std::vector<Vector2f>                    Texcoords;   
+		std::vector<glm::vec4>                   Colors;
+		std::vector<glm::vec3>                   Normals;
+		std::vector<glm::vec3>                   Tangents;
+		std::vector<glm::vec3>                   Binormals;
+		std::vector<glm::vec2>                   Texcoords;
 		std::vector<unsigned int>				 Indices;     // conterclock
 
 		BoxSphereBounds                         BoundingBox;

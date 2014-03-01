@@ -16,7 +16,7 @@ namespace Disorder
  
 	}
 
-	void Canvas::DrawLine(Vector3f const& beginPos,Vector4f const& beginColor,Vector3f const& endPos,Vector4f const& endColor)
+	void Canvas::DrawLine(glm::vec3 const& beginPos, glm::vec4 const& beginColor, glm::vec3 const& endPos, glm::vec4 const& endColor)
 	{
 		BatchLineVertex* pBuffer = _lineElement.PrepareAddVertex();
 		pBuffer[0].color = beginColor;
@@ -64,7 +64,7 @@ namespace Disorder
 		return length/2;
 	}
  
-	void Canvas::DrawString(float xPos,float yPos, float size,Vector4f const& color,std::string const& str)
+	void Canvas::DrawString(float xPos,float yPos, float size,glm::vec4 const& color,std::string const& str)
 	{
 		BOOST_ASSERT(xPos <=1.f && yPos <= 1.0f && size <= 1.0f);
 		//draw string x[-1.0,1.0] and y[-1.0,1.0] z = 0.0
@@ -89,21 +89,21 @@ namespace Disorder
 
 			BatchTileVertex* pVertexBuffer = _stringElement.PrepareAddVertex();
 
-			pVertexBuffer[0].position = Vector3f(xTemp,yTemp,0.f);
+			pVertexBuffer[0].position = glm::vec3(xTemp,yTemp,0.f);
 			pVertexBuffer[0].color = color;
-			pVertexBuffer[0].texcoord = Vector2f(rect.uvRect.left,rect.uvRect.top);
+			pVertexBuffer[0].texcoord = glm::vec2(rect.uvRect.left, rect.uvRect.top);
 
-			pVertexBuffer[1].position = Vector3f(xTemp+drawSizeX,yTemp,0.f);
+			pVertexBuffer[1].position = glm::vec3(xTemp + drawSizeX, yTemp, 0.f);
 			pVertexBuffer[1].color = color;
-			pVertexBuffer[1].texcoord = Vector2f(rect.uvRect.right,rect.uvRect.top);
+			pVertexBuffer[1].texcoord = glm::vec2(rect.uvRect.right, rect.uvRect.top);
 
-			pVertexBuffer[2].position  = Vector3f( xTemp,yTemp-size,0.f);
+			pVertexBuffer[2].position = glm::vec3(xTemp, yTemp - size, 0.f);
 			pVertexBuffer[2].color = color;
-			pVertexBuffer[2].texcoord = Vector2f(rect.uvRect.left,rect.uvRect.bottom);
+			pVertexBuffer[2].texcoord = glm::vec2(rect.uvRect.left, rect.uvRect.bottom);
 
-			pVertexBuffer[3].position = Vector3f( xTemp+drawSizeX,yTemp - size,0.f);
+			pVertexBuffer[3].position = glm::vec3(xTemp + drawSizeX, yTemp - size, 0.f);
 			pVertexBuffer[3].color = color;
-			pVertexBuffer[3].texcoord = Vector2f( rect.uvRect.right,rect.uvRect.bottom);
+			pVertexBuffer[3].texcoord = glm::vec2(rect.uvRect.right, rect.uvRect.bottom);
 
 			_stringElement.EndAddVertex();
 

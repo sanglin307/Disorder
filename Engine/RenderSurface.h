@@ -31,7 +31,7 @@ namespace Disorder
 	class RenderGBuffer
 	{
 	public:
-		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	 
 		RenderSurfacePtr DepthStencilBuffer;
 		RenderSurfacePtr BasicColorBuffer;
 		RenderSurfacePtr NormalDataBuffer;

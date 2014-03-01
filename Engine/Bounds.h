@@ -7,15 +7,15 @@ namespace Disorder
 	{
 		BoxBounds() 
 		{
-			BMin = Vector3f( Math::POS_INFINITY, Math::POS_INFINITY, Math::POS_INFINITY);
-			BMax = Vector3f( Math::NEG_INFINITY, Math::NEG_INFINITY, Math::NEG_INFINITY);
+			BMin = glm::vec3(Math::POS_INFINITY, Math::POS_INFINITY, Math::POS_INFINITY);
+			BMax = glm::vec3(Math::NEG_INFINITY, Math::NEG_INFINITY, Math::NEG_INFINITY);
 		}
 
-		BoxBounds(const Vector3f &p) : BMin(p), BMax(p) { }
-		BoxBounds(const Vector3f &p1, const Vector3f &p2) 
+		BoxBounds(const glm::vec3 &p) : BMin(p), BMax(p) { }
+		BoxBounds(const glm::vec3 &p1, const glm::vec3 &p2)
 		{
-			BMin = Vector3f(Min(p1.x, p2.x), Min(p1.y, p2.y), Min(p1.z, p2.z));
-			BMax = Vector3f(Max(p1.x, p2.x), Max(p1.y, p2.y), Max(p1.z, p2.z));
+			BMin = glm::vec3(Min(p1.x, p2.x), Min(p1.y, p2.y), Min(p1.z, p2.z));
+			BMax = glm::vec3(Max(p1.x, p2.x), Max(p1.y, p2.y), Max(p1.z, p2.z));
 		}
 
 		bool IsValid() const
@@ -23,35 +23,23 @@ namespace Disorder
 			return BMin.x < BMax.x && BMin.y < BMax.y && BMin.z < BMax.z;
 		}
 
-		/*int GetPlaneSide(const Eigen::Hyperplane<float,3>& plane)
+		glm::vec3 GetCenter() const
 		{
-			if( IsValid() == false )
-			{
-				BOOST_ASSERT(0);
-				return 0;
-			}
-
-
-            return Math::GetPlaneSide(plane,GetCenter(),GetExtent());
-		}*/
-
-		Vector3f GetCenter() const
-		{
-			return Vector3f( ( BMin + BMax ) * 0.5f );
+			return glm::vec3((BMin + BMax) * 0.5f);
 		}
 		// Returns the extent around the center
-		Vector3f GetExtent() const
+		glm::vec3 GetExtent() const
 		{
 			return (BMax - BMin)*0.5f;
 		}
 
-		void GetCenterAndExtents( Vector3f & center, Vector3f & Extents ) const
+		void GetCenterAndExtents(glm::vec3 & center, glm::vec3 & Extents) const
 		{
 			Extents = GetExtent();
 			center = BMin + Extents;
 		}
 
-		inline BoxBounds Union(const Vector3f &p)
+		inline BoxBounds Union(const glm::vec3 &p)
 		{
 			BoxBounds ret = *this;
 			ret.BMin.x = Min(BMin.x, p.x);
@@ -93,7 +81,7 @@ namespace Disorder
 			return (x && y && z);
 		}
 
-		inline  bool Inside(const Vector3f &pt) const 
+		inline  bool Inside(const glm::vec3 &pt) const
 		{
 			return (pt.x >= BMin.x && pt.x <= BMax.x &&
 					pt.y >= BMin.y && pt.y <= BMax.y &&
@@ -102,25 +90,25 @@ namespace Disorder
 
 		inline  void Expand(float delta) 
 		{
-			BMin -= Vector3f(delta, delta, delta);
-			BMax += Vector3f(delta, delta, delta);
+			BMin -= glm::vec3(delta, delta, delta);
+			BMax += glm::vec3(delta, delta, delta);
 		}
 
 		inline  float SurfaceArea() const 
 		{
-			Vector3f d = BMax - BMin;
+			glm::vec3 d = BMax - BMin;
 			return 2.f * (d.x * d.y + d.x * d.z + d.y * d.z);
 		}
 
 		inline float Volume() const 
 		{
-			Vector3f d = BMax - BMin;
+			glm::vec3 d = BMax - BMin;
 			return d.x * d.y * d.z;
 		}
 
 		inline int MaximumExtent() const 
 		{
-			Vector3f diag = BMax - BMin;
+			glm::vec3 diag = BMax - BMin;
 			if (diag.x > diag.y && diag.x > diag.z)
 				return 0;
 			else if (diag.y > diag.z)
@@ -129,15 +117,15 @@ namespace Disorder
 				return 2;
 		}
 		 
-		inline Vector3f Lerp(float tx, float ty, float tz) const 
+		inline glm::vec3 Lerp(float tx, float ty, float tz) const
 		{
-			return Vector3f(Math::Lerp(tx, BMin.x, BMax.x), Math::Lerp(ty, BMin.y, BMax.y),
+			return glm::vec3(Math::Lerp(tx, BMin.x, BMax.x), Math::Lerp(ty, BMin.y, BMax.y),
 						   Math::Lerp(tz, BMin.z, BMax.z));
 		}
 
-		inline Vector3f Offset(const Vector3f &p) const
+		inline glm::vec3 Offset(const glm::vec3 &p) const
 		{
-			return Vector3f((p.x - BMin.x) / (BMax.x - BMin.x),
+			return glm::vec3((p.x - BMin.x) / (BMax.x - BMin.x),
 						  (p.y - BMin.y) / (BMax.y - BMin.y),
 						  (p.z - BMin.z) / (BMax.z - BMin.z));
 		}
@@ -152,29 +140,29 @@ namespace Disorder
 			return b.BMin != BMin || b.BMax != BMax;
 		}
 
-		Vector3f BMin, BMax;
+		glm::vec3 BMin, BMax;
 	};
 
 	struct SphereBounds
 	{
-		Vector3f Origin;
+		glm::vec3 Origin;
 		float Radius;
 
 		SphereBounds() 
 		{
-			Origin = Vector3f( 0.f, 0.f, 0.f);
+			Origin = glm::vec3(0.f, 0.f, 0.f);
 			Radius = Math::POS_INFINITY;
 		}
 
-		SphereBounds(const Vector3f &p) : Origin(p), Radius(Math::POS_INFINITY) { }
-		SphereBounds(const Vector3f &origin, const float radius):Origin(origin),Radius(radius)
+		SphereBounds(const glm::vec3 &p) : Origin(p), Radius(Math::POS_INFINITY) { }
+		SphereBounds(const glm::vec3 &origin, const float radius) :Origin(origin), Radius(radius)
 		{
 		}
 
-		inline SphereBounds Union(const Vector3f &p)
+		inline SphereBounds Union(const glm::vec3 &p)
 		{
 			SphereBounds ret = *this;
-			float radius = Origin.Distance(p);
+			float radius = glm::distance(Origin,p);
 			if( ret.Radius < radius )
 				ret.Radius = radius;
 
@@ -183,14 +171,14 @@ namespace Disorder
 
 		inline  bool Overlaps(const SphereBounds &b) const 
 		{
-			float distance = Origin.Distance(b.Origin);
+			float distance = glm::distance(Origin,b.Origin);
 
 			return distance < Radius + b.Radius;
 		}
 
-		inline  bool Inside(const Vector3f &pt) const 
+		inline  bool Inside(const glm::vec3 &pt) const
 		{
-			float distance = Origin.Distance(pt);
+			float distance = glm::distance(Origin,pt);
 			return distance < Radius;
 		}
 
@@ -209,9 +197,9 @@ namespace Disorder
 			return Math::PI * Radius * Radius * Radius;
 		}
  
-		inline float Offset(const Vector3f &p) const
+		inline float Offset(const glm::vec3 &p) const
 		{
-			float distance = Origin.Distance(p);
+			float distance = glm::distance(Origin,p);
 			return distance / Radius;
 		}
 	 
@@ -229,14 +217,14 @@ namespace Disorder
 
 	struct BoxSphereBounds
 	{
-		Vector3f Origin,BoxExtent;
+		glm::vec3 Origin, BoxExtent;
 		float   SphereRadius;
 
 		// Constructor.
 
 		BoxSphereBounds() {}
 
-		BoxSphereBounds(const Vector3f& InOrigin,const Vector3f& InBoxExtent,float InSphereRadius):
+		BoxSphereBounds(const glm::vec3& InOrigin, const glm::vec3& InBoxExtent, float InSphereRadius) :
 			Origin(InOrigin),
 			BoxExtent(InBoxExtent),
 			SphereRadius(InSphereRadius)
@@ -248,16 +236,16 @@ namespace Disorder
 			SphereRadius = Sphere.Radius;
 			float v1 = 1.0f / Math::Sqrtf(3);
 			float v2 = Math::Sqrtf(2) * v1;
-			BoxExtent = Vector3f(SphereRadius * v1,SphereRadius * v2,SphereRadius * v1);
+			BoxExtent = glm::vec3(SphereRadius * v1, SphereRadius * v2, SphereRadius * v1);
 		}
 
 		BoxSphereBounds(const BoxBounds& Box)
 		{
 			Box.GetCenterAndExtents(Origin,BoxExtent);
-			SphereRadius = BoxExtent.Length();
+			SphereRadius = glm::length(BoxExtent);
 		}
 
-		BoxSphereBounds(const Vector3f* Points,unsigned int NumPoints)
+		BoxSphereBounds(const glm::vec3* Points, unsigned int NumPoints)
 		{
 			// Find an axis aligned bounding box for the points.
 			BoxBounds BoundingBox;
@@ -268,7 +256,7 @@ namespace Disorder
 			// Using the center of the bounding box as the origin of the sphere, find the radius of the bounding sphere.
 			SphereRadius = 0.0f;
 			for(unsigned int PointIndex = 0;PointIndex < NumPoints;PointIndex++)
-				SphereRadius = Max(SphereRadius,Points[PointIndex].Distance(Origin));
+				SphereRadius = Max(SphereRadius,glm::distance(Points[PointIndex],Origin));
 		}
 
 		// GetBox
@@ -286,10 +274,10 @@ namespace Disorder
 
 		BoxSphereBounds Union(const BoxSphereBounds& B) const
 		{
-			Vector3f AMin = Origin - BoxExtent;
-			Vector3f AMax = Origin + BoxExtent;
-			Vector3f BMin = B.Origin - B.BoxExtent;
-			Vector3f BMax = B.Origin + B.BoxExtent;
+			glm::vec3 AMin = Origin - BoxExtent;
+			glm::vec3 AMax = Origin + BoxExtent;
+			glm::vec3 BMin = B.Origin - B.BoxExtent;
+			glm::vec3 BMax = B.Origin + B.BoxExtent;
 
 			BoxBounds box;
 			box.BMin.x = Min(AMin.x, BMin.x);
@@ -301,7 +289,7 @@ namespace Disorder
 
 			BoxSphereBounds Result;
 			box.GetCenterAndExtents(Result.Origin,Result.BoxExtent);
-			Result.SphereRadius = Result.BoxExtent.Length();
+			Result.SphereRadius = glm::length(Result.BoxExtent);
  
 			return Result;
 		}
