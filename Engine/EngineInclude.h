@@ -52,14 +52,6 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-// Eigen
-#include <Eigen/StdVector>
-#include <Eigen/Geometry>
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2f)
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector3f)
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector4f)
-EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Matrix4f)
-
 //Class pre declare
 namespace Disorder
 {

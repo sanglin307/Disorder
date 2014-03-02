@@ -22,7 +22,7 @@ namespace Disorder
 		for(int i=0;i<6;i++)
 		{
 			Plane::Side side = _Planes[i].GetSide(center, extend);
-			if( side == Plane::POSITIVE_SIDE )
+			if( side == Plane::NEGATIVE_SIDE )
 				return false;
 		}
 
@@ -35,7 +35,7 @@ namespace Disorder
 		for(int i=0;i<6;i++)
 		{
 			Plane::Side side = _Planes[i].GetSide(eCenter, bounds.Radius);
-			if( side == Plane::POSITIVE_SIDE )
+			if( side == Plane::NEGATIVE_SIDE )
 				return false;
 		}
 
@@ -48,7 +48,7 @@ namespace Disorder
 		for(int i=0;i<6;i++)
 		{
 			Plane::Side side = _Planes[i].GetSide(eCenter, bounds.Radius);
-			if( side != Plane::NEGATIVE_SIDE )
+			if( side != Plane::POSITIVE_SIDE )
 				return false;
 		}
 
@@ -70,7 +70,7 @@ namespace Disorder
 		for(int i=0;i<6;i++)
 		{
 			Plane::Side side = _Planes[i].GetSide(center, extend);
-			if( side != Plane::NEGATIVE_SIDE )
+			if( side != Plane::POSITIVE_SIDE )
 				return false;
 		}
 
@@ -129,13 +129,14 @@ namespace Disorder
 		GEngine->GameCanvas->DrawLine(_Points[2],color,_Points[6],color);
 		GEngine->GameCanvas->DrawLine(_Points[3],color,_Points[7],color);
 
-		/*color = Vector4f(0,1.f,0,1.f);
-		GEngine->GameCanvas->DrawLine(_Points[0],color,_Points[0] + _Planes[PS_Near].normal(),Eigen::Vector4f(0,0,0,1.0f));
-		GEngine->GameCanvas->DrawLine(_Points[4],color,_Points[4] + _Planes[PS_Far].normal(),Eigen::Vector4f(0,0,0,1.0f));
-		GEngine->GameCanvas->DrawLine(_Points[0],color,_Points[0] + _Planes[PS_Left].normal(),Eigen::Vector4f(0,0,0,1.0f));
-		GEngine->GameCanvas->DrawLine(_Points[2],color,_Points[2] + _Planes[PS_Right].normal(),Eigen::Vector4f(0,0,0,1.0f));
-		GEngine->GameCanvas->DrawLine(_Points[1],color,_Points[1] + _Planes[PS_Top].normal(),Eigen::Vector4f(0,0,0,1.0f));
-		GEngine->GameCanvas->DrawLine(_Points[3],color,_Points[3] + _Planes[PS_Bottom].normal(),Eigen::Vector4f(0,0,0,1.0f));*/
+	 
+		color = glm::vec4(0, 1, 0, 1);
+		GEngine->GameCanvas->DrawLine(_Points[0],color,_Points[0] + _Planes[PS_Near].Normal,glm::vec4(0,0,0,1.0f));
+		GEngine->GameCanvas->DrawLine(_Points[4], color, _Points[4] + _Planes[PS_Far].Normal, glm::vec4(0, 0, 0, 1.0f));
+		GEngine->GameCanvas->DrawLine(_Points[0], color, _Points[0] + _Planes[PS_Left].Normal, glm::vec4(0, 0, 0, 1.0f));
+		GEngine->GameCanvas->DrawLine(_Points[2], color, _Points[2] + _Planes[PS_Right].Normal, glm::vec4(0, 0, 0, 1.0f));
+		GEngine->GameCanvas->DrawLine(_Points[1], color, _Points[1] + _Planes[PS_Top].Normal, glm::vec4(0, 0, 0, 1.0f));
+		GEngine->GameCanvas->DrawLine(_Points[3], color, _Points[3] + _Planes[PS_Bottom].Normal, glm::vec4(0, 0, 0, 1.0f));
 	}
 
 }

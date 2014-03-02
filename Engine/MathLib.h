@@ -143,6 +143,8 @@ namespace Disorder
 		static glm::mat4 ViewMatrixRH(const glm::vec3 &eye,const glm::vec3 &center,const glm::vec3 &up);
 		static glm::mat4 ViewMatrixRH(const glm::vec3 &eye,const glm::vec3 &xAxis,const glm::vec3 &yAxis,const glm::vec3 &zAxis);
 
+		static glm::vec3 EulerAngles(const glm::mat4& mat, int a0, int a1, int a2);
+
 		static const float Math::POS_INFINITY;
         static const float Math::NEG_INFINITY;
 		static const float PI;
