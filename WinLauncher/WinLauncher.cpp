@@ -31,7 +31,7 @@ void AppPeekMessage()
  
 
 	Disorder::GEngine->GameClient = Disorder::WinClient::Create();
-	Disorder::GEngine->RenderEngine = Disorder::DX11RenderEngine::Create();
+	Disorder::GEngine->RenderEngine = Disorder::GLRenderEngine::Create();
 	Disorder::GEngine->SceneImporter = Disorder::FbxSceneImporter::Create();
 	Disorder::GEngine->RenderResourceMgr = Disorder::DX11RenderResourceManager::Create();
 	Disorder::GEngine->RenderSurfaceCache = Disorder::DX11RenderSurfaceCache::Create();

@@ -11,23 +11,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{8976B6CA-1E68-4190-882B-29DBC0134BF6}</ProjectGuid>
+    <ProjectGuid>{745566FD-CAF7-42D6-8A4E-A8AFFCBBC05D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>DX11Render</RootNamespace>
+    <RootNamespace>GLRender</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>Unicode</CharacterSet>
     <PlatformToolset>v100</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -40,15 +40,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(DXSDK_DIR)\Include;$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;..\..\External\oiio\src\include;..\..\External\openEXR\lib\include;..\..\External\glm-0.9.5;$(IncludePath)</IncludePath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;..\..\External\oiio\src\include;..\..\External\openEXR\lib\include;..\..\External\glm-0.9.5;..\..\External\glew-1.10.0\include;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(DXSDK_DIR)\Include;$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;..\..\External\oiio\src\include;..\..\External\openEXR\lib\include;..\..\External\eigen3.2;$(IncludePath)</IncludePath>
-    <LibraryPath>$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -56,19 +49,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;FBXSDK_NEW_API;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeaderFile>DX11RenderInclude.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Zm183 %(AdditionalOptions)</AdditionalOptions>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <PrecompiledHeaderFile>GLRenderInclude.h</PrecompiledHeaderFile>
+      <AdditionalOptions>-Zm170 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
+      <AdditionalDependencies>OpenGL32.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -78,10 +67,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;FBXSDK_NEW_API;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeaderFile>DX11RenderInclude.h</PrecompiledHeaderFile>
-      <AdditionalOptions>-Zm170 %(AdditionalOptions)</AdditionalOptions>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -91,30 +77,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
+    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DX11RenderInclude.h" />
-    <ClInclude Include="DX11RenderEngine.h" />
-    <ClInclude Include="DX11RenderLayout.h" />
-    <ClInclude Include="DX11RenderResource.h" />
-    <ClInclude Include="DX11RenderResourceManager.h" />
-    <ClInclude Include="DX11RenderState.h" />
-    <ClInclude Include="DX11RenderSurface.h" />
-    <ClInclude Include="DX11RenderEffect.h" />
+    <ClInclude Include="GLRenderEngine.h" />
+    <ClInclude Include="GLRenderInclude.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DX11RenderEngine.cpp" />
-    <ClCompile Include="DX11RenderInclude.cpp">
+    <ClCompile Include="GLRenderEngine.cpp" />
+    <ClCompile Include="GLRenderInclude.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="DX11RenderLayout.cpp" />
-    <ClCompile Include="DX11RenderResource.cpp" />
-    <ClCompile Include="DX11RenderResourceManager.cpp" />
-    <ClCompile Include="DX11RenderState.cpp" />
-    <ClCompile Include="DX11RenderEffect.cpp" />
-    <ClCompile Include="DX11RenderSurface.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

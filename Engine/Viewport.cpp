@@ -5,7 +5,7 @@ namespace Disorder
 	Viewport::Viewport(int x,int y,int sizeX,int sizeY)
 		:X(x),Y(y),SizeX(sizeX),SizeY(sizeY)
 	{
-		SetRenderPath(RPT_DeferredShading);
+	//	SetRenderPath(RPT_DeferredShading);
 		_bActive = true;
 	}
 

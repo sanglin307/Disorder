@@ -3,6 +3,7 @@
 
 #include "..\Engine\EngineInclude.h"
 #include "..\DX11Render\DX11RenderInclude.h"
+#include "..\GLRender\GLRenderInclude.h"
 
 namespace Disorder
 {

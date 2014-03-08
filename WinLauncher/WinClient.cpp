@@ -39,7 +39,7 @@ namespace Disorder
 		memset( &Cls, 0,sizeof(Cls));
 		Cls.cbSize			= sizeof(Cls);
 		// disable dbl-click messages in the game as the dbl-click event is sent instead of the key pressed event, which causes issues with e.g. rapid firing
-		Cls.style			= CS_HREDRAW | CS_VREDRAW;
+		Cls.style           = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 		Cls.lpfnWndProc		= StaticWndProc;
 		Cls.hInstance		= GAppInstance;		 
 		Cls.lpszClassName	= winClassName;

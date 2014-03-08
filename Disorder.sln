@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcxproj", "{8C623C37-C9F7-446E-867A-54FB5E297BAC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX11Render", "DX11Render\DX11Render.vcxproj", "{8976B6CA-1E68-4190-882B-29DBC0134BF6}"
@@ -9,6 +11,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX11Render", "DX11Render\DX
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinLauncher", "WinLauncher\WinLauncher.vcxproj", "{ACEBD2CE-5CD1-4A7B-95FD-A27D8E05B1DD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{745566FD-CAF7-42D6-8A4E-A8AFFCBBC05D} = {745566FD-CAF7-42D6-8A4E-A8AFFCBBC05D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLRender", "GLRender\GLRender.vcxproj", "{745566FD-CAF7-42D6-8A4E-A8AFFCBBC05D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8C623C37-C9F7-446E-867A-54FB5E297BAC} = {8C623C37-C9F7-446E-867A-54FB5E297BAC}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,6 +38,10 @@ Global
 		{ACEBD2CE-5CD1-4A7B-95FD-A27D8E05B1DD}.Debug|Win32.Build.0 = Debug|Win32
 		{ACEBD2CE-5CD1-4A7B-95FD-A27D8E05B1DD}.Release|Win32.ActiveCfg = Release|Win32
 		{ACEBD2CE-5CD1-4A7B-95FD-A27D8E05B1DD}.Release|Win32.Build.0 = Release|Win32
+		{745566FD-CAF7-42D6-8A4E-A8AFFCBBC05D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{745566FD-CAF7-42D6-8A4E-A8AFFCBBC05D}.Debug|Win32.Build.0 = Debug|Win32
+		{745566FD-CAF7-42D6-8A4E-A8AFFCBBC05D}.Release|Win32.ActiveCfg = Release|Win32
+		{745566FD-CAF7-42D6-8A4E-A8AFFCBBC05D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
