@@ -80,15 +80,19 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GLRenderEffect.h" />
     <ClInclude Include="GLRenderEngine.h" />
     <ClInclude Include="GLRenderInclude.h" />
+    <ClInclude Include="GLRenderResourceManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GLRenderEffect.cpp" />
     <ClCompile Include="GLRenderEngine.cpp" />
     <ClCompile Include="GLRenderInclude.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="GLRenderResourceManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

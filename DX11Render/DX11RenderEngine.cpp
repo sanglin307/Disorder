@@ -58,19 +58,6 @@ namespace Disorder
  
 	 DX11RenderEngine::DX11RenderEngine()
 	 {
-		 
-		_driverType = D3D_DRIVER_TYPE_NULL;
-		_featureLevel = D3D_FEATURE_LEVEL_11_0;
- 
-		IDXGIFactory * pFactory;
-        HRESULT hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)(&pFactory) );
-		BOOST_ASSERT(SUCCEEDED(hr));
-
-		_pDXGIFactory = MakeComPtr<IDXGIFactory>(pFactory); 
-
-		EnumAdapters();
-
-		CreateDevice();
 	 }
 
 	 void DX11RenderEngine::EnumAdapters()
@@ -220,6 +207,18 @@ namespace Disorder
 
 	void DX11RenderEngine::Init()
 	{
+		_driverType = D3D_DRIVER_TYPE_NULL;
+		_featureLevel = D3D_FEATURE_LEVEL_11_0;
+
+		IDXGIFactory * pFactory;
+		HRESULT hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)(&pFactory));
+		BOOST_ASSERT(SUCCEEDED(hr));
+
+		_pDXGIFactory = MakeComPtr<IDXGIFactory>(pFactory);
+
+		EnumAdapters();
+
+		CreateDevice();
 	}
 
 	void DX11RenderEngine::Exit()

@@ -1,7 +1,5 @@
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
-
 
 // opengl header
 #include <GL/glew.h>
@@ -19,9 +17,13 @@ namespace Disorder
 
 	class GLRenderEngine;
 	typedef boost::shared_ptr<GLRenderEngine> GLRenderEnginePtr;
-
-
+	class GLRenderResourceManager;
+	typedef boost::shared_ptr<GLRenderResourceManager> GLRenderResourceManagerPtr;
+	class GLShaderObject;
+	typedef boost::shared_ptr<GLShaderObject> GLShaderObjectPtr;
 
 }
 
+#include "GLRenderEffect.h"
 #include "GLRenderEngine.h"
+#include "GLRenderResourceManager.h"

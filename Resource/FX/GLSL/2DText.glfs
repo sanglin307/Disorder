@@ -1,0 +1,20 @@
+
+// fragment shader of glsl
+
+#version 330
+
+uniform sampler2D TextTexture;
+
+in VS_OUTPUT
+{
+    vec4 Color;
+    vec2 TextureUV;
+} fs_in;
+
+out vec4 color;
+
+void main(void) 
+{
+    color = fs_in.Color;
+	color.a *= texture( TextTexture, fs_in.TextureUV ).g;
+}

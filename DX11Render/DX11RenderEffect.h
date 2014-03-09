@@ -168,7 +168,7 @@ namespace Disorder
 			}
 			else
 			{
-				std::string strFilePath = GConfig->sResourceFXPath + std::string(pFileName);
+				std::string strFilePath = GConfig->sResourceFXPath + "HLSL\\" + std::string(pFileName);
 				FileObjectPtr fileptr = GEngine->FileManager->OpenFile(strFilePath,"rt");
 		        std::string shaderContent = GEngine->FileManager->ReadFile(fileptr);
 				ShaderObject::sMapIncludeFiles.insert(std::pair<std::string,std::string>(pFileName,shaderContent));

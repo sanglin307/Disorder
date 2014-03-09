@@ -18,15 +18,18 @@ namespace Disorder
    {
 	   //Client Init
 	   GLogger->Init();
-//	   RenderResourceMgr->Init();
-	   RenderEngine->Init();  
-	   SceneImporter->Init();
+	   RenderEngine->Init();
 	   GameClient->Init();
-	   
 
 	   ViewportPtr const& viewport = GameClient->GetViewport(0);
-	   RenderEngine->CreateViewport(viewport->GetWindow());
-	 
+	   RenderEngine->CreateViewport(viewport->GetWindow());	 
+
+	   RenderResourceMgr->Init();
+	  
+	   viewport->SetRenderPath(RPT_ForwardLighting);
+
+	   SceneImporter->Init();
+
 	   GameCanvas = Canvas::Create(viewport->SizeX,viewport->SizeY);
 	   GameConsole = Console::Create();
 	   GSceneManager->Init();

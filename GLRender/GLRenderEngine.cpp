@@ -12,8 +12,7 @@ namespace Disorder
 
 	GLRenderEngine::GLRenderEngine()
 	{
-		_hRC = 0;
-		
+		_hRC = 0;	
 	}
 
 	void GLRenderEngine::CreateViewport(void *hWnd)
@@ -105,6 +104,7 @@ namespace Disorder
 	{
 		if (_hRC)
 		{
+			wglMakeCurrent(NULL, NULL);
 			wglDeleteContext(_hRC);
 			_hRC = 0;
 		}
@@ -123,9 +123,7 @@ namespace Disorder
 	{
 
 	}
-
  
-
 	void GLRenderEngine::ClearRenderTarget(const RenderSurfacePtr& renderTarget, const glm::vec4& color)
 	{
 

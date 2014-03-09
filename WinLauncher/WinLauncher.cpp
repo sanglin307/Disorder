@@ -29,12 +29,13 @@ void AppPeekMessage()
 	Disorder::GConfig->sResourceFontPath = Disorder::GConfig->sRootPath + "\\Resource\\Font\\";
 	Disorder::GConfig->Load();
  
-
 	Disorder::GEngine->GameClient = Disorder::WinClient::Create();
+
 	Disorder::GEngine->RenderEngine = Disorder::GLRenderEngine::Create();
-	Disorder::GEngine->SceneImporter = Disorder::FbxSceneImporter::Create();
-	Disorder::GEngine->RenderResourceMgr = Disorder::DX11RenderResourceManager::Create();
+	Disorder::GEngine->RenderResourceMgr = Disorder::GLRenderResourceManager::Create();
 	Disorder::GEngine->RenderSurfaceCache = Disorder::DX11RenderSurfaceCache::Create();
+
+	Disorder::GEngine->SceneImporter = Disorder::FbxSceneImporter::Create();
 	Disorder::GMainLoop->Init();
 
  }

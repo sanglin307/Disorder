@@ -24,12 +24,24 @@
     <ClInclude Include="GLRenderEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GLRenderResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GLRenderEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GLRenderInclude.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GLRenderEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GLRenderResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GLRenderEffect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

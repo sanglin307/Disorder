@@ -19,42 +19,75 @@
     <Filter Include="GameEngine">
       <UniqueIdentifier>{3448d376-cabb-4f64-bbba-c828fa086795}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders">
+    <Filter Include="Config">
+      <UniqueIdentifier>{4d13d33c-ec17-465b-a46f-30f8be891dc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Config">
-      <UniqueIdentifier>{4d13d33c-ec17-465b-a46f-30f8be891dc0}</UniqueIdentifier>
+    <Filter Include="GLSL">
+      <UniqueIdentifier>{5d7ef184-07ac-4a9e-89f9-79d09a4bc0a3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="TodoList.txt" />
-    <None Include="..\Resource\FX\BatchLines.dsf">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Resource\FX\Common.dsf">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\Config\CameraConfig.xml">
       <Filter>Config</Filter>
     </None>
     <None Include="..\Config\RenderConfig.xml">
       <Filter>Config</Filter>
     </None>
-    <None Include="..\Resource\FX\ScreenTiles.dsf">
-      <Filter>Shaders</Filter>
+    <None Include="..\Resource\FX\HLSL\2DText.dsf">
+      <Filter>HLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\DeferredShading.dsf">
-      <Filter>Shaders</Filter>
+    <None Include="..\Resource\FX\HLSL\BatchLines.dsf">
+      <Filter>HLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\ForwardLighting.dsf">
-      <Filter>Shaders</Filter>
+    <None Include="..\Resource\FX\HLSL\Common.dsf">
+      <Filter>HLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\2DText.dsf">
-      <Filter>Shaders</Filter>
+    <None Include="..\Resource\FX\HLSL\DeferredShading.dsf">
+      <Filter>HLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\SurfaceVisual.dsf">
-      <Filter>Shaders</Filter>
+    <None Include="..\Resource\FX\HLSL\ForwardLighting.dsf">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\HLSL\GBufferVisual.dsf">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\HLSL\ScreenTiles.dsf">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\HLSL\SurfaceVisual.dsf">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\BatchLines.dsf">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\Common.dsf">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\DeferredShading.dsf">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ForwardLighting.dsf">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\GBufferVisual.dsf">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ScreenTiles.dsf">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\SurfaceVisual.dsf">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\2DText.glvs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\2DText.glfs">
+      <Filter>GLSL</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

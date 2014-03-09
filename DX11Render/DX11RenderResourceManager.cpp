@@ -15,7 +15,7 @@ namespace Disorder
 		if( _shaderMap.find(shaderKey) != _shaderMap.end() )
 			return _shaderMap.at(shaderKey);
  
-		std::string strFilePath = GConfig->sResourceFXPath + fileName + ".dsf";
+		std::string strFilePath = GConfig->sResourceFXPath + "HLSL\\" + fileName + ".dsf";
 
 		DX11ShaderObjectPtr shaderObject = DX11ShaderObject::Create(fileName,entryPoint,type,shaderModel); 
 	    shaderObject->LoadShaderFromFile(strFilePath,entryPoint,type);
