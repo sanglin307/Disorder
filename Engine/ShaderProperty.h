@@ -139,7 +139,7 @@ namespace Disorder
 
 		virtual void DumpContent();
 	protected:
-		ShaderPropertyManager(std::string name):Name(name){}
+		ShaderPropertyManager(const std::string& name):Name(name){}
 		ShaderPropertyMap _shaderPropertyMap;
        
 

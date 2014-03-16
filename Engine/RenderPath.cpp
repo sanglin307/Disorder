@@ -215,13 +215,13 @@ namespace Disorder
 	{
 		_type = RPT_ForwardLighting;
  
-		_DirectionLightEffect = RenderEffect::Create();
+		_DirectionLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"RenderSceneVS");
 		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"DirectionalLightPS");
 		_DirectionLightEffect->BindShader(vertexShader);
 		_DirectionLightEffect->BindShader(pixelShader);
  
-		_FourLightEffect = RenderEffect::Create();
+		_FourLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr fVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"RenderSceneVS");
 		ShaderObjectPtr fPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"ForwardFourLightPS");
 		_FourLightEffect->BindShader(fVertexShader);
@@ -257,7 +257,7 @@ namespace Disorder
 	{
 		_type = RPT_DeferredShading;
 
-		_RenderSceneEffect = RenderEffect::Create();
+		_RenderSceneEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"RenderSceneVS");
 		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"RenderScenePS");
 		_RenderSceneEffect->BindShader(vertexShader);
@@ -274,13 +274,13 @@ namespace Disorder
 		DepthStencilStatePtr _DepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&depthDesc,1);
 		_RenderSceneEffect->BindDepthStencilState(_DepthWriteState);
 
-		_LightingEffect = RenderEffect::Create();
+		_LightingEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 	     vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"LightingVS");
 		 pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"BaseLightingPS");
 		_LightingEffect->BindShader(vertexShader);
 		_LightingEffect->BindShader(pixelShader); 
 
-		_FourLightEffect = RenderEffect::Create();
+		_FourLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr fVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"LightingVS");
 		ShaderObjectPtr fPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"DeferFourLightPS");
 		_FourLightEffect->BindShader(fVertexShader);

@@ -18,7 +18,7 @@ namespace Disorder
 		virtual RenderTexture2DPtr CreateRenderTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, ImagePtr image);
 
 		virtual RenderSurfacePtr CreateRenderSurface(RenderTexture2DPtr const& texture, unsigned int usage, PixelFormat RenderTargetFormat, PixelFormat DepthFormat, PixelFormat ShaderResFormat, bool ReadOnlyDepth = false, bool ReadOnlyStencil = false);
-
+		virtual RenderEffectPtr CreateRenderEffect();
 		virtual SamplerStatePtr CreateSamplerState(SamplerFilter filter, TextureAddressMode addressUVW, UINT maxAnisotropy = 16);
 		virtual RasterizeStatePtr CreateRasterizeState(RasterizeDesc *pDesc);
 		virtual DepthStencilStatePtr CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc, unsigned int stencilRef);

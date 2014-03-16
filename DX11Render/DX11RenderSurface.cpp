@@ -118,7 +118,7 @@ namespace Disorder
 		SpecularDataBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(specularTex,surfaceUsage,PF_R8G8B8A8_UNORM,PF_UNKNOWN,PF_R8G8B8A8_UNORM);
 
 		
-		_GBufferVisualEffect = RenderEffect::Create();
+		_GBufferVisualEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"SurfaceVisual",SM_4_0,"SurfaceVisualVS");
 		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"SurfaceVisual",SM_4_0,"SurfaceVisualPS");
 		_GBufferVisualEffect->BindShader(vertexShader);

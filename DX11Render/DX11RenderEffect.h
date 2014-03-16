@@ -250,12 +250,12 @@ namespace Disorder
 		~DX11ShaderPropertyManager();
 		virtual void UpdateShaderProperty();
 		bool Validate(ConstantBufferDesc *pConstBuffer);
-		static DX11ShaderPropertyManagerPtr Create(std::string name);
+		static DX11ShaderPropertyManagerPtr Create(const std::string& name);
 
 		ConstantBufferDesc* ConstantBuffer;
 
 	protected:
-		DX11ShaderPropertyManager(std::string name);
+		DX11ShaderPropertyManager(const std::string& name);
 		
 
 		

@@ -239,7 +239,7 @@ namespace Disorder
 				constantBuffer.CBuFlags = bufferDesc.uFlags;
 				constantBuffer.CBVariables = bufferDesc.Variables;
 				DX11ShaderPropertyManagerPtr propertyManager = boost::dynamic_pointer_cast<DX11ShaderPropertyManager>(resourceManager->GetPropertyManager(constantBuffer.CBName));		 
-				BOOST_ASSERT(propertyManager->Name != ShaderPropertyManager::sManagerGlobal);
+				BOOST_ASSERT(propertyManager->Name != ShaderPropertyManager::sManagerGlobal); // don't registe const buffer name ,please registe it in ShaderPropertyManager
 
 				constantBuffer.BufferParamRef = GlobalPropertyManager->GetProperty(constantBuffer.CBName);
 				if( constantBuffer.BufferParamRef == NULL )
@@ -412,7 +412,7 @@ namespace Disorder
 		delete pData;
 	}
 
-	DX11ShaderPropertyManager::DX11ShaderPropertyManager(std::string name)
+	DX11ShaderPropertyManager::DX11ShaderPropertyManager(const std::string& name)
 		:ShaderPropertyManager(name)
 	{
 		ConstantBuffer = NULL;
@@ -425,7 +425,7 @@ namespace Disorder
 		ConstantBuffer = NULL;
 	}
 
-	DX11ShaderPropertyManagerPtr DX11ShaderPropertyManager::Create(std::string name)
+	DX11ShaderPropertyManagerPtr DX11ShaderPropertyManager::Create(const std::string& name)
 	{
 		DX11ShaderPropertyManager *pManager = new DX11ShaderPropertyManager(name);
 		return DX11ShaderPropertyManagerPtr(pManager);

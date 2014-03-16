@@ -31,6 +31,8 @@
 #include <boost/smart_ptr/enable_shared_from_this.hpp>
 #include <boost/assert.hpp>
 #include <boost/make_shared.hpp>
+#define BOOST_FILESYSTEM_DYN_LINK
+#include <boost/filesystem.hpp>
 //#include <boost/uuid/uuid.hpp>
 //#include <boost/uuid/uuid_generators.hpp>
 #include <boost/array.hpp>

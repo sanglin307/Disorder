@@ -23,6 +23,12 @@ namespace Disorder
 
 		return shaderObject;
 	}
+	
+	RenderEffectPtr GLRenderResourceManager::CreateRenderEffect()
+	{
+		return GLRenderEffect::Create();
+	}
+
 	RenderBufferPtr GLRenderResourceManager::CreateRenderBuffer(RenderBufferType type, unsigned int accessHint, GeometryPtr const& data, std::string const& sematic, ShaderObjectPtr const& vertexShader)
 	{
 		return NULL;
@@ -74,7 +80,11 @@ namespace Disorder
 
 	void GLRenderResourceManager::RegisterPropertyManager(std::string const& name)
 	{
-		
+		if( _propertyManagerMap.find(name) != _propertyManagerMap.end() )
+			return;
+
+		ShaderPropertyManagerPtr manger = GLShaderPropertyManager::Create(name);
+		_propertyManagerMap.insert(std::pair<std::string,ShaderPropertyManagerPtr>(name,manger));
 	}
 
 	GLRenderResourceManagerPtr GLRenderResourceManager::Create()

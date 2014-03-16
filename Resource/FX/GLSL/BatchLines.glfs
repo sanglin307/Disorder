@@ -1,0 +1,9 @@
+#version 330
+
+in vec4 VSColor;
+out vec4 FSColor;
+ 
+void main(void) 
+{
+   FSColor = VSColor;
+}

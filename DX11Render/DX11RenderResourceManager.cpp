@@ -121,4 +121,9 @@ namespace Disorder
 		ShaderPropertyManagerPtr manger = DX11ShaderPropertyManager::Create(name);
 		_propertyManagerMap.insert(std::pair<std::string,ShaderPropertyManagerPtr>(name,manger));
 	}
+
+	RenderEffectPtr DX11RenderResourceManager::CreateRenderEffect()
+	{
+		return RenderEffect::Create();
+	}
 }

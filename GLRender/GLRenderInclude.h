@@ -21,6 +21,12 @@ namespace Disorder
 	typedef boost::shared_ptr<GLRenderResourceManager> GLRenderResourceManagerPtr;
 	class GLShaderObject;
 	typedef boost::shared_ptr<GLShaderObject> GLShaderObjectPtr;
+	class GLRenderEffect;
+	typedef boost::shared_ptr<GLRenderEffect> GLRenderEffectPtr;
+	class GLShaderPropertyManager;
+	typedef boost::shared_ptr<GLShaderPropertyManager> GLShaderPropertyManagerPtr;
+	class GLProgramReflection;
+	typedef boost::shared_ptr<GLProgramReflection> GLProgramReflectionPtr;
 
 }
 

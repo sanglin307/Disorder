@@ -13,7 +13,7 @@ namespace Disorder
 	 void World::Init()
 	 {
 		 // temp code to init a world		
-		 LevelPtr level = GEngine->SceneImporter->Import(std::string("MiniGun_CameraLight.fbx"));
+		// LevelPtr level = GEngine->SceneImporter->Import(std::string("MiniGun_CameraLight.fbx"));
 
 		 if( GSceneManager->GetDefaultCamera() == NULL ) // create default camera
 		 {

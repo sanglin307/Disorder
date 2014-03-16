@@ -25,6 +25,46 @@ namespace Disorder
 			GLogger->Error("Can't create windows OpenGL Context!");
 			return;
 		}
+
+		LoadShaderIncludeFiles();
+	}
+
+	void GLRenderEngine::LoadShaderIncludeFiles()
+	{
+		std::string shaderPath = GConfig->sResourceFXPath + "GLSL\\";
+		boost::filesystem::path p(shaderPath);
+		if (!boost::filesystem::exists(p) || !boost::filesystem::is_directory(p) )
+		{
+			GLogger->Error("shader's path not exist!");
+			return;
+		}
+
+		boost::filesystem::directory_iterator enditer;
+		for (boost::filesystem::directory_iterator fileiter(p); fileiter != enditer; ++fileiter)
+		{
+			if (!boost::filesystem::is_directory(*fileiter) && (boost::filesystem::extension(*fileiter) == ".gls"))
+			{
+				std::string path = fileiter->path().string();
+				std::string filekey = "/glsl/" + fileiter->path().leaf().string();
+				FileObjectPtr file = GEngine->FileManager->OpenFile(path,"rt"); 
+				std::string content = GEngine->FileManager->ReadFile(file);
+				if (ShaderObject::sMapIncludeFiles.find(filekey) == ShaderObject::sMapIncludeFiles.end())
+				{
+					ShaderObject::sMapIncludeFiles.insert(std::pair<std::string, std::string>(filekey, content));
+				}
+			}
+		}
+
+		if (ShaderObject::sMapIncludeFiles.size() > 0)
+		{
+			std::map<std::string, std::string>::const_iterator iter = ShaderObject::sMapIncludeFiles.begin();
+			while (iter != ShaderObject::sMapIncludeFiles.end())
+			{
+				glNamedStringARB(GL_SHADER_INCLUDE_ARB, iter->first.size(), iter->first.c_str(), iter->second.size(), iter->second.c_str());				 
+				++iter;
+				
+			}
+		}
 	}
 
 	bool GLRenderEngine::CreateGLContext(HWND window)
@@ -84,9 +124,8 @@ namespace Disorder
 		const GLubyte *GLVersionString = glGetString(GL_VERSION);
 
 		//Or better yet, use the GL3 way to get the version number
-		int OpenGLVersion[2];
-		glGetIntegerv(GL_MAJOR_VERSION, &OpenGLVersion[0]);
-		glGetIntegerv(GL_MINOR_VERSION, &OpenGLVersion[1]);
+		glGetIntegerv(GL_MAJOR_VERSION, &_mainVersion);
+		glGetIntegerv(GL_MINOR_VERSION, &_subVersion);
 
 		if (!_hRC) 
 			return false;

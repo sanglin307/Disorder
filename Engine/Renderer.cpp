@@ -119,7 +119,7 @@ namespace Disorder
 		:Renderer(name)
 	{
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderResourceMgr;
-		_renderEffect = RenderEffect::Create(); 
+		_renderEffect = resourceManager->CreateRenderEffect(); 
 		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"2DText",SM_4_0,"VS");
 		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"2DText",SM_4_0,"PS");
 	    
@@ -202,7 +202,7 @@ namespace Disorder
 		:Renderer(name)
 	{
 		RenderResourceManagerPtr resourceManager  = GEngine->RenderResourceMgr;
-		_renderEffect =  RenderEffect::Create();
+		_renderEffect =  resourceManager->CreateRenderEffect();
 		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"BatchLines",SM_4_0,"VS");
 		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"BatchLines",SM_4_0,"PS");
 		_renderEffect->BindShader(vertexShader);

@@ -96,8 +96,10 @@
     <None Include="..\Config\RenderConfig.xml" />
     <None Include="..\Resource\FX\GLSL\2DText.glfs" />
     <None Include="..\Resource\FX\GLSL\2DText.glvs" />
-    <None Include="..\Resource\FX\GLSL\BatchLines.dsf" />
+    <None Include="..\Resource\FX\GLSL\BatchLines.glfs" />
+    <None Include="..\Resource\FX\GLSL\BatchLines.glvs" />
     <None Include="..\Resource\FX\GLSL\Common.dsf" />
+    <None Include="..\Resource\FX\GLSL\common.gls" />
     <None Include="..\Resource\FX\GLSL\DeferredShading.dsf" />
     <None Include="..\Resource\FX\GLSL\ForwardLighting.dsf" />
     <None Include="..\Resource\FX\GLSL\GBufferVisual.dsf" />

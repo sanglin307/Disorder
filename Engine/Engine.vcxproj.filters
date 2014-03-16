@@ -62,9 +62,6 @@
     <None Include="..\Resource\FX\HLSL\SurfaceVisual.dsf">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\BatchLines.dsf">
-      <Filter>GLSL</Filter>
-    </None>
     <None Include="..\Resource\FX\GLSL\Common.dsf">
       <Filter>GLSL</Filter>
     </None>
@@ -87,6 +84,15 @@
       <Filter>GLSL</Filter>
     </None>
     <None Include="..\Resource\FX\GLSL\2DText.glfs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\common.gls">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\BatchLines.glvs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\BatchLines.glfs">
       <Filter>GLSL</Filter>
     </None>
   </ItemGroup>

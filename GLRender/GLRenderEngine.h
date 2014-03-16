@@ -45,9 +45,10 @@ namespace Disorder
 
 		GLRenderEngine();
 		bool CreateGLContext(HWND window);
-
+		void LoadShaderIncludeFiles();
 		HGLRC _hRC;
-
+		int _mainVersion;
+		int _subVersion;
 	};
 
 

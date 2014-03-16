@@ -25,9 +25,15 @@ namespace Disorder
 	   RenderEngine->CreateViewport(viewport->GetWindow());	 
 
 	   RenderResourceMgr->Init();
-	  
-	   viewport->SetRenderPath(RPT_ForwardLighting);
+	 
+	   ShaderObjectPtr vObject = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "2DText", SM_4_0, "main");
+	   ShaderObjectPtr pObject = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"2DText",SM_4_0,"main");
+	   RenderEffectPtr effect = GEngine->RenderResourceMgr->CreateRenderEffect();
+	   effect->BindShader(vObject);
+	   effect->BindShader(pObject);
+	   effect->LinkShaders();
 
+	   viewport->SetRenderPath(RPT_ForwardLighting);
 	   SceneImporter->Init();
 
 	   GameCanvas = Canvas::Create(viewport->SizeX,viewport->SizeY);

@@ -55,7 +55,7 @@ namespace Disorder
 			return _pixelShader;
 		}
 
-		void BindShader(ShaderObjectPtr const& shaderObject)
+		virtual void BindShader(ShaderObjectPtr const& shaderObject)
 		{
 			if( shaderObject->GetType() == ST_VertexShader )
 				_vertexShader = shaderObject;
@@ -64,6 +64,10 @@ namespace Disorder
 			else
 			   BOOST_ASSERT(0);
 
+		}
+
+		virtual void LinkShaders()
+		{
 		}
 
 		void BindRasterizeState(RasterizeStatePtr const& rasterizeState)
