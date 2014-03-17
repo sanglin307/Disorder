@@ -1,0 +1,23 @@
+
+#version 330
+#extension GL_ARB_shading_language_include : require
+
+#include </glsl/common.gls>
+
+layout (location = 0) in vec3 Position;
+layout (location = 1) in vec4 Color;
+
+out vec4 VSColor;
+ 
+void main(void) 
+{
+   vec4 pos = vec4(Position,1.0f);
+   gl_Position = CameraViewProj * pos;
+   VSColor = Color;
+}
+
+
+float4 PS( VS_OUTPUT In ) : SV_TARGET
+{ 
+    return In.Color;
+}
