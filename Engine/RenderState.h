@@ -72,6 +72,28 @@ namespace Disorder
 
 	} DepthStencilDesc;
 
+	typedef struct _SamplerDesc
+	{
+		_SamplerDesc()
+		:Filter(SF_Min_Mag_Point_Mip_Linear), AddressU(TAM_Clamp), AddressV(TAM_Clamp), AddressW(TAM_Clamp),
+		MipLODBias(0.f), MaxAnisotropy(1), CompareFunc(CF_Never)
+		{
+			BorderColor[0] = BorderColor[1] = BorderColor[2] = BorderColor[3] = 1.0f;
+			MinLOD = std::numeric_limits<float>::min();
+			MaxLOD = std::numeric_limits<float>::max();
+		}
+		SamplerFilter Filter;
+		TextureAddressMode AddressU;
+		TextureAddressMode AddressV;
+		TextureAddressMode AddressW;
+		float MipLODBias;
+		unsigned int MaxAnisotropy;
+		ComparisonFunc CompareFunc;
+		float BorderColor[4];
+		float MinLOD;
+		float MaxLOD;
+	} SamplerDesc;
+
 	class RenderState
 	{
 	public:
@@ -113,18 +135,9 @@ namespace Disorder
 	class SamplerState : public RenderState
 	{
 	public:
- 
-		static std::string GenerateMapKey(SamplerFilter filter,TextureAddressMode addressUVW,UINT maxAnisotropy);
 
 	protected:
 		SamplerState(){}
-
-		SamplerFilter _filter;
-		TextureAddressMode _AddressU;
-		TextureAddressMode _AddressV;
-		TextureAddressMode _AddressW;
-		UINT          _maxAnisotropy;
-
 	};
 
 

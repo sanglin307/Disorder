@@ -1,0 +1,40 @@
+
+#version 330
+#extension GL_ARB_shading_language_include : require
+
+#include </glsl/common.gls>
+
+in VSOut
+{
+    vec3 NormalWorld; 
+	vec3 PositionWorld;
+};
+
+out vec4 Color;
+
+Material PrepareMaterial(vec3 normal, vec2 UV)
+{
+	Material material;
+
+	// Normalize the interpulated vertex normal
+	material.Normal = normalize(normal);
+
+	// Sample the texture and convert to linear space
+    material.DiffuseColor = DiffuseColor;
+	material.SpecularColor = SpecularColor;
+	material.SpecularExp = SpecularExp;
+ 
+	return material;
+} 
+
+void main(void)
+{
+	// Prepare the material structure
+	Material material = PrepareMaterial(NormalWorld, vec2(0,0));
+
+	// Calculate the spot light color
+	vec3 finalColor = CalculateFourLights(PositionWorld, material);
+
+	// Return the final color
+	Color = vec4(finalColor, 1.0);
+}

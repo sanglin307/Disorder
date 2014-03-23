@@ -2,6 +2,11 @@
 
 namespace Disorder
 {
+	std::string DX11RenderLayout::POSITION = "POSITION";
+	std::string DX11RenderLayout::COLOR = "COLOR";
+	std::string DX11RenderLayout::NORMAL = "NORMAL";
+	std::string DX11RenderLayout::TEXCOORD = "TEXCOORD";
+
 	void* DX11RenderLayout::GetLowInterface()
 	{
 		if( D3DInterface != NULL )
@@ -11,9 +16,9 @@ namespace Disorder
 
 	}
 
-	DX11RenderLayoutPtr DX11RenderLayout::Create(ShaderObjectPtr const& vertexShader,TopologyType topologyType,bool soloBuffer)
+	DX11RenderLayoutPtr DX11RenderLayout::Create(RenderEffectPtr const& renderEffect,TopologyType topologyType,bool soloBuffer)
 	{
-		 
+		ShaderObjectPtr vertexShader = renderEffect->GetVertexShader();
 		DX11ShaderReflectionPtr shaderReflection = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader)->ShaderReflect;
 		BOOST_ASSERT(shaderReflection != NULL );
  

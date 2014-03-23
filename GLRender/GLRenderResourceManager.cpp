@@ -3,18 +3,19 @@
 
 namespace Disorder
 {
-	RenderLayoutPtr GLRenderResourceManager::CreateRenderLayout(ShaderObjectPtr const& vertexShader, TopologyType topologyType, bool soloBuffer)
+	RenderLayoutPtr GLRenderResourceManager::CreateRenderLayout(RenderEffectPtr const& renderEffect, TopologyType topologyType, bool soloBuffer)
 	{
-		return NULL;
+		RenderLayoutPtr renderLayout = GLRenderLayout::Create(renderEffect,topologyType,soloBuffer);
+		return renderLayout;
 	}
 	ShaderObjectPtr GLRenderResourceManager::CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel, std::string const& entryPoint)
 	{
 		std::string fileSuffix = GLShaderObject::GetShaderFileSuffix(type);
-		std::string shaderKey = fileName + fileSuffix;
+		std::string shaderKey = fileName + "_" + entryPoint + fileSuffix;
 		if (_shaderMap.find(shaderKey) != _shaderMap.end())
 			return _shaderMap.at(shaderKey);
 
-		std::string strFilePath = GConfig->sResourceFXPath + "GLSL\\" + fileName + fileSuffix;
+		std::string strFilePath = GConfig->sResourceFXPath + "GLSL\\" + shaderKey;
 
 		GLShaderObjectPtr shaderObject = GLShaderObject::Create(fileName, "main", type, shaderModel);
 		shaderObject->LoadShaderFromFile(strFilePath, "main", type);
@@ -28,29 +29,39 @@ namespace Disorder
 	{
 		return GLRenderEffect::Create();
 	}
-
-	RenderBufferPtr GLRenderResourceManager::CreateRenderBuffer(RenderBufferType type, unsigned int accessHint, GeometryPtr const& data, std::string const& sematic, ShaderObjectPtr const& vertexShader)
+ 
+	RenderBufferPtr GLRenderResourceManager::CreateRenderBuffer(RenderBufferType type,BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData)
 	{
-		return NULL;
-	}
-	RenderBufferPtr GLRenderResourceManager::CreateRenderBuffer(RenderBufferType type, unsigned int accessHint, unsigned int elementSize, unsigned int size, void *pData)
-	{
-		return NULL;
+		RenderBufferPtr renderBuffer = GLRenderBuffer::Create(type,bufferUsage,elementSize,size,pData);	 
+		return renderBuffer;
 	}
 
-	void GLRenderResourceManager::CreateRenderBufferArray(GeometryPtr const& data, unsigned int accessHint, ShaderObjectPtr const& vertexShader, std::vector<RenderBufferPtr> & bufferArray)
+	void GLRenderResourceManager::CreateRenderBufferArray(GeometryPtr const& data, BufferUsage bufferUsage, RenderEffectPtr const& renderEffect, std::vector<RenderBufferPtr> & bufferArray)
 	{
-	
+		GLRenderEffectPtr effect = boost::dynamic_pointer_cast<GLRenderEffect>(renderEffect);
+	 
+		for(unsigned int i=0; i< effect->EffectReflection->InputArray.size();++i)
+		{
+			RenderBufferPtr renderBuffer = GLRenderBuffer::Create(RBT_Vertex,data,effect->EffectReflection->InputArray[i].Location,bufferUsage,renderEffect);
+			bufferArray.push_back(renderBuffer);
+		}
+
+		RenderBufferPtr indexBuffer = GLRenderBuffer::Create(RBT_Index,data,0,bufferUsage,effect);
+		bufferArray.push_back(indexBuffer);
 	}
 
 	RenderTexture2DPtr GLRenderResourceManager::CreateRenderTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, unsigned int usage, BufferInitData const* pData)
 	{
-		return NULL;
+		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat,width,hight,bMipmap,usage,pData);
+		texture->Sampler = sampler;
+		return texture;
 	}
 
 	RenderTexture2DPtr GLRenderResourceManager::CreateRenderTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, ImagePtr image)
 	{
-		return NULL;
+		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat,image);
+		texture->Sampler = sampler;
+		return texture;
 	}
 
 	RenderSurfacePtr GLRenderResourceManager::CreateRenderSurface(RenderTexture2DPtr const& texture, unsigned int usage, PixelFormat RenderTargetFormat, PixelFormat DepthFormat, PixelFormat ShaderResFormat, bool ReadOnlyDepth, bool ReadOnlyStencil)
@@ -58,9 +69,9 @@ namespace Disorder
 		return NULL;
 	}
 
-	SamplerStatePtr GLRenderResourceManager::CreateSamplerState(SamplerFilter filter, TextureAddressMode addressUVW, UINT maxAnisotropy)
+	SamplerStatePtr GLRenderResourceManager::CreateSamplerState(SamplerDesc* pSamplerDesc)
 	{
-		return NULL;
+		return GLSamplerState::Create(pSamplerDesc);
 	}
 
 	RasterizeStatePtr GLRenderResourceManager::CreateRasterizeState(RasterizeDesc *pDesc)

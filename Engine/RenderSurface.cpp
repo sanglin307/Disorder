@@ -12,7 +12,8 @@ namespace Disorder
 		_SurfaceVisTex = propertyManager->CreateProperty(ShaderPropertyManager::sSurfaceVisTex,eSP_ShaderResource);
 		_SurfaceSampler = propertyManager->CreateProperty(ShaderPropertyManager::sSurfaceSampler,eSP_SampleState);
 		_GBufferPointSampler = propertyManager->CreateProperty(ShaderPropertyManager::sGBufferPointSampler,eSP_SampleState);
-		SamplerStatePtr pointState = GEngine->RenderResourceMgr->CreateSamplerState(SF_Point,TAM_Clamp,0);
+		SamplerDesc sDesc;
+		SamplerStatePtr pointState = GEngine->RenderResourceMgr->CreateSamplerState(&sDesc);
 		_GBufferPointSampler->SetData(pointState);
 		_SurfaceSampler->SetData(pointState);
 	}

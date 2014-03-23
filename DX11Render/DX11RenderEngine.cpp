@@ -280,6 +280,174 @@ namespace Disorder
 	 
 	}
 
+	D3D11_COMPARISON_FUNC DX11RenderEngine::GetD3DComparisonFunc(ComparisonFunc func)
+	{
+		switch (func)
+		{
+		case CF_Never:
+			return D3D11_COMPARISON_NEVER;
+		case CF_Less:
+			return D3D11_COMPARISON_LESS;
+		case CF_Equal:
+			return D3D11_COMPARISON_EQUAL;
+		case CF_Less_Equal:
+			return D3D11_COMPARISON_LESS_EQUAL;
+		case CF_Greater:
+			return D3D11_COMPARISON_GREATER;
+		case CF_Not_Equal:
+			return D3D11_COMPARISON_NOT_EQUAL;
+		case CF_Greater_Equal:
+			return D3D11_COMPARISON_GREATER_EQUAL;
+		case CF_Always:
+			return D3D11_COMPARISON_ALWAYS;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return D3D11_COMPARISON_NEVER;
+	}
+
+	D3D11_TEXTURE_ADDRESS_MODE DX11RenderEngine::GetD3DAddressMode(TextureAddressMode addrMode)
+	{
+		switch (addrMode)
+		{
+		case TAM_Wrap:
+			return D3D11_TEXTURE_ADDRESS_WRAP;
+		case TAM_Mirror:
+			return D3D11_TEXTURE_ADDRESS_MIRROR;
+		case TAM_Clamp:
+			return D3D11_TEXTURE_ADDRESS_CLAMP;
+		case TAM_Border:
+			return D3D11_TEXTURE_ADDRESS_BORDER;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return D3D11_TEXTURE_ADDRESS_CLAMP;
+	}
+
+	D3D11_FILTER DX11RenderEngine::GetD3DFilter(SamplerFilter filter)
+	{
+		switch (filter)
+		{
+		case SF_Min_Mag_Mip_Point:
+			return D3D11_FILTER_MIN_MAG_MIP_POINT;
+		case SF_Min_Mag_Point_Mip_Linear:
+			return D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+		case SF_Min_Point_Mag_Linear_Mip_Point:
+			return D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
+		case SF_Min_Point_Mag_Mip_Linear:
+			return D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
+		case SF_Min_Linear_Mag_Mip_Point:
+			return D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
+		case SF_Min_Linear_Mag_Point_Mip_Linear:
+			return D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+		case SF_Min_Mag_Linear_Mip_Point:
+			return D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+		case SF_Min_Mag_Mip_Linear:
+			return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		case SF_Anisotropic:
+			return D3D11_FILTER_ANISOTROPIC;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return D3D11_FILTER_MIN_MAG_MIP_POINT;
+	}
+
+	D3D11_STENCIL_OP DX11RenderEngine::GetD3DStencilOp(StencilOperation op)
+	{
+		switch (op)
+		{
+		case STENCIL_OP_KEEP:
+			return D3D11_STENCIL_OP_KEEP;
+		case STENCIL_OP_ZERO:
+			return D3D11_STENCIL_OP_ZERO;
+		case STENCIL_OP_REPLACE:
+			return D3D11_STENCIL_OP_REPLACE;
+		case STENCIL_OP_INCR_SAT:
+			return D3D11_STENCIL_OP_INCR_SAT;
+		case STENCIL_OP_DECR_SAT:
+			return D3D11_STENCIL_OP_DECR_SAT;
+		case STENCIL_OP_INVERT:
+			return D3D11_STENCIL_OP_INVERT;
+		case STENCIL_OP_INCR:
+			return D3D11_STENCIL_OP_INCR;
+		case STENCIL_OP_DECR:
+			return D3D11_STENCIL_OP_DECR;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return D3D11_STENCIL_OP_KEEP;
+	}
+
+	D3D11_BLEND_OP DX11RenderEngine::GetD3DBlendOp(BlendOperation blendOp)
+	{
+		switch (blendOp)
+		{
+		case BLEND_OP_ADD:
+			return D3D11_BLEND_OP_ADD;
+		case BLEND_OP_SUBTRACT:
+			return D3D11_BLEND_OP_SUBTRACT;
+		case BLEND_OP_REV_SUBTRACT:
+			return D3D11_BLEND_OP_REV_SUBTRACT;
+		case BLEND_OP_MIN:
+			return D3D11_BLEND_OP_MIN;
+		case BLEND_OP_MAX:
+			return D3D11_BLEND_OP_MAX;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return D3D11_BLEND_OP_ADD;
+	}
+
+	D3D11_BLEND DX11RenderEngine::GetD3DBlendDesc(BlendOptions blendOptions)
+	{
+		switch (blendOptions)
+		{
+		case BLEND_ZERO:
+			return D3D11_BLEND_ZERO;
+		case BLEND_ONE:
+			return D3D11_BLEND_ONE;
+		case BLEND_SRC_COLOR:
+			return D3D11_BLEND_SRC_COLOR;
+		case BLEND_INV_SRC_COLOR:
+			return D3D11_BLEND_INV_SRC_COLOR;
+		case BLEND_SRC_ALPHA:
+			return D3D11_BLEND_SRC_ALPHA;
+		case BLEND_INV_SRC_ALPHA:
+			return D3D11_BLEND_INV_SRC_ALPHA;
+		case BLEND_DEST_ALPHA:
+			return D3D11_BLEND_DEST_ALPHA;
+		case BLEND_INV_DEST_ALPHA:
+			return D3D11_BLEND_INV_DEST_ALPHA;
+		case BLEND_DEST_COLOR:
+			return D3D11_BLEND_DEST_COLOR;
+		case BLEND_INV_DEST_COLOR:
+			return D3D11_BLEND_INV_DEST_COLOR;
+		case BLEND_SRC_ALPHA_SAT:
+			return D3D11_BLEND_SRC_ALPHA_SAT;
+		case BLEND_BLEND_FACTOR:
+			return D3D11_BLEND_BLEND_FACTOR;
+		case BLEND_INV_BLEND_FACTOR:
+			return D3D11_BLEND_INV_BLEND_FACTOR;
+		case BLEND_SRC1_COLOR:
+			return D3D11_BLEND_SRC1_COLOR;
+		case BLEND_INV_SRC1_COLOR:
+			return D3D11_BLEND_INV_SRC1_COLOR;
+		case BLEND_SRC1_ALPHA:
+			return D3D11_BLEND_SRC1_ALPHA;
+		case BLEND_INV_SRC1_ALPHA:
+			return D3D11_BLEND_INV_SRC1_ALPHA;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return D3D11_BLEND_ZERO;
+	}
+
 	D3D_PRIMITIVE_TOPOLOGY DX11RenderEngine::GetPlatformTopology(TopologyType tType)
 	{
 		switch (tType)

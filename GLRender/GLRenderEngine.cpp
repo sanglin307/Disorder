@@ -10,6 +10,221 @@ namespace Disorder
 		return GLRenderEnginePtr(pEngine);
 	}
 
+	GLenum GLRenderEngine::GetPixelFormat(PixelFormat format,GLenum &glFormat,GLenum &glType)
+	{
+		//glFormat include : GL_RED, GL_RG, GL_RGB, GL_BGR, GL_RGBA, GL_BGRA, GL_DEPTH_COMPONENT, and GL_STENCIL_INDEX.
+		//glType include : GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT, 
+		//GL_UNSIGNED_BYTE_3_3_2, GL_UNSIGNED_BYTE_2_3_3_REV, GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_5_6_5_REV, GL_UNSIGNED_SHORT_4_4_4_4, 
+		//GL_UNSIGNED_SHORT_4_4_4_4_REV, GL_UNSIGNED_SHORT_5_5_5_1, GL_UNSIGNED_SHORT_1_5_5_5_REV, GL_UNSIGNED_INT_8_8_8_8, GL_UNSIGNED_INT_8_8_8_8_REV, 
+		//GL_UNSIGNED_INT_10_10_10_2, and GL_UNSIGNED_INT_2_10_10_10_REV
+
+		// the following is not all right, please check it when occure error!
+
+		switch (format)
+		{
+		case PF_R32G32B32A32_TYPELESS:
+		case PF_R32G32B32A32_FLOAT:
+			glFormat = GL_RGBA;
+			glType = GL_FLOAT;
+			return GL_RGBA32F;
+		case PF_R32G32B32A32_UINT:
+			glFormat = GL_RGBA;
+			glType = GL_UNSIGNED_INT;
+			return GL_RGBA32UI;
+		case PF_R32G32B32A32_SINT:
+			glFormat = GL_RGBA;
+			glType = GL_INT;
+			return GL_RGBA32I;
+		case PF_R32G32B32_TYPELESS:
+		case PF_R32G32B32_FLOAT:
+			glFormat = GL_RGB;
+			glType = GL_FLOAT;
+			return GL_RGB32F;
+		case PF_R32G32B32_UINT:
+			glFormat = GL_RGB;
+			glType = GL_UNSIGNED_INT;
+			return GL_RGB16UI;
+		case PF_R32G32B32_SINT:
+			glFormat = GL_RGB;
+			glType = GL_INT;
+			return GL_RGB16I;
+		case PF_R16G16B16A16_TYPELESS:
+			glFormat = GL_RGBA;
+			glType = GL_UNSIGNED_SHORT;
+			return GL_RGBA16;
+		case PF_R16G16B16A16_FLOAT:
+		case PF_R16G16B16A16_UNORM:
+		case PF_R16G16B16A16_SNORM:
+			glFormat = GL_RGBA;
+			glType = GL_UNSIGNED_SHORT;
+			return GL_RGBA16F;
+		case PF_R16G16B16A16_UINT:
+			glFormat = GL_RGBA;
+			glType = GL_UNSIGNED_SHORT;
+			return GL_RGBA16UI;
+		case PF_R16G16B16A16_SINT:
+			glFormat = GL_RGBA;
+			glType = GL_SHORT;
+			return GL_RGBA16I;
+		case PF_R32G32_TYPELESS:
+		case PF_R32G32_FLOAT:
+			glFormat = GL_RG;
+			glType = GL_FLOAT;
+			return GL_RG32F;
+		case PF_R32G32_UINT:
+			return GL_RG32UI;
+			glFormat = GL_RG;
+			glType = GL_UNSIGNED_INT;
+		case PF_R32G32_SINT:
+			glFormat = GL_RG;
+			glType = GL_INT;
+			return GL_RG32I;
+		case PF_R32G8X24_TYPELESS:
+		case PF_D32_FLOAT_S8X24_UINT:
+		case PF_R32_FLOAT_X8X24_TYPELESS:
+		case PF_X32_TYPELESS_G8X24_UINT:
+			glFormat = GL_DEPTH_COMPONENT;
+			glType = GL_FLOAT;
+			return GL_DEPTH32F_STENCIL8;
+		case PF_R10G10B10A2_TYPELESS:
+		case PF_R10G10B10A2_UNORM:
+			glFormat = GL_RGBA;
+			glType = GL_UNSIGNED_INT_10_10_10_2;
+			return GL_RGB10_A2;
+		case PF_R10G10B10A2_UINT:
+			glFormat = GL_RGBA;
+			glType = GL_UNSIGNED_INT_10_10_10_2;
+			return GL_RGB10_A2UI;
+		case PF_R11G11B10_FLOAT:
+			glFormat = GL_RGB;
+			glType = GL_FLOAT;
+			return GL_R11F_G11F_B10F;
+		case PF_R8G8B8A8_TYPELESS:
+		case PF_R8G8B8A8_UNORM:
+		case PF_R8G8B8A8_UNORM_SRGB:
+		case PF_R8G8B8A8_SNORM:
+			glFormat = GL_RGBA;
+			glType = GL_UNSIGNED_INT_8_8_8_8;
+			return GL_RGBA8;
+		case PF_R8G8B8A8_UINT:
+			glFormat = GL_RGBA;
+			glType = GL_UNSIGNED_INT_8_8_8_8;
+			return GL_RGBA8UI;
+		case PF_R8G8B8A8_SINT:
+			glFormat = GL_RGBA;
+			glType = GL_UNSIGNED_INT_8_8_8_8;
+			return GL_RGBA8I;
+		case PF_R16G16_TYPELESS:
+			glFormat = GL_RG;
+			glType = GL_UNSIGNED_INT_8_8_8_8;
+			return GL_RG16;
+		case PF_R16G16_FLOAT:
+		case PF_R16G16_UNORM:
+		case PF_R16G16_SNORM:
+			glFormat = GL_RG;
+			glType = GL_UNSIGNED_SHORT;		
+			return GL_RGB16F;
+		case PF_R16G16_UINT:
+			glFormat = GL_RG;
+			glType = GL_UNSIGNED_SHORT;
+			return GL_RG16UI;
+		case PF_R16G16_SINT:
+			glFormat = GL_RG;
+			glType = GL_SHORT;
+			return GL_RG16I;
+		case PF_D32_FLOAT:
+			glFormat = GL_DEPTH_COMPONENT;
+			glType = GL_FLOAT;
+			return GL_R32F;
+		case PF_R32_TYPELESS:
+		case PF_R32_FLOAT:
+			glFormat = GL_R;
+			glType = GL_FLOAT;
+			return GL_R32F;	
+		case PF_R32_UINT:
+			glFormat = GL_R;
+			glType = GL_UNSIGNED_INT;
+			return GL_R32UI;
+		case PF_R32_SINT :
+			glFormat = GL_R;
+			glType = GL_INT;
+			return GL_R32I;
+		case PF_R24G8_TYPELESS:		
+		case PF_D24_UNORM_S8_UINT:
+		case PF_R24_UNORM_X8_TYPELESS:
+		case PF_X24_TYPELESS_G8_UINT:
+			glFormat = GL_DEPTH_COMPONENT;
+			glType = GL_UNSIGNED_INT;
+			return GL_DEPTH24_STENCIL8;
+		case PF_R8G8_TYPELESS:
+		case PF_R8G8_UNORM:
+			glFormat = GL_RG;
+			glType = GL_UNSIGNED_BYTE;
+			return GL_RG8;
+		case PF_R8G8_UINT:
+			glFormat = GL_RG;
+			glType = GL_UNSIGNED_BYTE;
+			return GL_RG8UI;
+		case PF_R8G8_SNORM:
+			glFormat = GL_RG;
+			glType = GL_BYTE;
+			return GL_RG8_SNORM;
+		case PF_R8G8_SINT:
+			glFormat = GL_RG;
+			glType = GL_UNSIGNED_BYTE;
+			return GL_RG8I;
+		case PF_R16_TYPELESS:
+			glFormat = GL_R;
+			glType = GL_UNSIGNED_SHORT;
+			return GL_R16;
+		case PF_R16_FLOAT:
+		case PF_R16_UNORM:
+			glFormat = GL_R;
+			glType = GL_UNSIGNED_SHORT;
+			return GL_R16F;
+		case PF_D16_UNORM:
+			glFormat = GL_DEPTH_COMPONENT;
+			glType = GL_UNSIGNED_SHORT;
+			return GL_DEPTH_COMPONENT16;
+		case PF_R16_UINT:
+			glFormat = GL_R;
+			glType = GL_UNSIGNED_SHORT;
+			return GL_R16UI;
+		case PF_R16_SNORM:
+			glFormat = GL_R;
+			glType = GL_UNSIGNED_SHORT;
+			return GL_R16_SNORM;
+		case PF_R16_SINT:
+			glFormat = GL_R;
+			glType = GL_SHORT;
+			return GL_R16I;
+		case PF_R8_TYPELESS:
+			glFormat = GL_R;
+			glType = GL_UNSIGNED_BYTE;
+			return GL_R8;
+		case PF_R8_UNORM:
+		case PF_R8_UINT:
+			glFormat = GL_R;
+			glType = GL_UNSIGNED_BYTE;
+			return GL_R8UI;
+		case PF_R8_SNORM:
+			glFormat = GL_R;
+			glType = GL_BYTE;
+			return GL_R8_SNORM;
+		case PF_R8_SINT:
+			glFormat = GL_R;
+			glType = GL_BYTE;
+			return GL_R8I;
+		case PF_R9G9B9E5_SHAREDEXP:
+			glFormat = GL_R;
+			glType = GL_UNSIGNED_INT;
+			return GL_RGB9_E5;  
+		default:
+			BOOST_ASSERT(0);
+			return 0;
+		}
+	}
+
 	GLRenderEngine::GLRenderEngine()
 	{
 		_hRC = 0;	
@@ -141,12 +356,8 @@ namespace Disorder
 	
 	void GLRenderEngine::Exit()
 	{
-		if (_hRC)
-		{
-			wglMakeCurrent(NULL, NULL);
-			wglDeleteContext(_hRC);
-			_hRC = 0;
-		}
+		wglMakeCurrent(NULL, NULL);
+		wglDeleteContext(_hRC);
 	}
 
 	void GLRenderEngine::OnDrawBegin()

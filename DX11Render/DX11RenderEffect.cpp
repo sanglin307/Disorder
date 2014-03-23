@@ -244,7 +244,7 @@ namespace Disorder
 				constantBuffer.BufferParamRef = GlobalPropertyManager->GetProperty(constantBuffer.CBName);
 				if( constantBuffer.BufferParamRef == NULL )
 				{
-					RenderBufferPtr constBuffer = resourceManager->CreateRenderBuffer(RBT_Constant,BAH_GPU_Read,bufferDesc.Size,bufferDesc.Size,NULL);
+					RenderBufferPtr constBuffer = resourceManager->CreateRenderBuffer(RBT_Constant,BU_DynamicDraw,bufferDesc.Size,bufferDesc.Size,NULL);
 					constantBuffer.BufferParamRef = GlobalPropertyManager->CreateProperty(constantBuffer.CBName,eSP_ConstBuffer); 
 					constantBuffer.BufferParamRef->SetData(constBuffer);
 				}

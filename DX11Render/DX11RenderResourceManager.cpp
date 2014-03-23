@@ -40,37 +40,30 @@ namespace Disorder
 	}
 
 
-	RenderLayoutPtr DX11RenderResourceManager::CreateRenderLayout(ShaderObjectPtr const& vertexShader,TopologyType topologyType,bool soloBuffer)
+	RenderLayoutPtr DX11RenderResourceManager::CreateRenderLayout(RenderEffectPtr const& renderEffect,TopologyType topologyType,bool soloBuffer)
 	{
  
-		RenderLayoutPtr renderLayout = DX11RenderLayout::Create(vertexShader,topologyType,soloBuffer);
+		RenderLayoutPtr renderLayout = DX11RenderLayout::Create(renderEffect,topologyType,soloBuffer);
 		return renderLayout;
 	}
  
-	RenderBufferPtr DX11RenderResourceManager::CreateRenderBuffer(RenderBufferType type,unsigned int accessHint,GeometryPtr const& data,std::string const& sematic,ShaderObjectPtr const& vertexShader)
-	{
-		RenderBufferPtr renderBuffer = DX11RenderBuffer::Create(type,data,sematic,accessHint,vertexShader);
-		 
-		return renderBuffer;
-	}
-
-	void DX11RenderResourceManager::CreateRenderBufferArray(GeometryPtr const& data, unsigned int accessHint,ShaderObjectPtr const& vertexShader,std::vector<RenderBufferPtr> & bufferArray )
+	void DX11RenderResourceManager::CreateRenderBufferArray(GeometryPtr const& data,BufferUsage bufferUsage,RenderEffectPtr const& renderEffect,std::vector<RenderBufferPtr> & bufferArray )
 	{		 
-		DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
+		DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(renderEffect->GetVertexShader());
 		//vertex buffer first
 		for(unsigned int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
 		{
-			RenderBufferPtr renderBuffer = DX11RenderBuffer::Create(RBT_Vertex,data,shader->ShaderReflect->InputSignatureParameters[i].SemanticName,accessHint,vertexShader);
+			RenderBufferPtr renderBuffer = DX11RenderBuffer::Create(RBT_Vertex,data,shader->ShaderReflect->InputSignatureParameters[i].SemanticName,bufferUsage,shader);
 			bufferArray.push_back(renderBuffer);
 		}
 
-		RenderBufferPtr indexBuffer = DX11RenderBuffer::Create(RBT_Index,data,"",accessHint,vertexShader);
+		RenderBufferPtr indexBuffer = DX11RenderBuffer::Create(RBT_Index,data,"",bufferUsage,shader);
 		bufferArray.push_back(indexBuffer);
 	}
 
-    RenderBufferPtr DX11RenderResourceManager::CreateRenderBuffer(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData) 
+    RenderBufferPtr DX11RenderResourceManager::CreateRenderBuffer(RenderBufferType type,BufferUsage bufferUsage,unsigned int elementSize,unsigned int size,void *pData) 
 	{
-		RenderBufferPtr renderBuffer = DX11RenderBuffer::Create(type,accessHint,elementSize,size,pData);
+		RenderBufferPtr renderBuffer = DX11RenderBuffer::Create(type,bufferUsage,elementSize,size,pData);
 	 
 		return renderBuffer;
 	}
@@ -98,9 +91,9 @@ namespace Disorder
 
 	}
 
-	SamplerStatePtr DX11RenderResourceManager::CreateSamplerState(SamplerFilter filter,TextureAddressMode addressUVW,UINT maxAnisotropy)
+	SamplerStatePtr DX11RenderResourceManager::CreateSamplerState(SamplerDesc* pSamplerDesc)
 	{
-		SamplerStatePtr sampler = DX11SamplerState::Create(filter,addressUVW,maxAnisotropy);
+		SamplerStatePtr sampler = DX11SamplerState::Create(pSamplerDesc);
 		return sampler;
 	}
 

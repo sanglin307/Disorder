@@ -31,9 +31,18 @@ void AppPeekMessage()
  
 	Disorder::GEngine->GameClient = Disorder::WinClient::Create();
 
-	Disorder::GEngine->RenderEngine = Disorder::DX11RenderEngine::Create();
-	Disorder::GEngine->RenderResourceMgr = Disorder::DX11RenderResourceManager::Create();
-	Disorder::GEngine->RenderSurfaceCache = Disorder::DX11RenderSurfaceCache::Create();
+	if( Disorder::GConfig->pRenderConfig->RenderEngine == Disorder::RET_DirectX )
+	{
+		Disorder::GEngine->RenderEngine = Disorder::DX11RenderEngine::Create();
+	    Disorder::GEngine->RenderResourceMgr = Disorder::DX11RenderResourceManager::Create();
+	    Disorder::GEngine->RenderSurfaceCache = Disorder::DX11RenderSurfaceCache::Create();
+	}
+	else if( Disorder::GConfig->pRenderConfig->RenderEngine == Disorder::RET_OpenGL )
+	{
+		Disorder::GEngine->RenderEngine = Disorder::GLRenderEngine::Create();
+	    Disorder::GEngine->RenderResourceMgr = Disorder::GLRenderResourceManager::Create();
+	    Disorder::GEngine->RenderSurfaceCache = Disorder::GLRenderSurfaceCache::Create();
+	}
 
 	Disorder::GEngine->SceneImporter = Disorder::FbxSceneImporter::Create();
 	Disorder::GMainLoop->Init();

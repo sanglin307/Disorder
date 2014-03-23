@@ -38,6 +38,8 @@ namespace Disorder
 
 		virtual void SaveRenderSurface(RenderSurfacePtr const& surface, std::string const& fileName);
 
+		static GLenum GetPixelFormat(PixelFormat format, GLenum &glFormat, GLenum &glType);
+
 	protected:
 		virtual void SetBlendState(BlendStatePtr const& blendState);
 		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState);

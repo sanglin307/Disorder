@@ -6,8 +6,8 @@ namespace Disorder
 	class DX11RenderBuffer : public RenderBuffer
 	{
 	public:
-		static DX11RenderBufferPtr Create(RenderBufferType type,GeometryPtr const& data,std::string const& sematic,unsigned int accessHint,ShaderObjectPtr const& vertexShader);
-		static DX11RenderBufferPtr Create(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData);
+		static DX11RenderBufferPtr Create(RenderBufferType type,GeometryPtr const& data,std::string const& sematic,BufferUsage bufferUsage,ShaderObjectPtr const& vertexShader);
+		static DX11RenderBufferPtr Create(RenderBufferType type,BufferUsage bufferUsage,unsigned int elementSize,unsigned int size,void *pData);
 
 		virtual void * GetLowInterface();
 		virtual void Resize(unsigned int size);
@@ -15,7 +15,7 @@ namespace Disorder
 	private:
 		DX11RenderBuffer(){}
 
-		void GetD3DFlags(D3D11_USAGE& usage, UINT& cpuAccessFlags, UINT& bindFlags, UINT& miscFlags);
+		void GetD3DFlags(void *pData,D3D11_USAGE& usage, UINT& cpuAccessFlags,UINT& miscFlags);
 		void DoCreateBuffer(void *pData);
 
 	public:

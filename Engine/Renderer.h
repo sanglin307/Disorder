@@ -43,7 +43,7 @@ namespace Disorder
 			return _renderEffect;
 		}
 
-		virtual void BuildRenderLayout(ShaderObjectPtr const& shaderObject,bool releaseOld){};
+		virtual void BuildRenderLayout(RenderEffectPtr const& effect,bool releaseOld){};
 		 
 
 		void SetRenderEffect(RenderEffectPtr const& effect)
@@ -133,7 +133,7 @@ namespace Disorder
 		  static GeometryRendererPtr Create(std::string const& name);
 
           void SetGeometry(GeometryPtr const& geometry,SurfaceMaterialPtr const& mat);
-		  virtual void BuildRenderLayout(ShaderObjectPtr const& shaderObject,bool releaseOld);
+		  virtual void BuildRenderLayout(RenderEffectPtr const& effect,bool releaseOld);
 
 		  virtual bool Overlaps(const Frustrum& frustrum);		 
 		  virtual void PreRender(CameraPtr const& camera);

@@ -23,8 +23,8 @@ namespace Disorder
 
 		struct LogObj
 		{
-			static const unsigned int StringMaxLengh = 1024;
-			char content[StringMaxLengh];
+			static const unsigned int StringMaxLengh = 8096;
+			char content[StringMaxLengh+1];
 		};
 		
 		void Init();

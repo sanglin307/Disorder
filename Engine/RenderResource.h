@@ -31,7 +31,7 @@ namespace Disorder
 	protected:
 		RenderBuffer(){}
 
-		unsigned int _accessHint;
+		BufferUsage  _bufferUsage;
 		unsigned int _bindFlags;
 		unsigned int _elementSize;
 		unsigned int _bufferSize;
@@ -50,10 +50,10 @@ namespace Disorder
 	class RenderTexture2D: public RenderTexture
 	{
 	public:
-		UINT Width;
-		UINT Height;
+		unsigned int Width;
+		unsigned int Height;
 		PixelFormat Format;
-        UINT MipLevel;
+        unsigned int MipLevel;
 		SamplerStatePtr Sampler;
 	protected:
 

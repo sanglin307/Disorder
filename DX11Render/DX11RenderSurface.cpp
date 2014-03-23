@@ -101,7 +101,9 @@ namespace Disorder
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	DX11RenderGBuffer::DX11RenderGBuffer(unsigned int width,unsigned int height)
 	{
-		SamplerStatePtr linearSampleState = GEngine->RenderResourceMgr->CreateSamplerState(SF_Linear,TAM_Wrap,1);
+		SamplerDesc sDesc;
+		sDesc.AddressU = sDesc.AddressV = sDesc.AddressW = TAM_Wrap;
+		SamplerStatePtr linearSampleState = GEngine->RenderResourceMgr->CreateSamplerState(&sDesc);
 
 		unsigned int surfaceUsage = RSU_DepthStencil|RSU_ShaderResource;
 		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateRenderTexture2D(linearSampleState,PF_R24G8_TYPELESS,width,height,false,surfaceUsage,NULL);

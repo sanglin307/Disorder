@@ -1,7 +1,164 @@
+uniform SceneProperty
+{
+	vec3 AmbientLowColor;
+	vec3 AmbientUpperColor;
+};
 
 uniform CameraTransforms
 {
-   vec4 mem1;
-   vec3 mem2;
-   vec3 mem3;
-}block;
+	mat4 CameraView;
+	mat4 CameraProjection;	
+	mat4 CameraViewProj;
+    mat4 CameraViewInv;
+	mat4 CameraProjInv;
+	mat4 CameraViewProjInv;
+	vec3 CameraPosition;
+};
+
+uniform ObjectTransform
+{
+	mat4 WorldTransform;
+	mat4 WorldNormalTransform;  // translate for normal.
+};
+
+uniform MaterialProperty
+{
+	vec3 DiffuseColor;
+	vec3 SpecularColor;
+	vec3 EmissiveColor;
+	float SpecularExp;	
+};
+
+uniform DirectionLightProperty
+{
+	vec3 DirectionLightColor;
+	vec3 DirectionLightDir;	
+	float DirectionLightIntensity;
+} ;
+ 
+struct Material
+{
+   vec3 Normal;
+   vec3 DiffuseColor;
+   vec3 SpecularColor;
+   float  SpecularExp;
+};
+
+vec3 CalculateAmbient(vec3 normal, vec3 color)
+{
+	// Convert from [-1, 1] to [0, 1]
+	float up = normal.y * 0.5 + 0.5;
+
+	// Calculate the ambient value
+	vec3 ambient = AmbientLowColor + up * (AmbientUpperColor - AmbientLowColor);
+
+	// Apply the ambient value to the color
+	return ambient * color;
+}
+
+vec3 CalculateDirectionLight(vec3 position, Material material)
+{
+   //diffuse
+   vec3 lightColor = DirectionLightIntensity * DirectionLightColor.rgb;
+   float NDotL = max(dot(-DirectionLightDir, material.Normal),0);
+   vec3 finalColor = lightColor * NDotL * material.DiffuseColor;
+   
+   //specular
+   vec3 ToEye = normalize(CameraPosition - position);
+   vec3 reflectVector = reflect(DirectionLightDir,material.Normal);
+   float NDotH = max(dot(reflectVector, ToEye),0);
+   finalColor += lightColor * clamp(pow(NDotH, material.SpecularExp),0.0,1.0) * material.SpecularColor;
+   
+   return finalColor;
+}
+
+uniform ForwardFourLights 
+{
+	vec4 ForwardLightPosX	;	
+	vec4 ForwardLightPosY	;	
+	vec4 ForwardLightPosZ	;	
+	vec4 ForwardLightDirX	;	
+	vec4 ForwardLightDirY	;	
+	vec4 ForwardLightDirZ	;	
+	vec4 ForwardLightRangeRcp	;	
+	vec4 ForwardSpotCosOuterCone	;	
+	vec4 ForwardSpotCosInnerConeRcp;	
+	vec4 ForwardCapsuleLen;			
+	vec4 ForwardLightColorR;			
+	vec4 ForwardLightColorG;		
+	vec4 ForwardLightColorB;			
+};
+
+/////////////////////////////////////////////////////////////////////////////
+// Pixel shaders
+/////////////////////////////////////////////////////////////////////////////
+
+
+vec4 dot4x4(vec4 aX, vec4 aY, vec4 aZ, vec4 bX, vec4 bY, vec4 bZ)
+{
+	return aX * bX + aY * bY + aZ * bZ;
+}
+
+// Dot product between a four three component vectors and a single three component vector
+vec4 dot4x1(vec4 aX, vec4 aY, vec4 aZ, vec3 b)
+{
+	return aX * b.xxxx + aY * b.yyyy + aZ * b.zzzz;
+}
+
+// Four light calculation helper function
+vec3 CalculateFourLights(vec3 position, Material material)
+{
+	vec3 ToEye = CameraPosition.xyz - position;
+   
+	// Find the shortest distance between the pixel and capsules segment
+	vec4 ToCapsuleStartX = position.xxxx - ForwardLightPosX;
+	vec4 ToCapsuleStartY = position.yyyy - ForwardLightPosY;
+	vec4 ToCapsuleStartZ = position.zzzz - ForwardLightPosZ;
+	vec4 DistOnLine = dot4x4(ToCapsuleStartX, ToCapsuleStartY, ToCapsuleStartZ, ForwardLightDirX, ForwardLightDirY, ForwardLightDirZ);
+	vec4 CapsuleLenSafe = max(ForwardCapsuleLen, 1.e-6);
+	DistOnLine = ForwardCapsuleLen * clamp(DistOnLine / CapsuleLenSafe,0.0,1.0);
+	vec4 PointOnLineX = ForwardLightPosX + ForwardLightDirX * DistOnLine;
+	vec4 PointOnLineY = ForwardLightPosY + ForwardLightDirY * DistOnLine;
+	vec4 PointOnLineZ = ForwardLightPosZ + ForwardLightDirZ * DistOnLine;
+	vec4 ToLightX = PointOnLineX - position.xxxx;
+	vec4 ToLightY = PointOnLineY - position.yyyy;
+	vec4 ToLightZ = PointOnLineZ - position.zzzz;
+	vec4 DistToLightSqr = dot4x4(ToLightX, ToLightY, ToLightZ, ToLightX, ToLightY, ToLightZ);
+	vec4 DistToLight = sqrt(DistToLightSqr);
+   
+	// Phong diffuse
+	ToLightX /= DistToLight; // Normalize
+	ToLightY /= DistToLight; // Normalize
+	ToLightZ /= DistToLight; // Normalize
+	vec4 NDotL = clamp(dot4x1(ToLightX, ToLightY, ToLightZ, material.Normal),0.0,1.0);
+	//vec3 finalColor = vec3(dot(ForwardLightColorR, NDotL), dot(ForwardLightColorG, NDotL), dot(ForwardLightColorB, NDotL));
+   
+	// Blinn specular
+	ToEye = normalize(ToEye);
+	vec4 HalfWayX = ToEye.xxxx + ToLightX;
+	vec4 HalfWayY = ToEye.yyyy + ToLightY;
+	vec4 HalfWayZ = ToEye.zzzz + ToLightZ;
+	vec4 HalfWaySize = sqrt(dot4x4(HalfWayX, HalfWayY, HalfWayZ, HalfWayX, HalfWayY, HalfWayZ));
+	vec4 NDotH = clamp(dot4x1(HalfWayX / HalfWaySize, HalfWayY / HalfWaySize, HalfWayZ / HalfWaySize, material.Normal),0.0,1.0);
+	vec4 SpecValue = pow(NDotH, vec4(material.SpecularExp,material.SpecularExp,material.SpecularExp,material.SpecularExp)) ;//* material.specIntensity;
+	//finalColor += vec3(dot(ForwardLightColorR, SpecValue), dot(ForwardLightColorG, SpecValue), dot(ForwardLightColorB, SpecValue));
+   
+	// Cone attenuation
+	vec4 cosAng = dot4x4(ForwardLightDirX, ForwardLightDirY, ForwardLightDirZ, ToLightX, ToLightY, ToLightZ);
+	vec4 conAtt = clamp((cosAng - ForwardSpotCosOuterCone) * ForwardSpotCosInnerConeRcp,0.0,1.0);
+	conAtt *= conAtt;
+   
+	// Attenuation
+	vec4 DistToLightNorm = 1.0 - clamp(DistToLight * ForwardLightRangeRcp,0.0,1.0);
+	vec4 Attn = DistToLightNorm * DistToLightNorm;
+	Attn *= conAtt; // Include the cone attenuation
+
+	// Calculate the final color value
+	vec4 pixelIntensity = (NDotL + SpecValue) * Attn;
+	vec3 finalColor = vec3(dot(ForwardLightColorR, pixelIntensity), dot(ForwardLightColorG, pixelIntensity), dot(ForwardLightColorB, pixelIntensity)); 
+	finalColor *= material.DiffuseColor;
+   
+	return finalColor;
+}
+
+

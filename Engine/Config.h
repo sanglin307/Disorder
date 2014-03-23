@@ -20,6 +20,7 @@ namespace Disorder
 
 	struct RenderConfig
 	{
+		RenderEngineType RenderEngine;
 		bool	FullScreen;
 		int		X;
 		int		Y;
@@ -36,6 +37,7 @@ namespace Disorder
 
 		RenderConfig::RenderConfig()
 		{
+			RenderEngine = RET_DirectX;
 			FullScreen = false;
 			X = 0;
 			Y = 0;

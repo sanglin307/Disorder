@@ -8,11 +8,6 @@ namespace Disorder
 	class RenderLayout
 	{
 	public:
-
-		static std::string POSITION;
-		static std::string COLOR;
-		static std::string NORMAL;
-		static std::string TEXCOORD;
  
         virtual void BindVertexBuffer(RenderBufferPtr const& renderBuffer)
         {
@@ -40,6 +35,8 @@ namespace Disorder
 		}
  
 		virtual void * GetLowInterface(){ return 0;}
+
+		virtual void FinishBufferBinding(RenderEffectPtr const& renderEffect){};
 
 	protected:
 		RenderLayout(){}

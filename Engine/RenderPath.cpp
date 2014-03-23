@@ -145,7 +145,7 @@ namespace Disorder
 		for(unsigned int i=0;i< rendererList.size(); i++ )
 		{
 			RendererPtr obj = rendererList[i];
-			obj->BuildRenderLayout(_DirectionLightEffect->GetVertexShader(),false);
+			obj->BuildRenderLayout(_DirectionLightEffect,false);
 			obj->PreRender(mainCamera);
 
 			// render lights
@@ -216,16 +216,19 @@ namespace Disorder
 		_type = RPT_ForwardLighting;
  
 		_DirectionLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"RenderSceneVS");
-		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"DirectionalLightPS");
+		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"FLighting",SM_4_0,"SceneVS");
+		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"FLighting",SM_4_0,"LightPS");
 		_DirectionLightEffect->BindShader(vertexShader);
 		_DirectionLightEffect->BindShader(pixelShader);
+		_DirectionLightEffect->LinkShaders();
  
 		_FourLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr fVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"RenderSceneVS");
-		ShaderObjectPtr fPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"ForwardFourLightPS");
+		ShaderObjectPtr fVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"FLighting",SM_4_0,"SceneVS");
+		ShaderObjectPtr fPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"FLighting",SM_4_0,"FourLightPS");
 		_FourLightEffect->BindShader(fVertexShader);
 		_FourLightEffect->BindShader(fPixelShader);
+		_FourLightEffect->LinkShaders();
+
 		BlendDesc bDesc;
 		bDesc.BlendEnable = true;
 		bDesc.BlendOp = BLEND_OP_ADD;
@@ -450,7 +453,7 @@ namespace Disorder
 		for(unsigned int i=0;i< rendererList.size(); i++ )
 		{
 			RendererPtr obj = rendererList[i];
-			obj->BuildRenderLayout(_RenderSceneEffect->GetVertexShader(),false);
+			obj->BuildRenderLayout(_RenderSceneEffect,false);
 			obj->PreRender(mainCamera);
 			obj->SetRenderEffect(_RenderSceneEffect);
 			obj->Render(mainCamera);

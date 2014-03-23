@@ -95,6 +95,8 @@ namespace Disorder
 				glGetShaderInfoLog(_GLHandle,logLength,NULL,pLog);
 				GLogger->Error(pLog);
 				delete[] pLog;
+				BOOST_ASSERT(0);
+				return false;
 			}
 		}
 
@@ -103,12 +105,8 @@ namespace Disorder
 
 
 	GLShaderObject::~GLShaderObject()
-	{
-		if (_GLHandle)
-		{
-			glDeleteShader(_GLHandle);
-			_GLHandle = 0;
-		}
+	{ 
+		glDeleteShader(_GLHandle);		 
 	}
 
 	GLProgramReflectionPtr GLProgramReflection::Create()
@@ -136,6 +134,80 @@ namespace Disorder
 				delete[] pLog;
 			}
 			
+		}
+	}
+
+	void GLRenderEffect::GetGLShaderPropertyTypeLength(GLint type, GLenum& propertyType, int &lenght)
+	{
+		if (type == GL_FLOAT)
+		{
+			propertyType = GL_FLOAT;
+			lenght = 1;
+		}
+		else if (type == GL_FLOAT_VEC2)
+		{
+			propertyType = GL_FLOAT;
+			lenght = 2;
+		}
+		else if (type == GL_FLOAT_VEC3)
+		{
+			propertyType = GL_FLOAT;
+			lenght = 3;
+		}
+		else if (type == GL_FLOAT_VEC4)
+		{
+			propertyType = GL_FLOAT;
+			lenght = 4;
+		}
+		else if (type == GL_DOUBLE)
+		{
+			propertyType = GL_DOUBLE;
+			lenght = 1;
+		}
+		else if (type == GL_DOUBLE_VEC2)
+		{
+			propertyType = GL_DOUBLE;
+			lenght = 2;
+		}
+
+		else if (type == GL_DOUBLE_VEC3)
+		{
+			propertyType = GL_DOUBLE;
+			lenght = 3;
+		}
+		else if (type == GL_DOUBLE_VEC4)
+		{
+			propertyType = GL_DOUBLE;
+			lenght = 4;
+		}
+		else if (type == GL_INT)
+		{
+			propertyType = GL_INT;
+			lenght = 1;
+		}
+		else if (type == GL_INT_VEC2)
+		{
+			propertyType = GL_INT;
+			lenght = 2;
+		}
+		else if (type == GL_INT_VEC3)
+		{
+			propertyType = GL_INT;
+			lenght = 3;
+		}
+		else if (type == GL_INT_VEC4)
+		{
+			propertyType = GL_INT;
+			lenght = 4;
+		}
+		else if (type == GL_SAMPLER_2D)
+		{
+			propertyType = GL_SAMPLER_2D;
+			lenght = 1;
+		}
+		else
+		{
+			GLogger->Error("We don't support this shader property type now");
 		}
 	}
 
@@ -275,7 +347,7 @@ namespace Disorder
 				desc.BufferParamRef = GlobalPropertyManager->GetProperty(name);
 				if (desc.BufferParamRef == NULL)
 				{
-					RenderBufferPtr constBuffer = GEngine->RenderResourceMgr->CreateRenderBuffer(RBT_Constant, BAH_GPU_Read, desc.BlockSize, desc.BlockSize, NULL);
+					RenderBufferPtr constBuffer = GEngine->RenderResourceMgr->CreateRenderBuffer(RBT_Constant, BU_DynamicDraw, desc.BlockSize, desc.BlockSize, NULL);
 					desc.BufferParamRef = GlobalPropertyManager->CreateProperty(name, eSP_ConstBuffer);
 					desc.BufferParamRef->SetData(constBuffer);
 				}

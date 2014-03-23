@@ -68,6 +68,18 @@ namespace Disorder
 		boost::property_tree::ptree tree;
 		boost::property_tree::read_xml(renderConfigFile,tree);
 		
+		std::string renderType = tree.get("RenderConfig.RenderEngine","DirectX");
+		boost::to_lower(renderType);
+		if( renderType == "directx" )
+			pRenderConfig->RenderEngine = RET_DirectX;
+		else if( renderType == "opengl" )
+			pRenderConfig->RenderEngine = RET_OpenGL;
+		else
+		{
+			GLogger->Error("Unknown Render engine type:" + renderType );
+			return false;
+		}
+
 		pRenderConfig->FullScreen = tree.get("RenderConfig.FullScreen",0) > 0;
 		pRenderConfig->SizeX = tree.get("RenderConfig.ResX",640);
 		pRenderConfig->SizeY = tree.get("RenderConfig.ResY",480);
@@ -102,6 +114,12 @@ namespace Disorder
 			tree.put("RenderConfig.FullScreen",1);
 		else
 			tree.put("RenderConfig.FullScreen",0);
+
+		if( pRenderConfig->RenderEngine == RET_DirectX )
+		    tree.put("RenderConfig.RenderEngine","DirectX");
+		else if( pRenderConfig->RenderEngine == RET_OpenGL )
+			tree.put("RenderConfig.RenderEngine","OpenGL");
+
 		tree.put("RenderConfig.ResX",pRenderConfig->SizeX);
 		tree.put("RenderConfig.ResY",pRenderConfig->SizeY);
 

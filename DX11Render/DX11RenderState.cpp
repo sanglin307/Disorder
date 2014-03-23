@@ -7,47 +7,27 @@ namespace Disorder
 		return D3DInterface.get();
 	}
 
-	DX11SamplerStatePtr DX11SamplerState::Create(SamplerFilter filter,TextureAddressMode addressUVW,UINT maxAnisotropy)
+	DX11SamplerStatePtr DX11SamplerState::Create(SamplerDesc* pSamplerDesc)
 	{
 		DX11SamplerState *pSampler = new DX11SamplerState;
-
-		pSampler->_filter = filter;
-		pSampler->_AddressU = pSampler->_AddressV = pSampler->_AddressW = addressUVW;
-		pSampler->_maxAnisotropy = maxAnisotropy;
 
 		D3D11_SAMPLER_DESC samDesc;
         ZeroMemory( &samDesc, sizeof(samDesc) );
 
-		samDesc.MaxAnisotropy = maxAnisotropy;
-		if( pSampler->_filter == SF_Point )
-			samDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-		else if( pSampler->_filter == SF_Linear )
-			samDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		else if( pSampler->_filter == SF_Anisotropic )
-		{
-			samDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-			samDesc.MaxAnisotropy = maxAnisotropy;
-		}
- 
-		if( addressUVW == TAM_Wrap )
-		{
-			samDesc.AddressU = samDesc.AddressV = samDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-		}
-		else if( addressUVW == TAM_Mirror )
-		{
-			samDesc.AddressU = samDesc.AddressV = samDesc.AddressW = D3D11_TEXTURE_ADDRESS_MIRROR;
-		}
-		else if( addressUVW == TAM_Clamp )
-		{
-			samDesc.AddressU = samDesc.AddressV = samDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-		}
-		else if( addressUVW == TAM_Border )
-		{
-			samDesc.AddressU = samDesc.AddressV = samDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-		}
+		samDesc.MaxAnisotropy = pSamplerDesc->MaxAnisotropy;
+		samDesc.Filter = DX11RenderEngine::GetD3DFilter(pSamplerDesc->Filter);
+		samDesc.AddressU = DX11RenderEngine::GetD3DAddressMode(pSamplerDesc->AddressU);
+		samDesc.AddressV = DX11RenderEngine::GetD3DAddressMode(pSamplerDesc->AddressV);
+		samDesc.AddressW = DX11RenderEngine::GetD3DAddressMode(pSamplerDesc->AddressW);
+		samDesc.BorderColor[0] = pSamplerDesc->BorderColor[0];
+		samDesc.BorderColor[1] = pSamplerDesc->BorderColor[1];
+		samDesc.BorderColor[2] = pSamplerDesc->BorderColor[2];
+		samDesc.BorderColor[3] = pSamplerDesc->BorderColor[3];
+		samDesc.ComparisonFunc = DX11RenderEngine::GetD3DComparisonFunc(pSamplerDesc->CompareFunc);
+        samDesc.MaxLOD = pSamplerDesc->MaxLOD;
+		samDesc.MinLOD = pSamplerDesc->MinLOD;
+		samDesc.MipLODBias = pSamplerDesc->MipLODBias;
 
-        samDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-        samDesc.MaxLOD = D3D11_FLOAT32_MAX;
         DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
 
 		ID3D11SamplerState *pSamplerState;
@@ -126,21 +106,21 @@ namespace Disorder
 			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		else
 			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-		desc.DepthFunc = pDepthStencilState->GetD3DComparisonFunc(pDepthStencilDesc->DepthFunc);
+		desc.DepthFunc = DX11RenderEngine::GetD3DComparisonFunc(pDepthStencilDesc->DepthFunc);
 
 		desc.StencilEnable = pDepthStencilDesc->StencilEnable;
 		desc.StencilReadMask = pDepthStencilDesc->StencilReadMask;
 		desc.StencilWriteMask = pDepthStencilDesc->StencilWriteMask;
 
-		desc.FrontFace.StencilDepthFailOp = pDepthStencilState->GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilDepthFailOp);
-		desc.FrontFace.StencilFailOp = pDepthStencilState->GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilFailOp);
-		desc.FrontFace.StencilPassOp = pDepthStencilState->GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilPassOp);
-		desc.FrontFace.StencilFunc = pDepthStencilState->GetD3DComparisonFunc(pDepthStencilDesc->FrontFaceStencilFunc);
+		desc.FrontFace.StencilDepthFailOp = DX11RenderEngine::GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilDepthFailOp);
+		desc.FrontFace.StencilFailOp = DX11RenderEngine::GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilFailOp);
+		desc.FrontFace.StencilPassOp = DX11RenderEngine::GetD3DStencilOp(pDepthStencilDesc->FrontFaceStencilPassOp);
+		desc.FrontFace.StencilFunc = DX11RenderEngine::GetD3DComparisonFunc(pDepthStencilDesc->FrontFaceStencilFunc);
 
-		desc.BackFace.StencilDepthFailOp = pDepthStencilState->GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilDepthFailOp);
-		desc.BackFace.StencilFailOp = pDepthStencilState->GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilFailOp);
-		desc.BackFace.StencilPassOp = pDepthStencilState->GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilPassOp);
-		desc.BackFace.StencilFunc = pDepthStencilState->GetD3DComparisonFunc(pDepthStencilDesc->BackFaceStencilFunc);
+		desc.BackFace.StencilDepthFailOp = DX11RenderEngine::GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilDepthFailOp);
+		desc.BackFace.StencilFailOp = DX11RenderEngine::GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilFailOp);
+		desc.BackFace.StencilPassOp = DX11RenderEngine::GetD3DStencilOp(pDepthStencilDesc->BackFaceStencilPassOp);
+		desc.BackFace.StencilFunc = DX11RenderEngine::GetD3DComparisonFunc(pDepthStencilDesc->BackFaceStencilFunc);
 
 		ID3D11DepthStencilState *pState;
 		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
@@ -172,13 +152,13 @@ namespace Disorder
 			unsigned int TargetIndex = pBlendDescArray[index].TargetIndex ;
 			BOOST_ASSERT( TargetIndex < 8 );
 			desc.RenderTarget[TargetIndex].BlendEnable = pBlendDescArray[index].BlendEnable;
-			desc.RenderTarget[TargetIndex].DestBlend = pState->GetD3DBlendDesc(pBlendDescArray[index].DestBlend);
-			desc.RenderTarget[TargetIndex].DestBlendAlpha = pState->GetD3DBlendDesc(pBlendDescArray[index].DestBlendAlpha);
-			desc.RenderTarget[TargetIndex].SrcBlend = pState->GetD3DBlendDesc(pBlendDescArray[index].SrcBlend);
-			desc.RenderTarget[TargetIndex].SrcBlendAlpha = pState->GetD3DBlendDesc(pBlendDescArray[index].SrcBlendAlpha);
+			desc.RenderTarget[TargetIndex].DestBlend = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].DestBlend);
+			desc.RenderTarget[TargetIndex].DestBlendAlpha = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].DestBlendAlpha);
+			desc.RenderTarget[TargetIndex].SrcBlend = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].SrcBlend);
+			desc.RenderTarget[TargetIndex].SrcBlendAlpha = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].SrcBlendAlpha);
 			desc.RenderTarget[TargetIndex].RenderTargetWriteMask = pBlendDescArray[index].RenderTargetWriteMask;
-			desc.RenderTarget[TargetIndex].BlendOp = pState->GetD3DBlendOp(pBlendDescArray[index].BlendOp);
-			desc.RenderTarget[TargetIndex].BlendOpAlpha = pState->GetD3DBlendOp(pBlendDescArray[index].BlendOpAlpha);
+			desc.RenderTarget[TargetIndex].BlendOp = DX11RenderEngine::GetD3DBlendOp(pBlendDescArray[index].BlendOp);
+			desc.RenderTarget[TargetIndex].BlendOpAlpha = DX11RenderEngine::GetD3DBlendOp(pBlendDescArray[index].BlendOpAlpha);
 		}
 
 		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine);

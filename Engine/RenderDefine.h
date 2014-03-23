@@ -20,16 +20,17 @@ namespace Disorder
 		unsigned int SlicePitch;
 	} BufferInitData;
 
-	enum BufferAccessHint
+	enum BufferUsage
 	{
-		BAH_CPU_Read = 1UL << 0,
-		BAH_CPU_Write = 1UL << 1,
-		BAH_GPU_Read = 1UL << 2,
-		BAH_GPU_Write = 1UL << 3,
-		BAH_GPU_Unordered = 1UL << 4,
-		BAH_GPU_Structured = 1UL << 5,
-		BAH_Generate_Mips = 1UL << 6,
-		BAH_Immutable = 1UL << 7
+		BU_StreamDraw,
+        BU_StreamRead,
+        BU_StreamCopy,
+        BU_StaticDraw,
+        BU_StaticRead, 
+        BU_StaticCopy, 
+        BU_DynamicDraw,
+        BU_DynamicRead,
+        BU_DynamicCopy, 
 	};
 
 	enum BufferAccess
@@ -50,8 +51,14 @@ namespace Disorder
 
 	enum SamplerFilter
 	{
-		SF_Point,
-		SF_Linear,
+		SF_Min_Mag_Mip_Point,
+		SF_Min_Mag_Point_Mip_Linear,
+		SF_Min_Point_Mag_Linear_Mip_Point,
+		SF_Min_Point_Mag_Mip_Linear,
+		SF_Min_Linear_Mag_Mip_Point,
+		SF_Min_Linear_Mag_Point_Mip_Linear,
+		SF_Min_Mag_Linear_Mip_Point,
+		SF_Min_Mag_Mip_Linear,
 		SF_Anisotropic
 	};
 

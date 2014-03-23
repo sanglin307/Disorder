@@ -59,6 +59,12 @@ namespace Disorder
         static DXGI_FORMAT GetDepthTextureFormat(DXGI_FORMAT format);
 		
 		static D3D_PRIMITIVE_TOPOLOGY GetPlatformTopology(TopologyType tType);
+		static D3D11_BLEND_OP GetD3DBlendOp(BlendOperation blendOp);
+		static D3D11_BLEND GetD3DBlendDesc(BlendOptions blendOptions);
+		static D3D11_COMPARISON_FUNC GetD3DComparisonFunc(ComparisonFunc func);
+		static D3D11_STENCIL_OP GetD3DStencilOp(StencilOperation op);
+		static D3D11_FILTER GetD3DFilter(SamplerFilter filter);
+		static D3D11_TEXTURE_ADDRESS_MODE GetD3DAddressMode(TextureAddressMode addrMode);
 
 	protected:
 

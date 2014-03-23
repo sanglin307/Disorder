@@ -33,7 +33,7 @@ struct VS_OUTPUT
 //--------------------------------------------------------------------------------------
 // Vertex Shader
 //--------------------------------------------------------------------------------------
-VS_OUTPUT RenderSceneVS( VS_INPUT input )
+VS_OUTPUT SceneVS( VS_INPUT input )
 {
     VS_OUTPUT output;
     output.Position = mul(WorldTransform, float4(input.Position,1.0f));
@@ -49,7 +49,7 @@ VS_OUTPUT RenderSceneVS( VS_INPUT input )
 // Pixel Shader
 //--------------------------------------------------------------------------------------
  
-float4 DirectionalLightPS( VS_OUTPUT input ) : SV_Target
+float4 LightPS( VS_OUTPUT input ) : SV_Target
 {
     Material mat = PrepareMaterial(input.NormalWorld,(float2)0);
 
@@ -62,7 +62,7 @@ float4 DirectionalLightPS( VS_OUTPUT input ) : SV_Target
 
 
 
-float4 ForwardFourLightPS( VS_OUTPUT In ) : SV_TARGET
+float4 FourLightPS( VS_OUTPUT In ) : SV_TARGET
 {
 	// Prepare the material structure
 	Material material = PrepareMaterial(In.NormalWorld, (float2)0);

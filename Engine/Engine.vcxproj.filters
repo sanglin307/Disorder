@@ -50,9 +50,6 @@
     <None Include="..\Resource\FX\HLSL\DeferredShading.dsf">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\HLSL\ForwardLighting.dsf">
-      <Filter>HLSL</Filter>
-    </None>
     <None Include="..\Resource\FX\HLSL\GBufferVisual.dsf">
       <Filter>HLSL</Filter>
     </None>
@@ -68,9 +65,6 @@
     <None Include="..\Resource\FX\GLSL\DeferredShading.dsf">
       <Filter>GLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\ForwardLighting.dsf">
-      <Filter>GLSL</Filter>
-    </None>
     <None Include="..\Resource\FX\GLSL\GBufferVisual.dsf">
       <Filter>GLSL</Filter>
     </None>
@@ -80,19 +74,58 @@
     <None Include="..\Resource\FX\GLSL\SurfaceVisual.dsf">
       <Filter>GLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\2DText.glvs">
-      <Filter>GLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\2DText.glfs">
-      <Filter>GLSL</Filter>
-    </None>
     <None Include="..\Resource\FX\GLSL\common.gls">
       <Filter>GLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\BatchLines.glvs">
+    <None Include="..\Resource\FX\GLSL\DeferredShading.glvs">
       <Filter>GLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\BatchLines.glfs">
+    <None Include="..\Resource\FX\GLSL\DeferredShading.glfs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\GBufferVisual.glvs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\GBufferVisual.glfs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ScreenTiles.glvs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ScreenTiles.glfs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\SurfaceVisual.glvs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\SurfaceVisual.glfs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\HLSL\FLighting.dsf">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\FLighting_.dsf">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\FLighting_SceneVS.glvs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\FLighting_LightPS.glfs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\FLighting_FourLightPS.glfs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\2DText_VS.glvs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\2DText_PS.glfs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\BatchLines_VS.glvs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\BatchLines_PS.glfs">
       <Filter>GLSL</Filter>
     </None>
   </ItemGroup>

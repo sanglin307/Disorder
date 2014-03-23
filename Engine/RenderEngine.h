@@ -4,6 +4,12 @@
 
 namespace Disorder
 {
+	enum RenderEngineType
+	{
+		RET_DirectX,
+		RET_OpenGL
+	};
+
 	class RenderEngine
 	{
 	public:

@@ -25,7 +25,8 @@ namespace Disorder
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory( &bd, sizeof(bd) );
 		bd.ByteWidth = _bufferSize;
-		GetD3DFlags(bd.Usage,bd.CPUAccessFlags,bd.BindFlags,bd.MiscFlags);
+		bd.BindFlags = _bindFlags;
+		GetD3DFlags(pData,bd.Usage,bd.CPUAccessFlags,bd.MiscFlags);
 
 		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
 		BOOST_ASSERT(renderEngine);
@@ -51,12 +52,12 @@ namespace Disorder
 		D3DInterface = MakeComPtr<ID3D11Buffer>(pBuffer);
 	}
  
-	DX11RenderBufferPtr DX11RenderBuffer::Create(RenderBufferType type,unsigned int accessHint,unsigned int elementSize,unsigned int size,void *pData)
+	DX11RenderBufferPtr DX11RenderBuffer::Create(RenderBufferType type,BufferUsage bufferUsage,unsigned int elementSize,unsigned int size,void *pData)
 	{
 		DX11RenderBuffer *pBuffer = new DX11RenderBuffer;
 
 		pBuffer->_type = type;
-		pBuffer->_accessHint = accessHint;
+		pBuffer->_bufferUsage = bufferUsage;
 		pBuffer->_elementSize = elementSize;
 		pBuffer->_bufferSize = size;
 
@@ -83,11 +84,11 @@ namespace Disorder
  
 	}
 
-	DX11RenderBufferPtr DX11RenderBuffer::Create(RenderBufferType type,GeometryPtr const& data,std::string const& sematic,unsigned int accessHint,ShaderObjectPtr const& vertexShader)
+	DX11RenderBufferPtr DX11RenderBuffer::Create(RenderBufferType type,GeometryPtr const& data,std::string const& sematic,BufferUsage bufferUsage,ShaderObjectPtr const& vertexShader)
 	{
 		DX11RenderBuffer *pBuffer = new DX11RenderBuffer;
  
-		pBuffer->_accessHint = accessHint;
+		pBuffer->_bufferUsage = bufferUsage;
 		pBuffer->_elementSize = 0;
 		pBuffer->_bufferSize = 0;
 		pBuffer->_type = type;
@@ -116,7 +117,7 @@ namespace Disorder
 				return NULL;
 			}
 
-			if(sematic.compare(RenderLayout::POSITION) == 0 )
+			if(sematic.compare(DX11RenderLayout::POSITION) == 0 )
 			{
 				pBuffer->_bufferSize = pBuffer->_elementSize*data->Positions.size();
 				for(unsigned int index=0;index<data->Positions.size();++index)
@@ -127,7 +128,7 @@ namespace Disorder
 					vData.push_back(vec.z);
 				}
 			}
-			else if(sematic.compare(RenderLayout::COLOR) == 0 )
+			else if(sematic.compare(DX11RenderLayout::COLOR) == 0 )
 			{
 				pBuffer->_bufferSize = pBuffer->_elementSize*data->Colors.size();
 				for(unsigned int index=0;index<data->Colors.size();++index)
@@ -139,7 +140,7 @@ namespace Disorder
 					vData.push_back(vec.w);
 				}
 			}
-			else if(sematic.compare(RenderLayout::NORMAL) == 0 )
+			else if(sematic.compare(DX11RenderLayout::NORMAL) == 0 )
 			{
 				pBuffer->_bufferSize = pBuffer->_elementSize*data->Normals.size();
 				for(unsigned int index=0;index<data->Normals.size();++index)
@@ -150,7 +151,7 @@ namespace Disorder
 					vData.push_back(vec.z);
 				}
 			}
-			else if(sematic.compare(RenderLayout::TEXCOORD) == 0 )
+			else if(sematic.compare(DX11RenderLayout::TEXCOORD) == 0 )
 			{
 				pBuffer->_bufferSize = pBuffer->_elementSize*data->Texcoords.size();
 				for(unsigned int index=0;index<data->Texcoords.size();++index)
@@ -189,79 +190,69 @@ namespace Disorder
  
   
 
-	void DX11RenderBuffer::GetD3DFlags(D3D11_USAGE& usage, UINT& cpuAccessFlags, UINT& bindFlags, UINT& miscFlags)
+	void DX11RenderBuffer::GetD3DFlags(void *pData,D3D11_USAGE& usage, UINT& cpuAccessFlags, UINT& miscFlags)
 	{
-		if (_accessHint & BAH_Immutable)
+		if( _bufferUsage == BU_StaticDraw )
 		{
-			usage = D3D11_USAGE_IMMUTABLE; // Only GPU read, Must init when create
-		}
-		else
-		{
-			if ((BAH_CPU_Write == _accessHint) || ((BAH_CPU_Write | BAH_GPU_Read) == _accessHint))
-			{
-				usage = D3D11_USAGE_DYNAMIC;
-			}
+			if( pData != NULL )
+				usage = D3D11_USAGE_IMMUTABLE;
 			else
-			{
-				if (!(_accessHint & BAH_CPU_Read) && !(_accessHint & BAH_CPU_Write))
-				{
-					usage = D3D11_USAGE_DEFAULT; //A resource that requires read and write access by the GPU
-				}
-				else
-				{
-					usage = D3D11_USAGE_STAGING;//A resource that supports data transfer (copy) from the GPU to the CPU.
-
-				}
-			}
+				BOOST_ASSERT(0);
 		}
-
-		cpuAccessFlags = 0;
-		if (_accessHint & BAH_CPU_Read)
+		else if( _bufferUsage == BU_StaticCopy)
 		{
 			cpuAccessFlags |= D3D11_CPU_ACCESS_READ;
+			usage = D3D11_USAGE_STAGING;
 		}
-		if (_accessHint & BAH_CPU_Write)
+		else if(_bufferUsage == BU_StaticRead)
 		{
-			cpuAccessFlags |= D3D11_CPU_ACCESS_WRITE;
+			cpuAccessFlags |= D3D11_CPU_ACCESS_READ;
+			usage = D3D11_USAGE_STAGING;
 		}
-
-		if (D3D10_USAGE_STAGING == usage)
+		else if(_bufferUsage == BU_DynamicCopy )
 		{
-			bindFlags = 0;
+			cpuAccessFlags |= D3D11_CPU_ACCESS_READ;
+			usage = D3D11_USAGE_STAGING;
 		}
-		else
-			bindFlags = _bindFlags;
-
- 
-		if( _bindFlags != D3D11_BIND_CONSTANT_BUFFER )
+		else if(_bufferUsage == BU_DynamicRead )
 		{
-			if (_accessHint & BAH_GPU_Read)
+			cpuAccessFlags |= D3D11_CPU_ACCESS_READ;
+			usage = D3D11_USAGE_STAGING;
+		}
+		else if(_bufferUsage == BU_DynamicDraw )
+		{		
+			if( _type == RBT_Constant )
+				usage = D3D11_USAGE_DEFAULT;
+			else
 			{
-				if( _bindFlags != D3D11_BIND_VERTEX_BUFFER && _bindFlags != D3D11_BIND_INDEX_BUFFER )
-				    bindFlags |= D3D11_BIND_SHADER_RESOURCE;
-			}
-			if (_accessHint & BAH_GPU_Write)
-			{
-				bindFlags |= D3D11_BIND_STREAM_OUTPUT;
-			}
-			if (_accessHint & BAH_GPU_Unordered)
-			{
-				bindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+				usage = D3D11_USAGE_DYNAMIC;
+				cpuAccessFlags |= D3D11_CPU_ACCESS_WRITE;
 			}
 		}
-
-		miscFlags = 0;
-		if (_accessHint & BAH_GPU_Unordered)
+		else if(_bufferUsage == BU_StreamRead )
 		{
-			miscFlags = (_accessHint & BAH_GPU_Structured)
-				? D3D11_RESOURCE_MISC_BUFFER_STRUCTURED : D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
+			cpuAccessFlags |= D3D11_CPU_ACCESS_READ;
+			usage = D3D11_USAGE_STAGING;
 		}
+		else if(_bufferUsage == BU_StreamCopy )
+		{
+			cpuAccessFlags |= D3D11_CPU_ACCESS_READ;
+			usage = D3D11_USAGE_STAGING;
+		}
+		else if(_bufferUsage == BU_StreamDraw )
+		{
+			if( pData != NULL )
+				usage = D3D11_USAGE_DEFAULT;
+			else
+				BOOST_ASSERT(0);
+		}
+
 	}
 
 	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat,ImagePtr const& image)
 	{
 		const ImageSpec &spec = image->GetSpec();
-		_BufferInitData data;
+		BufferInitData data;
 		data.Data = image->GetImageData();
 		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat)/8 * spec.width;
 		data.SlicePitch = 0;

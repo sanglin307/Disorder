@@ -95,6 +95,7 @@ namespace Disorder
 		GLProgramReflectionPtr EffectReflection;
 
 		static void GetShaderPropertyTypeLength(GLint type, EShaderProperty& propertyType, int &lenght);
+		static void GetGLShaderPropertyTypeLength(GLint type, GLenum& propertyType, int &lenght);
 
 	private:
 		GLRenderEffect();
