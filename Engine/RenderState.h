@@ -76,7 +76,7 @@ namespace Disorder
 	{
 		_SamplerDesc()
 		:Filter(SF_Min_Mag_Point_Mip_Linear), AddressU(TAM_Clamp), AddressV(TAM_Clamp), AddressW(TAM_Clamp),
-		MipLODBias(0.f), MaxAnisotropy(1), CompareFunc(CF_Never)
+		MipLODBias(0.f), MaxAnisotropy(1), CompareFunc(CF_None)
 		{
 			BorderColor[0] = BorderColor[1] = BorderColor[2] = BorderColor[3] = 1.0f;
 			MinLOD = std::numeric_limits<float>::min();
@@ -103,7 +103,7 @@ namespace Disorder
 	class RasterizeState : public RenderState
 	{
 	public:
-
+		RasterizeDesc Desc;
 	protected:
 		RasterizeState(){}
 	};
@@ -111,7 +111,7 @@ namespace Disorder
 	class DepthStencilState : public RenderState
 	{
 	public:
-		 
+		DepthStencilDesc Desc;
 		unsigned int StencilRef;
 
 	protected:
@@ -123,7 +123,7 @@ namespace Disorder
     public:
          float BlendFactor[4];
          unsigned int SampleMask;
-
+		 BlendDesc Desc;
 	protected:
 		 BlendState()
          {
@@ -135,7 +135,7 @@ namespace Disorder
 	class SamplerState : public RenderState
 	{
 	public:
-
+		SamplerDesc Desc;
 	protected:
 		SamplerState(){}
 	};

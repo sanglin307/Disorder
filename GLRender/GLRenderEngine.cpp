@@ -225,6 +225,53 @@ namespace Disorder
 		}
 	}
 
+	GLint GLRenderEngine::GetGLAddressMode(TextureAddressMode addrMode)
+	{
+		switch (addrMode)
+		{
+		case TAM_Wrap:
+			return GL_REPEAT;
+		case TAM_Mirror:
+			return GL_MIRRORED_REPEAT;
+		case TAM_Clamp:
+			return GL_CLAMP_TO_EDGE;
+		case TAM_Border:
+			return GL_CLAMP_TO_BORDER;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return 0;
+	}
+
+	GLint GLRenderEngine::GetGLComparisonFunc(ComparisonFunc func)
+	{
+		switch (func)
+		{
+		case CF_None:
+		case CF_Never:
+			return GL_NEVER;
+		case CF_Less:
+			return GL_LESS;
+		case CF_Equal:
+			return GL_EQUAL;
+		case CF_Less_Equal:
+			return GL_LEQUAL;
+		case CF_Greater:
+			return GL_GREATER;
+		case CF_Not_Equal:
+			return GL_NOTEQUAL;
+		case CF_Greater_Equal:
+			return GL_GEQUAL;
+		case CF_Always:
+			return GL_ALWAYS;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return GL_NEVER;
+	}
+
 	GLRenderEngine::GLRenderEngine()
 	{
 		_hRC = 0;	

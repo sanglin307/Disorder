@@ -284,6 +284,7 @@ namespace Disorder
 	{
 		switch (func)
 		{
+		case CF_None:
 		case CF_Never:
 			return D3D11_COMPARISON_NEVER;
 		case CF_Less:

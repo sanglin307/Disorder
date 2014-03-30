@@ -11,6 +11,8 @@ namespace Disorder
 	{
 		DX11SamplerState *pSampler = new DX11SamplerState;
 
+		pSampler->Desc = *pSamplerDesc;
+
 		D3D11_SAMPLER_DESC samDesc;
         ZeroMemory( &samDesc, sizeof(samDesc) );
 
@@ -51,6 +53,8 @@ namespace Disorder
 	DX11RasterizeStatePtr DX11RasterizeState::Create(RasterizeDesc *pDesc)
 	{
 		DX11RasterizeState *pRasterizeState = new DX11RasterizeState;
+
+		pRasterizeState->Desc = *pDesc;
 
 		D3D11_RASTERIZER_DESC desc;
 		ZeroMemory(&desc,sizeof(desc));
@@ -98,6 +102,8 @@ namespace Disorder
 	{
 		DX11DepthStencilState *pDepthStencilState = new DX11DepthStencilState;
 
+		pDepthStencilState->Desc = *pDepthStencilDesc;
+
 		D3D11_DEPTH_STENCIL_DESC desc;
 		ZeroMemory(&desc,sizeof(desc));
 
@@ -141,6 +147,8 @@ namespace Disorder
 		BOOST_ASSERT(BlendArraySize <= 8 );
 
 		DX11BlendState *pState = new DX11BlendState;
+
+		pState->Desc = *pBlendDescArray;
 
 		D3D11_BLEND_DESC desc;
 		ZeroMemory(&desc,sizeof(desc));

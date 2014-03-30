@@ -20,14 +20,73 @@ namespace Disorder
 	GLSamplerStatePtr GLSamplerState::Create(SamplerDesc* pSamplerDesc)
 	{
 		GLSamplerState *pState = new GLSamplerState;
+		
+		pState->Desc = *pSamplerDesc;
 
-		/*GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T, GL_TEXTURE_WRAP_R, 
-		GL_TEXTURE_MIN_FILTER, GL_TEXTURE_MAG_FILTER, 
-		GL_TEXTURE_BORDER_COLOR, 
-		GL_TEXTURE_MIN_LOD, GL_TEXTURE_MAX_LOD, GL_TEXTURE_LOD_BIAS 
-		GL_TEXTURE_COMPARE_MODE, GL_TEXTURE_COMPARE_FUNC.*/
+		glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_WRAP_S,GLRenderEngine::GetGLAddressMode(pSamplerDesc->AddressU));
+		glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_WRAP_T,GLRenderEngine::GetGLAddressMode(pSamplerDesc->AddressV));
+		glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_WRAP_R,GLRenderEngine::GetGLAddressMode(pSamplerDesc->AddressW));
 
-		return NULL;
+	 
+		if( pSamplerDesc->Filter == SF_Min_Mag_Mip_Point )
+		{
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		}
+		else if( pSamplerDesc->Filter == SF_Min_Mag_Point_Mip_Linear )
+		{
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		}
+		else if( pSamplerDesc->Filter == SF_Min_Point_Mag_Linear_Mip_Point )
+		{
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
+		else if( pSamplerDesc->Filter == SF_Min_Point_Mag_Mip_Linear )
+		{
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
+		else if( pSamplerDesc->Filter == SF_Min_Linear_Mag_Mip_Point )
+		{
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		}
+		else if( pSamplerDesc->Filter == SF_Min_Linear_Mag_Point_Mip_Linear )
+		{
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		}
+		else if( pSamplerDesc->Filter == SF_Min_Mag_Linear_Mip_Point )
+		{
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
+		else if( pSamplerDesc->Filter == SF_Min_Mag_Mip_Linear )
+		{
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
+		else if( pSamplerDesc->Filter == SF_Anisotropic )
+		{
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MAX_ANISOTROPY_EXT, pSamplerDesc->MaxAnisotropy);
+		}
+
+		glSamplerParameterfv(pState->_stateHandle,GL_TEXTURE_BORDER_COLOR,pSamplerDesc->BorderColor);
+		glSamplerParameterf(pState->_stateHandle,GL_TEXTURE_MIN_LOD,pSamplerDesc->MinLOD);
+		glSamplerParameterf(pState->_stateHandle,GL_TEXTURE_MAX_LOD,pSamplerDesc->MaxLOD);
+		glSamplerParameterf(pState->_stateHandle,GL_TEXTURE_LOD_BIAS,pSamplerDesc->MipLODBias);
+
+		if( pSamplerDesc->CompareFunc == CF_None )
+		    glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_COMPARE_MODE, GL_NONE);
+		else
+		{
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_COMPARE_FUNC, GLRenderEngine::GetGLComparisonFunc(pSamplerDesc->CompareFunc));
+		}
+ 
+		return GLSamplerStatePtr(pState);
 
 	}
 }

@@ -85,6 +85,7 @@ namespace Disorder
 
 	enum ComparisonFunc
 	{
+		 CF_None,
 		 CF_Never,
          CF_Less,            
          CF_Equal,           
