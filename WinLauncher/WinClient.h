@@ -42,9 +42,7 @@ namespace Disorder
 	private:
 		void * _hWnd;
 	};
-
-	extern HINSTANCE GAppInstance;
-
+ 
 	class WinClient : public Client
 	{
 	public:

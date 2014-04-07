@@ -3,8 +3,7 @@
 
 namespace Disorder
 {
-	HINSTANCE GAppInstance;
-
+ 
 	WindowsViewport::WindowsViewport(int x,int y,int sizeX,int sizeY,void *hWnd)
 		:Viewport(x,y,sizeX,sizeY),_window((HWND)hWnd)
 	{		

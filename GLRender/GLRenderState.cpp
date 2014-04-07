@@ -89,4 +89,32 @@ namespace Disorder
 		return GLSamplerStatePtr(pState);
 
 	}
+
+	GLRasterizeStatePtr GLRasterizeState::Create(RasterizeDesc* pDesc)
+	{
+		GLRasterizeState* pState = new GLRasterizeState;
+		pState->Desc = *pDesc;
+
+		return GLRasterizeStatePtr(pState);
+	}
+
+
+	GLDepthStencilStatePtr GLDepthStencilState::Create(DepthStencilDesc *pDepthStencilDesc, unsigned int stencilRef)
+	{
+		GLDepthStencilState *pState = new GLDepthStencilState;
+		pState->Desc = *pDepthStencilDesc;
+		pState->StencilRef = stencilRef;
+
+		return GLDepthStencilStatePtr(pState);
+	}
+
+	GLBlendStatePtr GLBlendState::Create(BlendDesc *pBlendDescArray, int BlendArraySize, bool AlphaToCoverageEnable, bool IndependentBlendEnable)
+	{
+		GLBlendState* pState = new GLBlendState;
+
+		pState->Desc = *pBlendDescArray;
+
+		return GLBlendStatePtr(pState);
+	}
+
 }

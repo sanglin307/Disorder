@@ -2,6 +2,145 @@
 
 namespace Disorder
 {
+	void RenderEngine::ComputePixelColorAlphaSize(PixelFormat format, int& colorSize, int& alphaSize)
+	{
+		colorSize = 0;
+		alphaSize = 0;
+
+		switch (format)
+		{
+		case PF_R1_UNORM:
+			colorSize = 1;
+			break;
+		case PF_A8_UNORM:
+			alphaSize = 8;
+			break;
+		case PF_R8_SINT:
+		case PF_R8_SNORM:
+		case PF_R8_TYPELESS:
+		case PF_R8_UINT:
+		case PF_R8_UNORM:
+			colorSize = 8;
+			break;
+		case PF_B5G5R5A1_UNORM:
+			colorSize = 15;
+			alphaSize = 1;
+			break;
+		case PF_B5G6R5_UNORM:
+			colorSize = 16;
+			break;
+		case PF_R16_FLOAT:
+		case PF_R16_SINT:
+		case PF_R16_SNORM:
+		case PF_R16_TYPELESS:
+		case PF_R16_UINT:
+		case PF_R16_UNORM:
+		case PF_R8G8_SINT:
+		case PF_R8G8_SNORM:
+		case PF_R8G8_TYPELESS:
+		case PF_R8G8_UINT:
+		case PF_R8G8_UNORM:
+			colorSize = 16;
+			break;
+		case PF_B8G8R8X8_TYPELESS:
+		case PF_B8G8R8X8_UNORM:
+		case PF_B8G8R8X8_UNORM_SRGB:
+		case PF_R8G8B8A8_SINT:
+		case PF_R8G8B8A8_SNORM:
+		case PF_R8G8B8A8_TYPELESS:
+		case PF_R8G8B8A8_UINT:
+		case PF_R8G8B8A8_UNORM:
+		case PF_R8G8B8A8_UNORM_SRGB:
+		case PF_B8G8R8A8_TYPELESS:
+		case PF_B8G8R8A8_UNORM:
+		case PF_B8G8R8A8_UNORM_SRGB:
+			colorSize = 24;
+			alphaSize = 8;
+			break;
+		case PF_G8R8_G8B8_UNORM:
+			colorSize = 16;
+			break;
+		case PF_R10G10B10_XR_BIAS_A2_UNORM:
+		case PF_R10G10B10A2_TYPELESS:
+		case PF_R10G10B10A2_UINT:
+		case PF_R10G10B10A2_UNORM:
+			colorSize = 30;
+			alphaSize = 2;
+			break;
+		case PF_R11G11B10_FLOAT:
+		case PF_R16G16_FLOAT:
+		case PF_R16G16_SINT:
+		case PF_R16G16_SNORM:
+		case PF_R16G16_TYPELESS:
+		case PF_R16G16_UINT:
+		case PF_R16G16_UNORM:
+		case PF_R32_FLOAT:
+		case PF_R32_FLOAT_X8X24_TYPELESS:
+		case PF_R32_SINT:
+		case PF_R32_TYPELESS:
+		case PF_R32_UINT:
+		case PF_R24G8_TYPELESS:
+			colorSize = 32;
+			break;
+ 
+
+		case PF_R16G16B16A16_FLOAT:
+		case PF_R16G16B16A16_SINT:
+		case PF_R16G16B16A16_SNORM:
+		case PF_R16G16B16A16_TYPELESS:
+		case PF_R16G16B16A16_UINT:
+		case PF_R16G16B16A16_UNORM:
+			colorSize = 48;
+			alphaSize = 16;
+			break;
+
+		case PF_R32G32_FLOAT:
+		case PF_R32G32_SINT:
+		case PF_R32G32_TYPELESS:
+		case PF_R32G32_UINT:
+			colorSize = 64;
+			break;
+
+		case PF_R32G32B32_FLOAT:
+		case PF_R32G32B32_SINT:
+		case PF_R32G32B32_TYPELESS:
+		case PF_R32G32B32_UINT:
+			colorSize = 96;
+			break;
+		case PF_R32G32B32A32_FLOAT:
+		case PF_R32G32B32A32_SINT:
+		case PF_R32G32B32A32_TYPELESS:
+		case PF_R32G32B32A32_UINT:
+			colorSize = 96;
+			alphaSize = 32;
+			break;
+		}
+	}
+
+	void RenderEngine::ComputeDepthStencilSize(PixelFormat format, int& depth, int& stencil)
+	{
+		depth = 0;
+		stencil = 0;
+
+		switch (format)
+		{
+		case PF_D16_UNORM:
+			depth = 16;
+			break;
+		case PF_D24_UNORM_S8_UINT:
+			depth = 24;
+			stencil = 8;
+			break;
+		case PF_D32_FLOAT:
+			depth = 32;
+			break;
+		case PF_D32_FLOAT_S8X24_UINT:
+			depth = 32;
+			stencil = 8;
+			break;
+		}
+	}
+
 	size_t RenderEngine::ComputePixelChannel(PixelFormat format)
 	{
 		switch (format)

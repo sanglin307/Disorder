@@ -329,6 +329,7 @@ namespace Disorder
 		}
 	}
 
+	 
 	bool GLRenderEngine::CreateGLContext(HWND window)
 	{
 		PIXELFORMATDESCRIPTOR pfd;
@@ -337,23 +338,54 @@ namespace Disorder
 		pfd.nVersion = 1;
 		pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
 		pfd.iPixelType = PFD_TYPE_RGBA;
-		pfd.cColorBits = 32;
-		pfd.cDepthBits = 32;
+		pfd.cColorBits = 24;
+		pfd.cRedBits = 8;
+		pfd.cGreenBits = 8;
+		pfd.cBlueBits = 8;
+		pfd.cAlphaBits = 8;
+		pfd.cDepthBits = 24;
+		pfd.cStencilBits = 8;
 		pfd.iLayerType = PFD_MAIN_PLANE;
+		
+		TCHAR winClassName[] = L"tempWin";
+		WNDCLASSEXW Cls;
+		memset(&Cls, 0, sizeof(Cls));
+		Cls.cbSize = sizeof(Cls);
+		Cls.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+		Cls.lpfnWndProc = DefWindowProc;
+		Cls.hInstance = GAppInstance;
+		Cls.lpszClassName = winClassName;
+		Cls.lpszMenuName = NULL;
 
-		HDC dc = GetDC(window);
-		int nPixelFormat = ChoosePixelFormat(dc, &pfd);
+		// temp windows
+		if (!RegisterClassExW(&Cls))
+		{
+			DWORD result = GetLastError();
+			std::stringstream str;
+			str << "Window Class registe Error and code is:" << result;
+			GLogger->Error(str.str());
+			return false;
+		}
+
+		DWORD WindowStyle;
+		WindowStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+ 
+		// Create the window
+		HWND htempWin = CreateWindowW(winClassName, winClassName, WindowStyle, 0, 0, 640, 480, NULL, NULL, GAppInstance, NULL);
+		DWORD errr = GetLastError();
+		_hDC = GetDC(htempWin);
+		int nPixelFormat = ChoosePixelFormat(_hDC, &pfd);
 
 		if (nPixelFormat == 0) 
 			return false;
 
-		BOOL bResult = SetPixelFormat(dc, nPixelFormat, &pfd);
+		BOOL bResult = SetPixelFormat(_hDC, nPixelFormat, &pfd);
 
 		if (!bResult) 
 			return false;
 
-		HGLRC tempContext = wglCreateContext(dc);
-		wglMakeCurrent(dc, tempContext);
+		HGLRC tempContext = wglCreateContext(_hDC);
+		wglMakeCurrent(_hDC, tempContext);
  
 		GLenum err = glewInit();
 		if (GLEW_OK != err)
@@ -362,25 +394,76 @@ namespace Disorder
 			return false;
 		}
 
-		int attribs[] =
+		wglMakeCurrent(NULL, NULL);
+		wglDeleteContext(tempContext);
+		DestroyWindow(htempWin);
+		UnregisterClass(winClassName, GAppInstance);
+
+		_hDC = GetDC(window);
+		int nPixCount = 0;
+		int colorBit = 24;
+		int alphaBit = 8;
+		int depthBit = 24;
+		int stencilBit = 8;
+		RenderEngine::ComputePixelColorAlphaSize(GConfig->pRenderConfig->ColorFormat, colorBit, alphaBit);
+		RenderEngine::ComputeDepthStencilSize(GConfig->pRenderConfig->DepthStencilFormat,depthBit,stencilBit);
+
+		float fPixAttribs[] = { 0, 0 };
+		std::vector<int> pixAttribs;
+		pixAttribs.push_back(WGL_SUPPORT_OPENGL_ARB); pixAttribs.push_back(1);
+		pixAttribs.push_back(WGL_DRAW_TO_WINDOW_ARB); pixAttribs.push_back(1);
+		pixAttribs.push_back(WGL_ACCELERATION_ARB);
+		pixAttribs.push_back(WGL_FULL_ACCELERATION_ARB);
+		pixAttribs.push_back(WGL_COLOR_BITS_ARB);  pixAttribs.push_back(colorBit);
+		pixAttribs.push_back(WGL_ALPHA_BITS_ARB);  pixAttribs.push_back(alphaBit);
+		pixAttribs.push_back(WGL_DEPTH_BITS_ARB);  pixAttribs.push_back(depthBit);
+		pixAttribs.push_back(WGL_STENCIL_BITS_ARB); pixAttribs.push_back(stencilBit);
+		pixAttribs.push_back(WGL_ACCELERATION_ARB);
+		pixAttribs.push_back(WGL_DOUBLE_BUFFER_ARB); pixAttribs.push_back(GL_TRUE);
+		pixAttribs.push_back(WGL_PIXEL_TYPE_ARB); pixAttribs.push_back(WGL_TYPE_RGBA_ARB);
+		if (GConfig->pRenderConfig->MultiSampleCount > 1)
 		{
-			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-			WGL_CONTEXT_MINOR_VERSION_ARB, 1,
-			WGL_CONTEXT_FLAGS_ARB, 0,
-			0
-		};
+			pixAttribs.push_back(WGL_SAMPLE_BUFFERS_ARB); pixAttribs.push_back(GL_TRUE);
+			pixAttribs.push_back(WGL_SAMPLES_ARB); pixAttribs.push_back(GConfig->pRenderConfig->MultiSampleCount);
+		}
+		pixAttribs.push_back(0);
+
+		wglChoosePixelFormatARB(_hDC, pixAttribs.data(), fPixAttribs, 1, &nPixelFormat, (UINT*)&nPixCount);
+		if (nPixelFormat == -1)
+		{
+			GLogger->Error("Can't find right pixel format for openGL,please check render setting!");
+			return false;
+		}
+
+		// Got a format, now set it as the current one  
+		if (!SetPixelFormat(_hDC, nPixelFormat, &pfd))
+		{
+			return false;
+		}
+
+		std::vector<int> attrib;
+		attrib.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB); attrib.push_back(3);
+		attrib.push_back(WGL_CONTEXT_MINOR_VERSION_ARB); attrib.push_back(3);
+		attrib.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);
+		attrib.push_back(WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
+#ifdef _DEBUG
+		attrib.push_back(WGL_CONTEXT_FLAGS_ARB); attrib.push_back(WGL_CONTEXT_DEBUG_BIT_ARB);
+#endif
+		attrib.push_back(0);
 
 		if (wglewIsSupported("WGL_ARB_create_context") == 1)
 		{
-			_hRC = wglCreateContextAttribsARB(dc, 0, attribs);
-			wglMakeCurrent(NULL, NULL);
-			wglDeleteContext(tempContext);
-			wglMakeCurrent(dc, _hRC);
+			_hRC = wglCreateContextAttribsARB(_hDC, 0, attrib.data());
+			wglMakeCurrent(_hDC, _hRC);
 		}
 		else
-		{	//It's not possible to make a GL 3.x context. Use the old style context (GL 2.1 and before)
-			_hRC = tempContext;
+		{	
+			BOOST_ASSERT(0);
+			return false;
 		}
+		
+		//v-syn
+		wglSwapIntervalEXT(GConfig->pRenderConfig->SyncInterval);
 
 		//Checking GL version
 		const GLubyte *GLVersionString = glGetString(GL_VERSION);
@@ -409,11 +492,11 @@ namespace Disorder
 
 	void GLRenderEngine::OnDrawBegin()
 	{
-
+		GDrawTriNumber = 0;
 	}
 	void GLRenderEngine::OnDrawEnd()
 	{
-
+		SwapBuffers(_hDC);
 	}
 
 	void GLRenderEngine::AdjustProjMatrix(const glm::mat4 &matrix)

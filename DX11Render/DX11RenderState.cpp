@@ -58,7 +58,7 @@ namespace Disorder
 
 		D3D11_RASTERIZER_DESC desc;
 		ZeroMemory(&desc,sizeof(desc));
-		desc.AntialiasedLineEnable = pDesc->AntialiasedLineEnable;
+		
 		if( pDesc->CullMode == RCM_None)
 			desc.CullMode = D3D11_CULL_NONE;
 		else if( pDesc->CullMode == RCM_CullFront)
@@ -77,6 +77,11 @@ namespace Disorder
 
 		desc.FrontCounterClockwise = pDesc->FrontCounterClockwise;
 		desc.MultisampleEnable = pDesc->MultisampleEnable;
+		if (GConfig->pRenderConfig->MultiSampleCount > 1)
+			desc.MultisampleEnable = true;
+		desc.AntialiasedLineEnable = pDesc->AntialiasedLineEnable;
+
+
 		desc.ScissorEnable = pDesc->ScissorEnable;
 		desc.SlopeScaledDepthBias = pDesc->SlopeScaledDepthBias;
 

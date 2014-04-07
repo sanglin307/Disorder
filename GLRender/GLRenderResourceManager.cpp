@@ -76,17 +76,17 @@ namespace Disorder
 
 	RasterizeStatePtr GLRenderResourceManager::CreateRasterizeState(RasterizeDesc *pDesc)
 	{
-		return NULL;
+		return GLRasterizeState::Create(pDesc);
 	}
 
 	DepthStencilStatePtr GLRenderResourceManager::CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc, unsigned int stencilRef)
 	{
-		return NULL;
+		return GLDepthStencilState::Create(pDepthStencilDesc, stencilRef);
 	}
 
 	BlendStatePtr GLRenderResourceManager::CreateBlendState(BlendDesc *pBlendDescArray, int BlendArraySize, bool AlphaToCoverageEnable, bool IndependentBlendEnable)
 	{
-		return NULL;
+		return GLBlendState::Create(pBlendDescArray,BlendArraySize,AlphaToCoverageEnable,IndependentBlendEnable);
 	}
 
 	void GLRenderResourceManager::RegisterPropertyManager(std::string const& name)

@@ -101,6 +101,7 @@ namespace Disorder
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	DX11RenderGBuffer::DX11RenderGBuffer(unsigned int width,unsigned int height)
 	{
+ 
 		SamplerDesc sDesc;
 		sDesc.AddressU = sDesc.AddressV = sDesc.AddressW = TAM_Wrap;
 		SamplerStatePtr linearSampleState = GEngine->RenderResourceMgr->CreateSamplerState(&sDesc);
@@ -185,6 +186,7 @@ namespace Disorder
 
 	DX11RenderGBufferPtr DX11RenderGBuffer::Create(unsigned int width,unsigned int height)
 	{
+ 
 		DX11RenderGBuffer *pGbuffer = new DX11RenderGBuffer(width,height);
 		return DX11RenderGBufferPtr(pGbuffer);
 	}
@@ -203,6 +205,16 @@ namespace Disorder
 
 	void DX11RenderSurfaceCache::InitGBuffer(unsigned int width,unsigned int height)
 	{
+		DX11RenderEnginePtr rEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine);
+		if (rEngine->GetFeatureLevel() <= D3D_FEATURE_LEVEL_10_0 && GConfig->pRenderConfig->MultiSampleCount > 1)
+		{
+			char message[] = "Not support multisample for GBuffer on feature level below 10_1, because we can't use depthview and shaderview for multisample!";
+			MessageBoxA(NULL, message, "Warning", MB_OK);
+			GLogger->Error(message);
+			BOOST_ASSERT(0);
+			return;
+		}
+
 		GBuffer = DX11RenderGBuffer::Create(width,height);
 	}
 

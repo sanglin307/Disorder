@@ -16,6 +16,12 @@ namespace Disorder
 {
 	class GLSamplerState;
 	typedef boost::shared_ptr<GLSamplerState> GLSamplerStatePtr;
+	class GLRasterizeState;
+	typedef boost::shared_ptr<GLRasterizeState> GLRasterizeStatePtr;
+	class GLDepthStencilState;
+	typedef boost::shared_ptr<GLDepthStencilState> GLDepthStencilStatePtr;
+	class GLBlendState;
+	typedef boost::shared_ptr<GLBlendState> GLBlendStatePtr;
 	class GLRenderBuffer;
 	typedef boost::shared_ptr<GLRenderBuffer> GLRenderBufferPtr;
 	class GLRenderTexture2D;

@@ -47,10 +47,12 @@ namespace Disorder
 		static size_t ComputePixelSizeBits(PixelFormat format);
 		static size_t ComputeBlockSizeBits(PixelFormat format);
 		static size_t ComputePixelChannel(PixelFormat format); 
+		static void ComputePixelColorAlphaSize(PixelFormat format, int& colorSize, int& alphaSize);
+		static void ComputeDepthStencilSize(PixelFormat format, int& depth, int& stencil);
 		static bool  IsCompressed(PixelFormat format);
 		static unsigned int GetTextureFormatDimensionAlignment(PixelFormat format);
 		static bool IsDepthStencilFormat(PixelFormat format);
-		static PixelFormat GetDepthTextureFormat(PixelFormat format);
+	 
 
 	protected:
 		virtual void SetBlendState(BlendStatePtr const& blendState) = 0;

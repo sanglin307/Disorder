@@ -1,5 +1,6 @@
 #include "WinLauncher.h"
 
+HINSTANCE GAppInstance;
 
 void AppPeekMessage()
 {
@@ -51,7 +52,7 @@ void AppPeekMessage()
 
 int WINAPI WinMain( HINSTANCE hInInstance, HINSTANCE hPrevInstance, char*, INT nCmdShow )
 {
-	Disorder::GAppInstance = hInInstance;
+	GAppInstance = hInInstance;
 
 	InitGame();
 		

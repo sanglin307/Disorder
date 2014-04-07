@@ -83,6 +83,8 @@ namespace Disorder
 		pRenderConfig->FullScreen = tree.get("RenderConfig.FullScreen",0) > 0;
 		pRenderConfig->SizeX = tree.get("RenderConfig.ResX",640);
 		pRenderConfig->SizeY = tree.get("RenderConfig.ResY",480);
+		pRenderConfig->SyncInterval = tree.get("RenderConfig.SyncInterval", 0);
+		pRenderConfig->MultiSampleCount = tree.get("RenderConfig.MultiSampleCount", 0);
 
 		return true;
 	}
@@ -122,6 +124,8 @@ namespace Disorder
 
 		tree.put("RenderConfig.ResX",pRenderConfig->SizeX);
 		tree.put("RenderConfig.ResY",pRenderConfig->SizeY);
+		tree.put("RenderConfig.SyncInterval", pRenderConfig->SyncInterval);
+		tree.put("RenderConfig.MultiSampleCount", pRenderConfig->MultiSampleCount);
 
 		std::string renderConfigFile = GConfig->sConfigPath + "RenderConfig.xml";
 		boost::property_tree::write_xml(renderConfigFile,tree);

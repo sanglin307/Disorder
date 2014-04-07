@@ -280,7 +280,16 @@ namespace Disorder
 		else 
 		{
 			desc.MipLevels = pTexture->MipLevel = 1;
-			desc.SampleDesc.Count = 1; // just set it to 1...
+		}
+
+		if (!pData)
+		{
+			desc.SampleDesc.Count = GConfig->pRenderConfig->MultiSampleCount;
+			desc.SampleDesc.Quality = GConfig->pRenderConfig->MultiSampleQuality;
+		}
+		else
+		{
+			desc.SampleDesc.Count = 1;
 			desc.SampleDesc.Quality = 0;
 		}
 

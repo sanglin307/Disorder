@@ -215,9 +215,10 @@ namespace Disorder
 
 		RasterizeDesc rDesc;
 		rDesc.AntialiasedLineEnable = true;
-
+		rDesc.MultisampleEnable = true;
 		RasterizeStatePtr rState = resourceManager->CreateRasterizeState(&rDesc);
 		_renderEffect->BindRasterizeState(rState);
+
 
 		_renderLayout = resourceManager->CreateRenderLayout(_renderEffect,TT_LineList,true);
 	 

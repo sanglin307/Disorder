@@ -91,7 +91,7 @@ namespace Disorder
 			D3D_FEATURE_LEVEL_10_1,
 			D3D_FEATURE_LEVEL_10_0,
 		 };
-
+ 
 		 UINT numFeatureLevels = ARRAYSIZE( FeatureLevels );
 		 ID3D11Device*         pd3dDevice;
 		 ID3D11DeviceContext*  pImmediateContext;
@@ -112,20 +112,34 @@ namespace Disorder
 		DXGI_SWAP_CHAIN_DESC sd;
 		ZeroMemory( &sd, sizeof( sd ) );
 
+		DXGI_FORMAT dxFormat = DX11RenderEngine::GetPixelFormat(GConfig->pRenderConfig->ColorFormat);
+		while (GConfig->pRenderConfig->MultiSampleCount > 1)
+		{
+			_pd3dDevice->CheckMultisampleQualityLevels(dxFormat, GConfig->pRenderConfig->MultiSampleCount, &GConfig->pRenderConfig->MultiSampleQuality);
+			if (GConfig->pRenderConfig->MultiSampleQuality == 0) // invalid
+			{
+				GConfig->pRenderConfig->MultiSampleCount--;
+			}
+			else
+			{
+				GConfig->pRenderConfig->MultiSampleQuality--;
+				break;
+			}
+		}
+ 
 		sd.BufferCount = 1;
 		sd.BufferDesc.Width = GConfig->pRenderConfig->SizeX;
 		sd.BufferDesc.Height = GConfig->pRenderConfig->SizeY;
-		sd.BufferDesc.Format = DX11RenderEngine::GetPixelFormat(GConfig->pRenderConfig->ColorFormat); 
+		sd.BufferDesc.Format = dxFormat;
 		sd.BufferDesc.RefreshRate.Numerator = 60;
 		sd.BufferDesc.RefreshRate.Denominator = 1;
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
 		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 		sd.OutputWindow = (HWND)hWnd;
-		sd.SampleDesc.Count = 1;
-		sd.SampleDesc.Quality = 0;
+		sd.SampleDesc.Count = GConfig->pRenderConfig->MultiSampleCount;
+		sd.SampleDesc.Quality = GConfig->pRenderConfig->MultiSampleQuality;
 		sd.Windowed = !GConfig->pRenderConfig->FullScreen;
-
-		
+ 
 		IDXGISwapChain*       pSwapChain;
 		hr = _pDXGIFactory->CreateSwapChain(_pd3dDevice.get(),&sd,&pSwapChain);
 		BOOST_ASSERT(SUCCEEDED(hr));
@@ -143,7 +157,10 @@ namespace Disorder
 		ID3D11RenderTargetView* pRenderTargetView = NULL;
 		D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
 	    RTVDesc.Format = DX11RenderEngine::GetPixelFormat(GConfig->pRenderConfig->ColorFormat);
-	    RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		if (GConfig->pRenderConfig->MultiSampleCount > 1)
+			RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+		else
+	        RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	    RTVDesc.Texture2D.MipSlice = 0;
 		hr = _pd3dDevice->CreateRenderTargetView( pBackBuffer, &RTVDesc, &pRenderTargetView );
 		BOOST_ASSERT(SUCCEEDED(hr));
@@ -151,7 +168,10 @@ namespace Disorder
 		ID3D11ShaderResourceView* pShaderResourceView = NULL;
 		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
 		SRVDesc.Format = DX11RenderEngine::GetPixelFormat(GConfig->pRenderConfig->ColorFormat);
-		SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		if (GConfig->pRenderConfig->MultiSampleCount > 1)
+			SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+		else 
+			SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		SRVDesc.Texture2D.MostDetailedMip = 0;
 		SRVDesc.Texture2D.MipLevels = 1;
 		hr = _pd3dDevice->CreateShaderResourceView( pBackBuffer,&SRVDesc,&pShaderResourceView );
@@ -169,8 +189,8 @@ namespace Disorder
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
 		descDepth.Format = DX11RenderEngine::GetPixelFormat(GConfig->pRenderConfig->DepthStencilFormat);
-		descDepth.SampleDesc.Count = 1;
-		descDepth.SampleDesc.Quality = 0;
+		descDepth.SampleDesc.Count = GConfig->pRenderConfig->MultiSampleCount;
+		descDepth.SampleDesc.Quality = GConfig->pRenderConfig->MultiSampleQuality;
 		descDepth.Usage = D3D11_USAGE_DEFAULT;
 		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 		descDepth.CPUAccessFlags = 0;
@@ -184,7 +204,10 @@ namespace Disorder
 		D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
 		ZeroMemory( &descDSV, sizeof(descDSV) );
 		descDSV.Format = descDepth.Format;
-		descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		if (GConfig->pRenderConfig->MultiSampleCount > 1)
+			descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+		else
+		    descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		descDSV.Texture2D.MipSlice = 0;
 		hr = _pd3dDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &pDepthStencilView );
 		BOOST_ASSERT(SUCCEEDED(hr));

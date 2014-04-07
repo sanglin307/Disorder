@@ -46,11 +46,12 @@ namespace Disorder
 		virtual void SetBlendState(BlendStatePtr const& blendState);
 		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState);
 		virtual void SetDepthStencilState(DepthStencilStatePtr const& depthStencilState);
-
+ 
 		GLRenderEngine();
 		bool CreateGLContext(HWND window);
 		void LoadShaderIncludeFiles();
 		HGLRC _hRC;
+		HDC _hDC;
 		int _mainVersion;
 		int _subVersion;
 	};

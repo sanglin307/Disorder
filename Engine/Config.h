@@ -28,8 +28,8 @@ namespace Disorder
 		int		SizeY;
 		PixelFormat ColorFormat;
 		PixelFormat DepthStencilFormat;
-		unsigned int SampleCount;
-		unsigned int SampleQuality;
+		unsigned int MultiSampleCount;
+		unsigned int MultiSampleQuality;
 		unsigned int SyncInterval;
 		unsigned int MotionFrames;
 		bool HDR;
@@ -45,8 +45,8 @@ namespace Disorder
 			SizeY = 480;
 			ColorFormat = PF_R10G10B10A2_UNORM;
 			DepthStencilFormat = PF_D24_UNORM_S8_UINT;
-			SampleCount = 0;
-			SampleQuality = 0;
+			MultiSampleCount = 0;
+			MultiSampleQuality = 0;
 			SyncInterval = 0;
 			MotionFrames = 0;
 			HDR = false;
