@@ -24,7 +24,7 @@ namespace Disorder
 					GLogger->Error(stream.str());
 					continue;
 				}
-				CachedConstBuffer.push_back((ID3D11Buffer*)(res->GetDataAsConstBuffer()->GetLowInterface()));
+				CachedConstBuffer.push_back((ID3D11Buffer*)(res->GetDataAsConstBuffer()->GetHandle()));
 			}
 			else if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_TEXTURE )
 			{			
@@ -35,7 +35,7 @@ namespace Disorder
 					GLogger->Error(stream.str());
 					continue;
 				}
-				CachedShaderResourceView.push_back((ID3D11ShaderResourceView*)(res->GetDataAsShaderResource()->GetLowInterface(RSU_ShaderResource)));
+				CachedShaderResourceView.push_back((ID3D11ShaderResourceView*)(res->GetDataAsShaderResource()->GetHandle(SL_ShaderResource)));
 			}
 			else if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_SAMPLER )
 			{
@@ -46,7 +46,7 @@ namespace Disorder
 					GLogger->Error(stream.str());
 					continue;
 				}
-				CachedSamplerState.push_back((ID3D11SamplerState*)(res->GetDataAsSampler()->GetLowInterface()));
+				CachedSamplerState.push_back((ID3D11SamplerState*)(res->GetDataAsSampler()->GetHandle()));
 			}
 		}
 	}
@@ -57,7 +57,7 @@ namespace Disorder
 		return DX11ShaderObjectPtr(pObject);
 	}
 
-	void* DX11ShaderObject::GetLowInterface()
+	void* DX11ShaderObject::GetHandle()
 	{
 		switch(_type)
 		{
@@ -244,7 +244,7 @@ namespace Disorder
 				constantBuffer.BufferParamRef = GlobalPropertyManager->GetProperty(constantBuffer.CBName);
 				if( constantBuffer.BufferParamRef == NULL )
 				{
-					RenderBufferPtr constBuffer = resourceManager->CreateRenderBuffer(RBT_Constant,BU_DynamicDraw,bufferDesc.Size,bufferDesc.Size,NULL);
+					RenderBufferPtr constBuffer = resourceManager->CreateBuffer(RBT_Constant,BU_DynamicDraw,bufferDesc.Size,bufferDesc.Size,NULL);
 					constantBuffer.BufferParamRef = GlobalPropertyManager->CreateProperty(constantBuffer.CBName,eSP_ConstBuffer); 
 					constantBuffer.BufferParamRef->SetData(constBuffer);
 				}

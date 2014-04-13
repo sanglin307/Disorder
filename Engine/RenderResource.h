@@ -8,7 +8,7 @@ namespace Disorder
 	{
 	public:
 
-		virtual void * GetLowInterface(){ return 0;}
+		virtual void * GetHandle(){ return 0;}
 	};
 
 	class RenderBuffer :public RenderResource
@@ -26,7 +26,7 @@ namespace Disorder
 		}
 
 		virtual void Resize(unsigned int size) = 0;
-		virtual void * GetLowInterface(){ return 0;}
+		virtual void * GetHandle(){ return 0;}
 
 	protected:
 		RenderBuffer(){}
@@ -54,6 +54,9 @@ namespace Disorder
 		unsigned int Height;
 		PixelFormat Format;
         unsigned int MipLevel;
+		unsigned int MultiSampleCount;
+		unsigned int MultiSampleQuality;
+
 		SamplerStatePtr Sampler;
 	protected:
 

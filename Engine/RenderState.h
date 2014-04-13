@@ -97,7 +97,7 @@ namespace Disorder
 	class RenderState
 	{
 	public:
-		virtual void* GetLowInterface(){ return 0; }
+		virtual void* GetHandle(){ return 0; }
 	};
 
 	class RasterizeState : public RenderState

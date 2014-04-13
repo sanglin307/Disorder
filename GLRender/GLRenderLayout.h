@@ -18,7 +18,7 @@ namespace Disorder
 
 		static GLRenderLayoutPtr Create(RenderEffectPtr const& renderEffect,TopologyType topologyType,bool soloBuffer);
  
-		virtual void * GetLowInterface();
+		virtual void * GetHandle();
 		virtual void FinishBufferBinding(RenderEffectPtr const& renderEffect);
 
 		static GLint GetGLTypeSize(GLint type);

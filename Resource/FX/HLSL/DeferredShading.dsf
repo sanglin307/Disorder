@@ -4,6 +4,7 @@ Texture2D<float> GBufferDepthTexture;
 Texture2D<float4> GBufferColorSpecIntTexture;
 Texture2D<float3> GBufferNormalTexture;
 Texture2D<float4> GBufferSpecPowTexture;
+
 SamplerState    GBufferPointSampler;
 
 struct GBufferData

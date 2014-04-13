@@ -16,6 +16,12 @@ namespace Disorder
 
 	void Viewport::SetRenderPath(RenderPathType type)
 	{
+		if (GConfig->pRenderConfig->MultiSampleCount > 1 && type == RPT_DeferredShading)
+		{
+			GLogger->Error("Don't support DeferredShading for multiSample surface, so force to forward Rendering!");
+			type = RPT_ForwardLighting;
+		}
+
 		if( type == RPT_ForwardLighting )
 			_renderPath = ForwardRenderPath::Create();
 		else if(type == RPT_DeferredShading )

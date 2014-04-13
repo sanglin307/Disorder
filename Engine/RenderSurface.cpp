@@ -25,4 +25,42 @@ namespace Disorder
 		_GBufferNormalTexture->SetData(NormalDataBuffer);
 		_GBufferSpecPowTexture->SetData(SpecularDataBuffer);
 	}
+
+	//void* RenderSurface::GetHandle(ESurfaceLocation location)
+	//{
+	//	for (size_t i = 0; i < SurfaceDes.size(); i++)
+	//	{
+	//		if (SurfaceDes[i].Location == location)
+	//			return SurfaceDes[i].Handler;
+	//	}
+
+	//	return NULL;
+	//}
+
+	//RenderTexturePtr RenderSurface::GetResource(ESurfaceLocation location)
+	//{
+	//	for (size_t i = 0; i < SurfaceDes.size(); i++)
+	//	{
+	//		if (SurfaceDes[i].Location == location)
+	//			return SurfaceDes[i].Resource;
+	//	}
+
+	//	return NULL;
+	//}
+
+	void RenderSurface::AddSurface(const RenderTexturePtr& tex, const std::vector<sRenderSurfaceDes>& des)
+	{
+		if (_mapSurfaces.find(tex) != _mapSurfaces.end())
+			return;
+
+		sRenderSurfaceObject obj;
+		obj.Resource = tex;
+		obj.vDes = des;
+		_mapSurfaces.insert(std::pair<RenderTexturePtr, sRenderSurfaceObject>(tex, obj));
+	}
+
+	const std::vector<sRenderSurfaceDes>& RenderSurface::GetSurface(const RenderTexturePtr& tex) const
+	{
+		return _mapSurfaces.at(tex).vDes;
+	}
 }

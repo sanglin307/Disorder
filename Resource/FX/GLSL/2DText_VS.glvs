@@ -6,17 +6,16 @@ layout (location = 0) in vec3 Position;
 layout (location = 1) in vec4 Color;
 layout (location = 3) in vec2 TextureUV;
 
- 
-out VS_OUTPUT
+out block
 {
     vec4 Color;
     vec2 TextureUV;
-} vs_out;
+} Out;
 
 
 void main(void) 
 {
    gl_Position = vec4(Position,1);
-   vs_out.Color = Color;
-   vs_out.TextureUV = TextureUV;
+   Out.Color = Color;
+   Out.TextureUV = TextureUV;
 }

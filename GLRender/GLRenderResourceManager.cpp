@@ -30,13 +30,13 @@ namespace Disorder
 		return GLRenderEffect::Create();
 	}
  
-	RenderBufferPtr GLRenderResourceManager::CreateRenderBuffer(RenderBufferType type,BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData)
+	RenderBufferPtr GLRenderResourceManager::CreateBuffer(RenderBufferType type,BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData)
 	{
 		RenderBufferPtr renderBuffer = GLRenderBuffer::Create(type,bufferUsage,elementSize,size,pData);	 
 		return renderBuffer;
 	}
 
-	void GLRenderResourceManager::CreateRenderBufferArray(GeometryPtr const& data, BufferUsage bufferUsage, RenderEffectPtr const& renderEffect, std::vector<RenderBufferPtr> & bufferArray)
+	void GLRenderResourceManager::CreateBufferArray(GeometryPtr const& data, BufferUsage bufferUsage, RenderEffectPtr const& renderEffect, std::vector<RenderBufferPtr> & bufferArray)
 	{
 		GLRenderEffectPtr effect = boost::dynamic_pointer_cast<GLRenderEffect>(renderEffect);
 	 
@@ -50,24 +50,33 @@ namespace Disorder
 		bufferArray.push_back(indexBuffer);
 	}
 
-	RenderTexture2DPtr GLRenderResourceManager::CreateRenderTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, unsigned int usage, BufferInitData const* pData)
+	RenderTexture2DPtr GLRenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample, const std::vector<ESurfaceLocation>& location, BufferInitData const* pData)
 	{
-		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat,width,hight,bMipmap,usage,pData);
+		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat, width, hight, bMipmap, bMultiSample, pData);
 		texture->Sampler = sampler;
 		return texture;
 	}
 
-	RenderTexture2DPtr GLRenderResourceManager::CreateRenderTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, ImagePtr image)
+	RenderTexture2DPtr GLRenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample,ImagePtr image)
 	{
-		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat,image);
+		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat, bMultiSample,image);
 		texture->Sampler = sampler;
 		return texture;
 	}
 
-	RenderSurfacePtr GLRenderResourceManager::CreateRenderSurface(RenderTexture2DPtr const& texture, unsigned int usage, PixelFormat RenderTargetFormat, PixelFormat DepthFormat, PixelFormat ShaderResFormat, bool ReadOnlyDepth, bool ReadOnlyStencil)
+	RenderSurfacePtr GLRenderResourceManager::CreateShaderResource(RenderTexturePtr const& texture, PixelFormat format)
+	{
+		//RenderSurfacePtr surface = GLRenderSurface::Create(texture, RSU_ShaderResource);
+		//return surface;
+		return NULL;
+	}
+
+	RenderSurfacePtr GLRenderResourceManager::CreateRenderSurface(const std::vector<sRenderSurfaceDes>& surfaceDes)
 	{
 		return NULL;
 	}
+
+	 
 
 	SamplerStatePtr GLRenderResourceManager::CreateSamplerState(SamplerDesc* pSamplerDesc)
 	{

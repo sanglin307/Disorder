@@ -2,100 +2,90 @@
 
 namespace Disorder
 {
-	void* DX11RenderSurface::GetLowInterface(RenderSurfaceUsage usage)
-	{
-		if( usage == RSU_RenderTarget )
-			return RenderTargetView.get();
-		else if( usage == RSU_DepthStencil )
-			return DepthStencilView.get();
-		else if( usage == RSU_ShaderResource )
-			return ShaderResourceView.get();
-
-		return NULL;
-	}
-
-	DX11RenderSurfacePtr DX11RenderSurface::Create(const RenderTexture2DPtr& resource,ID3D11RenderTargetViewPtr RenerTarget,ID3D11ShaderResourceViewPtr ShaderResource,ID3D11DepthStencilViewPtr DepthStencil)
+	DX11RenderSurfacePtr DX11RenderSurface::Create()
 	{
 		DX11RenderSurface *pSurface = new DX11RenderSurface;
-		pSurface->Tex2DResource = resource;
-		pSurface->Usage = 0;
-		if( RenerTarget != NULL )
-		{
-			pSurface->Usage |= RSU_RenderTarget;
-			pSurface->RenderTargetView = RenerTarget;
-		}
+		return DX11RenderSurfacePtr(pSurface);
+	}
 
-		if( ShaderResource != NULL )
-		{
-			pSurface->Usage |= RSU_ShaderResource;
-			pSurface->ShaderResourceView = ShaderResource;
-		}
+	DX11RenderSurfacePtr DX11RenderSurface::Create(const std::vector<sRenderSurfaceDes>& surfaceDes)
+	{
+		BOOST_ASSERT(surfaceDes.size() > 0);
+		DX11RenderSurface *pSurface = new DX11RenderSurface;
+		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine);
 
-		if( DepthStencil != NULL )
+		for (size_t i = 0; i < surfaceDes.size(); i++)
 		{
-			pSurface->Usage |= RSU_DepthStencil;
-			pSurface->DepthStencilView = DepthStencil;
+			sRenderSurfaceDes des = surfaceDes[i];
+			if (des.Location == SL_ShaderResource)
+			{
+				ID3D11ShaderResourceView* pShaderResourceView = NULL;
+				D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
+				SRVDesc.Format = DX11RenderEngine::GetPixelFormat(des.Format);
+				RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(des.Resource);
+				if (tex->MultiSampleCount > 1)
+					SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+				else
+					SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+				SRVDesc.Texture2D.MostDetailedMip = 0;
+				SRVDesc.Texture2D.MipLevels = 1;
+				renderEngine->D3DDevice()->CreateShaderResourceView((ID3D11Resource *)des.Resource->GetHandle(), &SRVDesc, &pShaderResourceView);
+				des.Handler = pShaderResourceView;			
+			}
+			else if (des.Location == SL_DepthStencil)
+			{
+				ID3D11DepthStencilView* pDepthStencilView = NULL;
+				D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+				ZeroMemory(&descDSV, sizeof(descDSV));
+				descDSV.Format = DX11RenderEngine::GetPixelFormat(des.Format);
+				RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(des.Resource);
+				if (tex->MultiSampleCount > 1)
+					descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+				else
+					descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+				descDSV.Texture2D.MipSlice = 0;
+				if (renderEngine->GetFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
+				{
+					if (des.Flag & SF_ReadOnlyDepth)
+						descDSV.Flags |= D3D11_DSV_READ_ONLY_DEPTH;
+					if (des.Flag & SF_ReadOnlyStencil )
+						descDSV.Flags |= D3D11_DSV_READ_ONLY_STENCIL;
+				}
+
+				renderEngine->D3DDevice()->CreateDepthStencilView((ID3D11Resource *)des.Resource->GetHandle(), &descDSV, &pDepthStencilView);
+				des.Handler = pDepthStencilView;
+			}
+			else if (des.Location >= SL_RenderTarget1)
+			{
+				ID3D11RenderTargetView* pRenderTargetView = NULL;
+				D3D11_RENDER_TARGET_VIEW_DESC SRVDesc;
+				SRVDesc.Format = DX11RenderEngine::GetPixelFormat(des.Format);
+				RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(des.Resource);
+				if (tex->MultiSampleCount > 1)
+					SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+				else
+					SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+				SRVDesc.Texture2D.MipSlice = 0;
+				renderEngine->D3DDevice()->CreateRenderTargetView((ID3D11Resource *)des.Resource->GetHandle(), &SRVDesc, &pRenderTargetView);
+				des.Handler = pRenderTargetView;
+			}
+
+			pSurface->SurfaceDes.push_back(des);
 		}
 
 		return DX11RenderSurfacePtr(pSurface);
-
 	}
 
-	DX11RenderSurfacePtr DX11RenderSurface::Create(const RenderTexture2DPtr& resource,unsigned int usage,PixelFormat RenderTargetFormat,PixelFormat DepthFormat,PixelFormat ShaderResFormat,bool readOnlyDepth,bool readOnlyStencil)
+	DX11RenderSurface::~DX11RenderSurface()
 	{
-		DX11RenderSurface *pSurface = new DX11RenderSurface;
-		pSurface->Tex2DResource = resource;
-		pSurface->Usage = usage;
-
-		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
-		if( usage & RSU_RenderTarget )
+		for (size_t i = 0; i < SurfaceDes.size(); i++)
 		{
-			ID3D11RenderTargetView* pRenderTargetView = NULL;
-			D3D11_RENDER_TARGET_VIEW_DESC SRVDesc;
-			SRVDesc.Format = DX11RenderEngine::GetPixelFormat(RenderTargetFormat);
-			SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-			SRVDesc.Texture2D.MipSlice = 0;
-			renderEngine->D3DDevice()->CreateRenderTargetView((ID3D11Resource *)resource->GetLowInterface(),&SRVDesc,&pRenderTargetView);
-			pSurface->RenderTargetView = MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView);
-		}
-
-		if( usage & RSU_DepthStencil )
-		{
-			ID3D11DepthStencilView* pDepthStencilView = NULL;
-			D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-			ZeroMemory( &descDSV, sizeof(descDSV) );
-			descDSV.Format = DX11RenderEngine::GetPixelFormat(DepthFormat);   
-			descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-			descDSV.Texture2D.MipSlice = 0;
-			renderEngine->D3DDevice()->CreateDepthStencilView( (ID3D11Resource *)resource->GetLowInterface(), &descDSV, &pDepthStencilView );
-			pSurface->DepthStencilView = MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView);
-
-			// only feature level > 11 support it.
-			if( renderEngine->GetFeatureLevel() >= D3D_FEATURE_LEVEL_11_0 && ( readOnlyDepth || readOnlyStencil ) )
+			if (SurfaceDes[i].Handler != NULL)
 			{
-				if( readOnlyDepth )
-				    descDSV.Flags |= D3D11_DSV_READ_ONLY_DEPTH ;
-				if( readOnlyStencil )
-					descDSV.Flags |= D3D11_DSV_READ_ONLY_STENCIL;
-
-				renderEngine->D3DDevice()->CreateDepthStencilView( (ID3D11Resource *)resource->GetLowInterface(), &descDSV, &pDepthStencilView );
-			    pSurface->DepthStencilReadOnlyView = MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView);
+				((ID3D11View *)SurfaceDes[i].Handler)->Release();
+				SurfaceDes[i].Handler = NULL;
 			}
 		}
-
-		if( usage & RSU_ShaderResource )
-		{
-			ID3D11ShaderResourceView* pShaderResourceView = NULL;
-			D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
-			SRVDesc.Format = DX11RenderEngine::GetPixelFormat(ShaderResFormat);
-			SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			SRVDesc.Texture2D.MostDetailedMip = 0;
-			SRVDesc.Texture2D.MipLevels = 1;
-			renderEngine->D3DDevice()->CreateShaderResourceView((ID3D11Resource *)resource->GetLowInterface(),&SRVDesc,&pShaderResourceView );
-			pSurface->ShaderResourceView = MakeComPtr<ID3D11ShaderResourceView>(pShaderResourceView);
-		}
-
-		return DX11RenderSurfacePtr(pSurface);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,24 +96,72 @@ namespace Disorder
 		sDesc.AddressU = sDesc.AddressV = sDesc.AddressW = TAM_Wrap;
 		SamplerStatePtr linearSampleState = GEngine->RenderResourceMgr->CreateSamplerState(&sDesc);
 
-		unsigned int surfaceUsage = RSU_DepthStencil|RSU_ShaderResource;
-		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateRenderTexture2D(linearSampleState,PF_R24G8_TYPELESS,width,height,false,surfaceUsage,NULL);
-		DepthStencilBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(depthStencilTex,surfaceUsage,PF_UNKNOWN,PF_D24_UNORM_S8_UINT,PF_R24_UNORM_X8_TYPELESS,true,true);
+		{
+			std::vector<ESurfaceLocation> vlocation;
+			vlocation.push_back(SL_ShaderResource);
+			vlocation.push_back(SL_DepthStencil);
+			RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(linearSampleState, PF_R24G8_TYPELESS, width, height, false, false, vlocation, NULL);
+			std::vector<sRenderSurfaceDes> depthSurfaceDes;
+			sRenderSurfaceDes des;
+			des.Flag = SF_ReadOnlyDepth | SF_ReadOnlyStencil;
+			des.Format = PF_D24_UNORM_S8_UINT;
+			des.Location = SL_DepthStencil;
+			des.Resource = depthStencilTex;
+			depthSurfaceDes.push_back(des);
 
-		surfaceUsage = RSU_RenderTarget | RSU_ShaderResource;
-		RenderTexture2DPtr basicColorTex = GEngine->RenderResourceMgr->CreateRenderTexture2D(linearSampleState,PF_R8G8B8A8_UNORM,width,height,false,surfaceUsage,NULL);
-		BasicColorBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(basicColorTex,surfaceUsage,PF_R8G8B8A8_UNORM,PF_UNKNOWN,PF_R8G8B8A8_UNORM);
+			des.Flag = 0;
+			des.Format = PF_R24_UNORM_X8_TYPELESS;
+			des.Location = SL_ShaderResource;
+			depthSurfaceDes.push_back(des);
 
-		RenderTexture2DPtr normalTex = GEngine->RenderResourceMgr->CreateRenderTexture2D(linearSampleState,PF_R11G11B10_FLOAT,width,height,false,surfaceUsage,NULL);
-		NormalDataBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(normalTex,surfaceUsage,PF_R11G11B10_FLOAT,PF_UNKNOWN,PF_R11G11B10_FLOAT);
+			DepthStencilBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(depthSurfaceDes);
+		}
 
-		RenderTexture2DPtr specularTex = GEngine->RenderResourceMgr->CreateRenderTexture2D(linearSampleState,PF_R8G8B8A8_UNORM,width,height,false,surfaceUsage,NULL);
-		SpecularDataBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(specularTex,surfaceUsage,PF_R8G8B8A8_UNORM,PF_UNKNOWN,PF_R8G8B8A8_UNORM);
+		{
+			std::vector<ESurfaceLocation> vlocation;
+			vlocation.push_back(SL_ShaderResource);
+			vlocation.push_back(SL_RenderTarget1);
+			RenderTexture2DPtr basicColorTex = GEngine->RenderResourceMgr->CreateTexture2D(linearSampleState, PF_R8G8B8A8_UNORM, width, height, false, false, vlocation, NULL);
+			std::vector<sRenderSurfaceDes> vDes;
+			sRenderSurfaceDes des;
+			des.Format = PF_R8G8B8A8_UNORM;
+			des.Location = SL_ShaderResource;
+			des.Resource = basicColorTex;
+			vDes.push_back(des);
 
+			des.Format = PF_R8G8B8A8_UNORM;
+			des.Location = SL_RenderTarget1;
+			vDes.push_back(des);
+			BasicColorBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(vDes);
+
+			vDes.clear();
+			RenderTexture2DPtr normalTex = GEngine->RenderResourceMgr->CreateTexture2D(linearSampleState, PF_R11G11B10_FLOAT, width, height, false, false, vlocation, NULL);
+			des.Format = PF_R11G11B10_FLOAT;
+			des.Location = SL_ShaderResource;
+			des.Resource = basicColorTex;
+			vDes.push_back(des);
+
+			des.Format = PF_R11G11B10_FLOAT;
+			des.Location = SL_RenderTarget1;
+			vDes.push_back(des);
+			NormalDataBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(vDes);
+
+			vDes.clear();
+			RenderTexture2DPtr specularTex = GEngine->RenderResourceMgr->CreateTexture2D(linearSampleState, PF_R8G8B8A8_UNORM, width, height, false, false, vlocation, NULL);
+			des.Format = PF_R8G8B8A8_UNORM;
+			des.Location = SL_ShaderResource;
+			des.Resource = basicColorTex;
+			vDes.push_back(des);
+
+			des.Format = PF_R8G8B8A8_UNORM;
+			des.Location = SL_RenderTarget1;
+			vDes.push_back(des);
+			SpecularDataBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(vDes);
+		}
 		
 		_GBufferVisualEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"SurfaceVisual",SM_4_0,"SurfaceVisualVS");
-		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"SurfaceVisual",SM_4_0,"SurfaceVisualPS");
+		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"SurfaceVisual",SM_4_0,"VS");
+		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"SurfaceVisual",SM_4_0,"PS");
 		_GBufferVisualEffect->BindShader(vertexShader);
 		_GBufferVisualEffect->BindShader(pixelShader);
 
@@ -172,6 +210,7 @@ namespace Disorder
 
 	void DX11RenderGBuffer::DebugVisual()
 	{
+		return;
 		CameraPtr mainCamera = GSceneManager->GetDefaultCamera();
 
 		//_GBufferVisTex->SetData(DepthStencilBuffer);
@@ -205,16 +244,6 @@ namespace Disorder
 
 	void DX11RenderSurfaceCache::InitGBuffer(unsigned int width,unsigned int height)
 	{
-		DX11RenderEnginePtr rEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine);
-		if (rEngine->GetFeatureLevel() <= D3D_FEATURE_LEVEL_10_0 && GConfig->pRenderConfig->MultiSampleCount > 1)
-		{
-			char message[] = "Not support multisample for GBuffer on feature level below 10_1, because we can't use depthview and shaderview for multisample!";
-			MessageBoxA(NULL, message, "Warning", MB_OK);
-			GLogger->Error(message);
-			BOOST_ASSERT(0);
-			return;
-		}
-
 		GBuffer = DX11RenderGBuffer::Create(width,height);
 	}
 

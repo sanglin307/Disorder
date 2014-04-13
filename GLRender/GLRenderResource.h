@@ -11,7 +11,7 @@ namespace Disorder
 		static GLRenderBufferPtr Create(RenderBufferType type,GeometryPtr const& data,GLint location,BufferUsage bufferUsage,RenderEffectPtr const& effect);
 		static GLRenderBufferPtr Create(RenderBufferType type,BufferUsage bufferUsage,unsigned int elementSize,unsigned int size,void *pData);
 
-		virtual void * GetLowInterface();
+		virtual void * GetHandle();
 		virtual void Resize(unsigned int size);
 
 		
@@ -31,10 +31,10 @@ namespace Disorder
 	public:
 		~GLRenderTexture2D();
 
-		static GLRenderTexture2DPtr Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,unsigned int bindFlag,BufferInitData const* pData);
-		static GLRenderTexture2DPtr Create(PixelFormat pixelFormat,ImagePtr const& image);
+		static GLRenderTexture2DPtr Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, BufferInitData const* pData);
+		static GLRenderTexture2DPtr Create(PixelFormat pixelFormat, bool bMultiSample,ImagePtr const& image);
 	   
-		virtual void * GetLowInterface();
+		virtual void * GetHandle();
 	protected:
 		GLRenderTexture2D();
  

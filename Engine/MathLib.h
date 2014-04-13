@@ -48,11 +48,24 @@ namespace Disorder
 	{
 	public:
 
+		static inline unsigned int LogTwo(unsigned int n)
+		{
+			int i = 1;
+			while (n / 2 > 1)
+			{
+				i++;
+				n /= 2;
+			}
+
+			return i;
+		}
+
 		/** Returns the closest power-of-two number greater or equal to value.
             @note 0 and 1 are powers of two, so 
-                firstPO2From(0)==0 and firstPO2From(1)==1.
+                FirstPOW2From(0)==0 and FirstPOW2From(1)==1.
         */
-        static inline unsigned int FirstPO2From(unsigned int n)
+
+        static inline unsigned int FirstPOW2From(unsigned int n)
         {
             --n;            
             n |= n >> 16;
@@ -68,7 +81,7 @@ namespace Disorder
             @note 0 and 1 are tread as power of two.
         */
         template<typename T>
-        static inline bool IsPO2(T n)
+        static inline bool IsPOW2(T n)
         {
             return (n & (n-1)) == 0;
         }

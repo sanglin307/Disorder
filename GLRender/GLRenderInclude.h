@@ -46,7 +46,8 @@ namespace Disorder
 	typedef boost::shared_ptr<GLRenderGBuffer> GLRenderGBufferPtr;
 	class GLRenderSurfaceCache;
 	typedef boost::shared_ptr<GLRenderSurfaceCache> GLRenderSurfaceCachePtr;
-
+	class GLDebugLayer;
+	typedef boost::shared_ptr<GLDebugLayer> GLDebugLayerPtr;
 }
 
 #include "GLRenderState.h"

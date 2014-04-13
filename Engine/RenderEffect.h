@@ -20,7 +20,7 @@ namespace Disorder
 		}
  
 		virtual void  UpdateShaderParameter() {;}
-		virtual void* GetLowInterface(){ return 0;}
+		virtual void* GetHandle(){ return 0;}
 		virtual void* GetDataInterface() { return 0;}
  
 		virtual bool LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType) = 0;

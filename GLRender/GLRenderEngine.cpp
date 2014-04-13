@@ -3,6 +3,91 @@
 
 namespace Disorder
 {
+	GLDebugLayerPtr GLDebugLayer::Create()
+	{
+		GLDebugLayer *pLayer = new GLDebugLayer;
+		return GLDebugLayerPtr(pLayer);
+	}
+
+	void GLDebugLayer::Init()
+	{
+		GLRenderEnginePtr engine = boost::dynamic_pointer_cast<GLRenderEngine>(GEngine->RenderEngine);
+		if (engine->IsVersionSupported(4, 3))
+		{
+			glDebugMessageCallback(DebugCallback, this);
+			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_API, "API"));
+			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_WINDOW_SYSTEM, "Window System"));
+			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_SHADER_COMPILER, "Shader Compiler"));
+			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_THIRD_PARTY, "Third Party"));
+			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_APPLICATION, "Application"));
+			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_OTHER, "Other"));
+
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_ERROR, "Error"));
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR, "Deprecated Behavior"));
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR, "Undefined Behavior"));
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_PORTABILITY, "Portability"));
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_PERFORMANCE, "Performance"));
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_OTHER, "Other"));
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_MARKER, "Maker"));
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_PUSH_GROUP, "Push Group"));
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_POP_GROUP, "Pop Group"));
+
+			_mapSeverityInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SEVERITY_LOW, "Low"));
+			_mapSeverityInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SEVERITY_MEDIUM, "Medium"));
+			_mapSeverityInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SEVERITY_HIGH, "High"));
+			_mapSeverityInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SEVERITY_NOTIFICATION, "Notification"));
+		}
+		else if (engine->IsExtensionSupported("GL_ARB_debug_output"))
+		{
+			glDebugMessageCallbackARB(DebugCallback, this);
+			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
+
+			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_API_ARB, "API"));
+			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB, "Window System"));
+			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_SHADER_COMPILER_ARB, "Shader Compiler"));
+			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_THIRD_PARTY_ARB, "Third Party"));
+			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_APPLICATION_ARB, "Application"));
+			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_OTHER_ARB, "Other"));
+
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_ERROR_ARB, "Error"));
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB, "Deprecated Behavior"));
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB, "Undefined Behavior"));
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_PORTABILITY_ARB, "Portability"));
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_PERFORMANCE_ARB, "Performance"));
+			_mapTypeInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_TYPE_OTHER_ARB, "Other"));
+
+			_mapSeverityInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SEVERITY_LOW_ARB, "Low"));
+			_mapSeverityInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SEVERITY_MEDIUM_ARB, "Medium"));
+			_mapSeverityInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SEVERITY_HIGH_ARB, "High"));
+		
+		}
+	}
+
+	void GLDebugLayer::OnDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message)
+	{
+		std::stringstream stream;
+
+		stream << "OpenGL Debug Message -- Source: " << _mapSourceInfo[source] << "  Type: " << _mapTypeInfo[type] << "  Severity: " << _mapSeverityInfo[severity];
+		stream << " ID: " << id;
+		stream << " Message: " << message;
+
+		if (type == GL_DEBUG_TYPE_ERROR)
+		{
+			GLogger->Error(stream.str());
+		}
+		else
+		{
+			GLogger->Warning(stream.str());
+		}
+
+	}
+
+	void GLDebugLayer::Exit()
+	{
+
+	}
 
 	GLRenderEnginePtr GLRenderEngine::Create()
 	{
@@ -289,6 +374,38 @@ namespace Disorder
 		}
 
 		LoadShaderIncludeFiles();
+		LoadGLExtensions();
+
+		_debugLayer = GLDebugLayer::Create();
+		_debugLayer->Init();
+	}
+
+	void GLRenderEngine::LoadGLExtensions()
+	{
+		GLint numExtensions;
+		GLint i;
+
+		glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
+
+		for (i = 0; i < numExtensions; i++)
+		{
+			const char* e = (const char*)glGetStringi(GL_EXTENSIONS, i);
+			_vGLExtensions.push_back(e);
+		}
+	}
+
+	bool GLRenderEngine::IsExtensionSupported(std::string const& extension)
+	{
+		if (_vGLExtensions.size() == 0)
+			return false;
+
+		for (size_t i = 0; i < _vGLExtensions.size(); i++)
+		{
+			if (!stricmp(extension.c_str(),_vGLExtensions[i].c_str()))
+				return true;
+		}
+
+		return false;
 	}
 
 	void GLRenderEngine::LoadShaderIncludeFiles()
@@ -394,13 +511,16 @@ namespace Disorder
 			return false;
 		}
 
+		glGetIntegerv(GL_MAJOR_VERSION, &_mainVersion);
+		glGetIntegerv(GL_MINOR_VERSION, &_subVersion);
+
 		wglMakeCurrent(NULL, NULL);
 		wglDeleteContext(tempContext);
 		DestroyWindow(htempWin);
 		UnregisterClass(winClassName, GAppInstance);
 
 		_hDC = GetDC(window);
-		int nPixCount = 0;
+		unsigned int nPixCount = 0;
 		int colorBit = 24;
 		int alphaBit = 8;
 		int depthBit = 24;
@@ -412,13 +532,11 @@ namespace Disorder
 		std::vector<int> pixAttribs;
 		pixAttribs.push_back(WGL_SUPPORT_OPENGL_ARB); pixAttribs.push_back(1);
 		pixAttribs.push_back(WGL_DRAW_TO_WINDOW_ARB); pixAttribs.push_back(1);
-		pixAttribs.push_back(WGL_ACCELERATION_ARB);
-		pixAttribs.push_back(WGL_FULL_ACCELERATION_ARB);
+		pixAttribs.push_back(WGL_ACCELERATION_ARB); pixAttribs.push_back(WGL_FULL_ACCELERATION_ARB);
 		pixAttribs.push_back(WGL_COLOR_BITS_ARB);  pixAttribs.push_back(colorBit);
 		pixAttribs.push_back(WGL_ALPHA_BITS_ARB);  pixAttribs.push_back(alphaBit);
 		pixAttribs.push_back(WGL_DEPTH_BITS_ARB);  pixAttribs.push_back(depthBit);
 		pixAttribs.push_back(WGL_STENCIL_BITS_ARB); pixAttribs.push_back(stencilBit);
-		pixAttribs.push_back(WGL_ACCELERATION_ARB);
 		pixAttribs.push_back(WGL_DOUBLE_BUFFER_ARB); pixAttribs.push_back(GL_TRUE);
 		pixAttribs.push_back(WGL_PIXEL_TYPE_ARB); pixAttribs.push_back(WGL_TYPE_RGBA_ARB);
 		if (GConfig->pRenderConfig->MultiSampleCount > 1)
@@ -428,11 +546,28 @@ namespace Disorder
 		}
 		pixAttribs.push_back(0);
 
-		wglChoosePixelFormatARB(_hDC, pixAttribs.data(), fPixAttribs, 1, &nPixelFormat, (UINT*)&nPixCount);
-		if (nPixelFormat == -1)
+		int result = wglChoosePixelFormatARB(_hDC, pixAttribs.data(), fPixAttribs, 1, &nPixelFormat, &nPixCount);
+		if (!result || nPixCount <= 0)
 		{
-			GLogger->Error("Can't find right pixel format for openGL,please check render setting!");
-			return false;
+			while ((!result || nPixCount <= 0) && GConfig->pRenderConfig->MultiSampleCount > 1)
+			{
+				GConfig->pRenderConfig->MultiSampleCount--;
+				for (size_t t = 0; t < pixAttribs.size(); t++)
+				{
+					if (pixAttribs[t] == WGL_SAMPLES_ARB)
+					{
+						pixAttribs[t + 1] = GConfig->pRenderConfig->MultiSampleCount;
+						result = wglChoosePixelFormatARB(_hDC, pixAttribs.data(), fPixAttribs, 1, &nPixelFormat, (UINT*)&nPixCount);
+						break;
+					}
+				}
+			}
+
+			if (!result || nPixCount <= 0)
+			{
+			   GLogger->Error("Can't find right pixel format for openGL,please check render setting!");
+			   return false;
+		    }
 		}
 
 		// Got a format, now set it as the current one  
@@ -441,19 +576,24 @@ namespace Disorder
 			return false;
 		}
 
+		
+
 		std::vector<int> attrib;
-		attrib.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB); attrib.push_back(3);
-		attrib.push_back(WGL_CONTEXT_MINOR_VERSION_ARB); attrib.push_back(3);
-		attrib.push_back(WGL_CONTEXT_PROFILE_MASK_ARB);
-		attrib.push_back(WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
+		attrib.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB); attrib.push_back(_mainVersion);
+		attrib.push_back(WGL_CONTEXT_MINOR_VERSION_ARB); attrib.push_back(_subVersion);
+		attrib.push_back(WGL_CONTEXT_PROFILE_MASK_ARB); attrib.push_back(WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
 #ifdef _DEBUG
-		attrib.push_back(WGL_CONTEXT_FLAGS_ARB); attrib.push_back(WGL_CONTEXT_DEBUG_BIT_ARB);
+		attrib.push_back(WGL_CONTEXT_FLAGS_ARB); attrib.push_back(WGL_CONTEXT_DEBUG_BIT_ARB | WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB);
+#else
+		attrib.push_back(WGL_CONTEXT_FLAGS_ARB); attrib.push_back( WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB);
 #endif
 		attrib.push_back(0);
 
 		if (wglewIsSupported("WGL_ARB_create_context") == 1)
 		{
 			_hRC = wglCreateContextAttribsARB(_hDC, 0, attrib.data());
+			if (!_hRC)
+				return false;
 			wglMakeCurrent(_hDC, _hRC);
 		}
 		else
@@ -465,15 +605,13 @@ namespace Disorder
 		//v-syn
 		wglSwapIntervalEXT(GConfig->pRenderConfig->SyncInterval);
 
-		//Checking GL version
-		const GLubyte *GLVersionString = glGetString(GL_VERSION);
-
-		//Or better yet, use the GL3 way to get the version number
+	
+		//get the version number
 		glGetIntegerv(GL_MAJOR_VERSION, &_mainVersion);
 		glGetIntegerv(GL_MINOR_VERSION, &_subVersion);
 
-		if (!_hRC) 
-			return false;
+		glViewport(0, 0, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY);
+	
 
 		return true;
 	}
@@ -506,24 +644,44 @@ namespace Disorder
  
 	void GLRenderEngine::ClearRenderTarget(const RenderSurfacePtr& renderTarget, const glm::vec4& color)
 	{
+		GLuint fbo = (GLuint)renderTarget->GetHandle(SL_RenderTarget1);
+		_renderCache.CacheFrameBufferObject(fbo);
+
+		glClearBufferfv(GL_COLOR, 0, glm::value_ptr(color));
 
 	}
+
 	void GLRenderEngine::ClearDepthStencil(const RenderSurfacePtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
 	{
+		if (!bClearDepth && bClearStencil)
+			return;
 
+		GLuint fbo = (GLuint)depthBuffer->GetHandle(SL_DepthStencil);
+		_renderCache.CacheFrameBufferObject(fbo);
+
+		if ( bClearDepth)
+			glClearBufferfv(GL_DEPTH, 0, &depth);
+
+		if ( bClearStencil )
+			glClearStencil(stencil);
 	}
+
 	void GLRenderEngine::SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget, const RenderSurfacePtr& depthStencil, bool useReadOnlyDepthStencil)
 	{
-
+		BOOST_ASSERT(0);
 	}
+
 	void GLRenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget, const RenderSurfacePtr& depthStencil, bool useReadOnlyDepthStencil)
 	{
-
+		BOOST_ASSERT(0);
 	}
+
 	void GLRenderEngine::SetRenderLayout(RenderLayoutPtr const& renderLayout)
 	{
-
+		GLuint va = (GLuint)renderLayout->GetHandle();
+		glBindVertexArray(va);
 	}
+
 	void GLRenderEngine::SetPrimitiveTopology(TopologyType topologyType)
 	{
 
@@ -576,7 +734,14 @@ namespace Disorder
 
 
 
-
+	void GLRenderEngine::sGLEngineCache::CacheFrameBufferObject(GLuint fbo)
+	{
+		if (FrameBufferObject != fbo)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+			FrameBufferObject = fbo;
+		}
+	}
 
 
 

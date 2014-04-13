@@ -1,9 +1,13 @@
 #version 330
 
-in vec4 VSColor;
-out vec4 FSColor;
+in block 
+{
+  vec4 Color;
+} In;
+
+out vec4 Color;
  
 void main(void) 
 {
-   FSColor = VSColor;
+   Color = In.Color;
 }

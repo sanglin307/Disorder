@@ -3,7 +3,7 @@
 
 namespace Disorder
 {
-	void* DX11RenderBuffer::GetLowInterface()
+	void* DX11RenderBuffer::GetHandle()
 	{
 		if( D3DInterface != NULL )
 			return D3DInterface.get();
@@ -249,17 +249,19 @@ namespace Disorder
 
 	}
 
-	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat,ImagePtr const& image)
+	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, bool bMultiSample,ImagePtr const& image)
 	{
 		const ImageSpec &spec = image->GetSpec();
 		BufferInitData data;
 		data.Data = image->GetImageData();
 		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat)/8 * spec.width;
 		data.SlicePitch = 0;
-		return Create(pixelFormat,spec.width,spec.height,false,RSU_ShaderResource,&data);
+		std::vector<ESurfaceLocation> loc;
+		loc.push_back(SL_ShaderResource);
+		return Create(pixelFormat,spec.width,spec.height,false,bMultiSample,loc,&data);
 	}
 
-	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,unsigned int usage,BufferInitData const* pData)
+	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, const std::vector<ESurfaceLocation>& location, BufferInitData const* pData)
 	{
 		DX11RenderTexture2D* pTexture = new DX11RenderTexture2D;
 
@@ -267,6 +269,16 @@ namespace Disorder
 		pTexture->Width = width;
 		pTexture->Height = height;
 
+		if (bMultiSample && !pData)
+		{
+			pTexture->MultiSampleCount = GConfig->pRenderConfig->MultiSampleCount;
+			pTexture->MultiSampleQuality = GConfig->pRenderConfig->MultiSampleQuality;
+		}
+		else
+		{
+			pTexture->MultiSampleCount = 1;
+			pTexture->MultiSampleQuality = 0;
+		}
 
 		D3D11_TEXTURE2D_DESC desc;
 		ZeroMemory(&desc,sizeof(desc));
@@ -281,27 +293,22 @@ namespace Disorder
 		{
 			desc.MipLevels = pTexture->MipLevel = 1;
 		}
-
-		if (!pData)
-		{
-			desc.SampleDesc.Count = GConfig->pRenderConfig->MultiSampleCount;
-			desc.SampleDesc.Quality = GConfig->pRenderConfig->MultiSampleQuality;
-		}
-		else
-		{
-			desc.SampleDesc.Count = 1;
-			desc.SampleDesc.Quality = 0;
-		}
-
+ 
+		desc.SampleDesc.Count = pTexture->MultiSampleCount;
+		desc.SampleDesc.Quality = pTexture->MultiSampleQuality;
 		desc.ArraySize = 1;
 		desc.Format = DX11RenderEngine::GetPixelFormat(pixelFormat);
 		desc.Usage = D3D11_USAGE_DEFAULT;
-		if( usage & RSU_RenderTarget )
-			desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
-		if( usage & RSU_DepthStencil )
-			desc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
-		if( usage & RSU_ShaderResource )
-			desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
+		for (size_t i = 0; i < location.size(); i++)
+		{
+			if (location[i] == SL_ShaderResource )
+				desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+			else if (location[i] == SL_DepthStencil )
+				desc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
+			else if (location[i] >= SL_RenderTarget1 )
+				desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+		}
 
 		desc.CPUAccessFlags = 0;
         desc.MiscFlags = 0;
@@ -333,7 +340,7 @@ namespace Disorder
 	 
 	
 
-	void * DX11RenderTexture2D::GetLowInterface()
+	void * DX11RenderTexture2D::GetHandle()
 	{
 		return D3DInterface.get();
 	}

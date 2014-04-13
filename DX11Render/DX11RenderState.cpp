@@ -2,7 +2,7 @@
 
 namespace Disorder
 {
-	void* DX11SamplerState::GetLowInterface()
+	void* DX11SamplerState::GetHandle()
 	{
 		return D3DInterface.get();
 	}
@@ -45,7 +45,7 @@ namespace Disorder
 
 	//======================================================================
 
-	void* DX11RasterizeState::GetLowInterface()
+	void* DX11RasterizeState::GetHandle()
 	{
 		return D3DInterface.get();
 	}
@@ -98,7 +98,7 @@ namespace Disorder
 	}
 	//==================================================================
 
-	void* DX11DepthStencilState::GetLowInterface()
+	void* DX11DepthStencilState::GetHandle()
 	{
 		return D3DInterface.get();
 	}
@@ -186,7 +186,7 @@ namespace Disorder
 
 	}
 
-	void* DX11BlendState::GetLowInterface()
+	void* DX11BlendState::GetHandle()
 	{
 		return D3DInterface.get();
 	}

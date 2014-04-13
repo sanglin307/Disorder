@@ -36,7 +36,8 @@ namespace Disorder
 	    texProperty->SetData(_texture);
 	 
 		ShaderPropertyPtr Sampler = globalProperty->CreateProperty(ShaderPropertyManager::sTextSampler,eSP_SampleState,1);
-		Sampler->SetData(texture->Tex2DResource->Sampler);
+		RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(texture->GetResource(SL_ShaderResource));
+		Sampler->SetData(tex->Sampler);
  
 	}
 
@@ -151,11 +152,11 @@ namespace Disorder
 		_indexs = new unsigned short[_savedIndexBufferSize];
 		_indexNum = 0;
 
-		RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,BU_DynamicDraw,sizeof(BatchTileVertex),sizeof(BatchTileVertex)*_savedVertexBufferSize,NULL);
+		RenderBufferPtr vertexBuffer = resourceManager->CreateBuffer(RBT_Vertex,BU_DynamicDraw,sizeof(BatchTileVertex),sizeof(BatchTileVertex)*_savedVertexBufferSize,NULL);
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 
 		//Index buffer
-		RenderBufferPtr indexBuffer = resourceManager->CreateRenderBuffer(RBT_Index,BU_DynamicDraw,sizeof(WORD),sizeof(WORD)*_savedIndexBufferSize,NULL);
+		RenderBufferPtr indexBuffer = resourceManager->CreateBuffer(RBT_Index,BU_DynamicDraw,sizeof(WORD),sizeof(WORD)*_savedIndexBufferSize,NULL);
 		_renderLayout->BindIndexBuffer(indexBuffer);
 
 		_renderLayout->FinishBufferBinding(_renderEffect);
@@ -186,7 +187,7 @@ namespace Disorder
 	{
 		_renderEffect = renderEffect;
 		_renderLayout = GEngine->RenderResourceMgr->CreateRenderLayout(_renderEffect,TT_TriangleStrip,true);
-		RenderBufferPtr vertexBuffer = GEngine->RenderResourceMgr->CreateRenderBuffer(RBT_Vertex,BU_StaticDraw,sizeof(TileTexVertex),sizeof(TileTexVertex)*4,(void*)positions);
+		RenderBufferPtr vertexBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Vertex,BU_StaticDraw,sizeof(TileTexVertex),sizeof(TileTexVertex)*4,(void*)positions);
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 		_renderLayout->FinishBufferBinding(_renderEffect);
 	}
@@ -226,7 +227,7 @@ namespace Disorder
 		_vertexs = new BatchLineVertex[_savedVertexBufferSize];
 		_vertexNum = 0;
 
-		RenderBufferPtr vertexBuffer = resourceManager->CreateRenderBuffer(RBT_Vertex,BU_DynamicDraw,sizeof(BatchLineVertex),sizeof(BatchLineVertex)*_savedVertexBufferSize,NULL);
+		RenderBufferPtr vertexBuffer = resourceManager->CreateBuffer(RBT_Vertex,BU_DynamicDraw,sizeof(BatchLineVertex),sizeof(BatchLineVertex)*_savedVertexBufferSize,NULL);
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 		_renderLayout->FinishBufferBinding(_renderEffect);
 
@@ -345,7 +346,7 @@ namespace Disorder
 		_renderLayout = GEngine->RenderResourceMgr->CreateRenderLayout(effect,TT_TriangleList,false);
  
 		std::vector<RenderBufferPtr> bufferArray;
-		GEngine->RenderResourceMgr->CreateRenderBufferArray(_geometryObject,BU_StaticDraw,effect,bufferArray);
+		GEngine->RenderResourceMgr->CreateBufferArray(_geometryObject,BU_StaticDraw,effect,bufferArray);
 		for(unsigned int index = 0;index<bufferArray.size();index++)
 		{
 			if( bufferArray[index]->GetBufferType() == RBT_Vertex )
@@ -354,7 +355,7 @@ namespace Disorder
 				_renderLayout->BindIndexBuffer(bufferArray[index]);
 		}
 
-		_renderLayout->FinishBufferBinding(_renderEffect);
+		_renderLayout->FinishBufferBinding(effect);
 	}
 
 	 void GeometryRenderer::PreRender(CameraPtr const& camera)

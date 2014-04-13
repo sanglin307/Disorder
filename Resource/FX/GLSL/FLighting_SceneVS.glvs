@@ -6,11 +6,11 @@
 layout (location = 0) in vec3 Position;
 layout (location = 2) in vec3 Normal;
 
-out VSOut
+out block
 {
     vec3 NormalWorld; 
 	vec3 PositionWorld;
-};
+}Out;
  
  
 //--------------------------------------------------------------------------------------
@@ -19,8 +19,8 @@ out VSOut
 void main(void)
 {
     gl_Position = WorldTransform * vec4(Position,1.0f);
-	PositionWorld = gl_Position.xyz;
+	Out.PositionWorld = gl_Position.xyz;
 	
     gl_Position = CameraViewProj * gl_Position;
-    NormalWorld = (WorldNormalTransform * vec4(Normal,1.0)).xyz;
+    Out.NormalWorld = (WorldNormalTransform * vec4(Normal,1.0)).xyz;
 }

@@ -113,6 +113,7 @@ namespace Disorder
 		//for scene property
 		static const std::string sAmbientLowColor;
 		static const std::string sAmbientUpperColor;
+	 
  
 		//for global property
 		static const std::string sTextTexture;

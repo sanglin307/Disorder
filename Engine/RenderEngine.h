@@ -25,7 +25,7 @@ namespace Disorder
 
 		virtual void ClearRenderTarget(const RenderSurfacePtr& renderTarget,const glm::vec4& color ) = 0;
 		virtual void ClearDepthStencil(const RenderSurfacePtr& depthBuffer,bool bClearDepth,float depth,bool bClearStencil,unsigned char stencil) = 0;
-		virtual void SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget,const RenderSurfacePtr& depthStencil,bool useReadOnlyDepthStencil = false) = 0;
+		//virtual void SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget,const RenderSurfacePtr& depthStencil,bool useReadOnlyDepthStencil = false) = 0;
 		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil,bool useReadOnlyDepthStencil = false) = 0;
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout) = 0;
 		virtual void SetPrimitiveTopology(TopologyType topologyType) = 0;

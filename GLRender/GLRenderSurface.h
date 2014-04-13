@@ -8,13 +8,16 @@ namespace Disorder
 	class GLRenderSurface : public RenderSurface
 	{
 	public:
+		~GLRenderSurface();
 
 		//static GLRenderSurfacePtr Create(const RenderTexture2DPtr& resource,ID3D11RenderTargetViewPtr RenerTarget,ID3D11ShaderResourceViewPtr ShaderResource,ID3D11DepthStencilViewPtr DepthStencil);
-		static GLRenderSurfacePtr Create(const RenderTexture2DPtr& resource,unsigned int usage,PixelFormat RenderTargetFormat,PixelFormat DepthFormat,PixelFormat ShaderResFormat,bool readOnlyDepth = false,bool readOnlyStencil = false);
-		virtual void* GetLowInterface(RenderSurfaceUsage usage);
+		static GLRenderSurfacePtr Create(const RenderTexture2DPtr& resource,unsigned int usage);
+		virtual void* GetHandle();
 
 	private:
-		GLRenderSurface(){}
+		GLRenderSurface();
+
+		GLuint _frameBuffer;
 	};
 
 	class GLRenderGBuffer : public RenderGBuffer

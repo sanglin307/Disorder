@@ -62,7 +62,7 @@ namespace Disorder
 		// just in case the size might chop a glyph in half, add another glyph width/height
 		tex_side += std::max(max_width, (max_height>>6));
 		// Now round up to nearest power of two
-		UINT roundUpSize = Math::FirstPO2From(tex_side);
+		UINT roundUpSize = Math::FirstPOW2From(tex_side);
 
 		// Would we benefit from using a non-square texture (2X width(
 		size_t finalWidth, finalHeight;
@@ -180,8 +180,8 @@ namespace Disorder
 		SamplerDesc desc;
 		SamplerStatePtr sampler = GEngine->RenderResourceMgr->CreateSamplerState(&desc);
 		PixelFormat pixelFormat = PF_R8G8_UNORM;
-		RenderTexture2DPtr fontTexture = GEngine->RenderResourceMgr->CreateRenderTexture2D(sampler,pixelFormat,fontImage);
-		_glyphsTexture = GEngine->RenderResourceMgr->CreateRenderSurface(fontTexture,RSU_ShaderResource,PF_UNKNOWN,PF_UNKNOWN,pixelFormat);
+		RenderTexture2DPtr fontTexture = GEngine->RenderResourceMgr->CreateTexture2D(sampler,pixelFormat,false,fontImage);
+		_glyphsTexture = GEngine->RenderResourceMgr->CreateShaderResource(fontTexture,pixelFormat);
 		delete imageData;
 	}
 

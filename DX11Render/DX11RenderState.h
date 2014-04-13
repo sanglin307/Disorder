@@ -8,7 +8,7 @@ namespace Disorder
 	{
 	public:
 		static DX11SamplerStatePtr Create(SamplerDesc* pSamplerDesc);
-		virtual void* GetLowInterface();
+		virtual void* GetHandle();
 
 
 	protected:
@@ -21,7 +21,7 @@ namespace Disorder
 	public:
 
 		static DX11RasterizeStatePtr Create(RasterizeDesc *pDesc);
-		virtual void* GetLowInterface();
+		virtual void* GetHandle();
 
 	protected:
 		DX11RasterizeState(){}
@@ -34,7 +34,7 @@ namespace Disorder
 	{
 	public:
 		static DX11DepthStencilStatePtr Create(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef);
-		virtual void* GetLowInterface();
+		virtual void* GetHandle();
  
 	protected:
 		DX11DepthStencilState(){}
@@ -47,7 +47,7 @@ namespace Disorder
 	{
 	public:
 		static DX11BlendStatePtr Create(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable = false,bool IndependentBlendEnable = false);
-		virtual void* GetLowInterface();
+		virtual void* GetHandle();
 
 	protected:
 		DX11BlendState(){}

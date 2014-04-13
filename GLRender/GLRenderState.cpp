@@ -12,7 +12,7 @@ namespace Disorder
 		glDeleteSamplers(1,&_stateHandle);
 	}
 
-	void* GLSamplerState::GetLowInterface()
+	void* GLSamplerState::GetHandle()
 	{
 		return (void*)_stateHandle;
 	}

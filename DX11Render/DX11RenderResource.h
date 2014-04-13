@@ -9,7 +9,7 @@ namespace Disorder
 		static DX11RenderBufferPtr Create(RenderBufferType type,GeometryPtr const& data,std::string const& sematic,BufferUsage bufferUsage,ShaderObjectPtr const& vertexShader);
 		static DX11RenderBufferPtr Create(RenderBufferType type,BufferUsage bufferUsage,unsigned int elementSize,unsigned int size,void *pData);
 
-		virtual void * GetLowInterface();
+		virtual void * GetHandle();
 		virtual void Resize(unsigned int size);
 
 	private:
@@ -27,10 +27,10 @@ namespace Disorder
 	{
 	public:
 
-		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,unsigned int bindFlag,BufferInitData const* pData);
-		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat,ImagePtr const& image);
+		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, const std::vector<ESurfaceLocation>& location, BufferInitData const* pData);
+		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat, bool bMultiSample,ImagePtr const& image);
 	    static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,ID3D11Texture2DPtr DXInterface);
-		virtual void * GetLowInterface();
+		virtual void * GetHandle();
 	protected:
 		DX11RenderTexture2D(){};
 		 

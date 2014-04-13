@@ -4,6 +4,29 @@
 namespace Disorder
 {
  
+	class GLDebugLayer
+	{
+	public:
+		void Init();
+		void Exit();
+
+		static GLDebugLayerPtr Create();
+	private:
+		GLDebugLayer(){};
+
+		static void APIENTRY DebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
+		{
+			reinterpret_cast<GLDebugLayer*>(userParam)->OnDebugMessage(source, type, id, severity, length, message);
+		}
+
+		void OnDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message);
+
+		std::map<GLenum, std::string> _mapSourceInfo;
+		std::map<GLenum, std::string> _mapTypeInfo;
+		std::map<GLenum, std::string> _mapSeverityInfo;
+
+	};
+
 	class GLRenderEngine : public RenderEngine
 	{
 
@@ -42,7 +65,46 @@ namespace Disorder
 		static GLint GetGLAddressMode(TextureAddressMode addrMode);
 		static GLint GetGLComparisonFunc(ComparisonFunc func);
 
+		const int GetMainVersion() const
+		{
+			return _mainVersion;
+		}
+
+		const int GetSubVersion() const
+		{
+			return _subVersion;
+		}
+
+		bool IsVersionSupported(int mainver, int subver)
+		{
+			if (_mainVersion > mainver)
+				return true;
+
+			if (_mainVersion < mainver)
+				return false;
+
+			if (_subVersion >= subver)
+				return true;
+
+			return false;
+		}
+
+		bool IsExtensionSupported(std::string const& extension);
+
 	protected:
+
+		struct sGLEngineCache
+		{
+			GLuint FrameBufferObject;
+
+
+			void CacheFrameBufferObject(GLuint fbo);
+
+			sGLEngineCache()
+				:FrameBufferObject(0)
+			{}
+		};
+
 		virtual void SetBlendState(BlendStatePtr const& blendState);
 		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState);
 		virtual void SetDepthStencilState(DepthStencilStatePtr const& depthStencilState);
@@ -50,10 +112,20 @@ namespace Disorder
 		GLRenderEngine();
 		bool CreateGLContext(HWND window);
 		void LoadShaderIncludeFiles();
+		void LoadGLExtensions();
+		std::vector<std::string> _vGLExtensions;
+
 		HGLRC _hRC;
 		HDC _hDC;
 		int _mainVersion;
 		int _subVersion;
+
+		GLDebugLayerPtr _debugLayer;
+
+		sGLEngineCache _renderCache;
+
+
+
 	};
 
 

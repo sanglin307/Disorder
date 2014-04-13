@@ -8,7 +8,7 @@ namespace Disorder
 	public:
 		~GLSamplerState();
 		static GLSamplerStatePtr Create(SamplerDesc* pSamplerDesc);
-		virtual void* GetLowInterface();
+		virtual void* GetHandle();
 
 
 	protected:

@@ -7,7 +7,7 @@ namespace Disorder
 	GLint GLRenderLayout::Location_Normal = 2;
 	GLint GLRenderLayout::Location_Tex0 = 3;
 
-	void * GLRenderLayout::GetLowInterface()
+	void * GLRenderLayout::GetHandle()
 	{
 		return (void*)_VAOHandle;
 	}
@@ -71,7 +71,7 @@ namespace Disorder
 		bool soloBuffer = _vertexBuffers.size() > 1 ? false : true;
 
 		if( soloBuffer )
-			glBindBuffer(GL_ARRAY_BUFFER, (GLuint)_vertexBuffers[0]->GetLowInterface());
+			glBindBuffer(GL_ARRAY_BUFFER, (GLuint)_vertexBuffers[0]->GetHandle());
 
 		for(size_t attriIndex =0; attriIndex < glEffect->EffectReflection->InputArray.size(); attriIndex++ )
 		{
@@ -83,7 +83,7 @@ namespace Disorder
 
 			if( !soloBuffer )
 			{
-				glBindBuffer(GL_ARRAY_BUFFER, (GLuint)_vertexBuffers[attriIndex]->GetLowInterface());
+				glBindBuffer(GL_ARRAY_BUFFER, (GLuint)_vertexBuffers[attriIndex]->GetHandle());
 				glVertexAttribPointer(attriIndex, count, propertyType, GL_FALSE, 0, 0);
 			}
 			else
@@ -97,7 +97,7 @@ namespace Disorder
 
 		if(_indexBuffer!= NULL )
 		{
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,(GLuint)_indexBuffer->GetLowInterface());
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,(GLuint)_indexBuffer->GetHandle());
 		}
 
 		glBindVertexArray(0);

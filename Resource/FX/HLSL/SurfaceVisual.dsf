@@ -13,7 +13,7 @@ struct VisualVSOutput
     float2 UV		: TEXCOORD0;   // vertex texture coords
 };
 
-VisualVSOutput SurfaceVisualVS( VisualVSInput input )
+VisualVSOutput VS( VisualVSInput input )
 {
     VisualVSOutput Output;
 
@@ -24,7 +24,7 @@ VisualVSOutput SurfaceVisualVS( VisualVSInput input )
 }
 
 
-float4 SurfaceVisualPS( VisualVSOutput In ) : SV_TARGET
+float4 PS( VisualVSOutput In ) : SV_TARGET
 {
 	float4 finalColor = SurfaceVisTex.Sample(SurfaceSampler, In.UV.xy);
  

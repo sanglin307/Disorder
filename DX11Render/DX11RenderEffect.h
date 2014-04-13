@@ -201,7 +201,7 @@ namespace Disorder
 		virtual bool LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType); 
 		virtual void ShaderReflection();
 
-		virtual void* GetLowInterface();
+		virtual void* GetHandle();
 		virtual void* GetDataInterface();
 		
 		static DX11ShaderObjectPtr Create(std::string const& effectName,std::string const& entryPoint,ShaderType shaderType,ShaderModel shaderMode);

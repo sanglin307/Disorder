@@ -13,6 +13,7 @@ namespace Disorder
 		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerScene);
 		_sAmbientLowerProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientLowColor,eSP_Float,3);
 		_sAmbientUpperProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientUpperColor,eSP_Float,3);
+		 
 
 		EnableDebugDraw = true;
 	}
@@ -59,6 +60,7 @@ namespace Disorder
 	{
 		_sAmbientLowerProperty->SetData(glm::value_ptr(_vAmbientLowerColor));
 		_sAmbientUpperProperty->SetData(glm::value_ptr(_vAmbientUpperColor));
+	 
 		_propertyManager->UpdateShaderProperty();
 	}
 

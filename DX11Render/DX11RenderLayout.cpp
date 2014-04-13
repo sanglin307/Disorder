@@ -7,7 +7,7 @@ namespace Disorder
 	std::string DX11RenderLayout::NORMAL = "NORMAL";
 	std::string DX11RenderLayout::TEXCOORD = "TEXCOORD";
 
-	void* DX11RenderLayout::GetLowInterface()
+	void* DX11RenderLayout::GetHandle()
 	{
 		if( D3DInterface != NULL )
 			return D3DInterface.get();

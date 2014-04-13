@@ -47,7 +47,7 @@ namespace Disorder
 		return renderLayout;
 	}
  
-	void DX11RenderResourceManager::CreateRenderBufferArray(GeometryPtr const& data,BufferUsage bufferUsage,RenderEffectPtr const& renderEffect,std::vector<RenderBufferPtr> & bufferArray )
+	void DX11RenderResourceManager::CreateBufferArray(GeometryPtr const& data,BufferUsage bufferUsage,RenderEffectPtr const& renderEffect,std::vector<RenderBufferPtr> & bufferArray )
 	{		 
 		DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(renderEffect->GetVertexShader());
 		//vertex buffer first
@@ -61,31 +61,42 @@ namespace Disorder
 		bufferArray.push_back(indexBuffer);
 	}
 
-    RenderBufferPtr DX11RenderResourceManager::CreateRenderBuffer(RenderBufferType type,BufferUsage bufferUsage,unsigned int elementSize,unsigned int size,void *pData) 
+    RenderBufferPtr DX11RenderResourceManager::CreateBuffer(RenderBufferType type,BufferUsage bufferUsage,unsigned int elementSize,unsigned int size,void *pData) 
 	{
 		RenderBufferPtr renderBuffer = DX11RenderBuffer::Create(type,bufferUsage,elementSize,size,pData);
 	 
 		return renderBuffer;
 	}
  
-	RenderSurfacePtr DX11RenderResourceManager::CreateRenderSurface(RenderTexture2DPtr const& texture,unsigned int usage,PixelFormat RenderTargetFormat,PixelFormat DepthFormat,PixelFormat ShaderResFormat,bool ReadOnlyDepth,bool ReadOnlyStencil)
+	RenderSurfacePtr DX11RenderResourceManager::CreateShaderResource(RenderTexturePtr const& texture, PixelFormat format)
 	{
-		RenderSurfacePtr surface = DX11RenderSurface::Create(texture,usage,RenderTargetFormat,DepthFormat,ShaderResFormat,ReadOnlyDepth,ReadOnlyStencil);
-		 
-		return surface;
+		std::vector<sRenderSurfaceDes> vDes;
+		sRenderSurfaceDes des;
+		des.Format = format;
+		des.Location = SL_ShaderResource;
+		des.Resource = texture;
+		RenderSurfacePtr surface = DX11RenderSurface::Create(vDes);
 
+		return surface;
 	}
 
-	RenderTexture2DPtr DX11RenderResourceManager::CreateRenderTexture2D(SamplerStatePtr const& sampler,PixelFormat pixelFormat,ImagePtr image)
+
+	RenderSurfacePtr DX11RenderResourceManager::CreateRenderSurface(const std::vector<sRenderSurfaceDes>& surfaceDes)
 	{
-		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat,image);
+		DX11RenderSurfacePtr surface = DX11RenderSurface::Create(surfaceDes);
+		return surface;
+	}
+
+	RenderTexture2DPtr DX11RenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample,ImagePtr image)
+	{
+		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat,bMultiSample,image);
 		texture->Sampler = sampler;
 		return texture;
 	}
 
-	RenderTexture2DPtr DX11RenderResourceManager::CreateRenderTexture2D(SamplerStatePtr const& sampler,PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,unsigned int usage,BufferInitData const* pData)
+	RenderTexture2DPtr DX11RenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, const std::vector<ESurfaceLocation>& location, BufferInitData const* pData)
 	{
-		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat,width,height,bMipmap,usage,pData);
+		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat,width,height,bMipmap,bMultiSample,location,pData);
 		texture->Sampler = sampler;
 		return texture;
 

@@ -112,7 +112,7 @@ namespace Disorder
 		return GLRenderBufferPtr(pBuffer);
 	}
 
-	void * GLRenderBuffer::GetLowInterface()
+	void * GLRenderBuffer::GetHandle()
 	{
 		return (void*)_bufferHandle;
 	}
@@ -204,17 +204,18 @@ namespace Disorder
 
 	////////////////////////////////////////////////////////////////////////////////////////
 
-	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat,ImagePtr const& image)
+	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat, bool bMultiSample,ImagePtr const& image)
 	{
 		const ImageSpec &spec = image->GetSpec();
 		BufferInitData data;
 		data.Data = image->GetImageData();
 		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat)/8 * spec.width;
 		data.SlicePitch = 0;
-		return Create(pixelFormat,spec.width,spec.height,false,RSU_ShaderResource,&data);
+		std::vector<ESurfaceLocation> loc;
+		return Create(pixelFormat,spec.width,spec.height,false,bMultiSample,&data);
 	}
 
-	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,bool bMipmap,unsigned int bindFlag,BufferInitData const* pData)
+	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, BufferInitData const* pData)
 	{
 		GLRenderTexture2D *pTexture = new GLRenderTexture2D;
 
@@ -224,16 +225,21 @@ namespace Disorder
 	
 		glBindTexture(GL_TEXTURE_2D, pTexture->_texHandle);
 
-		if( bMipmap )
-			pTexture->MipLevel = 8;
+		if (bMipmap)
+		{
+	 
+	        unsigned int w = Math::LogTwo(width);
+			unsigned int h = Math::LogTwo(height);
+
+			pTexture->MipLevel = w > h ? h : w;
+		}
 		else
-			pTexture->MipLevel = 0;
+			pTexture->MipLevel = 1;
      
 		GLenum glFormat = 0;
 		GLenum glType = 0;
         glTexStorage2D(GL_TEXTURE_2D, pTexture->MipLevel,GLRenderEngine::GetPixelFormat(pixelFormat,glFormat,glType), width, height);  
 
-        //// Assume the texture is already bound to the GL_TEXTURE_2D target
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, glFormat, glType, pData->Data);
  
 		return GLRenderTexture2DPtr(pTexture);
@@ -249,7 +255,7 @@ namespace Disorder
 		glDeleteTextures(1,&_texHandle);
 	}
 
-	void* GLRenderTexture2D::GetLowInterface()
+	void* GLRenderTexture2D::GetHandle()
 	{
 		return (void*)_texHandle;
 	}

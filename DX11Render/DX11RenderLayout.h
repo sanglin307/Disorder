@@ -19,12 +19,12 @@ namespace Disorder
 		virtual void BindVertexBuffer(RenderBufferPtr const& renderBuffer)
 		{
 			RenderLayout::BindVertexBuffer(renderBuffer);
-			VertexArray.push_back((ID3D11Buffer*)(renderBuffer->GetLowInterface()));
+			VertexArray.push_back((ID3D11Buffer*)(renderBuffer->GetHandle()));
 			VertexArrayElementSize.push_back(renderBuffer->GetElementSize());
 			VertexArrayOffset.push_back(0);
 		}
 
-		virtual void * GetLowInterface();
+		virtual void * GetHandle();
 
 	public:
 		ID3D11InputLayoutPtr D3DInterface;

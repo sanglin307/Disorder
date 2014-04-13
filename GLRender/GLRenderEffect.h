@@ -11,7 +11,7 @@ namespace Disorder
 		~GLShaderObject();
 
 		virtual void  UpdateShaderParameter() { ; }
-		virtual void* GetLowInterface(){ return (void*)_GLHandle; }
+		virtual void* GetHandle(){ return (void*)_GLHandle; }
 		virtual void* GetDataInterface() { return 0; }
 
 		virtual bool LoadShaderFromFile(std::string const& fileName, std::string const& entryPoint, ShaderType shaderType);

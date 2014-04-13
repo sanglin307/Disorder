@@ -197,6 +197,7 @@ namespace Disorder
 	// scene ambient
 	const std::string ShaderPropertyManager::sAmbientLowColor = "AmbientLowColor";
 	const std::string ShaderPropertyManager::sAmbientUpperColor = "AmbientUpperColor";
+	 
 
 
 	// Global 

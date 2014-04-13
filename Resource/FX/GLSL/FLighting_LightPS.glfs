@@ -3,11 +3,11 @@
 
 #include </glsl/common.gls>
 
-in VSOut
+in block
 {
     vec3 NormalWorld; 
 	vec3 PositionWorld;
-};
+}In;
 
 out vec4 Color;
 
@@ -32,11 +32,11 @@ Material PrepareMaterial(vec3 normal, vec2 UV)
  
 void main(void)
 {
-    Material mat = PrepareMaterial(NormalWorld,vec2(0,0));
+    Material mat = PrepareMaterial(In.NormalWorld,vec2(0,0));
 
 	vec3 finalColor = CalculateAmbient(mat.Normal,mat.DiffuseColor);
 
-	finalColor += CalculateDirectionLight(PositionWorld,mat);
+	finalColor += CalculateDirectionLight(In.PositionWorld,mat);
 
     Color = vec4(finalColor,1.0f);
 }

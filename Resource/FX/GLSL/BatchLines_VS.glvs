@@ -7,17 +7,15 @@
 layout (location = 0) in vec3 Position;
 layout (location = 1) in vec4 Color;
 
-out vec4 VSColor;
+out block 
+{
+  vec4 Color;
+} Out;
  
 void main(void) 
 {
    vec4 pos = vec4(Position,1.0f);
    gl_Position = CameraViewProj * pos;
-   VSColor = Color;
+   Out.Color = Color;
 }
-
-
-float4 PS( VS_OUTPUT In ) : SV_TARGET
-{ 
-    return In.Color;
-}
+ 

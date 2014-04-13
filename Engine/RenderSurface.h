@@ -5,27 +5,71 @@
 
 namespace Disorder
 {
-	enum RenderSurfaceUsage
+	enum ESurfaceLocation
 	{
-		RSU_RenderTarget = 0x01,
-		RSU_DepthStencil = 0x02,
-		RSU_ShaderResource = 0x04,
+		SL_ShaderResource,
+		SL_DepthStencil,
+		SL_RenderTarget1,
+		SL_RenderTarget2,
+		SL_RenderTarget3,
+		SL_RenderTarget4,
+		SL_RenderTarget5,
+		SL_RenderTarget6,
+		SL_RenderTarget7,
+		SL_RenderTarget8
 	};
 
-	class RenderSurface
+	enum ESurfaceFlag
 	{
-	public:
- 
-		virtual void* GetLowInterface(RenderSurfaceUsage usage)
+		SF_ReadOnlyDepth = 0x01,
+		SF_ReadOnlyStencil = 0x20
+	};
+
+	struct sRenderSurfaceDes
+	{
+		ESurfaceLocation Location;
+		PixelFormat Format;
+		unsigned int Flag;
+		void * Handler;
+
+		sRenderSurfaceDes()
+			:Location(SL_RenderTarget1), Format(PF_UNKNOWN), Flag(0), Handler(0)
 		{
-			return 0;
 		}
 
-		RenderTexture1DPtr Tex1DResource;
-		RenderTexture2DPtr Tex2DResource;
-		RenderTexture3DPtr Tex3DResource;
+		bool IsRenderTarget()
+		{
+			return Location >= SL_RenderTarget1 && Location <= SL_RenderTarget8;
+		}
 
-	    unsigned int Usage;
+		bool IsDepthStencil()
+		{
+			return Location == SL_DepthStencil;
+		}
+
+		bool IsShaderResource()
+		{
+			return Location == SL_ShaderResource;
+		}
+	};
+
+	struct sRenderSurfaceObject
+	{
+		RenderTexturePtr Resource;
+		std::vector<sRenderSurfaceDes> vDes;
+	};
+
+	class RenderSurface 
+	{
+
+	public:
+		void AddSurface(const RenderTexturePtr& tex, const std::vector<sRenderSurfaceDes>& des);
+		const std::vector<sRenderSurfaceDes>& GetSurface(const RenderTexturePtr& tex) const;
+
+	private:
+		//virtual void * GetHandle(ESurfaceLocation location);
+		//RenderTexturePtr GetResource(ESurfaceLocation location);
+		boost::unordered_map<RenderTexturePtr, sRenderSurfaceObject> _mapSurfaces;
 	};
  
 	class RenderGBuffer
@@ -33,9 +77,7 @@ namespace Disorder
 	public:
 	 
 		RenderSurfacePtr DepthStencilBuffer;
-		RenderSurfacePtr BasicColorBuffer;
-		RenderSurfacePtr NormalDataBuffer;
-		RenderSurfacePtr SpecularDataBuffer;
+		RenderSurfacePtr RenderTargetBuffer;
 
 		virtual void UpdateShaderProperty();
 

@@ -93,7 +93,11 @@ namespace Disorder
 			{
 				char *pLog = new char[logLength];
 				glGetShaderInfoLog(_GLHandle,logLength,NULL,pLog);
-				GLogger->Error(pLog);
+				std::string strLog = "Shader Compile error: ";
+				strLog += fileName;
+				strLog += " -- ";
+				strLog += pLog;
+				GLogger->Error(strLog);
 				delete[] pLog;
 				BOOST_ASSERT(0);
 				return false;
@@ -211,77 +215,108 @@ namespace Disorder
 		}
 	}
 
-	void GLRenderEffect::GetShaderPropertyTypeLength(GLint type, EShaderProperty& propertyType, int &lenght)
+	void GLRenderEffect::GetShaderPropertyTypeLength(GLint type, EShaderProperty& propertyType, int &length)
 	{
 		if (type == GL_FLOAT)
 		{
 			propertyType = eSP_Float;
-			lenght = 1;
+			length = 1;
 		}
 		else if (type == GL_FLOAT_VEC2)
 		{
 			propertyType = eSP_Float;
-			lenght = 2;
+			length = 2;
 		}
 		else if (type == GL_FLOAT_VEC3)
 		{
 			propertyType = eSP_Float;
-			lenght = 3;
+			length = 3;
 		}
 		else if (type == GL_FLOAT_VEC4)
 		{
 			propertyType = eSP_Float;
-			lenght = 4;
+			length = 4;
+		}
+		else if (type == GL_FLOAT_MAT4)
+		{
+			propertyType = eSP_Float;
+			length = 16;
+		}
+		else if (type == GL_FLOAT_MAT3)
+		{
+			propertyType = eSP_Float;
+			length = 9;
+		}
+		else if (type == GL_FLOAT_MAT2)
+		{
+			propertyType = eSP_Float;
+			length = 4;
 		}
 		else if (type == GL_DOUBLE)
 		{
 			propertyType = eSP_Double;
-			lenght = 1;
+			length = 1;
 		}
 		else if (type == GL_DOUBLE_VEC2)
 		{
 			propertyType = eSP_Double;
-			lenght = 2;
+			length = 2;
 		}
 
 		else if (type == GL_DOUBLE_VEC3)
 		{
 			propertyType = eSP_Double;
-			lenght = 3;
+			length = 3;
 		}
 		else if (type == GL_DOUBLE_VEC4)
 		{
 			propertyType = eSP_Double;
-			lenght = 4;
+			length = 4;
+		}
+		else if (type == GL_DOUBLE_MAT2)
+		{
+			propertyType = eSP_Double;
+			length = 4;
+		}
+		else if (type == GL_DOUBLE_MAT3)
+		{
+			propertyType = eSP_Double;
+			length = 9;
+		}
+		else if (type == GL_DOUBLE_MAT4)
+		{
+			propertyType = eSP_Double;
+			length = 16;
 		}
 		else if (type == GL_INT)
 		{
 			propertyType = eSP_Int;
-			lenght = 1;
+			length = 1;
 		}
 		else if (type == GL_INT_VEC2)
 		{
 			propertyType = eSP_Int;
-			lenght = 2;
+			length = 2;
 		}
 		else if (type == GL_INT_VEC3)
 		{
 			propertyType = eSP_Int;
-			lenght = 3;
+			length = 3;
 		}
 		else if (type == GL_INT_VEC4)
 		{
 			propertyType = eSP_Int;
-			lenght = 4;
+			length = 4;
 		}
-		else if (type == GL_SAMPLER_2D)
+		else if (type == GL_SAMPLER_2D || type == GL_SAMPLER_1D || type == GL_SAMPLER_3D || type == GL_SAMPLER_CUBE)
 		{
-			propertyType = eSP_SampleState;
-			lenght = 1;
-		}
+			propertyType = eSP_ShaderResource;
+			length = 1;
+		}		
 		else
 		{
 			GLogger->Error("We don't support this shader property type now");
+			BOOST_ASSERT(0);
 		}
 	}
 
@@ -294,7 +329,7 @@ namespace Disorder
 		else
 			BOOST_ASSERT(0);
 
-		GLuint sHandle = (GLuint)shaderObject->GetLowInterface();
+		GLuint sHandle = (GLuint)shaderObject->GetHandle();
 		glAttachShader(_GLHandle,sHandle);
 	}
 
@@ -347,7 +382,7 @@ namespace Disorder
 				desc.BufferParamRef = GlobalPropertyManager->GetProperty(name);
 				if (desc.BufferParamRef == NULL)
 				{
-					RenderBufferPtr constBuffer = GEngine->RenderResourceMgr->CreateRenderBuffer(RBT_Constant, BU_DynamicDraw, desc.BlockSize, desc.BlockSize, NULL);
+					RenderBufferPtr constBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Constant, BU_DynamicDraw, desc.BlockSize, desc.BlockSize, NULL);
 					desc.BufferParamRef = GlobalPropertyManager->CreateProperty(name, eSP_ConstBuffer);
 					desc.BufferParamRef->SetData(constBuffer);
 				}

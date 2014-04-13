@@ -34,7 +34,7 @@ namespace Disorder
 			return _topologyType;
 		}
  
-		virtual void * GetLowInterface(){ return 0;}
+		virtual void * GetHandle(){ return 0;}
 
 		virtual void FinishBufferBinding(RenderEffectPtr const& renderEffect){};
 

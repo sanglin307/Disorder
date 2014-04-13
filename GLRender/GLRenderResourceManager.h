@@ -9,14 +9,15 @@ namespace Disorder
 	public:
 		virtual RenderLayoutPtr CreateRenderLayout(RenderEffectPtr const& renderEffect, TopologyType topologyType, bool soloBuffer);
 		virtual ShaderObjectPtr CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel, std::string const& entryPoint);
-		virtual RenderBufferPtr CreateRenderBuffer(RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData);
+		virtual RenderBufferPtr CreateBuffer(RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData);
 
-		virtual void CreateRenderBufferArray(GeometryPtr const& data, BufferUsage bufferUsage, RenderEffectPtr const& renderEffect, std::vector<RenderBufferPtr> & bufferArray);
+		virtual void CreateBufferArray(GeometryPtr const& data, BufferUsage bufferUsage, RenderEffectPtr const& renderEffect, std::vector<RenderBufferPtr> & bufferArray);
 
-		virtual RenderTexture2DPtr CreateRenderTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, unsigned int usage, BufferInitData const* pData);
-		virtual RenderTexture2DPtr CreateRenderTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, ImagePtr image);
+		virtual RenderTexture2DPtr CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample, const std::vector<ESurfaceLocation>& location, BufferInitData const* pData);
+		virtual RenderTexture2DPtr CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample, ImagePtr image);
 
-		virtual RenderSurfacePtr CreateRenderSurface(RenderTexture2DPtr const& texture, unsigned int usage, PixelFormat RenderTargetFormat, PixelFormat DepthFormat, PixelFormat ShaderResFormat, bool ReadOnlyDepth = false, bool ReadOnlyStencil = false);
+		virtual RenderSurfacePtr CreateShaderResource(RenderTexturePtr const& texture, PixelFormat format);
+		virtual RenderSurfacePtr CreateRenderSurface(const std::vector<sRenderSurfaceDes>& surfaceDes);
 		virtual RenderEffectPtr CreateRenderEffect();
 		virtual SamplerStatePtr CreateSamplerState(SamplerDesc* pSamplerDesc);
 		virtual RasterizeStatePtr CreateRasterizeState(RasterizeDesc *pDesc);

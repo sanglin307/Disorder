@@ -50,25 +50,13 @@
     <None Include="..\Resource\FX\HLSL\DeferredShading.dsf">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\HLSL\GBufferVisual.dsf">
-      <Filter>HLSL</Filter>
-    </None>
     <None Include="..\Resource\FX\HLSL\ScreenTiles.dsf">
       <Filter>HLSL</Filter>
     </None>
     <None Include="..\Resource\FX\HLSL\SurfaceVisual.dsf">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\Common.dsf">
-      <Filter>GLSL</Filter>
-    </None>
     <None Include="..\Resource\FX\GLSL\DeferredShading.dsf">
-      <Filter>GLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\GBufferVisual.dsf">
-      <Filter>GLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\ScreenTiles.dsf">
       <Filter>GLSL</Filter>
     </None>
     <None Include="..\Resource\FX\GLSL\SurfaceVisual.dsf">
@@ -83,29 +71,8 @@
     <None Include="..\Resource\FX\GLSL\DeferredShading.glfs">
       <Filter>GLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\GBufferVisual.glvs">
-      <Filter>GLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\GBufferVisual.glfs">
-      <Filter>GLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\ScreenTiles.glvs">
-      <Filter>GLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\ScreenTiles.glfs">
-      <Filter>GLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\SurfaceVisual.glvs">
-      <Filter>GLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\SurfaceVisual.glfs">
-      <Filter>GLSL</Filter>
-    </None>
     <None Include="..\Resource\FX\HLSL\FLighting.dsf">
       <Filter>HLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\FLighting_.dsf">
-      <Filter>GLSL</Filter>
     </None>
     <None Include="..\Resource\FX\GLSL\FLighting_SceneVS.glvs">
       <Filter>GLSL</Filter>
@@ -126,6 +93,12 @@
       <Filter>GLSL</Filter>
     </None>
     <None Include="..\Resource\FX\GLSL\BatchLines_PS.glfs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\SurfaceVisual_VS.glfs">
+      <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\SurfaceVisual_PS.glvs">
       <Filter>GLSL</Filter>
     </None>
   </ItemGroup>

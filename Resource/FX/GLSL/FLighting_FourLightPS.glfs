@@ -4,11 +4,11 @@
 
 #include </glsl/common.gls>
 
-in VSOut
+in block
 {
     vec3 NormalWorld; 
 	vec3 PositionWorld;
-};
+}In;
 
 out vec4 Color;
 
@@ -30,10 +30,10 @@ Material PrepareMaterial(vec3 normal, vec2 UV)
 void main(void)
 {
 	// Prepare the material structure
-	Material material = PrepareMaterial(NormalWorld, vec2(0,0));
+	Material material = PrepareMaterial(In.NormalWorld, vec2(0,0));
 
 	// Calculate the spot light color
-	vec3 finalColor = CalculateFourLights(PositionWorld, material);
+	vec3 finalColor = CalculateFourLights(In.PositionWorld, material);
 
 	// Return the final color
 	Color = vec4(finalColor, 1.0);
