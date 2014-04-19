@@ -12,12 +12,12 @@ namespace Disorder
 
 		virtual void CreateBufferArray(GeometryPtr const& data, BufferUsage bufferUsage,RenderEffectPtr const& renderEffect,std::vector<RenderBufferPtr> & bufferArray );
 		
-		virtual RenderTexture2DPtr CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample, const std::vector<ESurfaceLocation>& location, BufferInitData const* pData);
+		virtual RenderTexture2DPtr CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample,unsigned int viewFlag, BufferInitData const* pData);
 		virtual RenderTexture2DPtr CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample,ImagePtr image);
        
 		virtual RenderEffectPtr CreateRenderEffect();
-		virtual RenderSurfacePtr CreateShaderResource(RenderTexturePtr const& texture, PixelFormat format);
-		virtual RenderSurfacePtr CreateRenderSurface(const std::vector<sRenderSurfaceDes>& surfaceDes);
+		virtual SurfaceViewPtr CreateSurfaceView(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat Format, unsigned int Flag = 0);
+		virtual RenderSurfacePtr CreateRenderSurface();
 
 		virtual SamplerStatePtr CreateSamplerState(SamplerDesc* pSamplerDesc);
 		virtual RasterizeStatePtr CreateRasterizeState(RasterizeDesc *pDesc);

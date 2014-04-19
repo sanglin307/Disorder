@@ -126,6 +126,8 @@ namespace Disorder
 	typedef boost::shared_ptr<RenderTexture2D> RenderTexture2DPtr;
 	class RenderTexture3D;
 	typedef boost::shared_ptr<RenderTexture3D> RenderTexture3DPtr;
+	class SurfaceView;
+	typedef boost::shared_ptr<SurfaceView> SurfaceViewPtr;
 	class RenderSurface;
 	typedef boost::shared_ptr<RenderSurface> RenderSurfacePtr;
 	class RenderGBuffer;

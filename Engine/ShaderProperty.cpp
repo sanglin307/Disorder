@@ -18,7 +18,7 @@ namespace Disorder
 		else if( PropertyType == eSP_SampleState )
 			_data = new SamplerStatePtr;
 		else if( PropertyType == eSP_ShaderResource )
-			_data = new RenderSurfacePtr;
+			_data = new SurfaceViewPtr;
 		else
 			BOOST_ASSERT(0);
 	}
@@ -32,7 +32,7 @@ namespace Disorder
 		else if( PropertyType == eSP_SampleState )
 			delete (SamplerStatePtr *)_data;
 		else if( PropertyType == eSP_ShaderResource )
-			delete (RenderSurfacePtr *)_data;
+			delete (SurfaceViewPtr *)_data;
 		else
 			BOOST_ASSERT(0);
 	}
@@ -83,10 +83,10 @@ namespace Disorder
 		*(RenderBufferPtr*)_data = constBuffer;
 	}
 
-	void ShaderProperty::SetData(RenderSurfacePtr shaderResource)
+	void ShaderProperty::SetData(SurfaceViewPtr shaderResource)
 	{
 		BOOST_ASSERT(PropertyType == eSP_ShaderResource);
-		*(RenderSurfacePtr*)_data = shaderResource;
+		*(SurfaceViewPtr*)_data = shaderResource;
 	}
 
 	void ShaderProperty::SetData(SamplerStatePtr sample)
@@ -131,10 +131,10 @@ namespace Disorder
 		return *(RenderBufferPtr*)_data;
 	}
 
-	RenderSurfacePtr ShaderProperty::GetDataAsShaderResource()
+	SurfaceViewPtr ShaderProperty::GetDataAsShaderResource()
 	{
 		BOOST_ASSERT(PropertyType == eSP_ShaderResource );
-		return *(RenderSurfacePtr*)_data;
+		return *(SurfaceViewPtr*)_data;
 	}
 
 	SamplerStatePtr ShaderProperty::GetDataAsSampler()

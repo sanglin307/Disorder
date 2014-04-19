@@ -133,7 +133,7 @@ namespace Disorder
 		sd.BufferDesc.Format = dxFormat;
 		sd.BufferDesc.RefreshRate.Numerator = 60;
 		sd.BufferDesc.RefreshRate.Denominator = 1;
-		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
+		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;// | DXGI_USAGE_SHADER_INPUT;
 		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 		sd.OutputWindow = (HWND)hWnd;
 		sd.SampleDesc.Count = GConfig->pRenderConfig->MultiSampleCount;
@@ -154,84 +154,17 @@ namespace Disorder
 		BOOST_ASSERT(SUCCEEDED(hr));
 		DX11RenderTexture2DPtr BackBufferTex = DX11RenderTexture2D::Create(GConfig->pRenderConfig->ColorFormat,sd.BufferDesc.Width,sd.BufferDesc.Height,MakeComPtr<ID3D11Texture2D>(pBackBuffer));
  
-		ID3D11RenderTargetView* pRenderTargetView = NULL;
-		D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
-	    RTVDesc.Format = DX11RenderEngine::GetPixelFormat(GConfig->pRenderConfig->ColorFormat);
-		if (GConfig->pRenderConfig->MultiSampleCount > 1)
-			RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
-		else
-	        RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-	    RTVDesc.Texture2D.MipSlice = 0;
-		hr = _pd3dDevice->CreateRenderTargetView( pBackBuffer, &RTVDesc, &pRenderTargetView );
-		BOOST_ASSERT(SUCCEEDED(hr));
-
-		ID3D11ShaderResourceView* pShaderResourceView = NULL;
-		D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
-		SRVDesc.Format = DX11RenderEngine::GetPixelFormat(GConfig->pRenderConfig->ColorFormat);
-		if (GConfig->pRenderConfig->MultiSampleCount > 1)
-			SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
-		else 
-			SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		SRVDesc.Texture2D.MostDetailedMip = 0;
-		SRVDesc.Texture2D.MipLevels = 1;
-		hr = _pd3dDevice->CreateShaderResourceView( pBackBuffer,&SRVDesc,&pShaderResourceView );
-		BOOST_ASSERT(SUCCEEDED(hr));
-
-		GEngine->RenderSurfaceCache->RenderTarget = DX11RenderSurface::Create();
-		sRenderSurfaceDes des;
-		des.Format = GConfig->pRenderConfig->ColorFormat;
-		des.Location = SL_RenderTarget1;
-		des.Resource = BackBufferTex;
-		des.Handler = pRenderTargetView;
-		GEngine->RenderSurfaceCache->RenderTarget->SurfaceDes.push_back(des);
-
-		des.Location = SL_ShaderResource;
-		des.Handler = pShaderResourceView;
-		GEngine->RenderSurfaceCache->RenderTarget->SurfaceDes.push_back(des);
-		
-
-		//Create a stencil & depth buffer.
-		ID3D11Texture2D* pDepthStencil = NULL;
-		ID3D11DepthStencilView* pDepthStencilView = NULL;
-		D3D11_TEXTURE2D_DESC descDepth;
-		ZeroMemory( &descDepth, sizeof(descDepth) );
-		descDepth.Width = GConfig->pRenderConfig->SizeX;
-		descDepth.Height = GConfig->pRenderConfig->SizeY;
-		descDepth.MipLevels = 1;
-		descDepth.ArraySize = 1;
-		descDepth.Format = DX11RenderEngine::GetPixelFormat(GConfig->pRenderConfig->DepthStencilFormat);
-		descDepth.SampleDesc.Count = GConfig->pRenderConfig->MultiSampleCount;
-		descDepth.SampleDesc.Quality = GConfig->pRenderConfig->MultiSampleQuality;
-		descDepth.Usage = D3D11_USAGE_DEFAULT;
-		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		descDepth.CPUAccessFlags = 0;
-		descDepth.MiscFlags = 0;
-		hr = _pd3dDevice->CreateTexture2D( &descDepth, NULL, &pDepthStencil );
-		DX11RenderTexture2DPtr DepthBufferTex = DX11RenderTexture2D::Create(GConfig->pRenderConfig->DepthStencilFormat,descDepth.Width,descDepth.Height,MakeComPtr<ID3D11Texture2D>(pDepthStencil));
+		SurfaceViewPtr rtView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, BackBufferTex,GConfig->pRenderConfig->ColorFormat);
  
-		BOOST_ASSERT(SUCCEEDED(hr));
+		RenderTexture2DPtr DepthBufferTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, true, SV_DepthStencil, NULL);
 
-		// Create the depth stencil view
-		D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-		ZeroMemory( &descDSV, sizeof(descDSV) );
-		descDSV.Format = descDepth.Format;
-		if (GConfig->pRenderConfig->MultiSampleCount > 1)
-			descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
-		else
-		    descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		descDSV.Texture2D.MipSlice = 0;
-		hr = _pd3dDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &pDepthStencilView );
-		BOOST_ASSERT(SUCCEEDED(hr));
+		SurfaceViewPtr dsView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, DepthBufferTex, GConfig->pRenderConfig->DepthStencilFormat);
 
-		GEngine->RenderSurfaceCache->DepthStencilBuffer = DX11RenderSurface::Create();
-		des.Format = GConfig->pRenderConfig->DepthStencilFormat;
-		des.Location = SL_DepthStencil;
-		des.Resource = DepthBufferTex;
-		des.Handler = pDepthStencilView;
-		GEngine->RenderSurfaceCache->DepthStencilBuffer->SurfaceDes.push_back(des);
-
-	 
-
+		DX11RenderSurfacePtr mainTarget = DX11RenderSurface::Create();
+		mainTarget->SurfacesViewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, rtView));
+		mainTarget->SurfacesViewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, dsView));
+		GEngine->RenderSurfaceCache->MainRenderTarget = mainTarget;
+ 
 		// Setup the viewport
 		D3D11_VIEWPORT vp;
 		vp.Width = (FLOAT)GConfig->pRenderConfig->SizeX;
@@ -757,34 +690,12 @@ namespace Disorder
 			_pImmediateContext->OMSetDepthStencilState(pState,depthStencilState->StencilRef);
 		}
 	}
-
-	/*void DX11RenderEngine::SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget,const RenderSurfacePtr& depthStencil,bool useReadOnlyDepthStencil)
-	{
-		std::vector<ID3D11RenderTargetView*> vRenderTarget;
-		for(size_t i=0;i<renderTarget.size();i++ )
-		{
-			DX11RenderSurfacePtr dxRenderTarget = renderTarget[i] == NULL ? NULL : boost::dynamic_pointer_cast<DX11RenderSurface>(renderTarget[i]);
-			vRenderTarget.push_back(dxRenderTarget->RenderTargetView.get());
-		}
-
-		DX11RenderSurfacePtr dxDepthStencil = depthStencil == NULL ? NULL : boost::dynamic_pointer_cast<DX11RenderSurface>(depthStencil);
-		if( _featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil && dxDepthStencil->DepthStencilReadOnlyView == NULL )
-		{
-			BOOST_ASSERT(0);
-			return;
-		}
-		if( _featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil )
-			_pImmediateContext->OMSetRenderTargets(vRenderTarget.size(),&(vRenderTarget[0]),dxDepthStencil->DepthStencilReadOnlyView.get());
-		else
-		    _pImmediateContext->OMSetRenderTargets(vRenderTarget.size(),&(vRenderTarget[0]),dxDepthStencil->DepthStencilView.get());
-
-	}*/
-
-	void DX11RenderEngine::SaveRenderSurface(RenderSurfacePtr const& surface,std::string const& fileName)
+ 
+	void DX11RenderEngine::SaveSurfaceView(SurfaceViewPtr const& surface, std::string const& fileName)
 	{
 		//create stage texture
 		D3D11_TEXTURE2D_DESC desc;
-		RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(surface->GetResource(SL_ShaderResource));
+		RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(surface->Resource);
 		ID3D11Texture2D *pTex = (ID3D11Texture2D*)tex->GetHandle();
 		pTex->GetDesc(&desc);
 		desc.Usage = D3D11_USAGE_STAGING;
@@ -809,60 +720,82 @@ namespace Disorder
 		
 	}
 
-	void DX11RenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil,bool useReadOnlyDepthStencil)
+	void DX11RenderEngine::SetRenderTarget(const SurfaceViewPtr& renderTarget, const SurfaceViewPtr& depthStencil, bool useReadOnlyDepthStencil)
 	{
-		DX11RenderSurfacePtr dxRenderTarget = renderTarget == NULL ? NULL : boost::dynamic_pointer_cast<DX11RenderSurface>(renderTarget);
-		DX11RenderSurfacePtr dxDepthStencil = depthStencil == NULL ? NULL : boost::dynamic_pointer_cast<DX11RenderSurface>(depthStencil);
+		DX11SurfaceViewPtr dxRenderTarget = renderTarget == NULL ? NULL : boost::dynamic_pointer_cast<DX11SurfaceView>(renderTarget);
+		DX11SurfaceViewPtr dxDepthStencil = depthStencil == NULL ? NULL : boost::dynamic_pointer_cast<DX11SurfaceView>(depthStencil);
 
+		if ( dxRenderTarget == NULL && dxDepthStencil == NULL )
+			return;
+
+		if (_featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil && dxDepthStencil && dxDepthStencil->DepthStencilHandle == NULL)
+		{
+			BOOST_ASSERT(0);
+			return;
+		}
+
+		ID3D11RenderTargetView *pTarget = dxRenderTarget == NULL ? NULL : dxRenderTarget->RenderTargetHandle.get();
+		ID3D11DepthStencilView *pDepth = dxDepthStencil == NULL ? NULL : dxDepthStencil->DepthStencilHandle.get();
+		ID3D11DepthStencilView *pDepthOnly = dxDepthStencil == NULL ? NULL : dxDepthStencil->ReadonlyDepthStencil.get();
+
+		if (_featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil)
+			_pImmediateContext->OMSetRenderTargets(1, &pTarget, pDepthOnly);
+		else
+			_pImmediateContext->OMSetRenderTargets(1, &pTarget, pDepth);
+	}
+
+	 
+	void DX11RenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget,bool useReadOnlyDepthStencil)
+	{
 		std::vector<ID3D11RenderTargetView*> vRenderTarget;
-		for (size_t i = 0; i<dxRenderTarget->SurfaceDes.size(); i++)
+		ID3D11DepthStencilView* pDepthView = NULL;
+		std::map<ESurfaceLocation, SurfaceViewPtr>::const_iterator iter = renderTarget->SurfacesViewMap.begin();
+		while (iter != renderTarget->SurfacesViewMap.end())
 		{
-			if (dxRenderTarget->SurfaceDes[i].IsRenderTarget())
-			    vRenderTarget.push_back((ID3D11RenderTargetView*)dxRenderTarget->SurfaceDes[i].Handler);
-		}
-
-		ID3D11DepthStencilView *pDepthStencil = NULL;
-		if (dxDepthStencil != NULL)
-		{
-			for (size_t i = 0; i<dxRenderTarget->SurfaceDes.size(); i++)
+			if (iter->first == SL_DepthStencil && pDepthView == NULL )
 			{
-				if (useReadOnlyDepthStencil && _featureLevel >= D3D_FEATURE_LEVEL_11_0 )
-				{
-					if (dxDepthStencil->SurfaceDes[i].IsDepthStencil() && dxDepthStencil->SurfaceDes[i].Flag == (SF_ReadOnlyDepth | SF_ReadOnlyStencil))
-					{
-						pDepthStencil = (ID3D11DepthStencilView*)dxDepthStencil->SurfaceDes[i].Handler;
-						break;
-					}
-				}
+				DX11SurfaceViewPtr dxDepthStencil = boost::dynamic_pointer_cast<DX11SurfaceView>(iter->second);
+				if (_featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil)
+					pDepthView = dxDepthStencil->ReadonlyDepthStencil.get();
 				else
-				{
-					if (dxDepthStencil->SurfaceDes[i].IsDepthStencil() && dxDepthStencil->SurfaceDes[i].Flag == 0 )
-					{
-						pDepthStencil = (ID3D11DepthStencilView*)dxDepthStencil->SurfaceDes[i].Handler;
-						break;
-					}
-				}
+					pDepthView = dxDepthStencil->DepthStencilHandle.get();
 			}
+			else if (iter->first >= SL_RenderTarget1 && iter->first <= SL_RenderTarget8)
+			{
+				DX11SurfaceViewPtr dxRenderTarget = boost::dynamic_pointer_cast<DX11SurfaceView>(iter->second);
+				vRenderTarget.push_back((ID3D11RenderTargetView*)dxRenderTarget->RenderTargetHandle.get());
+			}
+			++iter;
 		}
-
-		//const ID3D11RenderTargetView* pRenderTargetArray = vRenderTarget.data();
-		_pImmediateContext->OMSetRenderTargets(vRenderTarget.size(), vRenderTarget.data(), pDepthStencil);
+ 
+		_pImmediateContext->OMSetRenderTargets(vRenderTarget.size(), vRenderTarget.data(), pDepthView);
 	 
 	}
 
-	void DX11RenderEngine::ClearRenderTarget(const RenderSurfacePtr& renderTarget,const glm::vec4& color )
+	void DX11RenderEngine::ClearRenderTarget(const SurfaceViewPtr& renderTarget,const glm::vec4& color )
 	{
-		for (size_t i = 0; i < renderTarget->SurfaceDes.size(); i++)
-		{
-			if (renderTarget->SurfaceDes[i].IsRenderTarget())
-			{
-				_pImmediateContext->ClearRenderTargetView((ID3D11RenderTargetView*)renderTarget->SurfaceDes[i].Handler, glm::value_ptr(color));
-			}
-		}
-		
+		DX11SurfaceViewPtr target = boost::dynamic_pointer_cast<DX11SurfaceView>(renderTarget);
+	    _pImmediateContext->ClearRenderTargetView((ID3D11RenderTargetView*)target->RenderTargetHandle.get(), glm::value_ptr(color));
 	}
 
-	void DX11RenderEngine::ClearDepthStencil(const RenderSurfacePtr& depthBuffer,bool bClearDepth,float depth,bool bClearStencil,unsigned char stencil)
+	void DX11RenderEngine::ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
+	{
+		std::map<ESurfaceLocation, SurfaceViewPtr>::const_iterator iter = renderSurface->SurfacesViewMap.begin();
+		while (iter != renderSurface->SurfacesViewMap.end())
+		{
+			if (iter->first == SL_DepthStencil)
+			{
+				ClearDepthStencil(iter->second, bClearDepth, depth, bClearStencil, stencil);
+			}
+			else if (iter->first >= SL_RenderTarget1 && iter->first <= SL_RenderTarget8)
+			{
+				ClearRenderTarget(iter->second, color);
+			}
+			++iter;
+		}
+	}
+
+	void DX11RenderEngine::ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
 	{
 		unsigned int flag = 0;
 		if( bClearDepth )
@@ -871,13 +804,9 @@ namespace Disorder
 		if( bClearStencil )
 			flag |= D3D11_CLEAR_STENCIL;
 
-		for (size_t i = 0; i < depthBuffer->SurfaceDes.size(); i++)
-		{
-			if (depthBuffer->SurfaceDes[i].IsDepthStencil())
-			{
-				_pImmediateContext->ClearDepthStencilView((ID3D11DepthStencilView*)depthBuffer->SurfaceDes[i].Handler, flag, depth, stencil);
-			}
-		}
+		DX11SurfaceViewPtr dxDepthStencil = boost::dynamic_pointer_cast<DX11SurfaceView>(depthBuffer); 
+		_pImmediateContext->ClearDepthStencilView((ID3D11DepthStencilView*)dxDepthStencil->DepthStencilHandle.get(), flag, depth, stencil);
+			 
 	}
 
 	void DX11RenderEngine::OnDrawBegin()

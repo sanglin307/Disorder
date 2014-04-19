@@ -87,7 +87,7 @@ namespace Disorder
 		strstream << "Drawed triangle num:" << GDrawTriNumber;
 		std::string drawstr = strstream.str();
 		float length = canvas->GetStringLength(0.04f,drawstr);
-		canvas->DrawString(0.98f - length, 0.01f, 0.04f, glm::vec4(1.f), drawstr);
+		canvas->DrawString(0.98f - length, 0.02f, 0.04f, glm::vec4(1.f), drawstr);
    }
 
    EnginePtr Engine::Create()
@@ -119,7 +119,7 @@ namespace Disorder
 
 	    std::stringstream strstream;
 		strstream << "Fps:" << fps << "  Frame Delta:"<< deltaSeconds;
-		canvas->DrawString(0.01f,0.01f,0.04f,color,strstream.str());
+		canvas->DrawString(0.01f,0.02f,0.04f,color,strstream.str());
 		strstream.clear();
 
    }

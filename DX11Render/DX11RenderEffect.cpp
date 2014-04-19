@@ -35,7 +35,7 @@ namespace Disorder
 					GLogger->Error(stream.str());
 					continue;
 				}
-				CachedShaderResourceView.push_back((ID3D11ShaderResourceView*)(res->GetDataAsShaderResource()->GetHandle(SL_ShaderResource)));
+				CachedShaderResourceView.push_back((ID3D11ShaderResourceView*)(res->GetDataAsShaderResource()->GetHandle()));
 			}
 			else if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_SAMPLER )
 			{

@@ -16,15 +16,15 @@ namespace Disorder
 		virtual void OnDrawBegin();
 		virtual void OnDrawEnd();
 
-		virtual void ClearRenderTarget(const RenderSurfacePtr& renderTarget, const glm::vec4& color);
-		virtual void ClearDepthStencil(const RenderSurfacePtr& depthBuffer,bool bClearDepth,float depth,bool bClearStencil,unsigned char stencil);
+		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
+		virtual void ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color);
+		virtual void ClearDepthStencil(const SurfaceViewPtr& depthBuffer,bool bClearDepth,float depth,bool bClearStencil,unsigned char stencil);
 
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
-		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,const RenderSurfacePtr& depthStencil,bool useReadOnlyDepthStencil = false);
-	//	virtual void SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget,const RenderSurfacePtr& depthStencil,bool useReadOnlyDepthStencil = false);
+		virtual void SetRenderTarget(const SurfaceViewPtr& renderTarget, const SurfaceViewPtr& depthStencil, bool useReadOnlyDepthStencil = false);
+		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,bool useReadOnlyDepthStencil = false);
 		virtual void SetPrimitiveTopology(TopologyType topologyType);
 
-		//virtual void UpdateMVPMatrix(RenderEffectPtr const& technique, Matrix4 const& worldMatrix,Matrix4 const& viewMatrix,Matrix4 const& projMatrix);
 		virtual void SetEffect(RenderEffectPtr const& technique);
 		virtual void DrawIndexed(unsigned int indexCount,unsigned int startIndexLocation,int baseVertexLocation);
 		virtual void Draw(unsigned int vertexCount,unsigned int startVertexLocation);
@@ -50,7 +50,7 @@ namespace Disorder
 			return _featureLevel;
 		}
 
-		virtual void SaveRenderSurface(RenderSurfacePtr const& surface,std::string const& fileName);
+		virtual void SaveSurfaceView(SurfaceViewPtr const& surface, std::string const& fileName);
 
 		// pixel format related things.
 		static DXGI_FORMAT GetPixelFormat(PixelFormat format);

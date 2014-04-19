@@ -642,18 +642,23 @@ namespace Disorder
 
 	}
  
-	void GLRenderEngine::ClearRenderTarget(const RenderSurfacePtr& renderTarget, const glm::vec4& color)
+	void GLRenderEngine::ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
 	{
-		GLuint fbo = (GLuint)renderTarget->GetHandle(SL_RenderTarget1);
-		_renderCache.CacheFrameBufferObject(fbo);
-
-		glClearBufferfv(GL_COLOR, 0, glm::value_ptr(color));
 
 	}
 
-	void GLRenderEngine::ClearDepthStencil(const RenderSurfacePtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
+	void GLRenderEngine::ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color)
 	{
-		if (!bClearDepth && bClearStencil)
+		/*GLuint fbo = (GLuint)renderTarget->GetHandle(SL_RenderTarget1);
+		_renderCache.CacheFrameBufferObject(fbo);
+
+		glClearBufferfv(GL_COLOR, 0, glm::value_ptr(color));*/
+
+	}
+
+	void GLRenderEngine::ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
+	{
+		/*if (!bClearDepth && bClearStencil)
 			return;
 
 		GLuint fbo = (GLuint)depthBuffer->GetHandle(SL_DepthStencil);
@@ -663,15 +668,15 @@ namespace Disorder
 			glClearBufferfv(GL_DEPTH, 0, &depth);
 
 		if ( bClearStencil )
-			glClearStencil(stencil);
+			glClearStencil(stencil);*/
 	}
 
-	void GLRenderEngine::SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget, const RenderSurfacePtr& depthStencil, bool useReadOnlyDepthStencil)
+	void GLRenderEngine::SetRenderTarget(const SurfaceViewPtr& renderTarget, const SurfaceViewPtr& depthStencil, bool useReadOnlyDepthStencil)
 	{
 		BOOST_ASSERT(0);
 	}
 
-	void GLRenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget, const RenderSurfacePtr& depthStencil, bool useReadOnlyDepthStencil)
+	void GLRenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget, bool useReadOnlyDepthStencil)
 	{
 		BOOST_ASSERT(0);
 	}
@@ -713,7 +718,7 @@ namespace Disorder
 
 	}
 
-	void GLRenderEngine::SaveRenderSurface(RenderSurfacePtr const& surface, std::string const& fileName)
+	void GLRenderEngine::SaveSurfaceView(SurfaceViewPtr const& surface, std::string const& fileName)
 	{
 
 	}

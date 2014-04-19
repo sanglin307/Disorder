@@ -256,18 +256,17 @@ namespace Disorder
 		data.Data = image->GetImageData();
 		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat)/8 * spec.width;
 		data.SlicePitch = 0;
-		std::vector<ESurfaceLocation> loc;
-		loc.push_back(SL_ShaderResource);
-		return Create(pixelFormat,spec.width,spec.height,false,bMultiSample,loc,&data);
+		return Create(pixelFormat,spec.width,spec.height,false,bMultiSample,SV_ShaderResource,&data);
 	}
 
-	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, const std::vector<ESurfaceLocation>& location, BufferInitData const* pData)
+	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample,unsigned int viewFlag, BufferInitData const* pData)
 	{
 		DX11RenderTexture2D* pTexture = new DX11RenderTexture2D;
 
 		pTexture->Format = pixelFormat;
 		pTexture->Width = width;
 		pTexture->Height = height;
+		pTexture->ViewFlag = viewFlag;
 
 		if (bMultiSample && !pData)
 		{
@@ -300,15 +299,14 @@ namespace Disorder
 		desc.Format = DX11RenderEngine::GetPixelFormat(pixelFormat);
 		desc.Usage = D3D11_USAGE_DEFAULT;
 
-		for (size_t i = 0; i < location.size(); i++)
-		{
-			if (location[i] == SL_ShaderResource )
-				desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
-			else if (location[i] == SL_DepthStencil )
-				desc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
-			else if (location[i] >= SL_RenderTarget1 )
-				desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
-		}
+		 
+		if ( viewFlag & SV_ShaderResource )
+			desc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+		if (viewFlag & SV_DepthStencil )
+			desc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
+		if ( viewFlag & SV_RenderTarget )
+			desc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+		 
 
 		desc.CPUAccessFlags = 0;
         desc.MiscFlags = 0;

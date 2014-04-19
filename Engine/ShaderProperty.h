@@ -17,8 +17,6 @@ namespace Disorder
 	class ShaderProperty
 	{
 	public:
-
-		
 		~ShaderProperty();
 
 		unsigned int GetLength()
@@ -32,7 +30,7 @@ namespace Disorder
 		void SetData(float* data);
 		void SetData(double* data);
 		void SetData(RenderBufferPtr constBuffer);
-		void SetData(RenderSurfacePtr shaderResource);
+		void SetData(SurfaceViewPtr shaderResource);
 		void SetData(SamplerStatePtr sample);
 
 		void* GetData();
@@ -41,7 +39,7 @@ namespace Disorder
 		double* GetDataAsDouble();
 
 		RenderBufferPtr GetDataAsConstBuffer();
-		RenderSurfacePtr GetDataAsShaderResource();
+		SurfaceViewPtr GetDataAsShaderResource();
 		SamplerStatePtr GetDataAsSampler();
 
 		EShaderProperty PropertyType;

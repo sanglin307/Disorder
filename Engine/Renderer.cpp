@@ -27,7 +27,7 @@ namespace Disorder
 
 //////////////////////////////////////////////////////////////////////////
 
-	void BatchScreenString::SetTexture(RenderSurfacePtr const& texture)
+	void BatchScreenString::SetTexture(SurfaceViewPtr const& texture)
 	{
 		_texture = texture;
  
@@ -36,7 +36,7 @@ namespace Disorder
 	    texProperty->SetData(_texture);
 	 
 		ShaderPropertyPtr Sampler = globalProperty->CreateProperty(ShaderPropertyManager::sTextSampler,eSP_SampleState,1);
-		RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(texture->GetResource(SL_ShaderResource));
+		RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(texture->Resource);
 		Sampler->SetData(tex->Sampler);
  
 	}

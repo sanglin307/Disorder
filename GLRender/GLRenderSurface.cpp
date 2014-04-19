@@ -50,33 +50,5 @@ namespace Disorder
 	 {
 		 glDeleteFramebuffers(1, &_frameBuffer);
 	 }
-
-	GLRenderGBufferPtr GLRenderGBuffer::Create(unsigned int width,unsigned int height)
-	{
-		GLRenderGBuffer *pBuffer = new GLRenderGBuffer(width,height);
-		return GLRenderGBufferPtr(pBuffer);
-	}
-
-	void GLRenderGBuffer::DebugVisual()
-	{
-	}
-
-	GLRenderGBuffer::GLRenderGBuffer(unsigned int width,unsigned int height)
-	{
-	}
-
-
-	GLRenderSurfaceCachePtr GLRenderSurfaceCache::Create()
-	{
-		GLRenderSurfaceCache *pCache = new GLRenderSurfaceCache;
-		return GLRenderSurfaceCachePtr(pCache);
-	}
-
-	void GLRenderSurfaceCache::InitGBuffer(unsigned int width,unsigned int height)
-	{
-	}
-
-	GLRenderSurfaceCache::GLRenderSurfaceCache()
-	{
-	}
+ 
 }

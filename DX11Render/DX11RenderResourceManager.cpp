@@ -68,24 +68,17 @@ namespace Disorder
 		return renderBuffer;
 	}
  
-	RenderSurfacePtr DX11RenderResourceManager::CreateShaderResource(RenderTexturePtr const& texture, PixelFormat format)
+	RenderSurfacePtr DX11RenderResourceManager::CreateRenderSurface()
 	{
-		std::vector<sRenderSurfaceDes> vDes;
-		sRenderSurfaceDes des;
-		des.Format = format;
-		des.Location = SL_ShaderResource;
-		des.Resource = texture;
-		RenderSurfacePtr surface = DX11RenderSurface::Create(vDes);
-
-		return surface;
+		return DX11RenderSurface::Create();
 	}
 
-
-	RenderSurfacePtr DX11RenderResourceManager::CreateRenderSurface(const std::vector<sRenderSurfaceDes>& surfaceDes)
+	SurfaceViewPtr DX11RenderResourceManager::CreateSurfaceView(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat format, unsigned int flag)
 	{
-		DX11RenderSurfacePtr surface = DX11RenderSurface::Create(surfaceDes);
-		return surface;
+		DX11SurfaceViewPtr view = DX11SurfaceView::Create(type, resource, format, flag);
+		return view;
 	}
+ 
 
 	RenderTexture2DPtr DX11RenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample,ImagePtr image)
 	{
@@ -94,9 +87,9 @@ namespace Disorder
 		return texture;
 	}
 
-	RenderTexture2DPtr DX11RenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, const std::vector<ESurfaceLocation>& location, BufferInitData const* pData)
+	RenderTexture2DPtr DX11RenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, BufferInitData const* pData)
 	{
-		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat,width,height,bMipmap,bMultiSample,location,pData);
+		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat,width,height,bMipmap,bMultiSample,viewFlag,pData);
 		texture->Sampler = sampler;
 		return texture;
 

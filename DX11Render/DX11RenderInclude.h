@@ -32,12 +32,10 @@ namespace Disorder
 	typedef boost::shared_ptr<DX11RenderTexture2D> DX11RenderTexture2DPtr;
 	class DX11RenderResourceManager;
 	typedef boost::shared_ptr<DX11RenderResourceManager> DX11RenderResourceManagerPtr;
+	class DX11SurfaceView;
+	typedef boost::shared_ptr<DX11SurfaceView> DX11SurfaceViewPtr;
 	class DX11RenderSurface;
 	typedef boost::shared_ptr<DX11RenderSurface> DX11RenderSurfacePtr;
-	class DX11RenderGBuffer;
-	typedef boost::shared_ptr<DX11RenderGBuffer> DX11RenderGBufferPtr;
-	class DX11RenderSurfaceCache;
-	typedef boost::shared_ptr<DX11RenderSurfaceCache> DX11RenderSurfaceCachePtr;
 	class DX11ShaderObject;
 	typedef boost::shared_ptr<DX11ShaderObject> DX11ShaderObjectPtr;
 	class DX11BlendState;

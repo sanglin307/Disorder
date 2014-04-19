@@ -27,7 +27,7 @@ namespace Disorder
 	{
 	public:
 
-		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, const std::vector<ESurfaceLocation>& location, BufferInitData const* pData);
+		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, BufferInitData const* pData);
 		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat, bool bMultiSample,ImagePtr const& image);
 	    static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,ID3D11Texture2DPtr DXInterface);
 		virtual void * GetHandle();

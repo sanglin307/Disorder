@@ -44,10 +44,11 @@ namespace Disorder
 
 		virtual void CreateViewport(void *hWnd);
 
-		virtual void ClearRenderTarget(const RenderSurfacePtr& renderTarget, const glm::vec4& color);
-		virtual void ClearDepthStencil(const RenderSurfacePtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
-		virtual void SetRenderTarget(const std::vector<RenderSurfacePtr>& renderTarget, const RenderSurfacePtr& depthStencil, bool useReadOnlyDepthStencil = false);
-		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget, const RenderSurfacePtr& depthStencil, bool useReadOnlyDepthStencil = false);
+		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
+		virtual void ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color);
+		virtual void ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
+		virtual void SetRenderTarget(const SurfaceViewPtr& renderTarget, const SurfaceViewPtr& depthStencil, bool useReadOnlyDepthStencil = false);
+		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget, bool useReadOnlyDepthStencil = false);
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
 		virtual void SetPrimitiveTopology(TopologyType topologyType);
 
@@ -59,7 +60,7 @@ namespace Disorder
 		virtual void UnMap(RenderBufferPtr const& buffer);
 		virtual void UpdateSubresource(RenderBufferPtr const& buffer, void* pSrcData, unsigned int srcDataSize);
 
-		virtual void SaveRenderSurface(RenderSurfacePtr const& surface, std::string const& fileName);
+		virtual void SaveSurfaceView(SurfaceViewPtr const& surface, std::string const& fileName);
 
 		static GLenum GetPixelFormat(PixelFormat format, GLenum &glFormat, GLenum &glType);
 		static GLint GetGLAddressMode(TextureAddressMode addrMode);

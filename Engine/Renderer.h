@@ -67,7 +67,7 @@ namespace Disorder
 		BatchScreenString(std::string const& name);
 		~BatchScreenString();
 
-		void SetTexture(RenderSurfacePtr const& texture);
+		void SetTexture(SurfaceViewPtr const& texture);
 		
 		BatchTileVertex* PrepareAddVertex();
 		void EndAddVertex();
@@ -85,7 +85,7 @@ namespace Disorder
 
 		unsigned int _savedVertexBufferSize;
 		unsigned int _savedIndexBufferSize;
-		RenderSurfacePtr _texture;
+		SurfaceViewPtr _texture;
 	};
 
 	 

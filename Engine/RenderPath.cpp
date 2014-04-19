@@ -133,9 +133,8 @@ namespace Disorder
 
 		GEngine->RenderEngine->OnDrawBegin();
 
-		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,GEngine->RenderSurfaceCache->DepthStencilBuffer);
-		GEngine->RenderEngine->ClearRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,glm::vec4(0.f,0.f,0.f,1.0f));
-		GEngine->RenderEngine->ClearDepthStencil(GEngine->RenderSurfaceCache->DepthStencilBuffer,true,1.0f,false,0);
+		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainRenderTarget);
+		GEngine->RenderEngine->ClearRenderSurface(GEngine->RenderSurfaceCache->MainRenderTarget, glm::vec4(0.f, 0.f, 0.f, 1.0f),true,1.0f,false,0);
  
 		GSceneManager->UpdateShaderProperty();
 		mainCamera->UpdateShaderProperty();
@@ -188,7 +187,7 @@ namespace Disorder
 			obj->PostRender(mainCamera);
 		}
 
-		GEngine->GameCanvas->DrawString(0.005f, 0.04f, 0.04f, glm::vec4(1.f), "Forward Lighting Mode");
+		GEngine->GameCanvas->DrawString(0.01f, 0.05f, 0.04f, glm::vec4(1.f), "Forward Lighting Mode");
 
 		GSceneManager->DebugDraw();
 
@@ -324,7 +323,7 @@ namespace Disorder
 		DepthStencilStatePtr _noDepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&nodepthWriteDesc,0);
 		_LightingEffect->BindDepthStencilState(_noDepthWriteState);
 
-		GEngine->RenderSurfaceCache->InitGBuffer(GConfig->pRenderConfig->SizeX,GConfig->pRenderConfig->SizeY);
+		GEngine->RenderSurfaceCache->GBuffer = RenderGBuffer::Create(GConfig->pRenderConfig->SizeX,GConfig->pRenderConfig->SizeY);
 	}
 
 	void DeferredShading::Render()
@@ -339,42 +338,29 @@ namespace Disorder
 
 		GEngine->RenderEngine->OnDrawBegin();
 	
-		RenderSurfacePtr depthSurfacePtr = GEngine->RenderSurfaceCache->GBuffer->DepthStencilBuffer;
-		RenderSurfacePtr colorSurfacePtr = GEngine->RenderSurfaceCache->GBuffer->BasicColorBuffer;
-		RenderSurfacePtr normalSurfacePtr = GEngine->RenderSurfaceCache->GBuffer->NormalDataBuffer;
-		RenderSurfacePtr specularSurfacePtr = GEngine->RenderSurfaceCache->GBuffer->SpecularDataBuffer;
-
-		GEngine->RenderEngine->ClearDepthStencil(depthSurfacePtr,true,1.f,true,0);
-		GEngine->RenderEngine->ClearRenderTarget(colorSurfacePtr,glm::vec4(0.f));
-		GEngine->RenderEngine->ClearRenderTarget(normalSurfacePtr, glm::vec4(0.f));
-		GEngine->RenderEngine->ClearRenderTarget(specularSurfacePtr, glm::vec4(0.f));
-
-		std::vector<RenderSurfacePtr> vRenderSurface;
-		vRenderSurface.push_back(colorSurfacePtr);
-		vRenderSurface.push_back(normalSurfacePtr);
-		vRenderSurface.push_back(specularSurfacePtr);
-
-		GEngine->RenderEngine->SetRenderTarget(vRenderSurface,depthSurfacePtr);
+		// draw to GBuffer
+		RenderSurfacePtr renderTargetPtr = GEngine->RenderSurfaceCache->GBuffer->RenderTargetBuffer;
+		GEngine->RenderEngine->SetRenderTarget(renderTargetPtr);
+		GEngine->RenderEngine->ClearRenderSurface(renderTargetPtr, glm::vec4(0.f),true, 1.f, true, 0);
  
 		RenderScene(mainCamera);
 
 		static bool sSaveTest = false;
 		if( sSaveTest )
 		{
-			GEngine->RenderEngine->SaveRenderSurface(depthSurfacePtr,"GBuffer_DepthStencilBuffer.bmp");
-			GEngine->RenderEngine->SaveRenderSurface(colorSurfacePtr,"GBuffer_BaseColorBuffer.bmp");
-			GEngine->RenderEngine->SaveRenderSurface(normalSurfacePtr,"GBuffer_NormalBuffer.bmp");
-			GEngine->RenderEngine->SaveRenderSurface(specularSurfacePtr,"GBuffer_SpecularBuffer.bmp");
+			GEngine->RenderEngine->SaveSurfaceView(GEngine->RenderSurfaceCache->GBuffer->DepthShaderView, "GBuffer_DepthStencilBuffer.bmp");
+			GEngine->RenderEngine->SaveSurfaceView(GEngine->RenderSurfaceCache->GBuffer->BasicColorShaderView, "GBuffer_BaseColorBuffer.bmp");
+			GEngine->RenderEngine->SaveSurfaceView(GEngine->RenderSurfaceCache->GBuffer->NormalDataShaderView, "GBuffer_NormalBuffer.bmp");
+			GEngine->RenderEngine->SaveSurfaceView(GEngine->RenderSurfaceCache->GBuffer->SpecularDataShaderView, "GBuffer_SpecularBuffer.bmp");
 
 			sSaveTest = false;
 		}
 
 		GEngine->RenderSurfaceCache->GBuffer->UpdateShaderProperty();
 	
-		//lighting pass
-		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,GEngine->RenderSurfaceCache->DepthStencilBuffer);
-		GEngine->RenderEngine->ClearRenderTarget(GEngine->RenderSurfaceCache->RenderTarget, glm::vec4(0.f, 0.f, 0.f, 1.0f));
-		GEngine->RenderEngine->ClearDepthStencil(GEngine->RenderSurfaceCache->DepthStencilBuffer,true,1.0f,false,0);
+		//lighting pass, draw to main render target
+		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainRenderTarget);
+		GEngine->RenderEngine->ClearRenderSurface(GEngine->RenderSurfaceCache->MainRenderTarget, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
 	
 		const std::vector<LightPtr>& vLights = GSceneManager->GetLightsList();
 		std::vector<DirectionLightPtr> directionLightArray;
@@ -423,10 +409,10 @@ namespace Disorder
 			}
 		}
 
+		// the last hud things, must use GBuffer's depth buffer surface view
 		GEngine->RenderEngine->SetEffect(NULL);
-		
-		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->RenderTarget,depthSurfacePtr,true);
-		GEngine->GameCanvas->DrawString(0.005f,0.04f,0.04f,glm::vec4(1.f),"Deferred Shading Mode");
+		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->GBuffer->MainTargetGDepth, true);
+		GEngine->GameCanvas->DrawString(0.01f,0.05f,0.04f,glm::vec4(1.f),"Deferred Shading Mode");
 		GSceneManager->DebugDraw();
 
 		// before we call canvas draw ,we should check if we should add stat info to canvas.

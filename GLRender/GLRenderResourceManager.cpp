@@ -50,11 +50,16 @@ namespace Disorder
 		bufferArray.push_back(indexBuffer);
 	}
 
-	RenderTexture2DPtr GLRenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample, const std::vector<ESurfaceLocation>& location, BufferInitData const* pData)
+	RenderTexture2DPtr GLRenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample,unsigned int viewFlag, BufferInitData const* pData)
 	{
 		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat, width, hight, bMipmap, bMultiSample, pData);
 		texture->Sampler = sampler;
 		return texture;
+	}
+
+	SurfaceViewPtr GLRenderResourceManager::CreateSurfaceView(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat format, unsigned int flag)
+	{
+		return NULL;
 	}
 
 	RenderTexture2DPtr GLRenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample,ImagePtr image)
@@ -64,14 +69,9 @@ namespace Disorder
 		return texture;
 	}
 
-	RenderSurfacePtr GLRenderResourceManager::CreateShaderResource(RenderTexturePtr const& texture, PixelFormat format)
-	{
-		//RenderSurfacePtr surface = GLRenderSurface::Create(texture, RSU_ShaderResource);
-		//return surface;
-		return NULL;
-	}
+	 
 
-	RenderSurfacePtr GLRenderResourceManager::CreateRenderSurface(const std::vector<sRenderSurfaceDes>& surfaceDes)
+	RenderSurfacePtr GLRenderResourceManager::CreateRenderSurface()
 	{
 		return NULL;
 	}

@@ -41,6 +41,8 @@ namespace Disorder
 	//----------Texture------------------------
 	class RenderTexture : public RenderResource
 	{
+	public:
+		 
 	};
 
 	class RenderTexture1D: public RenderTexture
@@ -53,6 +55,7 @@ namespace Disorder
 		unsigned int Width;
 		unsigned int Height;
 		PixelFormat Format;
+		unsigned int ViewFlag;
         unsigned int MipLevel;
 		unsigned int MultiSampleCount;
 		unsigned int MultiSampleQuality;
