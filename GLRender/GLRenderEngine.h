@@ -45,9 +45,7 @@ namespace Disorder
 		virtual void CreateViewport(void *hWnd);
 
 		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
-		virtual void ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color);
-		virtual void ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
-		virtual void SetRenderTarget(const SurfaceViewPtr& renderTarget, const SurfaceViewPtr& depthStencil, bool useReadOnlyDepthStencil = false);
+
 		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget, bool useReadOnlyDepthStencil = false);
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
 		virtual void SetPrimitiveTopology(TopologyType topologyType);
@@ -96,10 +94,25 @@ namespace Disorder
 
 		struct sGLEngineCache
 		{
-			GLuint FrameBufferObject;
+			GLenum PrimitiveTopology;
+			GLuint ShaderProgram;
 
+			GLuint FrameBufferObject;
+			GLuint VertexArrayObject;
+			
+			GLuint VertexBufferObject;
+			GLuint IndexBufferObject;
+			GLuint IndexElementSize;
+
+			GLuint UniformBufferObject;
 
 			void CacheFrameBufferObject(GLuint fbo);
+			void CacheVertexArrayObject(GLuint vao);
+			void CacheVertexBufferObject(GLuint vbo);
+			void CacheIndexBufferObject(GLuint ibo,GLuint ies);
+			void CacheUniformBufferObject(GLuint ubo);
+
+			void CacheShaderProgram(GLuint sp);
 
 			sGLEngineCache()
 				:FrameBufferObject(0)
@@ -110,6 +123,9 @@ namespace Disorder
 		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState);
 		virtual void SetDepthStencilState(DepthStencilStatePtr const& depthStencilState);
  
+		static GLenum GetPlatformTopology(TopologyType tType);
+		static GLenum GetBufferAccessFlag(BufferAccess ba);
+
 		GLRenderEngine();
 		bool CreateGLContext(HWND window);
 		void LoadShaderIncludeFiles();

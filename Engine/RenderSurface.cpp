@@ -2,6 +2,18 @@
 
 namespace Disorder
 { 
+	RenderSurface::RenderSurface()
+	{
+		for (size_t i = 0; i < SL_SurfaceLoactionMax; i++)
+		{
+			_surfacesViewArray.push_back(NULL);
+		}
+	}
+
+	SurfaceViewPtr RenderSurface::GetSurfaceView(ESurfaceLocation location)
+	{
+		return _surfacesViewArray[location];
+	}
 
 	RenderGBufferPtr RenderGBuffer::Create(unsigned int width, unsigned int height)
 	{
@@ -45,16 +57,19 @@ namespace Disorder
 		SpecularDataShaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, specularTex, PF_R8G8B8A8_UNORM);
 		SpecularDataTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, specularTex, PF_R8G8B8A8_UNORM);
 
-		RenderTargetBuffer = GEngine->RenderResourceMgr->CreateRenderSurface();
-		RenderTargetBuffer->SurfacesViewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, DepthBufferView));
-		RenderTargetBuffer->SurfacesViewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, BasicColorTargetView));
-		RenderTargetBuffer->SurfacesViewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget2, NormalDataTargetView));
-		RenderTargetBuffer->SurfacesViewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget3, SpecularDataTargetView));
+		
+		std::map<ESurfaceLocation, SurfaceViewPtr> viewMap;
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, DepthBufferView));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, BasicColorTargetView));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget2, NormalDataTargetView));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget3, SpecularDataTargetView));
+		RenderTargetBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 
-		MainTargetGDepth = GEngine->RenderResourceMgr->CreateRenderSurface();
-		SurfaceViewPtr mainView = GEngine->RenderSurfaceCache->MainRenderTarget->SurfacesViewMap.at(SL_RenderTarget1);
-		MainTargetGDepth->SurfacesViewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, DepthBufferView));
-		MainTargetGDepth->SurfacesViewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, mainView));
+		viewMap.clear();
+		SurfaceViewPtr mainView = GEngine->RenderSurfaceCache->MainTarget->GetSurfaceView(SL_RenderTarget1);
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, DepthBufferView));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, mainView));
+		MainTargetGDepth = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 
 		_GBufferVisualEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "SurfaceVisual", SM_4_0, "VS");

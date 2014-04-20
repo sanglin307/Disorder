@@ -59,7 +59,7 @@ namespace Disorder
 
 	SurfaceViewPtr GLRenderResourceManager::CreateSurfaceView(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat format, unsigned int flag)
 	{
-		return NULL;
+		return GLSurfaceView::Create(type,resource,format,flag);
 	}
 
 	RenderTexture2DPtr GLRenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample,ImagePtr image)
@@ -69,11 +69,9 @@ namespace Disorder
 		return texture;
 	}
 
-	 
-
-	RenderSurfacePtr GLRenderResourceManager::CreateRenderSurface()
+	RenderSurfacePtr GLRenderResourceManager::CreateRenderSurface(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap)
 	{
-		return NULL;
+	    return GLRenderSurface::Create(viewMap);
 	}
 
 	 

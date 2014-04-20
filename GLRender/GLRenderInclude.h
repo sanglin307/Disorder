@@ -40,6 +40,8 @@ namespace Disorder
 	typedef boost::shared_ptr<GLShaderPropertyManager> GLShaderPropertyManagerPtr;
 	class GLProgramReflection;
 	typedef boost::shared_ptr<GLProgramReflection> GLProgramReflectionPtr;
+	class GLSurfaceView;
+	typedef boost::shared_ptr<GLSurfaceView> GLSurfaceViewPtr;
 	class GLRenderSurface;
 	typedef boost::shared_ptr<GLRenderSurface> GLRenderSurfacePtr;
 	class GLDebugLayer;

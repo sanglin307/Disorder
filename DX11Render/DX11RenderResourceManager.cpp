@@ -68,9 +68,9 @@ namespace Disorder
 		return renderBuffer;
 	}
  
-	RenderSurfacePtr DX11RenderResourceManager::CreateRenderSurface()
+	RenderSurfacePtr DX11RenderResourceManager::CreateRenderSurface(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap)
 	{
-		return DX11RenderSurface::Create();
+		return DX11RenderSurface::Create(viewMap);
 	}
 
 	SurfaceViewPtr DX11RenderResourceManager::CreateSurfaceView(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat format, unsigned int flag)

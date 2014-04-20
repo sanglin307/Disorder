@@ -41,13 +41,18 @@ namespace Disorder
 		SL_RenderTarget5,
 		SL_RenderTarget6,
 		SL_RenderTarget7,
-		SL_RenderTarget8
+		SL_RenderTarget8,
+		SL_SurfaceLoactionMax
 	};
  
-	class RenderSurface 
+	class RenderSurface : public RenderResource
 	{
 	public:
-		std::map<ESurfaceLocation,SurfaceViewPtr> SurfacesViewMap;
+		SurfaceViewPtr GetSurfaceView(ESurfaceLocation location);
+
+	protected:
+		RenderSurface();
+		std::vector<SurfaceViewPtr> _surfacesViewArray;
 	};
  
 	class RenderGBuffer
@@ -99,7 +104,7 @@ namespace Disorder
 	class RenderSurfaceCache
 	{
 	public:
-		RenderSurfacePtr MainRenderTarget;
+		RenderSurfacePtr MainTarget;
 		RenderGBufferPtr GBuffer;
 
 		static RenderSurfaceCachePtr Create();

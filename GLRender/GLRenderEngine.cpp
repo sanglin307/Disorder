@@ -644,78 +644,164 @@ namespace Disorder
  
 	void GLRenderEngine::ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
 	{
-
-	}
-
-	void GLRenderEngine::ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color)
-	{
-		/*GLuint fbo = (GLuint)renderTarget->GetHandle(SL_RenderTarget1);
+		GLRenderSurfacePtr surface = boost::dynamic_pointer_cast<GLRenderSurface>(renderSurface);
+		GLuint fbo = (GLuint)surface->GetHandle();
 		_renderCache.CacheFrameBufferObject(fbo);
 
-		glClearBufferfv(GL_COLOR, 0, glm::value_ptr(color));*/
+		for (int i = 0; i < SL_SurfaceLoactionMax; i++)
+		{
+			if (surface->_surfacesViewArray[i] == NULL)
+				continue;
 
+			if (i == SL_DepthStencil)
+			{
+				if (bClearDepth)
+					glClearBufferfv(GL_DEPTH, 0, &depth);
+
+				if (bClearStencil)
+				{
+					GLint istencil = stencil;
+					glClearBufferiv(GL_STENCIL, 0, &istencil);
+				}
+			}
+			else if (i >= SL_RenderTarget1 && i <= SL_RenderTarget8)
+			{
+				int loc = i - SL_RenderTarget1;
+				glClearBufferfv(GL_COLOR, loc, glm::value_ptr(color));
+			}
+		}
 	}
 
-	void GLRenderEngine::ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
-	{
-		/*if (!bClearDepth && bClearStencil)
-			return;
-
-		GLuint fbo = (GLuint)depthBuffer->GetHandle(SL_DepthStencil);
-		_renderCache.CacheFrameBufferObject(fbo);
-
-		if ( bClearDepth)
-			glClearBufferfv(GL_DEPTH, 0, &depth);
-
-		if ( bClearStencil )
-			glClearStencil(stencil);*/
-	}
-
-	void GLRenderEngine::SetRenderTarget(const SurfaceViewPtr& renderTarget, const SurfaceViewPtr& depthStencil, bool useReadOnlyDepthStencil)
-	{
-		BOOST_ASSERT(0);
-	}
+ 
 
 	void GLRenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget, bool useReadOnlyDepthStencil)
 	{
-		BOOST_ASSERT(0);
+		GLuint fbo = (GLuint)renderTarget->GetHandle();
+		_renderCache.CacheFrameBufferObject(fbo);
 	}
 
 	void GLRenderEngine::SetRenderLayout(RenderLayoutPtr const& renderLayout)
 	{
-		GLuint va = (GLuint)renderLayout->GetHandle();
-		glBindVertexArray(va);
+		GLuint vao = (GLuint)renderLayout->GetHandle();
+		_renderCache.CacheVertexArrayObject(vao);
 	}
 
 	void GLRenderEngine::SetPrimitiveTopology(TopologyType topologyType)
 	{
-
+		_renderCache.PrimitiveTopology = GetPlatformTopology(topologyType);
 	}
 
 	void GLRenderEngine::SetEffect(RenderEffectPtr const& effect)
 	{
+		if (effect == NULL)
+		{
+			_renderCache.CacheShaderProgram(0);
+			return;
+		}
 
+		GLuint program = (GLuint)effect->GetHandle();
+		_renderCache.CacheShaderProgram(program);
 	}
+
 	void GLRenderEngine::DrawIndexed(unsigned int indexCount, unsigned int startIndexLocation, int baseVertexLocation)
 	{
+		//GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT
+		GLenum type;
+		if (_renderCache.IndexElementSize == 1)
+			type = GL_UNSIGNED_BYTE;
+		else if (_renderCache.IndexElementSize == 2)
+			type = GL_UNSIGNED_SHORT;
+		else if (_renderCache.IndexElementSize == 4)
+			type = GL_UNSIGNED_INT;
+		else
+			return;
 
+		glDrawElementsBaseVertex(_renderCache.PrimitiveTopology, indexCount, type, &startIndexLocation, baseVertexLocation);
 	}
+
 	void GLRenderEngine::Draw(unsigned int vertexCount, unsigned int startVertexLocation)
 	{
+		glDrawArrays(_renderCache.PrimitiveTopology, startVertexLocation, vertexCount);
+	}
 
+	GLenum GLRenderEngine::GetBufferAccessFlag(BufferAccess ba)
+	{
+		if (ba == BA_Read_Only)
+			return GL_READ_ONLY;
+		else if (ba == BA_Write_Only)
+			return GL_WRITE_ONLY;
+		else if (ba == BA_Read_Write)
+			return GL_READ_WRITE;
+
+		return GL_NONE;
 	}
 
 	void* GLRenderEngine::Map(RenderBufferPtr const& buffer, BufferAccess bufferAccess)
 	{
+		if (buffer->GetBufferType() == RBT_Vertex)
+		{
+			GLuint vbo = (GLuint)buffer->GetHandle();
+			_renderCache.CacheVertexBufferObject(vbo);
+			return glMapBuffer(GL_ARRAY_BUFFER, GetBufferAccessFlag(bufferAccess));
+		}
+		else if (buffer->GetBufferType() == RBT_Index)
+		{
+			GLuint ibo = (GLuint)buffer->GetHandle();
+			_renderCache.CacheIndexBufferObject(ibo, buffer->GetElementSize());
+			return glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GetBufferAccessFlag(bufferAccess));
+		}
+		else if (buffer->GetBufferType() == RBT_Constant)
+		{
+			GLuint ubo = (GLuint)buffer->GetHandle();
+			_renderCache.CacheUniformBufferObject(ubo);
+			return glMapBuffer(GL_UNIFORM_BUFFER, GetBufferAccessFlag(bufferAccess));
+		}
+
 		return NULL;
 	}
 	void GLRenderEngine::UnMap(RenderBufferPtr const& buffer)
 	{
-
+		if (buffer->GetBufferType() == RBT_Vertex)
+		{
+			GLuint vbo = (GLuint)buffer->GetHandle();
+			_renderCache.CacheVertexBufferObject(vbo);
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+		}
+		else if (buffer->GetBufferType() == RBT_Index)
+		{
+			GLuint ibo = (GLuint)buffer->GetHandle();
+			_renderCache.CacheIndexBufferObject(ibo, buffer->GetElementSize());
+			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+		}
+		else if (buffer->GetBufferType() == RBT_Constant)
+		{
+			GLuint ubo = (GLuint)buffer->GetHandle();
+			_renderCache.CacheUniformBufferObject(ubo);
+			glUnmapBuffer(GL_UNIFORM_BUFFER);
+		}
 	}
+
 	void GLRenderEngine::UpdateSubresource(RenderBufferPtr const& buffer, void* pSrcData, unsigned int srcDataSize)
 	{
-
+		if (buffer->GetBufferType() == RBT_Vertex)
+		{
+			GLuint vbo = (GLuint)buffer->GetHandle();
+			_renderCache.CacheVertexBufferObject(vbo);
+			glBufferSubData(GL_ARRAY_BUFFER,0,srcDataSize,pSrcData);
+		}
+		else if (buffer->GetBufferType() == RBT_Index)
+		{
+			GLuint ibo = (GLuint)buffer->GetHandle();
+			_renderCache.CacheIndexBufferObject(ibo,buffer->GetElementSize());
+			glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, srcDataSize, pSrcData);
+		}
+		else if (buffer->GetBufferType() == RBT_Constant)
+		{
+			GLuint ubo = (GLuint)buffer->GetHandle();
+			_renderCache.CacheUniformBufferObject(ubo);
+			glBufferSubData(GL_UNIFORM_BUFFER, 0, srcDataSize, pSrcData);
+		}
+		
 	}
 
 	void GLRenderEngine::SaveSurfaceView(SurfaceViewPtr const& surface, std::string const& fileName)
@@ -728,16 +814,50 @@ namespace Disorder
 	{
 
 	}
+
 	void GLRenderEngine::SetRasterizeState(RasterizeStatePtr const& rasterizeState)
 	{
 
 	}
+
 	void GLRenderEngine::SetDepthStencilState(DepthStencilStatePtr const& depthStencilState)
 	{
 
 	}
 
+	GLenum GLRenderEngine::GetPlatformTopology(TopologyType tType)
+	{			
+		switch (tType)
+		{
+		case TT_PointList:
+			return GL_POINTS;
+		case TT_LineList:
+			return GL_LINES;
+		case TT_LineStrip:
+			return GL_LINE_STRIP;
+		case TT_TriangleList:
+			return GL_TRIANGLES;
+		case TT_TriangleStrip:
+			return GL_TRIANGLE_STRIP;
+		case TT_LineList_Adj:
+			return GL_LINES_ADJACENCY;
+		case TT_LineStrip_Adj:
+			return GL_LINE_STRIP_ADJACENCY;
+		case TT_TriangleList_Adj:
+			return GL_TRIANGLES_ADJACENCY;
+		case TT_TriangleStrip_Adj:
+			return GL_TRIANGLE_STRIP_ADJACENCY;
+		default:
+			break;
+		}
 
+		if (tType >= TT_1_Ctrl_Pt_PatchList && tType <= TT_32_Ctrl_Pt_PatchList)
+		{
+			return GL_PATCHES;
+		}
+
+		return GL_NONE;
+	}
 
 	void GLRenderEngine::sGLEngineCache::CacheFrameBufferObject(GLuint fbo)
 	{
@@ -748,8 +868,50 @@ namespace Disorder
 		}
 	}
 
+	void GLRenderEngine::sGLEngineCache::CacheShaderProgram(GLuint sp)
+	{
+		if (ShaderProgram != sp)
+		{
+			glUseProgram(sp);
+			ShaderProgram = sp;
+		}
+	}
 
+	void GLRenderEngine::sGLEngineCache::CacheVertexArrayObject(GLuint vao)
+	{
+		if (VertexArrayObject != vao)
+		{
+			glBindVertexArray(vao);
+			VertexArrayObject = vao;
+		}
+	}
 
+	void GLRenderEngine::sGLEngineCache::CacheVertexBufferObject(GLuint vbo)
+	{
+		if (VertexBufferObject != vbo)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
+			VertexBufferObject = vbo;
+		}
+	}
 
+	void GLRenderEngine::sGLEngineCache::CacheIndexBufferObject(GLuint ibo, GLuint ies)
+	{
+		if (IndexBufferObject != ibo)
+		{
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+			IndexBufferObject = ibo;
+			IndexElementSize = ies;
+		}
+	}
+
+	void GLRenderEngine::sGLEngineCache::CacheUniformBufferObject(GLuint ubo)
+	{
+		if (UniformBufferObject != ubo)
+		{
+			glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+			UniformBufferObject = ubo;
+		}
+	}
 
 }

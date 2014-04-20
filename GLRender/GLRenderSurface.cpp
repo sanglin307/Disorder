@@ -3,35 +3,40 @@
 
 namespace Disorder
 {
-	 GLRenderSurfacePtr GLRenderSurface::Create(const RenderTexture2DPtr& resource,unsigned int usage)
+	GLSurfaceViewPtr GLSurfaceView::Create(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat Format, unsigned int Flag)
+	{
+		GLSurfaceView *pView = new GLSurfaceView;
+		pView->Flag = Flag;
+		pView->Format = Format;
+		pView->Resource = resource;
+		pView->Type = type;
+
+		return GLSurfaceViewPtr(pView);
+	}
+
+	GLRenderSurfacePtr GLRenderSurface::Create(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap)
 	 {
 		 GLRenderSurface *pSurface = new GLRenderSurface;
 
-		 //pSurface->Tex2DResource = resource;
-		 //pSurface->Usage = usage;
+		 glBindFramebuffer(GL_FRAMEBUFFER, pSurface->_frameBuffer);
+		 std::map<ESurfaceLocation, SurfaceViewPtr>::const_iterator iter = viewMap.cbegin();
+		 std::vector<GLenum> bufferLoc;
+		 while (iter != viewMap.cend())
+		 {
+			 pSurface->_surfacesViewArray[iter->first] = iter->second;
 
-		 //if (usage == RSU_ShaderResource)
-		 //{
-			// //don't use frame object handle it
-			// glDeleteFramebuffers(1, &pSurface->_frameBuffer);
-			// pSurface->_frameBuffer = 0;
-			// return GLRenderSurfacePtr(pSurface);
-		 //}
-
-		 //glBindFramebuffer(GL_FRAMEBUFFER, pSurface->_frameBuffer);
-		 //
-		 //if (usage & RSU_RenderTarget)
-		 //{
-			// glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, (GLuint)resource->GetHandle(), 0);
-		 //}
-
-		 //if (usage & RSU_DepthStencil)
-		 //{
-			// glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, (GLuint)resource->GetHandle(), 0);
-		 //}
-
-		 //static const GLenum draw_buffers[] = { GL_COLOR_ATTACHMENT0 };
-		 //glDrawBuffers(1, draw_buffers);
+			 if ( iter->first == SL_DepthStencil )
+				 glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, (GLuint)iter->second->Resource->GetHandle(), 0);
+			 else if (iter->first >= SL_RenderTarget1 && iter->first <= SL_RenderTarget8)
+			 {
+				 GLenum loc = iter->first - SL_RenderTarget1 + GL_COLOR_ATTACHMENT0;
+				 bufferLoc.push_back(loc);
+				 glFramebufferTexture(GL_FRAMEBUFFER, loc, (GLuint)(GLuint)iter->second->Resource->GetHandle(), 0);
+			 }
+			 ++iter;
+		 }
+ 
+		 glDrawBuffers(bufferLoc.size(), bufferLoc.data());
 
 		 return GLRenderSurfacePtr(pSurface);
 	 }

@@ -93,9 +93,15 @@ namespace Disorder
 		return DX11SurfaceViewPtr(pSurface);
 	}
 
-	DX11RenderSurfacePtr DX11RenderSurface::Create()
+	DX11RenderSurfacePtr DX11RenderSurface::Create(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap)
 	{
 		DX11RenderSurface *pSurface = new DX11RenderSurface;
+		std::map<ESurfaceLocation, SurfaceViewPtr>::const_iterator iter = viewMap.cbegin();
+		while (iter != viewMap.cend())
+		{
+			pSurface->_surfacesViewArray[iter->first] = iter->second;
+			++iter;
+		}
 		return DX11RenderSurfacePtr(pSurface);
 	}
  

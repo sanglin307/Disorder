@@ -91,6 +91,8 @@ namespace Disorder
 		virtual void BindShader(ShaderObjectPtr const& shaderObject);
 		virtual void LinkShaders();
 		 
+		virtual void* GetHandle(){ return (void*)_GLHandle; }
+
 		static GLRenderEffectPtr Create();
 		GLProgramReflectionPtr EffectReflection;
 

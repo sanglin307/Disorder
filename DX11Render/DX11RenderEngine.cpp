@@ -160,10 +160,10 @@ namespace Disorder
 
 		SurfaceViewPtr dsView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, DepthBufferTex, GConfig->pRenderConfig->DepthStencilFormat);
 
-		DX11RenderSurfacePtr mainTarget = DX11RenderSurface::Create();
-		mainTarget->SurfacesViewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, rtView));
-		mainTarget->SurfacesViewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, dsView));
-		GEngine->RenderSurfaceCache->MainRenderTarget = mainTarget;
+		std::map<ESurfaceLocation, SurfaceViewPtr> viewMap;
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, rtView));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, dsView));
+		GEngine->RenderSurfaceCache->MainTarget = DX11RenderSurface::Create(viewMap);
  
 		// Setup the viewport
 		D3D11_VIEWPORT vp;
@@ -720,54 +720,35 @@ namespace Disorder
 		
 	}
 
-	void DX11RenderEngine::SetRenderTarget(const SurfaceViewPtr& renderTarget, const SurfaceViewPtr& depthStencil, bool useReadOnlyDepthStencil)
-	{
-		DX11SurfaceViewPtr dxRenderTarget = renderTarget == NULL ? NULL : boost::dynamic_pointer_cast<DX11SurfaceView>(renderTarget);
-		DX11SurfaceViewPtr dxDepthStencil = depthStencil == NULL ? NULL : boost::dynamic_pointer_cast<DX11SurfaceView>(depthStencil);
-
-		if ( dxRenderTarget == NULL && dxDepthStencil == NULL )
-			return;
-
-		if (_featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil && dxDepthStencil && dxDepthStencil->DepthStencilHandle == NULL)
-		{
-			BOOST_ASSERT(0);
-			return;
-		}
-
-		ID3D11RenderTargetView *pTarget = dxRenderTarget == NULL ? NULL : dxRenderTarget->RenderTargetHandle.get();
-		ID3D11DepthStencilView *pDepth = dxDepthStencil == NULL ? NULL : dxDepthStencil->DepthStencilHandle.get();
-		ID3D11DepthStencilView *pDepthOnly = dxDepthStencil == NULL ? NULL : dxDepthStencil->ReadonlyDepthStencil.get();
-
-		if (_featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil)
-			_pImmediateContext->OMSetRenderTargets(1, &pTarget, pDepthOnly);
-		else
-			_pImmediateContext->OMSetRenderTargets(1, &pTarget, pDepth);
-	}
-
+	 
 	 
 	void DX11RenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget,bool useReadOnlyDepthStencil)
 	{
 		std::vector<ID3D11RenderTargetView*> vRenderTarget;
 		ID3D11DepthStencilView* pDepthView = NULL;
-		std::map<ESurfaceLocation, SurfaceViewPtr>::const_iterator iter = renderTarget->SurfacesViewMap.begin();
-		while (iter != renderTarget->SurfacesViewMap.end())
+		
+		DX11RenderSurfacePtr dxSurface = boost::dynamic_pointer_cast<DX11RenderSurface>(renderTarget);
+
+		for (size_t i = 0; i < SL_SurfaceLoactionMax; i++)
 		{
-			if (iter->first == SL_DepthStencil && pDepthView == NULL )
+			if (dxSurface->_surfacesViewArray[i] == NULL)
+				continue;
+
+			if (i == SL_DepthStencil && pDepthView == NULL)
 			{
-				DX11SurfaceViewPtr dxDepthStencil = boost::dynamic_pointer_cast<DX11SurfaceView>(iter->second);
+				DX11SurfaceViewPtr dxDepthStencil = boost::dynamic_pointer_cast<DX11SurfaceView>(dxSurface->_surfacesViewArray[i]);
 				if (_featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil)
 					pDepthView = dxDepthStencil->ReadonlyDepthStencil.get();
 				else
 					pDepthView = dxDepthStencil->DepthStencilHandle.get();
 			}
-			else if (iter->first >= SL_RenderTarget1 && iter->first <= SL_RenderTarget8)
+			else if (i >= SL_RenderTarget1 && i <= SL_RenderTarget8)
 			{
-				DX11SurfaceViewPtr dxRenderTarget = boost::dynamic_pointer_cast<DX11SurfaceView>(iter->second);
+				DX11SurfaceViewPtr dxRenderTarget = boost::dynamic_pointer_cast<DX11SurfaceView>(dxSurface->_surfacesViewArray[i]);
 				vRenderTarget.push_back((ID3D11RenderTargetView*)dxRenderTarget->RenderTargetHandle.get());
 			}
-			++iter;
 		}
- 
+	
 		_pImmediateContext->OMSetRenderTargets(vRenderTarget.size(), vRenderTarget.data(), pDepthView);
 	 
 	}
@@ -780,18 +761,20 @@ namespace Disorder
 
 	void DX11RenderEngine::ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
 	{
-		std::map<ESurfaceLocation, SurfaceViewPtr>::const_iterator iter = renderSurface->SurfacesViewMap.begin();
-		while (iter != renderSurface->SurfacesViewMap.end())
+		DX11RenderSurfacePtr dxSurface = boost::dynamic_pointer_cast<DX11RenderSurface>(renderSurface);
+		for (size_t i = 0; i < SL_SurfaceLoactionMax; i++)
 		{
-			if (iter->first == SL_DepthStencil)
+			if (dxSurface->_surfacesViewArray[i] != NULL)
 			{
-				ClearDepthStencil(iter->second, bClearDepth, depth, bClearStencil, stencil);
+				if (i == SL_DepthStencil)
+				{
+					ClearDepthStencil(dxSurface->_surfacesViewArray[i], bClearDepth, depth, bClearStencil, stencil);
+				}
+				else
+				{
+					ClearRenderTarget(dxSurface->_surfacesViewArray[i], color);
+				}
 			}
-			else if (iter->first >= SL_RenderTarget1 && iter->first <= SL_RenderTarget8)
-			{
-				ClearRenderTarget(iter->second, color);
-			}
-			++iter;
 		}
 	}
 

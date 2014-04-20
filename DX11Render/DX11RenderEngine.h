@@ -17,11 +17,9 @@ namespace Disorder
 		virtual void OnDrawEnd();
 
 		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
-		virtual void ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color);
-		virtual void ClearDepthStencil(const SurfaceViewPtr& depthBuffer,bool bClearDepth,float depth,bool bClearStencil,unsigned char stencil);
-
+ 
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
-		virtual void SetRenderTarget(const SurfaceViewPtr& renderTarget, const SurfaceViewPtr& depthStencil, bool useReadOnlyDepthStencil = false);
+	
 		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,bool useReadOnlyDepthStencil = false);
 		virtual void SetPrimitiveTopology(TopologyType topologyType);
 
@@ -74,6 +72,8 @@ namespace Disorder
 		virtual void SetBlendState(BlendStatePtr const& blendState);
 		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState);
 		virtual void SetDepthStencilState(DepthStencilStatePtr const& depthStencilState);
+		virtual void ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color);
+		virtual void ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
 
 	private:
 		DX11RenderEngine();

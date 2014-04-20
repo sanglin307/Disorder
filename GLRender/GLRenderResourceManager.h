@@ -17,7 +17,7 @@ namespace Disorder
 		virtual RenderTexture2DPtr CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample, ImagePtr image);
 
 		virtual SurfaceViewPtr CreateSurfaceView(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat Format, unsigned int Flag = 0);
-		virtual RenderSurfacePtr CreateRenderSurface();
+		virtual RenderSurfacePtr CreateRenderSurface(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap);
 		virtual RenderEffectPtr CreateRenderEffect();
 		virtual SamplerStatePtr CreateSamplerState(SamplerDesc* pSamplerDesc);
 		virtual RasterizeStatePtr CreateRasterizeState(RasterizeDesc *pDesc);

@@ -104,6 +104,11 @@ namespace Disorder
 
 		static RenderEffectPtr Create(); 
 
+		virtual void* GetHandle()
+		{
+			return 0;
+		}
+
 	protected:
 		// shader slot!
 		ShaderObjectPtr _vertexShader;

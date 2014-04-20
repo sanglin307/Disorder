@@ -24,8 +24,10 @@ namespace Disorder
 
 	class DX11RenderSurface : public RenderSurface
 	{
+		friend class DX11RenderEngine;
+
 	public:
-		static DX11RenderSurfacePtr Create();
+		static DX11RenderSurfacePtr Create(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap);
 
 	private:
 		DX11RenderSurface(){}

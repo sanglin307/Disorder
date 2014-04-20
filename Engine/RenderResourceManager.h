@@ -20,7 +20,7 @@ namespace Disorder
 		virtual SamplerStatePtr CreateSamplerState(SamplerDesc* pSamplerDesc) = 0;
 	
 		virtual SurfaceViewPtr CreateSurfaceView(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat Format, unsigned int Flag = 0) = 0;
-		virtual RenderSurfacePtr CreateRenderSurface() = 0;
+		virtual RenderSurfacePtr CreateRenderSurface(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap) = 0;
 		virtual RenderEffectPtr CreateRenderEffect() = 0;
 		virtual RasterizeStatePtr CreateRasterizeState(RasterizeDesc *pDesc) = 0;
 		virtual DepthStencilStatePtr CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef) = 0;

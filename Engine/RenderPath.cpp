@@ -133,8 +133,8 @@ namespace Disorder
 
 		GEngine->RenderEngine->OnDrawBegin();
 
-		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainRenderTarget);
-		GEngine->RenderEngine->ClearRenderSurface(GEngine->RenderSurfaceCache->MainRenderTarget, glm::vec4(0.f, 0.f, 0.f, 1.0f),true,1.0f,false,0);
+		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget);
+		GEngine->RenderEngine->ClearRenderSurface(GEngine->RenderSurfaceCache->MainTarget, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
  
 		GSceneManager->UpdateShaderProperty();
 		mainCamera->UpdateShaderProperty();
@@ -359,8 +359,8 @@ namespace Disorder
 		GEngine->RenderSurfaceCache->GBuffer->UpdateShaderProperty();
 	
 		//lighting pass, draw to main render target
-		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainRenderTarget);
-		GEngine->RenderEngine->ClearRenderSurface(GEngine->RenderSurfaceCache->MainRenderTarget, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
+		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget);
+		GEngine->RenderEngine->ClearRenderSurface(GEngine->RenderSurfaceCache->MainTarget, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
 	
 		const std::vector<LightPtr>& vLights = GSceneManager->GetLightsList();
 		std::vector<DirectionLightPtr> directionLightArray;
