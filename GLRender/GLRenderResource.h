@@ -9,12 +9,15 @@ namespace Disorder
 		~GLRenderBuffer();
 
 		static GLRenderBufferPtr Create(RenderBufferType type,GeometryPtr const& data,GLint location,BufferUsage bufferUsage,RenderEffectPtr const& effect);
-		static GLRenderBufferPtr Create(RenderBufferType type,BufferUsage bufferUsage,unsigned int elementSize,unsigned int size,void *pData);
+		static GLRenderBufferPtr Create(RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint);
 
 		virtual void * GetHandle();
 		virtual void Resize(unsigned int size);
 
-		
+		GLuint GetBindingPoint()
+		{
+			return _bindingPoint;
+		}
 
 	private:
 		GLRenderBuffer();
@@ -23,6 +26,7 @@ namespace Disorder
 		GLenum GetGLBufferUsage(BufferUsage bufferUsage);
 
 		GLuint _bufferHandle;
+		GLuint _bindingPoint;
  
 	};
  

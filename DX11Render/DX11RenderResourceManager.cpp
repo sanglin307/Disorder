@@ -61,7 +61,7 @@ namespace Disorder
 		bufferArray.push_back(indexBuffer);
 	}
 
-    RenderBufferPtr DX11RenderResourceManager::CreateBuffer(RenderBufferType type,BufferUsage bufferUsage,unsigned int elementSize,unsigned int size,void *pData) 
+	RenderBufferPtr DX11RenderResourceManager::CreateBuffer(RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint)
 	{
 		RenderBufferPtr renderBuffer = DX11RenderBuffer::Create(type,bufferUsage,elementSize,size,pData);
 	 

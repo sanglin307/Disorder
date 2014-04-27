@@ -1,10 +1,10 @@
-uniform SceneProperty
+layout(std140) uniform SceneProperty
 {
 	vec3 AmbientLowColor;
 	vec3 AmbientUpperColor;
 };
 
-uniform CameraTransforms
+layout(std140) uniform CameraTransforms
 {
 	mat4 CameraView;
 	mat4 CameraProjection;	
@@ -15,13 +15,13 @@ uniform CameraTransforms
 	vec3 CameraPosition;
 };
 
-uniform ObjectTransform
+layout(std140) uniform ObjectTransform
 {
 	mat4 WorldTransform;
 	mat4 WorldNormalTransform;  // translate for normal.
 };
 
-uniform MaterialProperty
+layout(std140) uniform MaterialProperty
 {
 	vec3 DiffuseColor;
 	vec3 SpecularColor;
@@ -29,7 +29,7 @@ uniform MaterialProperty
 	float SpecularExp;	
 };
 
-uniform DirectionLightProperty
+layout(std140) uniform DirectionLightProperty
 {
 	vec3 DirectionLightColor;
 	vec3 DirectionLightDir;	
@@ -72,7 +72,7 @@ vec3 CalculateDirectionLight(vec3 position, Material material)
    return finalColor;
 }
 
-uniform ForwardFourLights 
+layout(std140) uniform ForwardFourLights 
 {
 	vec4 ForwardLightPosX	;	
 	vec4 ForwardLightPosY	;	

@@ -112,6 +112,7 @@ namespace Disorder
 
 	void Frustrum::Draw()
 	{
+
 		glm::vec4 color(1.0f,0,1,1.0f);
 
 		GEngine->GameCanvas->DrawLine(_Points[0],color,_Points[1],color);

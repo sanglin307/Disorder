@@ -18,7 +18,7 @@ out block
 //--------------------------------------------------------------------------------------
 void main(void)
 {
-    gl_Position = WorldTransform * vec4(Position,1.0f);
+    gl_Position = WorldTransform * vec4(Position,1.0f) ;
 	Out.PositionWorld = gl_Position.xyz;
 	
     gl_Position = CameraViewProj * gl_Position;

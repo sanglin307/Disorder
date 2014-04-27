@@ -25,6 +25,8 @@ namespace Disorder
 		static GLRenderSurfacePtr Create(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap);
 		virtual void* GetHandle();
 
+		void GetGLDrawBuffers(std::vector<GLenum>& buffers);
+
 	private:
 		GLRenderSurface();
 

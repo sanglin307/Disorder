@@ -13,9 +13,7 @@ namespace Disorder
 		void DrawLine(glm::vec3 const& beginPos, glm::vec4 const& beginColor, glm::vec3 const& endPos, glm::vec4 const& endColor);
 
 		void Render(CameraPtr const& camera);
-
-		unsigned int GetCurrentDrawTriNumber();
-
+ 
 		const unsigned int GetWidth() const
 		{
 			return _width;

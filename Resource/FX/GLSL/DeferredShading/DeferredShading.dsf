@@ -1,27 +1,25 @@
-#version 330
-#extension GL_ARB_shading_language_include : require
+#include "Common.dsf"
 
-#include </glsl/common.gls>
+Texture2D<float> GBufferDepthTexture;
+Texture2D<float4> GBufferColorSpecIntTexture;
+Texture2D<float3> GBufferNormalTexture;
+Texture2D<float4> GBufferSpecPowTexture;
+SamplerState    GBufferPointSampler;
 
-uniform sampler2D GBufferDepthTexture;
-uniform sampler2D GBufferColorSpecIntTexture;
-uniform sampler2D GBufferNormalTexture;
-uniform sampler2D GBufferSpecPowTexture;
-
-uniform GBufferData
+struct GBufferData
 {
 	float Depth;
-	vec3 Color;
-	vec3 Normal;
-	vec3 SpecularColor;
+	float3 Color;
+	float3 Normal;
+	float3 SpecularColor;
 	float SpecularExp;
 };
  
-vec3 CalculateWorldPos(vec2 csPos, float depth)
+float3 CalculateWorldPos(float2 csPos, float depth)
 {
-	vec4 position = vec4(csPos.x,csPos.y,depth,1.0f);
-	position = CameraViewProjInv * position;
-	return vec3(position.x/position.w,position.y/position.w,position.z/position.w);
+	float4 position = float4(csPos.x,csPos.y,depth,1.0f);
+	position = mul(CameraViewProjInv,position);
+	return float3(position.x/position.w,position.y/position.w,position.z/position.w);
 }
 
 struct SceneVSInput
@@ -38,7 +36,7 @@ struct SceneVSOutput
 	float3 PositionWorld: TEXCOORD1;
 };
 
-SceneVSOutput RenderSceneVS( SceneVSInput input )
+SceneVSOutput SceneVS( SceneVSInput input )
 {   
     SceneVSOutput output;
     output.Position = mul( WorldTransform,float4(input.Position,1.0f));
@@ -77,7 +75,7 @@ ScenePSOutput PackGBuffer(float3 BaseColor, float3 Normal, float3 SpecColor, flo
 	return Out;
 }
 
-ScenePSOutput RenderScenePS( SceneVSOutput In )
+ScenePSOutput ScenePS( SceneVSOutput In )
 { 
     // Lookup mesh texture and modulate it with diffuse
    // float3 DiffuseColor = DiffuseTexture.Sample( LinearSampler, In.UV );
@@ -157,7 +155,7 @@ float4 BaseLightingPS(LightVSOutput In) : SV_TARGET
 	return float4(finalColor, 1.0);
 }
 
-float4 DeferFourLightPS( LightVSOutput In ) : SV_TARGET
+float4 DeferLightPS( LightVSOutput In ) : SV_TARGET
 {
 	// Unpack the GBuffer
 	GBufferData gbd = UnpackGBuffer(In.Position.xy);

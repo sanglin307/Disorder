@@ -24,6 +24,7 @@ void AppPeekMessage()
 	fullPath = fullPath.substr(0,pos+fstr.size());	
 	Disorder::GConfig->sRootPath = boost::locale::conv::from_utf(fullPath,"UTF-8");
 	Disorder::GConfig->sConfigPath = Disorder::GConfig->sRootPath + "\\Config\\";
+	Disorder::GConfig->sLogPath = Disorder::GConfig->sRootPath + "\\Log\\";
 	Disorder::GConfig->sResourceFBXPath = Disorder::GConfig->sRootPath + "\\Resource\\Fbx\\";
 	Disorder::GConfig->sResourceFXPath = Disorder::GConfig->sRootPath + "\\Resource\\FX\\";
 	Disorder::GConfig->sResourceTexPath = Disorder::GConfig->sRootPath + "\\Resource\\Texture\\";

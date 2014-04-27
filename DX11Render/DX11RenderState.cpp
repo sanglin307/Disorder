@@ -67,7 +67,9 @@ namespace Disorder
 			desc.CullMode = D3D11_CULL_BACK;
 
 		desc.DepthBias = pDesc->DepthBias;
-		desc.DepthBiasClamp = pDesc->DepthBiasClamp;
+		desc.DepthBiasClamp = pDesc->DepthBiasClamp;		
+		desc.SlopeScaledDepthBias = pDesc->SlopeScaledDepthBias;
+
 		desc.DepthClipEnable = pDesc->DepthClipEnable;
 
 		if( pDesc->FillMode == RFM_Wireframe )
@@ -83,7 +85,7 @@ namespace Disorder
 
 
 		desc.ScissorEnable = pDesc->ScissorEnable;
-		desc.SlopeScaledDepthBias = pDesc->SlopeScaledDepthBias;
+		
 
 		ID3D11RasterizerState *pState;
 		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
@@ -152,26 +154,27 @@ namespace Disorder
 		BOOST_ASSERT(BlendArraySize <= 8 );
 
 		DX11BlendState *pState = new DX11BlendState;
-
-		pState->Desc = *pBlendDescArray;
+ 
+		pState->AlphaToCoverageEnable = AlphaToCoverageEnable;
+		pState->IndependentBlendEnable = IndependentBlendEnable;
 
 		D3D11_BLEND_DESC desc;
 		ZeroMemory(&desc,sizeof(desc));
+
 		desc.AlphaToCoverageEnable = AlphaToCoverageEnable;
 		desc.IndependentBlendEnable = IndependentBlendEnable;
 
-		for( int index = 0;index< BlendArraySize;index ++ )
+		for( int index = 0; index < BlendArraySize; index ++ )
 		{
-			unsigned int TargetIndex = pBlendDescArray[index].TargetIndex ;
-			BOOST_ASSERT( TargetIndex < 8 );
-			desc.RenderTarget[TargetIndex].BlendEnable = pBlendDescArray[index].BlendEnable;
-			desc.RenderTarget[TargetIndex].DestBlend = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].DestBlend);
-			desc.RenderTarget[TargetIndex].DestBlendAlpha = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].DestBlendAlpha);
-			desc.RenderTarget[TargetIndex].SrcBlend = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].SrcBlend);
-			desc.RenderTarget[TargetIndex].SrcBlendAlpha = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].SrcBlendAlpha);
-			desc.RenderTarget[TargetIndex].RenderTargetWriteMask = pBlendDescArray[index].RenderTargetWriteMask;
-			desc.RenderTarget[TargetIndex].BlendOp = DX11RenderEngine::GetD3DBlendOp(pBlendDescArray[index].BlendOp);
-			desc.RenderTarget[TargetIndex].BlendOpAlpha = DX11RenderEngine::GetD3DBlendOp(pBlendDescArray[index].BlendOpAlpha);
+			pState->Desc[index] = pBlendDescArray[index];
+			desc.RenderTarget[index].BlendEnable = pBlendDescArray[index].BlendEnable;
+			desc.RenderTarget[index].DestBlend = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].DestBlend);
+			desc.RenderTarget[index].DestBlendAlpha = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].DestBlendAlpha);
+			desc.RenderTarget[index].SrcBlend = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].SrcBlend);
+			desc.RenderTarget[index].SrcBlendAlpha = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].SrcBlendAlpha);
+			desc.RenderTarget[index].RenderTargetWriteMask = pBlendDescArray[index].RenderTargetWriteMask;
+			desc.RenderTarget[index].BlendOp = DX11RenderEngine::GetD3DBlendOp(pBlendDescArray[index].BlendOp);
+			desc.RenderTarget[index].BlendOpAlpha = DX11RenderEngine::GetD3DBlendOp(pBlendDescArray[index].BlendOpAlpha);
 		}
 
 		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine);

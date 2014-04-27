@@ -112,7 +112,14 @@ namespace Disorder
 	{
 		GLBlendState* pState = new GLBlendState;
 
-		pState->Desc = *pBlendDescArray;
+		pState->AlphaToCoverageEnable = AlphaToCoverageEnable;
+		pState->IndependentBlendEnable = IndependentBlendEnable;
+
+		for (int index = 0; index < BlendArraySize; index++)
+		{
+			pState->Desc[index] = pBlendDescArray[index];
+		}
+		
 
 		return GLBlendStatePtr(pState);
 	}

@@ -7,12 +7,8 @@ namespace Disorder
 
 	// while check if should exit mainloop  
 	extern bool GIsRequestingExit;
-
-	extern unsigned long GFrameCounter;
-	extern unsigned int  GDrawTriNumber;
  
 	void sysSleep(float deltaseconds);
-	 
 
 	void DebugOutput(const char* expr,const char* file,int line,const char* message);
 

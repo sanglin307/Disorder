@@ -64,14 +64,17 @@ namespace Disorder
 		GLRenderEffectPtr glEffect = boost::dynamic_pointer_cast<GLRenderEffect>(renderEffect);
 		BOOST_ASSERT(glEffect->EffectReflection->InputArray.size() > 0 );
 		BOOST_ASSERT(_VAOHandle > 0 );
-		
+ 
 		glBindVertexArray(_VAOHandle);
-			
 		GLuint offset = 0;
+		GLuint stride = 0;
 		bool soloBuffer = _vertexBuffers.size() > 1 ? false : true;
 
-		if( soloBuffer )
+		if (soloBuffer)
+		{
 			glBindBuffer(GL_ARRAY_BUFFER, (GLuint)_vertexBuffers[0]->GetHandle());
+			stride = _vertexBuffers[0]->GetElementSize();
+		}
 
 		for(size_t attriIndex =0; attriIndex < glEffect->EffectReflection->InputArray.size(); attriIndex++ )
 		{
@@ -81,18 +84,20 @@ namespace Disorder
 			int normalize = 0;
 			GLRenderEffect::GetGLShaderPropertyTypeLength(pDesc->Type, propertyType, count);
 
+			glEnableVertexAttribArray(pDesc->Location);
+
 			if( !soloBuffer )
 			{
 				glBindBuffer(GL_ARRAY_BUFFER, (GLuint)_vertexBuffers[attriIndex]->GetHandle());
-				glVertexAttribPointer(attriIndex, count, propertyType, GL_FALSE, 0, 0);
+				glVertexAttribPointer(pDesc->Location, count, propertyType, GL_FALSE, _vertexBuffers[attriIndex]->GetElementSize(), 0);
 			}
 			else
 			{
-				glVertexAttribPointer(attriIndex, count, propertyType, GL_FALSE, 0, (void*)offset);
+				glVertexAttribPointer(pDesc->Location, count, propertyType, GL_FALSE, stride, (GLvoid*)offset);
 				offset += GLRenderLayout::GetGLTypeSize(pDesc->Type);
 			}
 
-			glEnableVertexAttribArray(attriIndex);
+			
 		}
 
 		if(_indexBuffer!= NULL )

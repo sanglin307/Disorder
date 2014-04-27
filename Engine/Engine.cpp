@@ -25,13 +25,6 @@ namespace Disorder
 	   RenderEngine->CreateViewport(viewport->GetWindow());	 
 
 	   RenderResourceMgr->Init();
-	 
-	  /* ShaderObjectPtr vObject = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "2DText", SM_4_0, "main");
-	   ShaderObjectPtr pObject = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"2DText",SM_4_0,"main");
-	   RenderEffectPtr effect = GEngine->RenderResourceMgr->CreateRenderEffect();
-	   effect->BindShader(vObject);
-	   effect->BindShader(pObject);
-	   effect->LinkShaders();*/
 
 	   viewport->SetRenderPath(RPT_ForwardLighting);
 	   SceneImporter->Init();
@@ -61,6 +54,7 @@ namespace Disorder
 	   //Draw Evertything~
 	   GameClient->GetViewport(0)->Render();
 
+	   Stat.FrameCounter++;
 
    }
 
@@ -68,26 +62,25 @@ namespace Disorder
    {
 	   GWorld->Exit();
 	   GSceneManager->Exit();
-	   RenderEngine->Exit();
 	   GameClient->Exit();
 	   SceneImporter->Exit();
+	   RenderEngine->Exit();
 	   GLogger->Exit();
 
    }
 
    void EngineStat::DrawStat()
    {
-		if( !_bEnable )
+	   if (!_bDrawEnable)
 			return;
  
-		 
 		CanvasPtr canvas = GEngine->GameCanvas;
 
 		std::stringstream strstream;
-		strstream << "Drawed triangle num:" << GDrawTriNumber;
+		strstream << "Drawed triangle num:" << _lastFrameDrawTriNumber;
 		std::string drawstr = strstream.str();
 		float length = canvas->GetStringLength(0.04f,drawstr);
-		canvas->DrawString(0.98f - length, 0.02f, 0.04f, glm::vec4(1.f), drawstr);
+		canvas->DrawString(0.98f - length, 0.06f, 0.04f, glm::vec4(1.f), drawstr);
    }
 
    EnginePtr Engine::Create()
@@ -119,7 +112,7 @@ namespace Disorder
 
 	    std::stringstream strstream;
 		strstream << "Fps:" << fps << "  Frame Delta:"<< deltaSeconds;
-		canvas->DrawString(0.01f,0.02f,0.04f,color,strstream.str());
+		canvas->DrawString(0.01f,0.06f,0.04f,color,strstream.str());
 		strstream.clear();
 
    }

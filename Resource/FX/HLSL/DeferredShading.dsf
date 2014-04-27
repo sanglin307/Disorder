@@ -37,7 +37,7 @@ struct SceneVSOutput
 	float3 PositionWorld: TEXCOORD1;
 };
 
-SceneVSOutput RenderSceneVS( SceneVSInput input )
+SceneVSOutput SceneVS( SceneVSInput input )
 {   
     SceneVSOutput output;
     output.Position = mul( WorldTransform,float4(input.Position,1.0f));
@@ -76,7 +76,7 @@ ScenePSOutput PackGBuffer(float3 BaseColor, float3 Normal, float3 SpecColor, flo
 	return Out;
 }
 
-ScenePSOutput RenderScenePS( SceneVSOutput In )
+ScenePSOutput ScenePS( SceneVSOutput In )
 { 
     // Lookup mesh texture and modulate it with diffuse
    // float3 DiffuseColor = DiffuseTexture.Sample( LinearSampler, In.UV );
@@ -156,7 +156,7 @@ float4 BaseLightingPS(LightVSOutput In) : SV_TARGET
 	return float4(finalColor, 1.0);
 }
 
-float4 DeferFourLightPS( LightVSOutput In ) : SV_TARGET
+float4 FourLightingPS( LightVSOutput In ) : SV_TARGET
 {
 	// Unpack the GBuffer
 	GBufferData gbd = UnpackGBuffer(In.Position.xy);

@@ -29,6 +29,21 @@
     <Filter Include="GLSL">
       <UniqueIdentifier>{5d7ef184-07ac-4a9e-89f9-79d09a4bc0a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GLSL\2DText">
+      <UniqueIdentifier>{65534e8a-2501-488a-97b3-2693cd38f9b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLSL\BatchLines">
+      <UniqueIdentifier>{a692cda9-646b-4b87-95a1-b1ace2f14123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLSL\DeferredShading">
+      <UniqueIdentifier>{c326d625-5239-4605-87e1-45ac764c51f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLSL\ForwardLighting">
+      <UniqueIdentifier>{7fc4f972-d3e3-4cf1-a0de-249dae6ba287}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLSL\SurfaceVisual">
+      <UniqueIdentifier>{82539860-2ecc-4c3e-a979-4f0e6acfce32}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="TodoList.txt" />
@@ -56,49 +71,52 @@
     <None Include="..\Resource\FX\HLSL\SurfaceVisual.dsf">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\DeferredShading.dsf">
-      <Filter>GLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\SurfaceVisual.dsf">
-      <Filter>GLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\common.gls">
-      <Filter>GLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\DeferredShading.glvs">
-      <Filter>GLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\DeferredShading.glfs">
-      <Filter>GLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\HLSL\FLighting.dsf">
+    <None Include="..\Resource\FX\HLSL\ForwardLighting.dsf">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\FLighting_SceneVS.glvs">
-      <Filter>GLSL</Filter>
+    <None Include="..\Resource\FX\GLSL\2DText\PS.glfs">
+      <Filter>GLSL\2DText</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\FLighting_LightPS.glfs">
-      <Filter>GLSL</Filter>
+    <None Include="..\Resource\FX\GLSL\2DText\VS.glvs">
+      <Filter>GLSL\2DText</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\FLighting_FourLightPS.glfs">
-      <Filter>GLSL</Filter>
+    <None Include="..\Resource\FX\GLSL\BatchLines\PS.glfs">
+      <Filter>GLSL\BatchLines</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\2DText_VS.glvs">
-      <Filter>GLSL</Filter>
+    <None Include="..\Resource\FX\GLSL\BatchLines\VS.glvs">
+      <Filter>GLSL\BatchLines</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\2DText_PS.glfs">
-      <Filter>GLSL</Filter>
+    <None Include="..\Resource\FX\GLSL\DeferredShading\BaseLightingPS.glfs">
+      <Filter>GLSL\DeferredShading</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\BatchLines_VS.glvs">
-      <Filter>GLSL</Filter>
+    <None Include="..\Resource\FX\GLSL\DeferredShading\FourLightingPS.glfs">
+      <Filter>GLSL\DeferredShading</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\BatchLines_PS.glfs">
-      <Filter>GLSL</Filter>
+    <None Include="..\Resource\FX\GLSL\DeferredShading\LightingVS.glvs">
+      <Filter>GLSL\DeferredShading</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\SurfaceVisual_VS.glfs">
-      <Filter>GLSL</Filter>
+    <None Include="..\Resource\FX\GLSL\DeferredShading\ScenePS.glfs">
+      <Filter>GLSL\DeferredShading</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\SurfaceVisual_PS.glvs">
+    <None Include="..\Resource\FX\GLSL\DeferredShading\SceneVS.glvs">
+      <Filter>GLSL\DeferredShading</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ForwardLighting\BaseLightingPS.glfs">
+      <Filter>GLSL\ForwardLighting</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ForwardLighting\FourLightingPS.glfs">
+      <Filter>GLSL\ForwardLighting</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ForwardLighting\SceneVS.glvs">
+      <Filter>GLSL\ForwardLighting</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\SurfaceVisual\PS.glvs">
+      <Filter>GLSL\SurfaceVisual</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\SurfaceVisual\VS.glfs">
+      <Filter>GLSL\SurfaceVisual</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\Common.gls">
       <Filter>GLSL</Filter>
     </None>
   </ItemGroup>

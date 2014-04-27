@@ -35,14 +35,7 @@ namespace Disorder
 		_stringElement.Render(camera);
 		
 	}
-
-	unsigned int Canvas::GetCurrentDrawTriNumber()
-	{
-		return _stringElement.GetCurrentDrawTriNumber();
-	}
-
-	 
-
+ 
 	float Canvas::GetStringLength(float fontSize,std::string const& str)
 	{
 		BOOST_ASSERT(fontSize<= 1.0f);
@@ -66,6 +59,7 @@ namespace Disorder
  
 	void Canvas::DrawString(float xPos,float yPos, float size,glm::vec4 const& color,std::string const& str)
 	{
+
 		BOOST_ASSERT(xPos <=1.f && yPos <= 1.0f && size <= 1.0f);
 		//draw string x[-1.0,1.0] and y[-1.0,1.0] z = 0.0
 		

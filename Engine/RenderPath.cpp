@@ -131,7 +131,7 @@ namespace Disorder
 		if( mainCamera == NULL )
 			return;
 
-		GEngine->RenderEngine->OnDrawBegin();
+		GEngine->RenderEngine->OnFrameBegin();
 
 		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget);
 		GEngine->RenderEngine->ClearRenderSurface(GEngine->RenderSurfaceCache->MainTarget, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
@@ -187,20 +187,13 @@ namespace Disorder
 			obj->PostRender(mainCamera);
 		}
 
-		GEngine->GameCanvas->DrawString(0.01f, 0.05f, 0.04f, glm::vec4(1.f), "Forward Lighting Mode");
+		GEngine->GameCanvas->DrawString(0.01f, 0.08f, 0.04f, glm::vec4(1.f), "Forward Lighting Mode");
 
 		GSceneManager->DebugDraw();
-
-		// before we call canvas draw ,we should check if we should add stat info to canvas.
-		if(GEngine->Stat.bEnable())
-		{
-			GDrawTriNumber += GEngine->GameCanvas->GetCurrentDrawTriNumber();
-			GEngine->Stat.DrawStat();
-		}
-
+		GEngine->Stat.DrawStat();
 		GEngine->GameCanvas->Render(mainCamera);
 
-		GEngine->RenderEngine->OnDrawEnd();
+		GEngine->RenderEngine->OnFrameEnd();
 	}
  
 
@@ -215,15 +208,15 @@ namespace Disorder
 		_type = RPT_ForwardLighting;
  
 		_DirectionLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"FLighting",SM_4_0,"SceneVS");
-		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"FLighting",SM_4_0,"LightPS");
+		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"SceneVS");
+		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"BaseLightingPS");
 		_DirectionLightEffect->BindShader(vertexShader);
 		_DirectionLightEffect->BindShader(pixelShader);
 		_DirectionLightEffect->LinkShaders();
  
 		_FourLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr fVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"FLighting",SM_4_0,"SceneVS");
-		ShaderObjectPtr fPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"FLighting",SM_4_0,"FourLightPS");
+		ShaderObjectPtr fVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"SceneVS");
+		ShaderObjectPtr fPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"FourLightingPS");
 		_FourLightEffect->BindShader(fVertexShader);
 		_FourLightEffect->BindShader(fPixelShader);
 		_FourLightEffect->LinkShaders();
@@ -260,8 +253,8 @@ namespace Disorder
 		_type = RPT_DeferredShading;
 
 		_RenderSceneEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"RenderSceneVS");
-		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"RenderScenePS");
+		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"SceneVS");
+		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"ScenePS");
 		_RenderSceneEffect->BindShader(vertexShader);
 		_RenderSceneEffect->BindShader(pixelShader);
 		DepthStencilDesc depthDesc;
@@ -284,7 +277,7 @@ namespace Disorder
 
 		_FourLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr fVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"LightingVS");
-		ShaderObjectPtr fPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"DeferFourLightPS");
+		ShaderObjectPtr fPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"FourLightingPS");
 		_FourLightEffect->BindShader(fVertexShader);
 		_FourLightEffect->BindShader(fPixelShader);
 		BlendDesc bDesc;
@@ -333,11 +326,11 @@ namespace Disorder
 		if( mainCamera == NULL )
 			return;
 
+		GEngine->RenderEngine->OnFrameBegin();
+
 		GSceneManager->UpdateShaderProperty();
 		mainCamera->UpdateShaderProperty();
 
-		GEngine->RenderEngine->OnDrawBegin();
-	
 		// draw to GBuffer
 		RenderSurfacePtr renderTargetPtr = GEngine->RenderSurfaceCache->GBuffer->RenderTargetBuffer;
 		GEngine->RenderEngine->SetRenderTarget(renderTargetPtr);
@@ -412,31 +405,23 @@ namespace Disorder
 		// the last hud things, must use GBuffer's depth buffer surface view
 		GEngine->RenderEngine->SetEffect(NULL);
 		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->GBuffer->MainTargetGDepth, true);
-		GEngine->GameCanvas->DrawString(0.01f,0.05f,0.04f,glm::vec4(1.f),"Deferred Shading Mode");
+		GEngine->GameCanvas->DrawString(0.01f,0.08f,0.04f,glm::vec4(1.f),"Deferred Shading Mode");
 		GSceneManager->DebugDraw();
+		GEngine->Stat.DrawStat();
 
-		// before we call canvas draw ,we should check if we should add stat info to canvas.
-		if(GEngine->Stat.bEnable())
-		{
-			GDrawTriNumber += GEngine->GameCanvas->GetCurrentDrawTriNumber();
-			GEngine->Stat.DrawStat();
-		}
+		GEngine->RenderSurfaceCache->GBuffer->DebugVisual();
 
 		GEngine->GameCanvas->Render(mainCamera);
 
-		if( GSceneManager->EnableDebugDraw )
-		    GEngine->RenderSurfaceCache->GBuffer->DebugVisual();
-
 		GEngine->RenderEngine->SetEffect(NULL);
-		GEngine->RenderEngine->OnDrawEnd();
-
+		GEngine->RenderEngine->OnFrameEnd();
 	}
 
 	void DeferredShading::RenderScene(const CameraPtr& mainCamera)
 	{
 		std::vector<RendererPtr> rendererList;
 		GSceneManager->GetRendererList(mainCamera,rendererList);
-		for(unsigned int i=0;i< rendererList.size(); i++ )
+		for(size_t i=0;i< rendererList.size(); i++ )
 		{
 			RendererPtr obj = rendererList[i];
 			obj->BuildRenderLayout(_RenderSceneEffect,false);

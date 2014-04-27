@@ -7,9 +7,9 @@ namespace Disorder
 
 	void Logger::Init()
 	{
-		_errorFile = GEngine->FileManager->OpenFile("..\\Log\\Error.log","wt");
-		_warningFile = GEngine->FileManager->OpenFile("..\\Log\\Warning.log","wt");
-		_infoFile = GEngine->FileManager->OpenFile("..\\Log\\Info.log","wt");
+		_errorFile = GEngine->FileManager->OpenFile(GConfig->sLogPath + "Error.log","wt");
+		_warningFile = GEngine->FileManager->OpenFile(GConfig->sLogPath + "Warning.log", "wt");
+		_infoFile = GEngine->FileManager->OpenFile(GConfig->sLogPath + "Info.log", "wt");
 		_thread =  boost::thread(LoggerRunner());
 	}
 

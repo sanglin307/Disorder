@@ -230,14 +230,19 @@ namespace Disorder
 
 	void DX11RenderEngine::SetBlendState(BlendStatePtr const& blendState)
 	{ 
-	    if( CachedBlendState != blendState )
+		if (CachedBlendState != blendState || CachedBlendState->BlendFactor[0] != CachedBlendFactor[0] || CachedBlendState->BlendFactor[1] != CachedBlendFactor[1] || 
+			CachedBlendState->BlendFactor[2] != CachedBlendFactor[2] || CachedBlendState->BlendFactor[3] != CachedBlendFactor[3] || 
+			CachedBlendState->SampleMask != CachedBlendSampleMask )
 		{
 			CachedBlendState = blendState;
+			CachedBlendFactor[0] = blendState->BlendFactor[0];
+			CachedBlendFactor[1] = blendState->BlendFactor[1];
+			CachedBlendFactor[2] = blendState->BlendFactor[2];
+			CachedBlendFactor[3] = blendState->BlendFactor[3];
+			CachedBlendSampleMask = blendState->SampleMask;
+
 		    ID3D11BlendState *pState = (ID3D11BlendState*)(blendState->GetHandle());
-
-			D3D11_BLEND_DESC desc;
-			pState->GetDesc(&desc);
-
+ 
 		    _pImmediateContext->OMSetBlendState(pState,blendState->BlendFactor,blendState->SampleMask);	 
 		
 		}
@@ -517,18 +522,15 @@ namespace Disorder
 
 	void DX11RenderEngine::SetPrimitiveTopology(TopologyType topologyType)
 	{
-		_pImmediateContext->IASetInputLayout(NULL);
+		CachedTopology = topologyType;
 		_pImmediateContext->IASetPrimitiveTopology(DX11RenderEngine::GetPlatformTopology(topologyType));
-		_pImmediateContext->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
 	}
 
 	void DX11RenderEngine::SetRenderLayout( RenderLayoutPtr const& renderLayout)
 	{
 		DX11RenderLayoutPtr dxRenderLayout = boost::dynamic_pointer_cast<DX11RenderLayout>(renderLayout);
 
-		TopologyType topology = renderLayout->GetTopology();
-		_pImmediateContext->IASetPrimitiveTopology(DX11RenderEngine::GetPlatformTopology(topology));
-
+		SetPrimitiveTopology(renderLayout->GetTopology());
 		//set layout
 		_pImmediateContext->IASetInputLayout((ID3D11InputLayout*)(renderLayout->GetHandle()));
 		 
@@ -558,14 +560,15 @@ namespace Disorder
 
 	void DX11RenderEngine::DrawIndexed(unsigned int indexCount,unsigned int startIndexLocation,int baseVertexLocation)
 	{
-		GDrawTriNumber += indexCount / 3;
-
 		_pImmediateContext->DrawIndexed(indexCount,startIndexLocation,baseVertexLocation);
+		GEngine->Stat.DrawTriNumber += GetTriangleCountFromTopology(CachedTopology, indexCount);
 	}
 
 	void DX11RenderEngine::Draw(unsigned int vertexCount,unsigned int startVertexLocation)
 	{
 		_pImmediateContext->Draw(vertexCount,startVertexLocation);
+
+		GEngine->Stat.DrawTriNumber += GetTriangleCountFromTopology(CachedTopology, vertexCount);
 	}
  
 	void DX11RenderEngine::SetEffect(RenderEffectPtr const& effect)
@@ -683,9 +686,11 @@ namespace Disorder
 
 	void DX11RenderEngine::SetDepthStencilState(DepthStencilStatePtr const& depthStencilState)
 	{
-		if( CachedDepthStencilState != depthStencilState )
+		if( CachedDepthStencilState != depthStencilState || depthStencilState->StencilRef != CachedStencilRef )
 		{
 			CachedDepthStencilState = depthStencilState;
+			CachedStencilRef = depthStencilState->StencilRef;
+
 			ID3D11DepthStencilState* pState = (ID3D11DepthStencilState*)(depthStencilState->GetHandle());
 			_pImmediateContext->OMSetDepthStencilState(pState,depthStencilState->StencilRef);
 		}
@@ -792,16 +797,16 @@ namespace Disorder
 			 
 	}
 
-	void DX11RenderEngine::OnDrawBegin()
-	{
-		GDrawTriNumber = 0;
- 
-		
+	void DX11RenderEngine::OnFrameBegin()
+	{	
+		GEngine->Stat.OnFrameBegin();
 	}
 
-    void DX11RenderEngine::OnDrawEnd()
+	void DX11RenderEngine::OnFrameEnd()
 	{
-		_pSwapChain->Present( 0, 0 );
+		_pSwapChain->Present( GConfig->pRenderConfig->SyncInterval, 0 );
+
+		GEngine->Stat.OnFrameEnd();
 	}
 
 

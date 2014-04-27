@@ -67,6 +67,7 @@ namespace Disorder
 		bool Save();
 
 		static std::string sRootPath; 
+		static std::string sLogPath;
 		static std::string sConfigPath;
 		static std::string sResourceFBXPath;
 		static std::string sResourceFXPath;

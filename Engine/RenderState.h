@@ -28,11 +28,10 @@ namespace Disorder
 	typedef struct _BlendDesc 
 	{
 		_BlendDesc()
-		:TargetIndex(0),BlendEnable(false),SrcBlend(BLEND_ONE),DestBlend(BLEND_ZERO),BlendOp(BLEND_OP_ADD),
+		:BlendEnable(false),SrcBlend(BLEND_ONE),DestBlend(BLEND_ZERO),BlendOp(BLEND_OP_ADD),
 		 SrcBlendAlpha(BLEND_ONE),DestBlendAlpha(BLEND_ZERO),BlendOpAlpha(BLEND_OP_ADD),RenderTargetWriteMask(COLOR_WRITE_ENABLE_ALL)
 		{
 		}
-		unsigned int   TargetIndex;
 		bool           BlendEnable;
 		BlendOptions   SrcBlend;
 		BlendOptions   DestBlend;
@@ -41,6 +40,7 @@ namespace Disorder
 		BlendOptions   DestBlendAlpha;
 		BlendOperation BlendOpAlpha;
 		unsigned char  RenderTargetWriteMask;
+
     } BlendDesc;
 
 	typedef struct _DepthStencilDesc
@@ -123,12 +123,17 @@ namespace Disorder
     public:
          float BlendFactor[4];
          unsigned int SampleMask;
-		 BlendDesc Desc;
+		 BlendDesc Desc[8];
+		 bool AlphaToCoverageEnable;
+		 bool IndependentBlendEnable;
+
 	protected:
 		 BlendState()
          {
              BlendFactor[0] = BlendFactor[1] = BlendFactor[2] = BlendFactor[3] = 1.0f;
              SampleMask =  0xffffffff;
+			 AlphaToCoverageEnable = false;
+			 IndependentBlendEnable = false;
          }
 	};
 

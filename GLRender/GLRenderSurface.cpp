@@ -20,7 +20,6 @@ namespace Disorder
 
 		 glBindFramebuffer(GL_FRAMEBUFFER, pSurface->_frameBuffer);
 		 std::map<ESurfaceLocation, SurfaceViewPtr>::const_iterator iter = viewMap.cbegin();
-		 std::vector<GLenum> bufferLoc;
 		 while (iter != viewMap.cend())
 		 {
 			 pSurface->_surfacesViewArray[iter->first] = iter->second;
@@ -30,16 +29,31 @@ namespace Disorder
 			 else if (iter->first >= SL_RenderTarget1 && iter->first <= SL_RenderTarget8)
 			 {
 				 GLenum loc = iter->first - SL_RenderTarget1 + GL_COLOR_ATTACHMENT0;
-				 bufferLoc.push_back(loc);
 				 glFramebufferTexture(GL_FRAMEBUFFER, loc, (GLuint)(GLuint)iter->second->Resource->GetHandle(), 0);
 			 }
 			 ++iter;
 		 }
- 
-		 glDrawBuffers(bufferLoc.size(), bufferLoc.data());
 
 		 return GLRenderSurfacePtr(pSurface);
 	 }
+
+	void GLRenderSurface::GetGLDrawBuffers(std::vector<GLenum>& buffers)
+	{
+		for (size_t i = SL_RenderTarget1; i < SL_SurfaceLoactionMax; i++)
+		{
+			if (_surfacesViewArray[i] != NULL)
+			{
+				buffers.push_back(i - SL_RenderTarget1 + GL_COLOR_ATTACHMENT0);
+			}
+		}
+
+		// single buffer
+		if (buffers.size() == 1 && buffers[0] == GL_COLOR_ATTACHMENT0)
+		{
+			buffers.clear();
+			buffers.push_back(GL_BACK);
+		}
+	}
 
 	 void* GLRenderSurface::GetHandle()
 	 {

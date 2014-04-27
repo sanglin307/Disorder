@@ -73,9 +73,7 @@ namespace Disorder
 		void EndAddVertex();
 
 		virtual void Render(CameraPtr const& camera);
- 
-		unsigned int GetCurrentDrawTriNumber();
-
+  
 	protected:
 		BatchTileVertex* _vertexs;
 	    unsigned int _vertexNum;
@@ -93,7 +91,6 @@ namespace Disorder
 	{
 	public:
 		BatchLines(std::string const& name);
-		void AddLine(glm::vec3 const& beginPos, glm::vec4 const& beginColor, glm::vec3 const& endPos, glm::vec4 const& endColor);
 		virtual void Render(CameraPtr const& camera);
 		~BatchLines();
 

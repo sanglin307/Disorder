@@ -215,103 +215,122 @@ namespace Disorder
 		}
 	}
 
-	void GLRenderEffect::GetShaderPropertyTypeLength(GLint type, EShaderProperty& propertyType, int &length)
+	void GLRenderEffect::GetShaderPropertyTypeLength(GLint type, EShaderProperty& propertyType, int &length,int &size)
 	{
 		if (type == GL_FLOAT)
 		{
 			propertyType = eSP_Float;
 			length = 1;
+			size = sizeof(GLfloat)* length;
 		}
 		else if (type == GL_FLOAT_VEC2)
 		{
 			propertyType = eSP_Float;
 			length = 2;
+			size = sizeof(GLfloat)* length;
 		}
 		else if (type == GL_FLOAT_VEC3)
 		{
 			propertyType = eSP_Float;
 			length = 3;
+			size = sizeof(GLfloat)* length;
 		}
 		else if (type == GL_FLOAT_VEC4)
 		{
 			propertyType = eSP_Float;
 			length = 4;
+			size = sizeof(GLfloat)* length;
 		}
 		else if (type == GL_FLOAT_MAT4)
 		{
 			propertyType = eSP_Float;
 			length = 16;
+			size = sizeof(GLfloat)* length;
 		}
 		else if (type == GL_FLOAT_MAT3)
 		{
 			propertyType = eSP_Float;
 			length = 9;
+			size = sizeof(GLfloat)* length;
 		}
 		else if (type == GL_FLOAT_MAT2)
 		{
 			propertyType = eSP_Float;
 			length = 4;
+			size = sizeof(GLfloat)* length;
 		}
 		else if (type == GL_DOUBLE)
 		{
 			propertyType = eSP_Double;
 			length = 1;
+			size = sizeof(GLdouble)* length;
 		}
 		else if (type == GL_DOUBLE_VEC2)
 		{
 			propertyType = eSP_Double;
 			length = 2;
+			size = sizeof(GLdouble)* length;
 		}
 
 		else if (type == GL_DOUBLE_VEC3)
 		{
 			propertyType = eSP_Double;
 			length = 3;
+			size = sizeof(GLdouble)* length;
 		}
 		else if (type == GL_DOUBLE_VEC4)
 		{
 			propertyType = eSP_Double;
 			length = 4;
+			size = sizeof(GLdouble)* length;
 		}
 		else if (type == GL_DOUBLE_MAT2)
 		{
 			propertyType = eSP_Double;
 			length = 4;
+			size = sizeof(GLdouble)* length;
 		}
 		else if (type == GL_DOUBLE_MAT3)
 		{
 			propertyType = eSP_Double;
 			length = 9;
+			size = sizeof(GLdouble)* length;
 		}
 		else if (type == GL_DOUBLE_MAT4)
 		{
 			propertyType = eSP_Double;
 			length = 16;
+			size = sizeof(GLdouble)* length;
 		}
 		else if (type == GL_INT)
 		{
 			propertyType = eSP_Int;
 			length = 1;
+			size = sizeof(GLdouble)* length;
 		}
 		else if (type == GL_INT_VEC2)
 		{
 			propertyType = eSP_Int;
 			length = 2;
+			size = sizeof(GLdouble)* length;
 		}
 		else if (type == GL_INT_VEC3)
 		{
 			propertyType = eSP_Int;
 			length = 3;
+			size = sizeof(GLdouble)* length;
 		}
 		else if (type == GL_INT_VEC4)
 		{
 			propertyType = eSP_Int;
 			length = 4;
+			size = sizeof(GLdouble)* length;
 		}
 		else if (type == GL_SAMPLER_2D || type == GL_SAMPLER_1D || type == GL_SAMPLER_3D || type == GL_SAMPLER_CUBE)
 		{
 			propertyType = eSP_ShaderResource;
 			length = 1;
+			size = length;
 		}		
 		else
 		{
@@ -357,6 +376,17 @@ namespace Disorder
 				inputDesc.Location = params[1];
 				EffectReflection->InputArray.push_back(inputDesc);
 			}
+
+			class InputArraySort
+			{
+			public:
+				bool operator () (GLShaderSignatureDesc& a, GLShaderSignatureDesc& b) const
+				{
+					return a.Location < b.Location;
+				};
+			};
+
+			std::sort(EffectReflection->InputArray.begin(), EffectReflection->InputArray.end(), InputArraySort());
 		}
  
 		// uniform block
@@ -369,23 +399,27 @@ namespace Disorder
 			for (int i = 0; i < uniformBlockNumber; i++)
 			{
 				GLShaderUniformBlock desc;
-				char name[64];
+				char name[128];
 				glGetProgramResourceName(_GLHandle, GL_UNIFORM_BLOCK, i, sizeof(name), NULL, name);
 
 				desc.Name = name;
 				desc.BlockIndex = glGetUniformBlockIndex(_GLHandle, name);
 				glGetActiveUniformBlockiv(_GLHandle, desc.BlockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &desc.BlockSize);
-				glGetActiveUniformBlockiv(_GLHandle, desc.BlockIndex, GL_UNIFORM_BLOCK_BINDING, &desc.BlockBinding);
+				//glGetActiveUniformBlockiv(_GLHandle, desc.BlockIndex, GL_UNIFORM_BLOCK_BINDING, &desc.BlockBinding);
 				GLShaderPropertyManagerPtr propertyManager = boost::dynamic_pointer_cast<GLShaderPropertyManager>(GEngine->RenderResourceMgr->GetPropertyManager(name));
 				BOOST_ASSERT(propertyManager->Name != ShaderPropertyManager::sManagerGlobal);  // don't registe uniform block name ,please registe it in ShaderPropertyManager
 
 				desc.BufferParamRef = GlobalPropertyManager->GetProperty(name);
+				desc.BlockBinding = propertyManager->BindingPoint;
 				if (desc.BufferParamRef == NULL)
 				{
-					RenderBufferPtr constBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Constant, BU_DynamicDraw, desc.BlockSize, desc.BlockSize, NULL);
+					RenderBufferPtr constBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Constant, BU_DynamicDraw, desc.BlockSize, desc.BlockSize, NULL, desc.BlockBinding);
 					desc.BufferParamRef = GlobalPropertyManager->CreateProperty(name, eSP_ConstBuffer);
-					desc.BufferParamRef->SetData(constBuffer);
+					desc.BufferParamRef->SetData(constBuffer);					
 				}
+			 
+				// binging block to GLSL
+				glUniformBlockBinding(_GLHandle, desc.BlockIndex, desc.BlockBinding);
 
 				EffectReflection->UniformBlockArray.push_back(desc);
 			}
@@ -414,47 +448,47 @@ namespace Disorder
 				desc.BlockIndex = params[2];
 				desc.Offset = params[3];
 
-				int pos = desc.Name.find_first_of('.');
-				std::string blockName = "";
-				std::string varName = name;
-				ShaderPropertyManagerPtr manager = NULL; 
-				if (pos != std::string::npos)
+				GLShaderUniformBlock *pBlock = NULL;
+				ShaderPropertyManagerPtr manager = NULL;
+				if (desc.BlockIndex >= 0)
 				{
-					blockName = desc.Name.substr(0, pos);
-					varName = desc.Name.substr(pos+1);
-					manager = GEngine->RenderResourceMgr->GetPropertyManager(blockName);
+					for (size_t k = 0; k < EffectReflection->UniformBlockArray.size(); k++)
+					{
+						if (EffectReflection->UniformBlockArray[k].BlockIndex == desc.BlockIndex)
+						{
+							pBlock = &(EffectReflection->UniformBlockArray[k]);
+							break;
+						}
+					}
+
+					BOOST_ASSERT(pBlock);
+					manager = GEngine->RenderResourceMgr->GetPropertyManager(pBlock->Name);
 				}
 				else
 					manager = GlobalPropertyManager;
 
 				EShaderProperty shaderProperty;
 				int length;
-				GLRenderEffect::GetShaderPropertyTypeLength(desc.Type, shaderProperty, length);
+				GLRenderEffect::GetShaderPropertyTypeLength(desc.Type, shaderProperty, length,desc.Size);
 
-				desc.ParamRef = manager->CreateProperty(varName, shaderProperty, length);
-				if (desc.Location < 0 && blockName != "") // ? block
+				desc.ParamRef = manager->CreateProperty(desc.Name, shaderProperty, length);
+
+				if (pBlock)
 				{
-					bool found = false;
-					for (size_t j = 0; j < EffectReflection->UniformBlockArray.size(); j++)
-					{
-						if (EffectReflection->UniformBlockArray[j].Name == blockName)
-						{
-							found = true;
-							EffectReflection->UniformBlockArray[j].Members.push_back(desc);
-							EffectReflection->UniformBlockArray[j].MembersRef.push_back(desc.ParamRef);
-						}
-					}
-					if (!found)
-					{
-						BOOST_ASSERT(0);
-					}
-				}
- 
+				   pBlock->Members.push_back(desc);
+				   pBlock->MembersRef.push_back(desc.ParamRef);
+			    }
+
 				EffectReflection->ResourceArray.push_back(desc);
 			}
 		}
 
-		
+		for (size_t i = 0; i < EffectReflection->UniformBlockArray.size(); i++)
+		{
+			ShaderPropertyManagerPtr mgr = GEngine->RenderResourceMgr->GetPropertyManager(EffectReflection->UniformBlockArray[i].Name);
+			GLShaderPropertyManagerPtr glMgr = boost::dynamic_pointer_cast<GLShaderPropertyManager>(mgr);
+			BOOST_ASSERT(glMgr->Validate(&(EffectReflection->UniformBlockArray[i])));
+		}
 	}
 
 	GLRenderEffectPtr GLRenderEffect::Create()
@@ -467,6 +501,7 @@ namespace Disorder
 		:EffectReflection(NULL)
 	{
 		_GLHandle = glCreateProgram();
+		//glProgramParameteri(_GLHandle, GL_PROGRAM_SEPARABLE, GL_TRUE);
 	}
 
 	GLRenderEffect::~GLRenderEffect()
@@ -483,15 +518,70 @@ namespace Disorder
 	GLShaderPropertyManager::GLShaderPropertyManager(const std::string& name)
 		:ShaderPropertyManager(name)
 	{
+		_uniformBlock = NULL;
 	}
 
+ 
 	void GLShaderPropertyManager::UpdateShaderProperty()
 	{
+		if (!_uniformBlock)
+			return;
+
+		BYTE* pData = new BYTE[_uniformBlock->BlockSize];
+		BYTE* pDest = pData;
+		for (unsigned int j = 0; j<_uniformBlock->Members.size(); j++)
+		{
+			GLShaderResourceBinding* vaDesc = &(_uniformBlock->Members[j]);
+			pDest = pData + vaDesc->Offset;
+			void *pSrc = vaDesc->ParamRef->GetData();
+			memcpy(pDest, pSrc, vaDesc->Size);
+		}
+
+		GEngine->RenderEngine->UpdateSubresource(_uniformBlock->BufferParamRef->GetDataAsConstBuffer(), pData, _uniformBlock->BlockSize);
+		delete pData;
 	}
 
 	GLShaderPropertyManager::~GLShaderPropertyManager()
 	{
+		if (_uniformBlock)
+			delete _uniformBlock;
+
+		_uniformBlock = NULL;
 	}
 
 
+	bool GLShaderPropertyManager::Validate(GLShaderUniformBlock *pUniformBlock)
+	{
+		if (_uniformBlock == NULL)
+		{
+			_uniformBlock = new GLShaderUniformBlock;
+			_uniformBlock->BlockBinding = pUniformBlock->BlockBinding;
+			_uniformBlock->BlockIndex = pUniformBlock->BlockIndex;
+			_uniformBlock->BlockSize = pUniformBlock->BlockSize;
+			_uniformBlock->BufferParamRef = pUniformBlock->BufferParamRef;
+			std::copy(pUniformBlock->Members.begin(), pUniformBlock->Members.end(), std::back_inserter(_uniformBlock->Members));
+			std::copy(pUniformBlock->MembersRef.begin(), pUniformBlock->MembersRef.end(), std::back_inserter(_uniformBlock->MembersRef));
+			 
+			_uniformBlock->Name = pUniformBlock->Name;
+			return true;
+		}
+		else
+		{
+			if (_uniformBlock->Name != pUniformBlock->Name)
+				return false;
+
+			if (_uniformBlock->BlockIndex != pUniformBlock->BlockIndex)
+				return false;
+
+			if (_uniformBlock->BlockSize != pUniformBlock->BlockSize)
+				return false;
+
+			if (_uniformBlock->Members.size() != pUniformBlock->Members.size())
+				return false;
+
+			return true;
+		}
+
+		return false;
+	}
 }

@@ -479,6 +479,27 @@ namespace Disorder
 		}
 	}
 
+	int RenderEngine::GetTriangleCountFromTopology(TopologyType topology,int indexCount)
+	{
+		switch (topology)
+		{
+		case TT_PointList:
+			return indexCount / 3;
+		case TT_LineList:
+			return indexCount / 2;
+		case TT_LineStrip:
+			return indexCount - 1;
+		case TT_TriangleList:
+			return indexCount / 3;
+		case TT_TriangleStrip:
+			return indexCount - 2;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return 0;
+	}
+
 	bool RenderEngine::IsDepthStencilFormat(PixelFormat format)
 	{
 		switch (format)

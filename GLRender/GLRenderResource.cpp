@@ -14,7 +14,7 @@ namespace Disorder
 		GLRenderBuffer *pBuffer = new GLRenderBuffer;
 		pBuffer->_type = type;
 		pBuffer->_bufferUsage = bufferUsage;
-		pBuffer->_elementSize = elementSize;
+		
 
 		if( type == RBT_Vertex )
 		{
@@ -34,6 +34,7 @@ namespace Disorder
 				return NULL;
 			}
  
+			pBuffer->_elementSize = elementSize;
 			if( location == GLRenderLayout::Location_Position )
 			{
 				pBuffer->_bufferSize = pBuffer->_elementSize*data->Positions.size();
@@ -143,7 +144,7 @@ namespace Disorder
 		}
 		else if( _type == RBT_Constant )
 		{
-			glBindBuffer(GL_UNIFORM_BUFFER,_bufferHandle);
+			glBindBufferBase(GL_UNIFORM_BUFFER, _bindingPoint,_bufferHandle);
 			glBufferData(GL_UNIFORM_BUFFER,_bufferSize,pData,GetGLBufferUsage(_bufferUsage));
 		}
 
@@ -177,13 +178,14 @@ namespace Disorder
 
 	}
 
-	GLRenderBufferPtr GLRenderBuffer::Create(RenderBufferType type,BufferUsage bufferUsage,unsigned int elementSize,unsigned int size,void *pData)
+	GLRenderBufferPtr GLRenderBuffer::Create(RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint)
 	{
 		GLRenderBuffer *pBuffer = new GLRenderBuffer;
 		pBuffer->_type = type;
 		pBuffer->_bufferUsage = bufferUsage;
 		pBuffer->_elementSize = elementSize;
 		pBuffer->_bufferSize = size;
+		pBuffer->_bindingPoint = bindingPoint;
 
 		pBuffer->DoCreateBuffer(pData);
 		 

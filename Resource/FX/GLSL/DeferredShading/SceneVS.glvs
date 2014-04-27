@@ -1,25 +1,27 @@
-#include "Common.dsf"
+#version 330
+#extension GL_ARB_shading_language_include : require
 
-Texture2D<float> GBufferDepthTexture;
-Texture2D<float4> GBufferColorSpecIntTexture;
-Texture2D<float3> GBufferNormalTexture;
-Texture2D<float4> GBufferSpecPowTexture;
-SamplerState    GBufferPointSampler;
+#include </glsl/common.gls>
 
-struct GBufferData
+uniform sampler2D GBufferDepthTexture;
+uniform sampler2D GBufferColorSpecIntTexture;
+uniform sampler2D GBufferNormalTexture;
+uniform sampler2D GBufferSpecPowTexture;
+
+layout(std140) uniform GBufferData
 {
 	float Depth;
-	float3 Color;
-	float3 Normal;
-	float3 SpecularColor;
+	vec3 Color;
+	vec3 Normal;
+	vec3 SpecularColor;
 	float SpecularExp;
 };
  
-float3 CalculateWorldPos(float2 csPos, float depth)
+vec3 CalculateWorldPos(vec2 csPos, float depth)
 {
-	float4 position = float4(csPos.x,csPos.y,depth,1.0f);
-	position = mul(CameraViewProjInv,position);
-	return float3(position.x/position.w,position.y/position.w,position.z/position.w);
+	vec4 position = vec4(csPos.x,csPos.y,depth,1.0f);
+	position = CameraViewProjInv * position;
+	return vec3(position.x/position.w,position.y/position.w,position.z/position.w);
 }
 
 struct SceneVSInput
@@ -155,7 +157,7 @@ float4 BaseLightingPS(LightVSOutput In) : SV_TARGET
 	return float4(finalColor, 1.0);
 }
 
-float4 DeferFourLightPS( LightVSOutput In ) : SV_TARGET
+float4 DeferLightPS( LightVSOutput In ) : SV_TARGET
 {
 	// Unpack the GBuffer
 	GBufferData gbd = UnpackGBuffer(In.Position.xy);

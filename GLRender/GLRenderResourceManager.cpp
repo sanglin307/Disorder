@@ -11,7 +11,7 @@ namespace Disorder
 	ShaderObjectPtr GLRenderResourceManager::CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel, std::string const& entryPoint)
 	{
 		std::string fileSuffix = GLShaderObject::GetShaderFileSuffix(type);
-		std::string shaderKey = fileName + "_" + entryPoint + fileSuffix;
+		std::string shaderKey = fileName + "\\" + entryPoint + fileSuffix;
 		if (_shaderMap.find(shaderKey) != _shaderMap.end())
 			return _shaderMap.at(shaderKey);
 
@@ -30,9 +30,9 @@ namespace Disorder
 		return GLRenderEffect::Create();
 	}
  
-	RenderBufferPtr GLRenderResourceManager::CreateBuffer(RenderBufferType type,BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData)
+	RenderBufferPtr GLRenderResourceManager::CreateBuffer(RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint)
 	{
-		RenderBufferPtr renderBuffer = GLRenderBuffer::Create(type,bufferUsage,elementSize,size,pData);	 
+		RenderBufferPtr renderBuffer = GLRenderBuffer::Create(type,bufferUsage,elementSize,size,pData,bindingPoint);	 
 		return renderBuffer;
 	}
 
@@ -101,8 +101,13 @@ namespace Disorder
 		if( _propertyManagerMap.find(name) != _propertyManagerMap.end() )
 			return;
 
-		ShaderPropertyManagerPtr manger = GLShaderPropertyManager::Create(name);
-		_propertyManagerMap.insert(std::pair<std::string,ShaderPropertyManagerPtr>(name,manger));
+		GLShaderPropertyManagerPtr manager = GLShaderPropertyManager::Create(name);
+		if (name != ShaderPropertyManager::sManagerGlobal)
+			manager->BindingPoint = _propertyManagerMap.size();
+		else
+			manager->BindingPoint = -1;
+
+		_propertyManagerMap.insert(std::pair<std::string, ShaderPropertyManagerPtr>(name, manager));
 	}
 
 	GLRenderResourceManagerPtr GLRenderResourceManager::Create()

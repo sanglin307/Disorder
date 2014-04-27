@@ -16,8 +16,8 @@ namespace Disorder
 		virtual void Init() = 0;
 		virtual void Exit() = 0;
 		
-		virtual void OnDrawBegin(){};
-		virtual void OnDrawEnd(){};
+		virtual void OnFrameBegin(){};
+		virtual void OnFrameEnd(){};
 
 		virtual void AdjustProjMatrix(const glm::mat4 &matrix){};
 
@@ -40,8 +40,12 @@ namespace Disorder
 		virtual void SaveSurfaceView(SurfaceViewPtr const& surface,std::string const& fileName){};
 
         BlendStatePtr CachedBlendState;
+		float CachedBlendFactor[4];
+		unsigned int CachedBlendSampleMask;
         RasterizeStatePtr CachedRasterizeState;
 		DepthStencilStatePtr CachedDepthStencilState;
+		unsigned int CachedStencilRef;
+		TopologyType CachedTopology;
  
 		static size_t ComputePixelSizeBits(PixelFormat format);
 		static size_t ComputeBlockSizeBits(PixelFormat format);
@@ -51,9 +55,11 @@ namespace Disorder
 		static bool  IsCompressed(PixelFormat format);
 		static unsigned int GetTextureFormatDimensionAlignment(PixelFormat format);
 		static bool IsDepthStencilFormat(PixelFormat format);
-	 
+ 
+		static int GetTriangleCountFromTopology(TopologyType topology, int indexCount);
 
 	protected:
+
 		virtual void SetBlendState(BlendStatePtr const& blendState) = 0;
 		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState)=0;
 		virtual void SetDepthStencilState(DepthStencilStatePtr const& depthStencilState) = 0;

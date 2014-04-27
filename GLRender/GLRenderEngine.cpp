@@ -15,8 +15,9 @@ namespace Disorder
 		if (engine->IsVersionSupported(4, 3))
 		{
 			glDebugMessageCallback(DebugCallback, this);
+			glEnable(GL_DEBUG_OUTPUT);
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-
+			
 			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_API, "API"));
 			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_WINDOW_SYSTEM, "Window System"));
 			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_SHADER_COMPILER, "Shader Compiler"));
@@ -42,6 +43,7 @@ namespace Disorder
 		else if (engine->IsExtensionSupported("GL_ARB_debug_output"))
 		{
 			glDebugMessageCallbackARB(DebugCallback, this);
+			glEnable(GL_DEBUG_OUTPUT);
 			glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 
 			_mapSourceInfo.insert(std::make_pair<GLenum, std::string>(GL_DEBUG_SOURCE_API_ARB, "API"));
@@ -73,6 +75,9 @@ namespace Disorder
 		stream << " ID: " << id;
 		stream << " Message: " << message;
 
+#ifdef _DEBUG
+		OutputDebugStringA(stream.str().c_str());
+#endif
 		if (type == GL_DEBUG_TYPE_ERROR)
 		{
 			GLogger->Error(stream.str());
@@ -329,6 +334,129 @@ namespace Disorder
 		return 0;
 	}
 
+	GLenum GLRenderEngine::GetGLFillMode(RenderFillMode fm)
+	{
+		switch (fm)
+		{
+		case RFM_Wireframe:
+			return GL_LINE;
+		case Disorder::RFM_Solid:
+			return GL_FILL;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return 0;
+	}
+
+	GLenum GLRenderEngine::GetGLCullMode(RenderCullMode cm)
+	{
+		switch (cm)
+		{
+		case RCM_CullFront:
+			return GL_FRONT;
+		case RCM_CullBack:
+			return GL_BACK;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return 0;
+	}
+
+	GLenum GLRenderEngine::GetGLStencilOp(StencilOperation sop)
+	{
+		switch (sop)
+		{
+		case STENCIL_OP_KEEP:
+			return GL_KEEP;
+		case STENCIL_OP_ZERO:
+			return GL_ZERO;
+		case STENCIL_OP_REPLACE:
+			return GL_REPLACE;
+		case STENCIL_OP_INCR_SAT:
+			return GL_INCR_WRAP;
+		case STENCIL_OP_DECR_SAT:
+			return GL_DECR_WRAP;
+		case STENCIL_OP_INVERT:
+			return GL_INVERT;
+		case STENCIL_OP_INCR:
+			return GL_INCR;
+		case STENCIL_OP_DECR:
+			return GL_DECR;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return 0;
+	}
+
+	GLenum GLRenderEngine::GetGLBlendFunc(BlendOptions blendOptions)
+	{
+		switch (blendOptions)
+		{
+		case BLEND_ZERO:
+			return GL_ZERO;
+		case BLEND_ONE:
+			return GL_ONE;
+		case BLEND_SRC_COLOR:
+			return GL_SRC_COLOR;
+		case BLEND_INV_SRC_COLOR:
+			return GL_ONE_MINUS_SRC_COLOR;
+		case BLEND_SRC_ALPHA:
+			return GL_SRC_ALPHA;
+		case BLEND_INV_SRC_ALPHA:
+			return GL_ONE_MINUS_SRC_ALPHA;
+		case BLEND_DEST_ALPHA:
+			return GL_DST_ALPHA;
+		case BLEND_INV_DEST_ALPHA:
+			return GL_ONE_MINUS_DST_ALPHA;
+		case BLEND_DEST_COLOR:
+			return GL_DST_COLOR;
+		case BLEND_INV_DEST_COLOR:
+			return GL_ONE_MINUS_DST_COLOR;
+		case BLEND_SRC_ALPHA_SAT:
+			return GL_SRC_ALPHA_SATURATE;
+		case BLEND_BLEND_FACTOR:
+			return GL_CONSTANT_COLOR;
+		case BLEND_INV_BLEND_FACTOR:
+			return GL_ONE_MINUS_CONSTANT_COLOR;
+		case BLEND_SRC1_COLOR:
+			return GL_SRC1_COLOR;
+		case BLEND_INV_SRC1_COLOR:
+			return GL_ONE_MINUS_SRC1_COLOR;
+		case BLEND_SRC1_ALPHA:
+			return GL_SRC1_ALPHA;
+		case BLEND_INV_SRC1_ALPHA:
+			return GL_ONE_MINUS_SRC1_ALPHA;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return GL_NONE;
+	}
+
+	GLenum GLRenderEngine::GetGLBlendOp(BlendOperation blendOp)
+	{
+		switch (blendOp)
+		{
+		case BLEND_OP_ADD:
+			return GL_FUNC_ADD;
+		case BLEND_OP_SUBTRACT:
+			return GL_FUNC_SUBTRACT;
+		case BLEND_OP_REV_SUBTRACT:
+			return GL_FUNC_REVERSE_SUBTRACT;
+		case BLEND_OP_MIN:
+			return GL_MIN;
+		case BLEND_OP_MAX:
+			return GL_MAX;
+		default:
+			BOOST_ASSERT(0);
+		}
+
+		return GL_NONE;
+	}
+
 	GLint GLRenderEngine::GetGLComparisonFunc(ComparisonFunc func)
 	{
 		switch (func)
@@ -362,6 +490,12 @@ namespace Disorder
 		_hRC = 0;	
 	}
 
+	GLRenderEngine::~GLRenderEngine()
+	{
+		wglMakeCurrent(NULL, NULL);
+		wglDeleteContext(_hRC);
+	}
+
 	void GLRenderEngine::CreateViewport(void *hWnd)
 	{
 		if (_hRC)
@@ -376,8 +510,15 @@ namespace Disorder
 		LoadShaderIncludeFiles();
 		LoadGLExtensions();
 
+		LoadGLProfile();
+
 		_debugLayer = GLDebugLayer::Create();
 		_debugLayer->Init();
+	}
+
+	void GLRenderEngine::LoadGLProfile()
+	{
+		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &_profile.UniformBufferMaxBindings);
 	}
 
 	void GLRenderEngine::LoadGLExtensions()
@@ -575,9 +716,7 @@ namespace Disorder
 		{
 			return false;
 		}
-
-		
-
+ 
 		std::vector<int> attrib;
 		attrib.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB); attrib.push_back(_mainVersion);
 		attrib.push_back(WGL_CONTEXT_MINOR_VERSION_ARB); attrib.push_back(_subVersion);
@@ -605,10 +744,12 @@ namespace Disorder
 		//v-syn
 		wglSwapIntervalEXT(GConfig->pRenderConfig->SyncInterval);
 
-	
+ 
 		//get the version number
 		glGetIntegerv(GL_MAJOR_VERSION, &_mainVersion);
 		glGetIntegerv(GL_MINOR_VERSION, &_subVersion);
+
+		_renderCache.Init();
 
 		glViewport(0, 0, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY);
 	
@@ -624,17 +765,18 @@ namespace Disorder
 	
 	void GLRenderEngine::Exit()
 	{
-		wglMakeCurrent(NULL, NULL);
-		wglDeleteContext(_hRC);
+	
 	}
 
-	void GLRenderEngine::OnDrawBegin()
+	void GLRenderEngine::OnFrameBegin()
 	{
-		GDrawTriNumber = 0;
+		GEngine->Stat.OnFrameBegin();
 	}
-	void GLRenderEngine::OnDrawEnd()
+
+	void GLRenderEngine::OnFrameEnd()
 	{
 		SwapBuffers(_hDC);
+		GEngine->Stat.OnFrameEnd();
 	}
 
 	void GLRenderEngine::AdjustProjMatrix(const glm::mat4 &matrix)
@@ -644,10 +786,26 @@ namespace Disorder
  
 	void GLRenderEngine::ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
 	{
-		GLRenderSurfacePtr surface = boost::dynamic_pointer_cast<GLRenderSurface>(renderSurface);
-		GLuint fbo = (GLuint)surface->GetHandle();
-		_renderCache.CacheFrameBufferObject(fbo);
+		SetRenderTarget(renderSurface);
 
+		if (renderSurface == NULL) //default
+		{
+			glClearBufferfv(GL_COLOR, 0, glm::value_ptr(color));
+
+			if (bClearDepth)
+				glClearBufferfv(GL_DEPTH, 0, &depth);
+
+			if (bClearStencil)
+			{
+				GLint istencil = stencil;
+				glClearBufferiv(GL_STENCIL, 0, &istencil);
+			}
+
+			return;
+		}
+
+		GLRenderSurfacePtr surface = boost::dynamic_pointer_cast<GLRenderSurface>(renderSurface);
+ 
 		for (int i = 0; i < SL_SurfaceLoactionMax; i++)
 		{
 			if (surface->_surfacesViewArray[i] == NULL)
@@ -676,19 +834,46 @@ namespace Disorder
 
 	void GLRenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget, bool useReadOnlyDepthStencil)
 	{
+		if (renderTarget == NULL)
+		{
+			_renderCache.CacheFrameBufferObject(0);
+			_renderCache.CacheSingleDrawBuffer(GL_BACK);
+			return;
+		}
+
 		GLuint fbo = (GLuint)renderTarget->GetHandle();
 		_renderCache.CacheFrameBufferObject(fbo);
+
+		GLRenderSurfacePtr GLSurface = boost::dynamic_pointer_cast<GLRenderSurface>(renderTarget);
+		std::vector<GLenum> bufferArray;
+		GLSurface->GetGLDrawBuffers(bufferArray);
+		size_t bufferSize = bufferArray.size();
+		if (bufferSize == 1)
+			_renderCache.CacheSingleDrawBuffer(bufferArray[0]);
+		else if (bufferSize > 1)
+			_renderCache.CacheMultiDrawBuffers(bufferArray);
 	}
 
 	void GLRenderEngine::SetRenderLayout(RenderLayoutPtr const& renderLayout)
 	{
+		TopologyType topology = renderLayout->GetTopology();
+		SetPrimitiveTopology(topology);
+
+		RenderBufferPtr indexBuffer = renderLayout->GetIndexBuffer();
 		GLuint vao = (GLuint)renderLayout->GetHandle();
-		_renderCache.CacheVertexArrayObject(vao);
+		if (indexBuffer)
+		{	
+			_renderCache.CacheVertexArrayObject(vao, indexBuffer->GetElementSize());
+			_renderCache.CacheIndexBufferObject((GLuint)indexBuffer->GetHandle(), indexBuffer->GetElementSize());
+		}
+		else
+			_renderCache.CacheVertexArrayObject(vao, 0); // don't use index draw
 	}
 
 	void GLRenderEngine::SetPrimitiveTopology(TopologyType topologyType)
 	{
-		_renderCache.PrimitiveTopology = GetPlatformTopology(topologyType);
+		CachedTopology = topologyType;
+		_renderCache.SetPrimitiveTopology(GetPlatformTopology(topologyType));
 	}
 
 	void GLRenderEngine::SetEffect(RenderEffectPtr const& effect)
@@ -699,29 +884,57 @@ namespace Disorder
 			return;
 		}
 
+		SetBlendState(effect->GetBlendState());
+		SetRasterizeState(effect->GetRasterizeState());
+		SetDepthStencilState(effect->GetDepthStencilState());
+
+		GLRenderEffectPtr effectGL = boost::dynamic_pointer_cast<GLRenderEffect>(effect);
+		GLShaderResourceBinding* pDesc = NULL;
+		std::vector<GLuint> texBinding;
+		std::vector<GLuint> samplerBinding;
+
+		for (size_t i = 0; i < effectGL->EffectReflection->ResourceArray.size(); i++)
+		{
+			pDesc = &(effectGL->EffectReflection->ResourceArray[i]);
+			if (pDesc->Type == GL_SAMPLER_2D)
+			{
+				SurfaceViewPtr tex = pDesc->ParamRef->GetDataAsShaderResource();
+				GLRenderTexture2DPtr res = boost::dynamic_pointer_cast<GLRenderTexture2D>(tex->Resource);
+				texBinding.push_back((GLuint)res->GetHandle());
+				samplerBinding.push_back((GLuint)res->Sampler->GetHandle());
+			}
+		}
+
+		if (texBinding.size() > 0)
+			_renderCache.CacheTexBinding(0, texBinding, samplerBinding);
+
+		 
 		GLuint program = (GLuint)effect->GetHandle();
 		_renderCache.CacheShaderProgram(program);
+ 
 	}
 
 	void GLRenderEngine::DrawIndexed(unsigned int indexCount, unsigned int startIndexLocation, int baseVertexLocation)
 	{
 		//GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT
 		GLenum type;
-		if (_renderCache.IndexElementSize == 1)
+		if (_renderCache.GetIndexElementSize() == 1)
 			type = GL_UNSIGNED_BYTE;
-		else if (_renderCache.IndexElementSize == 2)
+		else if (_renderCache.GetIndexElementSize() == 2)
 			type = GL_UNSIGNED_SHORT;
-		else if (_renderCache.IndexElementSize == 4)
+		else if (_renderCache.GetIndexElementSize() == 4)
 			type = GL_UNSIGNED_INT;
 		else
 			return;
 
-		glDrawElementsBaseVertex(_renderCache.PrimitiveTopology, indexCount, type, &startIndexLocation, baseVertexLocation);
+		glDrawElementsBaseVertex(_renderCache.GetPrimitiveTopology(), indexCount, type, (const GLvoid*)startIndexLocation, baseVertexLocation);
+		GEngine->Stat.DrawTriNumber += GetTriangleCountFromTopology(CachedTopology, indexCount);
 	}
 
 	void GLRenderEngine::Draw(unsigned int vertexCount, unsigned int startVertexLocation)
 	{
-		glDrawArrays(_renderCache.PrimitiveTopology, startVertexLocation, vertexCount);
+		glDrawArrays(_renderCache.GetPrimitiveTopology(), startVertexLocation, vertexCount);
+		GEngine->Stat.DrawTriNumber += GetTriangleCountFromTopology(CachedTopology, vertexCount);
 	}
 
 	GLenum GLRenderEngine::GetBufferAccessFlag(BufferAccess ba)
@@ -752,8 +965,9 @@ namespace Disorder
 		}
 		else if (buffer->GetBufferType() == RBT_Constant)
 		{
-			GLuint ubo = (GLuint)buffer->GetHandle();
-			_renderCache.CacheUniformBufferObject(ubo);
+			GLRenderBufferPtr GLbuffer = boost::dynamic_pointer_cast<GLRenderBuffer>(buffer);
+			GLuint ubo = (GLuint)GLbuffer->GetHandle();
+			_renderCache.CacheUniformBufferObject(ubo, GLbuffer->GetBindingPoint());
 			return glMapBuffer(GL_UNIFORM_BUFFER, GetBufferAccessFlag(bufferAccess));
 		}
 
@@ -775,8 +989,9 @@ namespace Disorder
 		}
 		else if (buffer->GetBufferType() == RBT_Constant)
 		{
-			GLuint ubo = (GLuint)buffer->GetHandle();
-			_renderCache.CacheUniformBufferObject(ubo);
+			GLRenderBufferPtr GLbuffer = boost::dynamic_pointer_cast<GLRenderBuffer>(buffer);
+			GLuint ubo = (GLuint)GLbuffer->GetHandle();
+			_renderCache.CacheUniformBufferObject(ubo, GLbuffer->GetBindingPoint());
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 	}
@@ -797,8 +1012,9 @@ namespace Disorder
 		}
 		else if (buffer->GetBufferType() == RBT_Constant)
 		{
-			GLuint ubo = (GLuint)buffer->GetHandle();
-			_renderCache.CacheUniformBufferObject(ubo);
+			GLRenderBufferPtr GLbuffer = boost::dynamic_pointer_cast<GLRenderBuffer>(buffer);
+			GLuint ubo = (GLuint)GLbuffer->GetHandle();
+			_renderCache.CacheUniformBufferObject(ubo, GLbuffer->GetBindingPoint());
 			glBufferSubData(GL_UNIFORM_BUFFER, 0, srcDataSize, pSrcData);
 		}
 		
@@ -812,17 +1028,97 @@ namespace Disorder
 
 	void GLRenderEngine::SetBlendState(BlendStatePtr const& blendState)
 	{
+		if (CachedBlendState != blendState)
+		{
+			CachedBlendState = blendState;
+			_renderCache.CacheAlphaToCoverage(blendState->AlphaToCoverageEnable);
+			bool bEnable = false;
+			for (int i = 0; i < 8; i++)
+			{
+				bEnable |= blendState->Desc[i].BlendEnable;
+				if (bEnable)
+					break;
+			}
 
+			if (!bEnable)
+			{
+				_renderCache.CacheBlendEnable(false);
+				return;
+			}
+
+			_renderCache.CacheBlendEnable(true);
+			_renderCache.CacheBlendFactor(blendState->BlendFactor[0], blendState->BlendFactor[1], blendState->BlendFactor[2], blendState->BlendFactor[3]);
+			if (blendState->IndependentBlendEnable)
+			{
+				for (int j = 0; j < 8; j++)
+				{
+					if (!blendState->Desc[j].BlendEnable)
+						continue;
+
+					_renderCache.CacheBlendEquation(j, GetGLBlendOp(blendState->Desc[j].BlendOp), GetGLBlendOp(blendState->Desc[j].BlendOpAlpha));
+					_renderCache.CacheBlendFunc(j, GetGLBlendFunc(blendState->Desc[j].SrcBlend), GetGLBlendFunc(blendState->Desc[j].DestBlend), 
+						                       GetGLBlendFunc(blendState->Desc[j].SrcBlendAlpha), GetGLBlendFunc(blendState->Desc[j].DestBlendAlpha));
+				}
+			}
+			else
+			{
+				_renderCache.CacheBlendEquation(-1, GetGLBlendOp(blendState->Desc[0].BlendOp), GetGLBlendOp(blendState->Desc[0].BlendOpAlpha));
+				_renderCache.CacheBlendFunc(-1, GetGLBlendFunc(blendState->Desc[0].SrcBlend), GetGLBlendFunc(blendState->Desc[0].DestBlend),
+					                        GetGLBlendFunc(blendState->Desc[0].SrcBlendAlpha), GetGLBlendFunc(blendState->Desc[0].DestBlendAlpha));
+			}
+		}
 	}
 
 	void GLRenderEngine::SetRasterizeState(RasterizeStatePtr const& rasterizeState)
 	{
+		if (CachedRasterizeState != rasterizeState)
+		{
+			CachedRasterizeState = rasterizeState;
+			
+			_renderCache.CacheFillMode(GetGLFillMode(rasterizeState->Desc.FillMode));
+			if (rasterizeState->Desc.CullMode == RCM_None)
+				_renderCache.CacheCullMode(false, GL_BACK);
+			else
+				_renderCache.CacheCullMode(true, GetGLCullMode(rasterizeState->Desc.CullMode));
 
+			if (rasterizeState->Desc.FrontCounterClockwise)
+				_renderCache.CacheFrontFace(GL_CCW);
+			else
+				_renderCache.CacheFrontFace(GL_CW);
+
+			_renderCache.CachePolygonOffset(rasterizeState->Desc.DepthBias,rasterizeState->Desc.SlopeScaledDepthBias);
+			_renderCache.CacheAntialiasedLine(rasterizeState->Desc.AntialiasedLineEnable);
+			_renderCache.CacheDepthClip(rasterizeState->Desc.DepthClipEnable);
+			_renderCache.CacheMultiSample(rasterizeState->Desc.MultisampleEnable);
+			_renderCache.CacheScissor(rasterizeState->Desc.ScissorEnable);
+		}
 	}
 
 	void GLRenderEngine::SetDepthStencilState(DepthStencilStatePtr const& depthStencilState)
 	{
+		if (CachedDepthStencilState != depthStencilState)
+		{
+			CachedDepthStencilState = depthStencilState;
+ 
+			_renderCache.CacheDepthEnable(depthStencilState->Desc.DepthEnable);
+			if (depthStencilState->Desc.DepthEnable)
+			{
+				_renderCache.CacheDepthFunc(GLRenderEngine::GetGLComparisonFunc(depthStencilState->Desc.DepthFunc));
+				_renderCache.CacheDepthWrite(depthStencilState->Desc.DepthWrite);
+			}
 
+			_renderCache.CacheStencilEnable(depthStencilState->Desc.StencilEnable);
+			if (depthStencilState->Desc.StencilEnable)
+			{
+				_renderCache.CacheStencilFunc(GLRenderEngine::GetGLComparisonFunc(depthStencilState->Desc.FrontFaceStencilFunc), GLRenderEngine::GetGLComparisonFunc(depthStencilState->Desc.BackFaceStencilFunc),
+					depthStencilState->StencilRef, depthStencilState->Desc.StencilReadMask);
+				_renderCache.CacheStencilOpFront(GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.FrontFaceStencilFailOp), GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.FrontFaceStencilDepthFailOp),
+					GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.FrontFaceStencilPassOp));
+				_renderCache.CacheStencilOpBack(GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.BackFaceStencilFailOp), GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.BackFaceStencilDepthFailOp),
+					GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.BackFaceStencilPassOp));
+				_renderCache.CacheStencilWriteMask(depthStencilState->Desc.StencilWriteMask);
+			}
+		}
 	}
 
 	GLenum GLRenderEngine::GetPlatformTopology(TopologyType tType)
@@ -859,7 +1155,88 @@ namespace Disorder
 		return GL_NONE;
 	}
 
-	void GLRenderEngine::sGLEngineCache::CacheFrameBufferObject(GLuint fbo)
+	void GLRenderEngine::GLEngineCache::Init()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferObject);
+		glUseProgram(ShaderProgram);
+		glBindVertexArray(VertexArrayObject);
+		glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IndexBufferObject);
+		glBindBufferBase(GL_UNIFORM_BUFFER, UniformBufferBindingPoint,UniformBufferObject);
+
+		if (DepthEnable)
+		{
+			glEnable(GL_DEPTH_TEST);
+			glDepthMask(DepthWrite);
+			glDepthFunc(DepthFunc);
+		}
+		else
+			glDisable(GL_DEPTH_TEST);
+		
+
+		if (StencilEnable)
+		{
+			glEnable(GL_STENCIL_TEST);
+			glStencilFuncSeparate(FrontFaceStencilFunc, BackFaceStencilFunc, StencilRef, StencilReadMask);
+			glStencilOpSeparate(GL_FRONT, FrontFaceStencilFailOp, FrontFaceStencilDepthFailOp, FrontFaceStencilPassOp);
+			glStencilOpSeparate(GL_BACK, BackFaceStencilFailOp, BackFaceStencilDepthFailOp, BackFaceStencilPassOp);
+			glStencilMask(StencilWriteMask);
+		}
+		else
+			glDisable(GL_STENCIL_TEST);
+
+		
+		glPolygonMode(GL_FRONT_AND_BACK, FillMode);
+		if (CullEnable)
+		{
+			glEnable(GL_CULL_FACE);
+			glCullFace(CullMode);
+		}
+		else
+			glDisable(GL_CULL_FACE);
+
+		glFrontFace(FrontFace);
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(SlopeScaledDepthBias, (GLfloat)DepthBias);
+
+		if (DepthClipEnable)
+			glEnable(GL_DEPTH_CLAMP);
+		else
+			glDisable(GL_DEPTH_CLAMP);
+
+		if (ScissorEnable)
+			glEnable(GL_SCISSOR_TEST);
+		else
+			glDisable(GL_SCISSOR_TEST);
+
+		if (MultisampleEnable)
+			glEnable(GL_MULTISAMPLE);
+		else
+			glDisable(GL_MULTISAMPLE);
+
+		if (AntialiasedLineEnable)
+			glEnable(GL_LINE_SMOOTH);
+		else
+			glDisable(GL_LINE_SMOOTH);
+
+		if (AlphaToCoverageEnable)
+			glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+		else
+			glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+
+		if (BlendEnable)
+			glEnable(GL_BLEND);
+		else
+			glDisable(GL_BLEND);
+
+		if (MultiDrawBuffers.size() > 0)
+			glDrawBuffers(MultiDrawBuffers.size(), MultiDrawBuffers.data());
+		else
+			glDrawBuffer(SingleDrawBuffer);
+
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheFrameBufferObject(GLuint fbo)
 	{
 		if (FrameBufferObject != fbo)
 		{
@@ -868,7 +1245,45 @@ namespace Disorder
 		}
 	}
 
-	void GLRenderEngine::sGLEngineCache::CacheShaderProgram(GLuint sp)
+	void GLRenderEngine::GLEngineCache::CacheSingleDrawBuffer(GLenum buf)
+	{
+		if (buf != SingleDrawBuffer)
+		{
+			buf = SingleDrawBuffer;
+			glDrawBuffer(buf);
+			
+			MultiDrawBuffers.clear();
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheMultiDrawBuffers(const std::vector<GLenum>& buffers)
+	{
+		bool bChange = false;
+		if (MultiDrawBuffers.size() != buffers.size())
+			bChange = true;
+
+		if (!bChange)
+		{
+			for (size_t i = 0; i < MultiDrawBuffers.size(); i++)
+			{
+				if (MultiDrawBuffers[i] != buffers[i])
+				{
+					bChange = true;
+					break;
+				}
+			}
+		}
+
+		if (!bChange)
+			return;
+
+		MultiDrawBuffers.clear();
+		std::copy(buffers.begin(), buffers.end(), std::back_inserter(MultiDrawBuffers));
+		glDrawBuffers(MultiDrawBuffers.size(), MultiDrawBuffers.data());
+		SingleDrawBuffer = 0;
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheShaderProgram(GLuint sp)
 	{
 		if (ShaderProgram != sp)
 		{
@@ -877,16 +1292,17 @@ namespace Disorder
 		}
 	}
 
-	void GLRenderEngine::sGLEngineCache::CacheVertexArrayObject(GLuint vao)
+	void GLRenderEngine::GLEngineCache::CacheVertexArrayObject(GLuint vao,GLuint ies)
 	{
 		if (VertexArrayObject != vao)
 		{
 			glBindVertexArray(vao);
 			VertexArrayObject = vao;
+			IndexElementSize = ies;
 		}
 	}
 
-	void GLRenderEngine::sGLEngineCache::CacheVertexBufferObject(GLuint vbo)
+	void GLRenderEngine::GLEngineCache::CacheVertexBufferObject(GLuint vbo)
 	{
 		if (VertexBufferObject != vbo)
 		{
@@ -895,7 +1311,7 @@ namespace Disorder
 		}
 	}
 
-	void GLRenderEngine::sGLEngineCache::CacheIndexBufferObject(GLuint ibo, GLuint ies)
+	void GLRenderEngine::GLEngineCache::CacheIndexBufferObject(GLuint ibo, GLuint ies)
 	{
 		if (IndexBufferObject != ibo)
 		{
@@ -905,13 +1321,364 @@ namespace Disorder
 		}
 	}
 
-	void GLRenderEngine::sGLEngineCache::CacheUniformBufferObject(GLuint ubo)
+	void GLRenderEngine::GLEngineCache::CacheUniformBufferObject(GLuint ubo, GLuint bindingPoint)
 	{
 		if (UniformBufferObject != ubo)
 		{
-			glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+			glBindBufferBase(GL_UNIFORM_BUFFER, bindingPoint, ubo);
 			UniformBufferObject = ubo;
+			UniformBufferBindingPoint = bindingPoint;
 		}
 	}
 
+	void GLRenderEngine::GLEngineCache::CacheDepthEnable(bool bEnable)
+	{
+		if (DepthEnable != bEnable)
+		{
+			DepthEnable = bEnable;
+			if (bEnable)
+				glEnable(GL_DEPTH_TEST);
+			else
+				glDisable(GL_DEPTH_TEST);
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheDepthWrite(bool bWrite)
+	{
+		if (!DepthEnable)
+			return;
+
+		if (DepthWrite != bWrite)
+		{
+			DepthWrite = bWrite; 
+			glDepthMask(bWrite);		 
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheDepthFunc(GLenum eFunc)
+	{
+		if (!DepthEnable)
+			return;
+
+		if (DepthFunc != eFunc)
+		{
+			DepthFunc = eFunc;
+			glDepthFunc(eFunc);
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheStencilEnable(bool bEnable)
+	{
+		if (StencilEnable != bEnable)
+		{
+			StencilEnable = bEnable;
+			if (bEnable)
+				glEnable(GL_STENCIL_TEST);
+			else
+				glDisable(GL_STENCIL_TEST);
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheStencilFunc(GLenum frontfunc, GLenum backfunc, GLint ref, BYTE mask)
+	{
+		if (!StencilEnable)
+			return;
+
+		if (FrontFaceStencilFunc != frontfunc || BackFaceStencilFunc != backfunc || StencilRef != ref || mask != StencilReadMask)
+		{
+			glStencilFuncSeparate(frontfunc, backfunc, ref, mask);
+			FrontFaceStencilFunc = frontfunc;
+			BackFaceStencilFunc = backfunc;
+			StencilRef = ref;
+			StencilReadMask = mask;
+		}
+	}
+
+	 
+	void GLRenderEngine::GLEngineCache::CacheStencilOpFront(GLenum sfail, GLenum dpfail, GLenum dppass)
+	{
+		if (!StencilEnable)
+			return;
+
+		if (FrontFaceStencilDepthFailOp != dpfail || FrontFaceStencilFailOp != sfail || FrontFaceStencilPassOp != dppass)
+		{
+			glStencilOpSeparate(GL_FRONT, sfail, dpfail, dppass);
+			FrontFaceStencilDepthFailOp = dpfail;
+			FrontFaceStencilFailOp = sfail;
+			FrontFaceStencilPassOp = dppass;
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheStencilOpBack(GLenum sfail, GLenum dpfail, GLenum dppass)
+	{
+		if (!StencilEnable)
+			return;
+
+		if (BackFaceStencilDepthFailOp != dpfail || BackFaceStencilFailOp != sfail || BackFaceStencilPassOp != dppass)
+		{
+			glStencilOpSeparate(GL_BACK, sfail, dpfail, dppass);
+			BackFaceStencilDepthFailOp = dpfail;
+			BackFaceStencilFailOp = sfail;
+			BackFaceStencilPassOp = dppass;
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheStencilWriteMask(BYTE mask)
+	{
+		if (!StencilEnable)
+			return;
+
+		if (StencilWriteMask != mask)
+		{
+			glStencilMask(mask);
+			StencilWriteMask = mask;
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheFillMode(GLenum fillmode)
+	{
+		if (FillMode != fillmode)
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, fillmode);
+			FillMode = fillmode;
+		}
+
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheCullMode(bool bEnable,GLenum cullmode)
+	{
+		if (bEnable != CullEnable)
+		{
+			CullEnable = bEnable;
+			if (bEnable)
+			{
+				glEnable(GL_CULL_FACE);
+				if (CullMode != cullmode)
+				{
+					glCullFace(cullmode);
+					CullMode = cullmode;
+				}
+			}
+			else
+			{
+				glDisable(GL_CULL_FACE);
+			}
+		}
+		else if (bEnable && cullmode != CullMode)
+		{
+			glCullFace(cullmode);
+			CullMode = cullmode;
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheFrontFace(GLenum ff)
+	{
+		if (FrontFace != ff)
+		{
+			FrontFace = ff;
+			glFrontFace(ff);
+		}
+	}
+	
+	void  GLRenderEngine::GLEngineCache::CachePolygonOffset(int depthbias, float slopedepthbias)
+	{
+		if (depthbias != DepthBias || slopedepthbias != SlopeScaledDepthBias)
+		{
+			glPolygonOffset(slopedepthbias, (GLfloat)depthbias);
+			SlopeScaledDepthBias = slopedepthbias;
+			DepthBias = depthbias;
+		}
+	}
+
+	void  GLRenderEngine::GLEngineCache::CacheDepthClip(bool bEnable)
+	{
+		if (DepthClipEnable != bEnable)
+		{
+			DepthClipEnable = bEnable;
+			if (bEnable)
+				glEnable(GL_DEPTH_CLAMP);
+			else
+				glDisable(GL_DEPTH_CLAMP);
+		}
+
+	}
+
+	void  GLRenderEngine::GLEngineCache::CacheScissor(bool bEnable)
+	{
+		if (ScissorEnable != bEnable)
+		{
+			ScissorEnable = bEnable;
+			if (bEnable)
+				glEnable(GL_SCISSOR_TEST);
+			else
+				glDisable(GL_SCISSOR_TEST);
+		}
+	}
+
+	void  GLRenderEngine::GLEngineCache::CacheMultiSample(bool bEnable)
+	{
+		if (MultisampleEnable != bEnable)
+		{
+			MultisampleEnable = bEnable;
+			if (bEnable)
+				glEnable(GL_MULTISAMPLE);
+			else
+				glDisable(GL_MULTISAMPLE);
+		}
+	}
+
+	void  GLRenderEngine::GLEngineCache::CacheAntialiasedLine(bool bEnable)
+	{
+		if (AntialiasedLineEnable != bEnable)
+		{
+			AntialiasedLineEnable = bEnable;
+			if (bEnable)
+				glEnable(GL_LINE_SMOOTH);
+			else
+				glDisable(GL_LINE_SMOOTH);
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheAlphaToCoverage(bool bEnable)
+	{
+		if (AlphaToCoverageEnable != bEnable)
+		{
+			AlphaToCoverageEnable = bEnable;
+			if (bEnable)
+				glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+			else
+				glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheBlendEnable(bool bEnable)
+	{
+		if (BlendEnable != bEnable)
+		{
+			BlendEnable = bEnable;
+			if (bEnable)
+				glEnable(GL_BLEND);
+			else
+				glDisable(GL_BLEND);
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheBlendFunc(int index, GLenum srcRGB, GLenum destRGB, GLenum srcAlpha, GLenum destAlpha)
+	{
+		if (!BlendEnable)
+			return;
+
+		if (index == -1 && (BlendDesc[0].SrcRGB != srcRGB || BlendDesc[0].DestRGB != destRGB || BlendDesc[0].SrcAlpha != srcAlpha || BlendDesc[0].DestAlpha != destAlpha))
+		{
+			BlendDesc[0].SrcRGB = srcRGB;
+			BlendDesc[0].DestRGB = destRGB;
+			BlendDesc[0].SrcAlpha = srcAlpha;
+			BlendDesc[0].DestAlpha = destAlpha;
+			glBlendFuncSeparate(srcRGB, destRGB, srcAlpha, destAlpha);
+		}
+		else if (index >=0 && (BlendDesc[index].SrcRGB != srcRGB || BlendDesc[index].DestRGB != destRGB || BlendDesc[index].SrcAlpha != srcAlpha || BlendDesc[index].DestAlpha != destAlpha))
+		{
+			BlendDesc[index].SrcRGB = srcRGB;
+			BlendDesc[index].DestRGB = destRGB;
+			BlendDesc[index].SrcAlpha = srcAlpha;
+			BlendDesc[index].DestAlpha = destAlpha;
+			glBlendFuncSeparatei(index, srcRGB, destRGB, srcAlpha, destAlpha);
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheBlendEquation(int index, GLenum rgbMode,GLenum alphaMode)
+	{
+		if (!BlendEnable)
+			return;
+
+		if (index == -1 && (BlendDesc[0].RGBEquation != rgbMode || BlendDesc[0].AlphaEquation != alphaMode))
+		{
+			BlendDesc[0].RGBEquation = rgbMode;
+			BlendDesc[0].AlphaEquation = alphaMode;
+			glBlendEquationSeparate(rgbMode,alphaMode);
+		}
+		else if (index >= 0 && (BlendDesc[index].RGBEquation != rgbMode || BlendDesc[index].AlphaEquation != alphaMode))
+		{
+			BlendDesc[index].RGBEquation = rgbMode;
+			BlendDesc[index].AlphaEquation = alphaMode;
+			glBlendEquationSeparatei(index, rgbMode, alphaMode);
+		}
+
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheBlendFactor(float r, float g, float b, float alpha)
+	{
+		if (!BlendEnable)
+			return;
+
+		if (BlendFactor[0] != r || BlendFactor[1] != g || BlendFactor[2] != b || BlendFactor[3] != alpha)
+		{
+			BlendFactor[0] = r;
+			BlendFactor[1] = g;
+			BlendFactor[2] = b;
+			BlendFactor[3] = alpha;
+			glBlendColor(r, g, b, alpha);
+		}
+	}
+
+	void GLRenderEngine::GLEngineCache::CacheTexBinding(GLuint first, const std::vector<GLuint>& bindingArray,const std::vector<GLuint>& sArray)
+	{
+		bool bTexChange = false;
+		bool bSamplerChange = false;
+
+		if (TexBindingBegin != first)
+		{
+			bTexChange = true;
+			bSamplerChange = true;
+		}
+		else
+		{
+			if (bindingArray.size() != TexBindingArray.size())
+				bTexChange = true;
+
+			if (SamplerArray.size() != sArray.size())
+				bSamplerChange = true;
+		}
+		
+		
+		if (!bTexChange)
+		{
+			for (size_t i = 0; i < bindingArray.size(); i++)
+			{
+				if (bindingArray[i] != TexBindingArray[i])
+				{
+					bTexChange = true;
+					break;
+				}
+			}
+		}
+
+		if (!bSamplerChange)
+		{
+			for (size_t i = 0; i < sArray.size(); i++)
+			{
+				if (sArray[i] != SamplerArray[i])
+				{
+					bSamplerChange = true;
+					break;
+				}
+			}	 
+		}
+
+		if (bTexChange)
+		{
+			TexBindingBegin = first;
+			TexBindingArray.clear();
+			std::copy(bindingArray.begin(), bindingArray.end(), std::back_inserter(TexBindingArray));
+			glBindTextures(first, bindingArray.size(), bindingArray.data());
+		}
+
+		if (bSamplerChange)
+		{
+			SamplerArray.clear();
+			std::copy(sArray.begin(), sArray.end(), std::back_inserter(SamplerArray));
+			glBindSamplers(TexBindingBegin, sArray.size(), sArray.data());
+			 
+		}
+	}
 }

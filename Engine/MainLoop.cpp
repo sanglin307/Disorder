@@ -45,7 +45,6 @@ namespace Disorder
 	{	 
 		CalculateTimeDelta();
 		GEngine->Tick((float)GameTime::FrameDelta);
-		GFrameCounter++;
 	}
 
 	void MainLoop::Exit()

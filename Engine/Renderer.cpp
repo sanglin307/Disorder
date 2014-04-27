@@ -69,12 +69,7 @@ namespace Disorder
 		_vertexNum = 0;
 		_indexNum = 0;
 	}
-
-	unsigned int BatchScreenString::GetCurrentDrawTriNumber()
-	{
-		return _indexNum /3;
-	}
-
+ 
 	BatchTileVertex* BatchScreenString::PrepareAddVertex()
 	{
 		if( _vertexNum + 4 >= _savedVertexBufferSize )
@@ -214,13 +209,6 @@ namespace Disorder
 		_renderEffect->BindShader(pixelShader);
 		_renderEffect->LinkShaders();
 
-		RasterizeDesc rDesc;
-		rDesc.AntialiasedLineEnable = true;
-		rDesc.MultisampleEnable = true;
-		RasterizeStatePtr rState = resourceManager->CreateRasterizeState(&rDesc);
-		_renderEffect->BindRasterizeState(rState);
-
-
 		_renderLayout = resourceManager->CreateRenderLayout(_renderEffect,TT_LineList,true);
 	 
 		_savedVertexBufferSize = 1024;
@@ -263,32 +251,7 @@ namespace Disorder
 	{
 		_vertexNum += 2;
 	}
-
-	void BatchLines::AddLine(glm::vec3 const& beginPos, glm::vec4 const& beginColor, glm::vec3 const& endPos, glm::vec4 const& endColor)
-	{
-		if( _vertexNum >= _savedVertexBufferSize )
-		{
-			_savedVertexBufferSize *= 2;
-			BatchLineVertex* pBuffer = new BatchLineVertex[_savedVertexBufferSize];
-			memcpy(pBuffer,_vertexs,sizeof(BatchLineVertex)*_vertexNum);
-			delete[] _vertexs;
-			_vertexs = pBuffer;
-
-			const RenderBufferPtr & vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
-			vertexRenderBuffer->Resize(sizeof(BatchLineVertex) * _savedVertexBufferSize);
-		}
  
-		
-		_vertexs[_vertexNum].position = beginPos;
-		_vertexs[_vertexNum].color = beginColor;
- 
-		_vertexs[_vertexNum+1].position = endPos;
-		_vertexs[_vertexNum+1].color = endColor;
-		
-		_vertexNum += 2;
- 
-	}
-
 	void BatchLines::Render(CameraPtr const& camera)
 	{
 		BOOST_ASSERT(_vertexNum%2==0);
@@ -369,6 +332,7 @@ namespace Disorder
 
 	 void GeometryRenderer::DrawBoundingBox(CameraPtr const& camera)
 	 {
+
 		 glm::vec4 boxVec1( _geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
 			                _geometryObject->BoundingBox.Origin.y - _geometryObject->BoundingBox.BoxExtent.y,
 						    _geometryObject->BoundingBox.Origin.z - _geometryObject->BoundingBox.BoxExtent.z,1);

@@ -55,6 +55,7 @@ namespace Disorder
 		GLint Location;
 		GLint BlockIndex;
 		GLint Offset;
+		GLint Size;
 		ShaderPropertyPtr ParamRef;
 	};
 
@@ -96,7 +97,7 @@ namespace Disorder
 		static GLRenderEffectPtr Create();
 		GLProgramReflectionPtr EffectReflection;
 
-		static void GetShaderPropertyTypeLength(GLint type, EShaderProperty& propertyType, int &lenght);
+		static void GetShaderPropertyTypeLength(GLint type, EShaderProperty& propertyType, int &lenght,  int &size);
 		static void GetGLShaderPropertyTypeLength(GLint type, GLenum& propertyType, int &lenght);
 
 	private:
@@ -111,12 +112,16 @@ namespace Disorder
 	public:
 		~GLShaderPropertyManager();
 		virtual void UpdateShaderProperty();
-	 
+	  
+		bool Validate(GLShaderUniformBlock *pUniformBlock);
 		static GLShaderPropertyManagerPtr Create(const std::string& name);
  
+		GLint BindingPoint;
+
 	protected:
 		GLShaderPropertyManager(const std::string& name);
 		
+		GLShaderUniformBlock* _uniformBlock;
 
 		
 	};

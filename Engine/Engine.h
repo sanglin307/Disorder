@@ -10,20 +10,35 @@ namespace Disorder
 	{
 	public:
 
+		unsigned long FrameCounter;
+		unsigned int  DrawTriNumber;
+
+		void OnFrameBegin()
+		{
+			_lastFrameDrawTriNumber = DrawTriNumber;
+			DrawTriNumber = 0;
+		}
+
+		void OnFrameEnd()
+		{
+		}
+
 		EngineStat()
 		{
-			_bEnable = true;
-		 
+			_bDrawEnable = true;	
+			FrameCounter = 0;
+			DrawTriNumber = 0;
+			_lastFrameDrawTriNumber = 0;
 		}
 
 		void OnOff()
 		{
-			_bEnable = !_bEnable;
+			_bDrawEnable = !_bDrawEnable;
 		}
 
-		bool bEnable()
+		bool bDrawEnable()
 		{
-			return _bEnable;
+			return _bDrawEnable;
 		}
 
 		void DrawStat();
@@ -31,7 +46,8 @@ namespace Disorder
 		void Tick(float deltaSeconds);
 
 	private:
-		bool _bEnable;
+		bool _bDrawEnable;
+		int _lastFrameDrawTriNumber;
 		 
 	};
 
@@ -47,8 +63,6 @@ namespace Disorder
 		int GetMaxTickRate(float delta) { return 0;}
 		void Tick(float deltaSeconds);
 
-		
-	
 		~Engine();
 
 	public :

@@ -13,8 +13,8 @@ namespace Disorder
 		virtual void Init();
 		virtual void Exit();
 		
-		virtual void OnDrawBegin();
-		virtual void OnDrawEnd();
+		virtual void OnFrameBegin();
+		virtual void OnFrameEnd();
 
 		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
  

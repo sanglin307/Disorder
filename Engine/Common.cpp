@@ -4,8 +4,6 @@
 namespace Disorder
 {
 	bool GIsRequestingExit = false;
-	unsigned long GFrameCounter = 0;
-	unsigned int  GDrawTriNumber = 0;
  
 	void sysSleep(float deltaseconds)
 	{

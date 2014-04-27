@@ -129,6 +129,9 @@ namespace Disorder
 
 	void RenderGBuffer::DebugVisual()
 	{
+		if (!GSceneManager->EnableDebugDraw)
+			return;
+
 		CameraPtr mainCamera = GSceneManager->GetDefaultCamera();
 
 		//_GBufferVisTex->SetData(DepthStencilBuffer);

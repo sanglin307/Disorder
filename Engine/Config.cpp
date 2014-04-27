@@ -9,6 +9,7 @@ namespace Disorder
 
 	std::string Config::sRootPath = "";
 	std::string Config::sConfigPath = "";
+	std::string Config::sLogPath = "";
 	std::string Config::sResourceFBXPath = "";
     std::string Config::sResourceFXPath = "";
     std::string Config::sResourceTexPath = "";
