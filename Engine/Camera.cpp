@@ -361,19 +361,14 @@ namespace Disorder
 
 	void Camera::DebugDraw()
 	{
-		std::stringstream strstream;
-		glm::vec3 lookAt = EyePos + Direction() * glm::vec3(50);
-		strstream << "camera: [eyePos](" << (int)EyePos.x << "; " <<  (int)EyePos.y << "; " <<  (int)EyePos.z << ")     [Focus At](" <<  (int)lookAt.x << ";  "<<  (int)lookAt.y << ";  " <<  (int)lookAt.z << ")";
 		if( _updateMode == eFirstPersonMode )
 		{
-			GEngine->GameCanvas->DrawString(0.01f, 0.945f, 0.04f, glm::vec4(1.f), "First Person Mode");
+			GEngine->GameCanvas->DrawString(5, GConfig->pRenderConfig->SizeY - 25, "First Person Mode");
 		}
 		else if( _updateMode == eSphericalTargetMode )
 		{
-			GEngine->GameCanvas->DrawString(0.01f, 0.945f, 0.04f, glm::vec4(1.f), "Spherical Coordinate Mode");
-		}
-		GEngine->GameCanvas->DrawString(0.01f,0.965f,0.04f,glm::vec4(1.f),strstream.str());
- 
+			GEngine->GameCanvas->DrawString(5, GConfig->pRenderConfig->SizeY - 25, "Spherical Coordinate Mode");
+		} 
 	}
 
 	void Camera::Update(float delta)

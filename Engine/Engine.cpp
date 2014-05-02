@@ -81,8 +81,8 @@ namespace Disorder
 		std::stringstream strstream;
 		strstream << "Drawed triangle num:" << _lastFrameDrawTriNumber;
 		std::string drawstr = strstream.str();
-		float length = canvas->GetStringLength(0.04f,drawstr);
-		canvas->DrawString(0.98f - length, 0.06f, 0.04f, glm::vec4(1.f), drawstr);
+		unsigned int length = canvas->GetStringLength(1.0f,drawstr);
+		canvas->DrawString(GConfig->pRenderConfig->SizeX - 5 - length, 10, drawstr);
    }
 
    EnginePtr Engine::Create()
@@ -102,8 +102,7 @@ namespace Disorder
 	   CanvasPtr canvas = GEngine->GameCanvas;
 	   float x = 10.f;
 	   float y = 10.f;
-	   glm::vec4 color(1.0f, 0, 0, 1.0f);
-
+	  
 	   static int fps = (int)(1/deltaSeconds);
 	   if( timeDelta > 1 )
 	   {
@@ -114,7 +113,7 @@ namespace Disorder
 
 	    std::stringstream strstream;
 		strstream << "Fps:" << fps << "  Frame Delta:"<< deltaSeconds;
-		canvas->DrawString(0.01f,0.06f,0.04f,color,strstream.str());
+		canvas->DrawString(5,10,strstream.str());
 		strstream.clear();
 
    }

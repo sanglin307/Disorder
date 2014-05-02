@@ -4,8 +4,8 @@
 namespace Disorder
 {
  
-	WindowsViewport::WindowsViewport(int x,int y,int sizeX,int sizeY,void *hWnd)
-		:Viewport(x,y,sizeX,sizeY),_window((HWND)hWnd)
+	WindowsViewport::WindowsViewport(int sizeX,int sizeY,void *hWnd)
+		:Viewport(sizeX,sizeY),_window((HWND)hWnd)
 	{		
 	}
 
@@ -15,9 +15,9 @@ namespace Disorder
 		
 	}
 
-	WindowsViewportPtr WindowsViewport::Create(int x,int y,int sizeX,int sizeY,void* hWnd)
+	WindowsViewportPtr WindowsViewport::Create(int sizeX,int sizeY,void* hWnd)
 	{
-		WindowsViewport *pViewport = new WindowsViewport(x,y,sizeX,sizeY,hWnd);
+		WindowsViewport *pViewport = new WindowsViewport(sizeX,sizeY,hWnd);
 		return WindowsViewportPtr(pViewport);
 	}
 
@@ -56,19 +56,60 @@ namespace Disorder
 			GLogger->Error(str.str());
 			return;
 		}
-			 
+		
+		if (GConfig->pRenderConfig->FullScreen)												// Attempt Fullscreen Mode?
+		{
+			int colorBit = 24;
+			int alphaBit = 8;
+			RenderEngine::ComputePixelColorAlphaSize(GConfig->pRenderConfig->ColorFormat, colorBit, alphaBit);
+
+			DEVMODE dmScreenSettings;								// Device Mode
+			memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));	// Makes Sure Memory's Cleared
+			dmScreenSettings.dmSize = sizeof(dmScreenSettings);		// Size Of The Devmode Structure
+			dmScreenSettings.dmPelsWidth = GConfig->pRenderConfig->SizeX;				// Selected Screen Width
+			dmScreenSettings.dmPelsHeight = GConfig->pRenderConfig->SizeY;				// Selected Screen Height
+			dmScreenSettings.dmBitsPerPel = colorBit + alphaBit;					// Selected Bits Per Pixel
+			dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+
+			// Try To Set Selected Mode And Get Results.  NOTE: CDS_FULLSCREEN Gets Rid Of Start Bar.
+			if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
+			{
+				GConfig->pRenderConfig->FullScreen = false;
+			}
+		}
+
+		DWORD		dwExStyle;				// Window Extended Style
+		DWORD		dwStyle;				// Window Style
+		RECT		WindowRect;				// Grabs Rectangle Upper
+		WindowRect.left = WindowRect.top = 0;
+		WindowRect.right = GConfig->pRenderConfig->SizeX;
+		WindowRect.bottom = GConfig->pRenderConfig->SizeY;
+
+		if (GConfig->pRenderConfig->FullScreen)												// Are We Still In Fullscreen Mode?
+		{
+			dwExStyle = WS_EX_APPWINDOW;								// Window Extended Style
+			dwStyle = WS_POPUP;										// Windows Style
+		}
+		else
+		{
+			dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;			// Window Extended Style
+			dwStyle = WS_OVERLAPPED | WS_CAPTION |  WS_THICKFRAME ;							// Windows Style
+		}
+
+		AdjustWindowRectEx(&WindowRect, dwStyle, FALSE, dwExStyle);		// Adjust Window To True Requested Size
+
 		DWORD WindowStyle;
-		WindowStyle = WS_OVERLAPPED|WS_CAPTION|WS_THICKFRAME|WS_MINIMIZEBOX|WS_MAXIMIZEBOX;
+		WindowStyle = dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 		// Obtain width and height of primary monitor.
 		INT ScreenWidth  = ::GetSystemMetrics( SM_CXSCREEN );
 		INT ScreenHeight = ::GetSystemMetrics( SM_CYSCREEN );
-		INT WindowWidth  = GConfig->pRenderConfig->SizeX;
-		INT WindowHeight = GConfig->pRenderConfig->SizeY;
+		INT WindowWidth = WindowRect.right - WindowRect.left;
+		INT WindowHeight = WindowRect.bottom - WindowRect.top;
 		INT WindowPosX = (ScreenWidth - WindowWidth ) / 2;
 		INT WindowPosY = (ScreenHeight - WindowHeight ) / 2;
  
 		// Create the window
-		HWND windows = CreateWindowW(winClassName,winClassName, WindowStyle, WindowPosX, WindowPosY, WindowWidth, WindowHeight, NULL, NULL, GAppInstance, NULL);
+		HWND windows = CreateWindowExW(dwExStyle,winClassName, winClassName, WindowStyle, WindowPosX, WindowPosY, WindowWidth, WindowHeight, NULL, NULL, GAppInstance, NULL);
 		BOOST_ASSERT(windows);
         if( !windows )
 		{
@@ -88,7 +129,7 @@ namespace Disorder
 		GConfig->pRenderConfig->Y = WindowPosY;
 	 
 		// Create viewport
-		CreateViewport(WindowPosX,WindowPosY,WindowWidth,WindowHeight,windows);
+		CreateViewport(GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, windows);
 
 		//Create InputManager
 		_inputManager = InputManager::Create((unsigned int)windows);
@@ -154,11 +195,11 @@ namespace Disorder
 		Client::Exit();
 	}
 
-	void WinClient::CreateViewport(int x,int y,int sizeX,int sizeY,void* hWnd)
+	void WinClient::CreateViewport(int sizeX,int sizeY,void* hWnd)
 	{
 		// only support one viewport now!
 		BOOST_ASSERT(_Viewports.empty());
-		_Viewports.push_back(WindowsViewport::Create(x,y,sizeX,sizeY,hWnd));
+		_Viewports.push_back(WindowsViewport::Create(sizeX,sizeY,hWnd));
 
 	}
 

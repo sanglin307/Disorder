@@ -20,7 +20,7 @@ namespace Disorder
 		return FontManagerPtr(pManager);
 	}
 
-	FontPtr FontManager::CreateFontFromTrueTypeFile(std::string const& fontName,float fontSize,unsigned int fontResolution)
+	FontPtr FontManager::CreateFontFromTrueTypeFile(std::string const& fontName,unsigned int fontSize,unsigned int fontResolution)
 	{
 		if( _fontMap.find(fontName) != _fontMap.end() )
 			return _fontMap.at(fontName);

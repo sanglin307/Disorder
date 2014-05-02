@@ -2,8 +2,8 @@
 
 namespace Disorder
 {
-	Viewport::Viewport(int x,int y,int sizeX,int sizeY)
-		:X(x),Y(y),SizeX(sizeX),SizeY(sizeY)
+	Viewport::Viewport(int sizeX,int sizeY)
+		:SizeX(sizeX),SizeY(sizeY)
 	{	
 		_bActive = true;
 	}

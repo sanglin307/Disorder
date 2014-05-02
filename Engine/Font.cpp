@@ -2,14 +2,14 @@
 
 namespace Disorder
 {
-	FontPtr Font::Create(float fontSize,unsigned int fontRevolution)
+	FontPtr Font::Create(unsigned int fontSize,unsigned int fontRevolution)
 	{
 		Font *pFont = new Font(fontSize,fontRevolution);
 		return FontPtr(pFont);
 	}
 
-	Font::Font(float fontSize,unsigned int fontRevolution)
-		:_fontSize(fontSize),_fontRevolution(fontRevolution),_fontMaxBearingY(0)
+	Font::Font(unsigned int fontWidSize,unsigned int fontRevolution)
+		:_fontSize(fontWidSize), _fontRevolution(fontRevolution), _fontMaxBearingY(0)
 		,_characterSpacer(5),_antialiasColor(false)
 	{
 		_codePointRangeList.push_back(CodePointRange(33,166));
@@ -103,9 +103,6 @@ namespace Disorder
 				ftResult = FT_Load_Char( face, cp, FT_LOAD_RENDER | FT_LOAD_NO_BITMAP );
 				if (ftResult)
 				{
-					// problem loading this glyph, continue
-					/*LogManager::getSingleton().logMessage("Info: cannot load character " +
-						StringConverter::toString(cp) + " in font " + mName);*/
 					continue;
 				}
 
@@ -116,8 +113,6 @@ namespace Disorder
 				if (!buffer)
 				{
 					// Yuck, FT didn't detect this but generated a null pointer!
-				/*	LogManager::getSingleton().logMessage("Info: Freetype returned null for character " +
-						StringConverter::toString(cp) + " in font " + mName);*/
 					continue;
 				}
 
@@ -178,9 +173,10 @@ namespace Disorder
 		//GImageManager->Save(strImageFileName,fontImage);
 
 		SamplerDesc desc;
+		desc.Filter = SF_Min_Mag_Linear_Mip_Point;
 		SamplerStatePtr sampler = GEngine->RenderResourceMgr->CreateSamplerState(&desc);
 		PixelFormat pixelFormat = PF_R8G8_UNORM;
-		RenderTexture2DPtr fontTexture = GEngine->RenderResourceMgr->CreateTexture2D(sampler,pixelFormat,false,fontImage);
+		RenderTexture2DPtr fontTexture = GEngine->RenderResourceMgr->CreateTexture2D(sampler, pixelFormat, false, fontImage);
 		_glyphsTexture = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource,fontTexture,pixelFormat);
 		delete imageData;
 	}

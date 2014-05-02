@@ -8,8 +8,8 @@ namespace Disorder
 	{
 	public:
        
-		float GetStringLength(float fsize,std::string const& str);
-		void DrawString(float xPos, float yPos, float size, glm::vec4 const& color, std::string const& str);	  // xPos,yPos in [ 0.f ,1.f]	 
+		unsigned int GetStringLength(float fsize,std::string const& str);
+		void DrawString(unsigned int xPos, unsigned int yPos, std::string const& str, glm::vec4 const& color = glm::vec4(1.0f),float scale = 1.0f);	  // screen pos
 		void DrawLine(glm::vec3 const& beginPos, glm::vec4 const& beginColor, glm::vec3 const& endPos, glm::vec4 const& endColor);
 
 		void Render(CameraPtr const& camera);
@@ -37,6 +37,7 @@ namespace Disorder
 		unsigned int _height;
 
 		FontPtr _font;
+		unsigned int _fontSize;
 
 		 
 	};

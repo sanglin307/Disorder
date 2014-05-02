@@ -75,7 +75,7 @@ namespace Disorder
 	typedef struct _SamplerDesc
 	{
 		_SamplerDesc()
-		:Filter(SF_Min_Mag_Point_Mip_Linear), AddressU(TAM_Clamp), AddressV(TAM_Clamp), AddressW(TAM_Clamp),
+		:Filter(SF_Min_Mag_Mip_Linear), AddressU(TAM_Clamp), AddressV(TAM_Clamp), AddressW(TAM_Clamp),
 		MipLODBias(0.f), MaxAnisotropy(1), CompareFunc(CF_None)
 		{
 			BorderColor[0] = BorderColor[1] = BorderColor[2] = BorderColor[3] = 1.0f;

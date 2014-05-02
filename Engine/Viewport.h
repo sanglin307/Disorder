@@ -7,8 +7,7 @@ namespace Disorder
 	 class Viewport
 	 {
 	 public:
-		 int X;
-		 int Y;
+
 		 int SizeX;
 		 int SizeY;
 
@@ -18,7 +17,7 @@ namespace Disorder
 
 	 public:
 
-		 Viewport(int x,int y,int sizeX,int sizeY);
+		 Viewport(int sizeX,int sizeY);
 		 
 		 virtual void Render();
 

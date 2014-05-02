@@ -1,11 +1,15 @@
 #ifndef _DISORDER_IMAGE_H_
 #define _DISORDER_IMAGE_H_
 
-#include "OpenImageIO/ImageIO.h"
-OIIO_NAMESPACE_USING
+#include <png.h>
+#include <zlib.h>
 
 namespace Disorder
 {
+	struct ImageSpec
+	{
+
+	};
 
 	class Image
 	{
@@ -33,15 +37,12 @@ namespace Disorder
 	protected:
 		
 		Image(ImageSpec const& spec);
-		Image(ImageSpec const& spec,void *pPixels);
-		void InitRawImage(unsigned int bytes,void* pData); // only used to set non-convert data
+		Image(ImageSpec const& spec,BYTE *pPixels);
+		void InitRawImage(unsigned int bytes,BYTE* pData); // only used to set non-convert data
 
 		ImageSpec _imageSpec;
-		void* _pPixelRawData;
-
-		void ConvertData_B5G5R5A1_UNORM(int width,int height,void *pData);
-		void ConvertData_PF_R24G8_TYPELESS(int width,int height,void *pData);
-
+		BYTE* _pPixelRawData;
+ 
 	};
 
 

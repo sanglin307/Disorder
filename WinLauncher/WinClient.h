@@ -8,7 +8,7 @@ namespace Disorder
 	 {
 	 public:
 		
-		 static WindowsViewportPtr Create(int x,int y,int sizeX,int sizeY,void* hWnd);
+		 static WindowsViewportPtr Create(int sizeX,int sizeY,void* hWnd);
 
 		 virtual void Render();
 
@@ -19,7 +19,7 @@ namespace Disorder
 
 	 private:
 
-		 WindowsViewport(int x,int y,int sizeX,int sizeY,void* hWnd);
+		 WindowsViewport(int sizeX,int sizeY,void* hWnd);
 		 HWND _window;
 	 };
 	
@@ -56,7 +56,7 @@ namespace Disorder
 		static WinClientPtr Create();
 
 	protected:
-		virtual void CreateViewport(int x,int y,int sizeX,int sizeY,void* hWnd);
+		virtual void CreateViewport(int sizeX,int sizeY,void* hWnd);
 
 	    static LONG APIENTRY StaticWndProc( HWND hWnd, UINT Message, UINT wParam, LONG lParam );
 

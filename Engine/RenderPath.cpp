@@ -187,7 +187,7 @@ namespace Disorder
 			obj->PostRender(mainCamera);
 		}
 
-		GEngine->GameCanvas->DrawString(0.01f, 0.08f, 0.04f, glm::vec4(1.f), "Forward Lighting Mode");
+		GEngine->GameCanvas->DrawString(5, 35, "Forward Lighting Mode");
 
 		GSceneManager->DebugDraw();
 		GEngine->Stat.DrawStat();
@@ -416,7 +416,7 @@ namespace Disorder
 		// the last hud things, must use GBuffer's depth buffer surface view
 		GEngine->RenderEngine->SetEffect(NULL);
 		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->GBuffer->MainTargetGDepth, true);
-		GEngine->GameCanvas->DrawString(0.01f,0.08f,0.04f,glm::vec4(1.f),"Deferred Shading Mode");
+		GEngine->GameCanvas->DrawString(5,35,"Deferred Shading Mode");
 		GSceneManager->DebugDraw();
 		GEngine->Stat.DrawStat();
 

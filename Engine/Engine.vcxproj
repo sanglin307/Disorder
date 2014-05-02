@@ -41,7 +41,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
-    <IncludePath>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;..\..\External\oiio\src\include;$(FBXSDK)\include;..\..\External\openEXR\lib\include;..\..\External\glm-0.9.5;$(IncludePath)</IncludePath>
+    <IncludePath>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;..\..\External\openEXR\lib\include;..\..\External\lpng1610;..\..\External\zlib;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;..\..\External\oiio\src\include;$(FBXSDK)\include;..\..\External\openEXR\lib\include;..\..\External\eigen3.2;$(IncludePath)</IncludePath>

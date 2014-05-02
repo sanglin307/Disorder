@@ -93,13 +93,13 @@ namespace Disorder
 
         }
 
-		static FontPtr Create(float fontSize,unsigned int fontRevolution);
+		static FontPtr Create(unsigned int fontSize,unsigned int fontRevolution);
 
 	protected:
 
-		Font(float fontSize,unsigned int fontRevolution);
+		Font(unsigned int fontSize,unsigned int fontRevolution);
 
-		float _fontSize; // in pixel.
+		unsigned int _fontSize; // in pixel.
 		unsigned int _fontRevolution;
 		/// Max distance to baseline of this (truetype) font
 		int   _fontMaxBearingY;

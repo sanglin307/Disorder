@@ -35,7 +35,7 @@ namespace Disorder
 		}
 		else if( pSamplerDesc->Filter == SF_Min_Mag_Point_Mip_Linear )
 		{
-			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+			glSamplerParameteri(pState->_stateHandle, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		}
 		else if( pSamplerDesc->Filter == SF_Min_Point_Mag_Linear_Mip_Point )
@@ -45,12 +45,12 @@ namespace Disorder
 		}
 		else if( pSamplerDesc->Filter == SF_Min_Point_Mag_Mip_Linear )
 		{
-			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+			glSamplerParameteri(pState->_stateHandle, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
 			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		}
 		else if( pSamplerDesc->Filter == SF_Min_Linear_Mag_Mip_Point )
 		{
-			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+			glSamplerParameteri(pState->_stateHandle, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		}
 		else if( pSamplerDesc->Filter == SF_Min_Linear_Mag_Point_Mip_Linear )
@@ -60,7 +60,7 @@ namespace Disorder
 		}
 		else if( pSamplerDesc->Filter == SF_Min_Mag_Linear_Mip_Point )
 		{
-			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+			glSamplerParameteri(pState->_stateHandle, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		}
 		else if( pSamplerDesc->Filter == SF_Min_Mag_Mip_Linear )
