@@ -4,6 +4,7 @@
 
 namespace Disorder
 {
+	
 	enum RenderEngineType
 	{
 		RET_DirectX,
@@ -13,13 +14,13 @@ namespace Disorder
 	class RenderEngine
 	{
 	public:
+		virtual ~RenderEngine(){};
+
 		virtual void Init() = 0;
 		virtual void Exit() = 0;
 		
 		virtual void OnFrameBegin(){};
 		virtual void OnFrameEnd(){};
-
-		virtual void AdjustProjMatrix(const glm::mat4 &matrix){};
 
 		virtual void CreateViewport(void *hWnd) = 0;
 

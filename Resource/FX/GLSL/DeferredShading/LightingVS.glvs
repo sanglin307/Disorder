@@ -1,0 +1,18 @@
+#version 330
+#extension GL_ARB_shading_language_include : require
+
+layout (location = 0) in vec3 Position;
+layout (location = 3) in vec2 TextureUV;
+
+out block
+{
+    vec2 Position;
+    vec2 UV;
+} Out;
+
+void main(void)
+{
+	gl_Position = vec4(Position,1.0f);
+	Out.Position = gl_Position.xy;
+	Out.UV = TextureUV;
+}

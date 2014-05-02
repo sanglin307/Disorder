@@ -110,14 +110,17 @@
     <None Include="..\Resource\FX\GLSL\ForwardLighting\SceneVS.glvs">
       <Filter>GLSL\ForwardLighting</Filter>
     </None>
-    <None Include="..\Resource\FX\GLSL\SurfaceVisual\PS.glvs">
-      <Filter>GLSL\SurfaceVisual</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\SurfaceVisual\VS.glfs">
-      <Filter>GLSL\SurfaceVisual</Filter>
-    </None>
     <None Include="..\Resource\FX\GLSL\Common.gls">
       <Filter>GLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\DeferredShading\common.gls">
+      <Filter>GLSL\DeferredShading</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\SurfaceVisual\VS.glvs">
+      <Filter>GLSL\SurfaceVisual</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\SurfaceVisual\PS.glfs">
+      <Filter>GLSL\SurfaceVisual</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

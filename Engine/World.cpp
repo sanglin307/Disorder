@@ -26,6 +26,7 @@ namespace Disorder
 
 	 void World::Exit()
 	 {
+		 _Levels.empty();
 	 }
  
 	 void World::Tick(float deltaSeconds)

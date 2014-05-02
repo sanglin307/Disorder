@@ -368,14 +368,16 @@ namespace Disorder
 		if( ConstantBuffer == NULL )
 			return;
 
-		BYTE* pData = new BYTE[ConstantBuffer->CBSize];
-		BYTE* pDest = pData;
+		if ( !_content )
+			_content = new BYTE[ConstantBuffer->CBSize];
+	 
+		BYTE* pDest = _content;
 		for(unsigned int j=0;j<ConstantBuffer->Parameters.size();j++)
 		{
 			ShaderVariableDesc &vaDesc = ConstantBuffer->Variables[j];
 			ShaderTypeDesc &taDesc = ConstantBuffer->Types[j];
 			ShaderPropertyPtr &paDesc =  ConstantBuffer->Parameters[j];
-			pDest = pData + vaDesc.StartOffset;
+			pDest = _content + vaDesc.StartOffset;
 				
 			if( taDesc.Class == D3D_SVC_SCALAR && taDesc.Type == D3D_SVT_INT)
 			{
@@ -408,8 +410,8 @@ namespace Disorder
 			}
 		}
 				
-		GEngine->RenderEngine->UpdateSubresource(ConstantBuffer->BufferParamRef->GetDataAsConstBuffer(),pData,ConstantBuffer->CBSize);
-		delete pData;
+		GEngine->RenderEngine->UpdateSubresource(ConstantBuffer->BufferParamRef->GetDataAsConstBuffer(), _content, ConstantBuffer->CBSize);
+	 
 	}
 
 	DX11ShaderPropertyManager::DX11ShaderPropertyManager(const std::string& name)

@@ -13,13 +13,22 @@ namespace Disorder
 		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerScene);
 		_sAmbientLowerProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientLowColor,eSP_Float,3);
 		_sAmbientUpperProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientUpperColor,eSP_Float,3);
-		 
+		
+		_sScreenWidthProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sScreenWidth, eSP_Int, 1);
+		_sScreenHeightProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sScreenHeight, eSP_Int, 1);
 
 		EnableDebugDraw = true;
 	}
 
 	void SceneManager::Exit()
 	{
+		_mRenderObjects.empty();
+		_mLightObjects.empty();;
+		_mCameraObjects.empty();
+		_mDefaultCamera = NULL;
+		_sceneImporter = NULL;
+		_vLightList.empty();
+		_vRenderObjects.empty();
 	}
 
 	void SceneManager::DebugDraw()
@@ -61,6 +70,9 @@ namespace Disorder
 		_sAmbientLowerProperty->SetData(glm::value_ptr(_vAmbientLowerColor));
 		_sAmbientUpperProperty->SetData(glm::value_ptr(_vAmbientUpperColor));
 	 
+		_sScreenWidthProperty->SetData(&GConfig->pRenderConfig->SizeX);
+		_sScreenHeightProperty->SetData(&GConfig->pRenderConfig->SizeY);
+
 		_propertyManager->UpdateShaderProperty();
 	}
 

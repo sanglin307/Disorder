@@ -28,6 +28,11 @@ namespace Disorder
 
 	void Client::Exit()
 	{
+		_Viewports.empty();
+		_inputManager = NULL;
+		_keyboardEvents.empty();
+		_mouseEvents.empty();
+	    _inputListenerList.empty();
 	}
  
 	void Client::AddKeyboardEvent(KeyboardInputEvent const& keyEvent)

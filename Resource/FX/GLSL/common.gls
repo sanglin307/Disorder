@@ -1,7 +1,10 @@
 layout(std140) uniform SceneProperty
 {
+	int    ScreenWidth;
+	int    ScreenHeight;
 	vec3 AmbientLowColor;
 	vec3 AmbientUpperColor;
+
 };
 
 layout(std140) uniform CameraTransforms

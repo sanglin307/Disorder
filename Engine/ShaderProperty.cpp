@@ -4,6 +4,7 @@
 namespace Disorder
 {
 		//////////////////////////////////////////////////////////////////////////
+
 	ShaderProperty::ShaderProperty(EShaderProperty type,unsigned int length,std::string const& name)
 		:PropertyType(type),PropertyName(name),_length(length)
 	{
@@ -197,7 +198,8 @@ namespace Disorder
 	// scene ambient
 	const std::string ShaderPropertyManager::sAmbientLowColor = "AmbientLowColor";
 	const std::string ShaderPropertyManager::sAmbientUpperColor = "AmbientUpperColor";
-	 
+	const std::string ShaderPropertyManager::sScreenWidth = "ScreenWidth";
+	const std::string ShaderPropertyManager::sScreenHeight = "ScreenHeight";
 
 
 	// Global 
@@ -211,7 +213,7 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sGBufferColorSpecIntTexture = "GBufferColorSpecIntTexture";
 	const std::string ShaderPropertyManager::sGBufferNormalTexture = "GBufferNormalTexture";
 	const std::string ShaderPropertyManager::sGBufferSpecPowTexture = "GBufferSpecPowTexture";
-	const std::string ShaderPropertyManager::sGBufferPointSampler = "GBufferPointSampler";
+
 
 	const std::string ShaderPropertyManager::sSurfaceVisTex = "SurfaceVisTex";
 	const std::string ShaderPropertyManager::sSurfaceSampler = "SurfaceSampler";
@@ -233,6 +235,14 @@ namespace Disorder
 			iter->second->ClearData();
 			++iter;
 		}
+	}
+
+	ShaderPropertyManager::~ShaderPropertyManager()
+	{
+		if (_content != 0)
+			delete[] _content;
+		_content = 0;
+
 	}
 
 	ShaderPropertyPtr ShaderPropertyManager::CreateProperty(std::string const& name,EShaderProperty type,unsigned int length)

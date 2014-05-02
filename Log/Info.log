@@ -1,21 +1,33 @@
 FBX file format version for file MiniGun_CameraLight.fbx is 7,3,0
-Shader Object :BatchLines:PS
-Shader Object :BatchLines:VS
-Shader Object :2DText:PS
-Shader Object :2DText:VS
-Shader Object :ForwardLighting:FourLightingPS
-Shader Object :ForwardLighting:BaseLightingPS
-Shader Object :ForwardLighting:SceneVS
+Shader Object :BatchLines:main
+Shader Object :2DText:main
+Shader Object :2DText:main
+Shader Object :SurfaceVisual:main
+Shader Object :DeferredShading:main
+Shader Object :DeferredShading:main
+Shader Object :DeferredShading:main
+Shader Object :BatchLines:main
+Shader Object :SurfaceVisual:main
+Shader Object :DeferredShading:main
+Shader Object :DeferredShading:main
 Shader Property Manager Name :Global
  ****** Shader Property :TextTexture
+ ****** Shader Property :GBufferDepthTexture
+ ****** Shader Property :SurfaceVisTex
+ ****** Shader Property :GBufferColorSpecIntTexture
+ ****** Shader Property :GBufferSpecPowTexture
+ ****** Shader Property :GBufferNormalTexture
+ ****** Shader Property :SceneProperty
+ ****** Shader Property :ObjectTransform
+ ****** Shader Property :MaterialProperty
+ ****** Shader Property :SurfaceSampler
  ****** Shader Property :ForwardFourLights
  ****** Shader Property :TextSampler
  ****** Shader Property :DirectionLightProperty
- ****** Shader Property :MaterialProperty
- ****** Shader Property :SceneProperty
- ****** Shader Property :ObjectTransform
  ****** Shader Property :CameraTransforms
 Shader Property Manager Name :SceneProperty
+ ****** Shader Property :ScreenWidth
+ ****** Shader Property :ScreenHeight
  ****** Shader Property :AmbientUpperColor
  ****** Shader Property :AmbientLowColor
 Shader Property Manager Name :ForwardFourLights
@@ -39,17 +51,17 @@ Shader Property Manager Name :DirectionLightProperty
 Shader Property Manager Name :MaterialProperty
  ****** Shader Property :Transparency
  ****** Shader Property :SpecularExp
- ****** Shader Property :EmissiveColor
  ****** Shader Property :SpecularColor
+ ****** Shader Property :EmissiveColor
  ****** Shader Property :DiffuseColor
 Shader Property Manager Name :ObjectTransform
- ****** Shader Property :WorldNormalTransform
  ****** Shader Property :WorldTransform
+ ****** Shader Property :WorldNormalTransform
 Shader Property Manager Name :CameraTransforms
  ****** Shader Property :CameraViewProjInv
- ****** Shader Property :CameraProjInv
- ****** Shader Property :CameraViewInv
  ****** Shader Property :CameraViewProj
- ****** Shader Property :CameraPosition
- ****** Shader Property :CameraProjection
+ ****** Shader Property :CameraViewInv
  ****** Shader Property :CameraView
+ ****** Shader Property :CameraProjInv
+ ****** Shader Property :CameraProjection
+ ****** Shader Property :CameraPosition

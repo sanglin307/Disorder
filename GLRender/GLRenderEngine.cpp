@@ -492,8 +492,21 @@ namespace Disorder
 
 	GLRenderEngine::~GLRenderEngine()
 	{
-		wglMakeCurrent(NULL, NULL);
-		wglDeleteContext(_hRC);
+	
+	}
+
+	void GLRenderEngine::CreateMainTarget()
+	{
+		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil, NULL);
+		SurfaceViewPtr DepthBufferView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, depthStencilTex, GConfig->pRenderConfig->DepthStencilFormat, 0);
+ 
+		RenderTexture2DPtr mainTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->ColorFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_RenderTarget , NULL);
+		SurfaceViewPtr mainTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, mainTex, GConfig->pRenderConfig->ColorFormat);
+
+		std::map<ESurfaceLocation, SurfaceViewPtr> viewMap;
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, DepthBufferView));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, mainTargetView));
+		GEngine->RenderSurfaceCache->MainTarget = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 	}
 
 	void GLRenderEngine::CreateViewport(void *hWnd)
@@ -506,6 +519,8 @@ namespace Disorder
 			GLogger->Error("Can't create windows OpenGL Context!");
 			return;
 		}
+
+		CreateMainTarget();
 
 		LoadShaderIncludeFiles();
 		LoadGLExtensions();
@@ -549,6 +564,37 @@ namespace Disorder
 		return false;
 	}
 
+	void GLRenderEngine::LoadShaderIncludeForPath(const boost::filesystem::path& p)
+	{
+		if (boost::filesystem::is_directory(p))
+		{
+			boost::filesystem::directory_iterator enditer;
+			for (boost::filesystem::directory_iterator fileiter(p); fileiter != enditer; ++fileiter)
+			{
+				LoadShaderIncludeForPath(fileiter->path());
+			}
+		}
+		else if (boost::filesystem::extension(p) == ".gls")
+		{
+			std::string path = p.string();
+			boost::to_lower(path);
+			int pos = path.find("glsl");
+			std::string filekey = "/" + path.substr(pos + 5);//"/glsl/" + p.leaf().string();
+			for (size_t i = 0; i < filekey.size(); i++)
+			{
+				if (filekey[i] == '\\')
+					filekey[i] = '/';
+			}
+
+			FileObjectPtr file = GEngine->FileManager->OpenFile(path, "rt");
+			std::string content = GEngine->FileManager->ReadFile(file);
+			if (ShaderObject::sMapIncludeFiles.find(filekey) == ShaderObject::sMapIncludeFiles.end())
+			{
+				ShaderObject::sMapIncludeFiles.insert(std::pair<std::string, std::string>(filekey, content));
+			}
+		}
+	}
+
 	void GLRenderEngine::LoadShaderIncludeFiles()
 	{
 		std::string shaderPath = GConfig->sResourceFXPath + "GLSL\\";
@@ -562,17 +608,7 @@ namespace Disorder
 		boost::filesystem::directory_iterator enditer;
 		for (boost::filesystem::directory_iterator fileiter(p); fileiter != enditer; ++fileiter)
 		{
-			if (!boost::filesystem::is_directory(*fileiter) && (boost::filesystem::extension(*fileiter) == ".gls"))
-			{
-				std::string path = fileiter->path().string();
-				std::string filekey = "/glsl/" + fileiter->path().leaf().string();
-				FileObjectPtr file = GEngine->FileManager->OpenFile(path,"rt"); 
-				std::string content = GEngine->FileManager->ReadFile(file);
-				if (ShaderObject::sMapIncludeFiles.find(filekey) == ShaderObject::sMapIncludeFiles.end())
-				{
-					ShaderObject::sMapIncludeFiles.insert(std::pair<std::string, std::string>(filekey, content));
-				}
-			}
+			LoadShaderIncludeForPath(fileiter->path());
 		}
 
 		if (ShaderObject::sMapIncludeFiles.size() > 0)
@@ -765,7 +801,8 @@ namespace Disorder
 	
 	void GLRenderEngine::Exit()
 	{
-	
+		//wglMakeCurrent(NULL, NULL);
+		//wglDeleteContext(_hRC);
 	}
 
 	void GLRenderEngine::OnFrameBegin()
@@ -775,15 +812,25 @@ namespace Disorder
 
 	void GLRenderEngine::OnFrameEnd()
 	{
+		//blit
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glDrawBuffer(GL_BACK);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLint)GEngine->RenderSurfaceCache->MainTarget->GetHandle());
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+		GLint SizeX = GConfig->pRenderConfig->SizeX;
+		GLint SizeY = GConfig->pRenderConfig->SizeY;
+		glBlitFramebuffer(0, 0, SizeX, SizeY, 0, 0, SizeX, SizeY, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
 		SwapBuffers(_hDC);
+
+		_renderCache.CacheFrameBufferObject(0);
+		_renderCache.CacheSingleDrawBuffer(GL_BACK);
+
 		GEngine->Stat.OnFrameEnd();
 	}
 
-	void GLRenderEngine::AdjustProjMatrix(const glm::mat4 &matrix)
-	{
-
-	}
- 
+  
 	void GLRenderEngine::ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
 	{
 		SetRenderTarget(renderSurface);
@@ -847,11 +894,8 @@ namespace Disorder
 		GLRenderSurfacePtr GLSurface = boost::dynamic_pointer_cast<GLRenderSurface>(renderTarget);
 		std::vector<GLenum> bufferArray;
 		GLSurface->GetGLDrawBuffers(bufferArray);
-		size_t bufferSize = bufferArray.size();
-		if (bufferSize == 1)
-			_renderCache.CacheSingleDrawBuffer(bufferArray[0]);
-		else if (bufferSize > 1)
-			_renderCache.CacheMultiDrawBuffers(bufferArray);
+		 
+		_renderCache.CacheMultiDrawBuffers(bufferArray);
 	}
 
 	void GLRenderEngine::SetRenderLayout(RenderLayoutPtr const& renderLayout)
@@ -892,7 +936,7 @@ namespace Disorder
 		GLShaderResourceBinding* pDesc = NULL;
 		std::vector<GLuint> texBinding;
 		std::vector<GLuint> samplerBinding;
-
+ 
 		for (size_t i = 0; i < effectGL->EffectReflection->ResourceArray.size(); i++)
 		{
 			pDesc = &(effectGL->EffectReflection->ResourceArray[i]);
@@ -901,14 +945,17 @@ namespace Disorder
 				SurfaceViewPtr tex = pDesc->ParamRef->GetDataAsShaderResource();
 				GLRenderTexture2DPtr res = boost::dynamic_pointer_cast<GLRenderTexture2D>(tex->Resource);
 				texBinding.push_back((GLuint)res->GetHandle());
-				samplerBinding.push_back((GLuint)res->Sampler->GetHandle());
+				if (res->Sampler)
+				    samplerBinding.push_back((GLuint)res->Sampler->GetHandle());
+				
 			}
 		}
 
 		if (texBinding.size() > 0)
+		{
 			_renderCache.CacheTexBinding(0, texBinding, samplerBinding);
+		}
 
-		 
 		GLuint program = (GLuint)effect->GetHandle();
 		_renderCache.CacheShaderProgram(program);
  
@@ -1022,7 +1069,12 @@ namespace Disorder
 
 	void GLRenderEngine::SaveSurfaceView(SurfaceViewPtr const& surface, std::string const& fileName)
 	{
+		int pixel = 64;
+		GLvoid* data = malloc(4 * pixel);
+		glReadPixels(500, 300, 8, 8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, data);
 
+		GLuint depth = (GLuint)data;
+		GLuint d = depth >> 8;
 	}
 
 
@@ -1386,7 +1438,17 @@ namespace Disorder
 
 		if (FrontFaceStencilFunc != frontfunc || BackFaceStencilFunc != backfunc || StencilRef != ref || mask != StencilReadMask)
 		{
-			glStencilFuncSeparate(frontfunc, backfunc, ref, mask);
+			if (frontfunc == backfunc)
+				glStencilFunc(frontfunc, ref, mask);
+			else
+			{
+				if (FrontFaceStencilFunc != frontfunc || StencilRef != ref || mask != StencilReadMask)
+					glStencilFuncSeparate(GL_FRONT,frontfunc, ref, mask);
+
+				if (BackFaceStencilFunc != backfunc || StencilRef != ref || mask != StencilReadMask)
+					glStencilFuncSeparate(GL_BACK, backfunc, ref, mask);
+			}
+		
 			FrontFaceStencilFunc = frontfunc;
 			BackFaceStencilFunc = backfunc;
 			StencilRef = ref;

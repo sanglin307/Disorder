@@ -30,30 +30,24 @@ namespace Disorder
 		_GBufferSpecPowTexture = propertyManager->CreateProperty(ShaderPropertyManager::sGBufferSpecPowTexture,eSP_ShaderResource);
 		_SurfaceVisTex = propertyManager->CreateProperty(ShaderPropertyManager::sSurfaceVisTex,eSP_ShaderResource);
 		_SurfaceSampler = propertyManager->CreateProperty(ShaderPropertyManager::sSurfaceSampler,eSP_SampleState);
-		_GBufferPointSampler = propertyManager->CreateProperty(ShaderPropertyManager::sGBufferPointSampler,eSP_SampleState);
-
+ 
 		SamplerDesc sDesc;
 		SamplerStatePtr pointState = GEngine->RenderResourceMgr->CreateSamplerState(&sDesc);
-		_GBufferPointSampler->SetData(pointState);
 		_SurfaceSampler->SetData(pointState);
-
-		SamplerDesc slinearDesc;
-		slinearDesc.AddressU = slinearDesc.AddressV = slinearDesc.AddressW = TAM_Wrap;
-		SamplerStatePtr linearSampleState = GEngine->RenderResourceMgr->CreateSamplerState(&slinearDesc);
-
-		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(linearSampleState, PF_R24G8_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource, NULL);
+ 
+		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R24G8_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource, NULL);
 		DepthBufferView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, depthStencilTex, PF_D24_UNORM_S8_UINT, SF_ReadOnlyDepth | SF_ReadOnlyStencil);
 		DepthShaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, depthStencilTex, PF_R24_UNORM_X8_TYPELESS);
 
-		RenderTexture2DPtr basicColorTex = GEngine->RenderResourceMgr->CreateTexture2D(linearSampleState, PF_R8G8B8A8_UNORM, width, height, false, false, SV_RenderTarget | SV_ShaderResource, NULL);
+		RenderTexture2DPtr basicColorTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, width, height, false, false, SV_RenderTarget | SV_ShaderResource, NULL);
 		BasicColorShaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, basicColorTex, PF_R8G8B8A8_UNORM);
 		BasicColorTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, basicColorTex, PF_R8G8B8A8_UNORM);
 
-		RenderTexture2DPtr normalTex = GEngine->RenderResourceMgr->CreateTexture2D(linearSampleState, PF_R11G11B10_FLOAT, width, height, false, false, SV_RenderTarget | SV_ShaderResource, NULL);
+		RenderTexture2DPtr normalTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R11G11B10_FLOAT, width, height, false, false, SV_RenderTarget | SV_ShaderResource, NULL);
 		NormalDataShaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, normalTex, PF_R11G11B10_FLOAT);
 		NormalDataTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, normalTex, PF_R11G11B10_FLOAT);
 
-		RenderTexture2DPtr specularTex = GEngine->RenderResourceMgr->CreateTexture2D(linearSampleState, PF_R8G8B8A8_UNORM, width, height, false, false, SV_RenderTarget | SV_ShaderResource, NULL);
+		RenderTexture2DPtr specularTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, width, height, false, false, SV_RenderTarget | SV_ShaderResource, NULL);
 		SpecularDataShaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, specularTex, PF_R8G8B8A8_UNORM);
 		SpecularDataTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, specularTex, PF_R8G8B8A8_UNORM);
 
@@ -76,10 +70,12 @@ namespace Disorder
 		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "SurfaceVisual", SM_4_0, "PS");
 		_GBufferVisualEffect->BindShader(vertexShader);
 		_GBufferVisualEffect->BindShader(pixelShader);
+		_GBufferVisualEffect->LinkShaders();
 
+ 
 		DepthStencilDesc depthDesc;
 		depthDesc.DepthEnable = false;
-		DepthStencilStatePtr _DepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&depthDesc, 1);
+		DepthStencilStatePtr _DepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&depthDesc, 0);
 		_GBufferVisualEffect->BindDepthStencilState(_DepthWriteState);
 
 		TileTexVertex vertex[4];
@@ -149,5 +145,11 @@ namespace Disorder
 	{
 		RenderSurfaceCache *pCache = new RenderSurfaceCache;
 		return RenderSurfaceCachePtr(pCache);
+	}
+
+	RenderSurfaceCache::~RenderSurfaceCache()
+	{
+		MainTarget = NULL;
+		GBuffer = NULL;
 	}
 }

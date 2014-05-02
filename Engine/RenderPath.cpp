@@ -257,6 +257,8 @@ namespace Disorder
 		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"ScenePS");
 		_RenderSceneEffect->BindShader(vertexShader);
 		_RenderSceneEffect->BindShader(pixelShader);
+		_RenderSceneEffect->LinkShaders();
+
 		DepthStencilDesc depthDesc;
 		depthDesc.DepthEnable = true;
 		depthDesc.DepthWrite = true;
@@ -266,7 +268,7 @@ namespace Disorder
 		depthDesc.BackFaceStencilFailOp = depthDesc.FrontFaceStencilFailOp = STENCIL_OP_REPLACE;
 		depthDesc.BackFaceStencilPassOp = depthDesc.FrontFaceStencilPassOp = STENCIL_OP_REPLACE;
 		depthDesc.BackFaceStencilFunc = depthDesc.BackFaceStencilFunc = CF_Always;
-		DepthStencilStatePtr _DepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&depthDesc,1);
+		DepthStencilStatePtr _DepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&depthDesc,0);
 		_RenderSceneEffect->BindDepthStencilState(_DepthWriteState);
 
 		_LightingEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
@@ -274,12 +276,27 @@ namespace Disorder
 		 pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"BaseLightingPS");
 		_LightingEffect->BindShader(vertexShader);
 		_LightingEffect->BindShader(pixelShader); 
+		_LightingEffect->LinkShaders();
+
+		DepthStencilDesc nodepthWriteDesc;
+		nodepthWriteDesc.DepthEnable = true;
+		nodepthWriteDesc.DepthWrite = false;
+		nodepthWriteDesc.DepthFunc = CF_Less;
+		nodepthWriteDesc.StencilEnable = true;
+		nodepthWriteDesc.BackFaceStencilDepthFailOp = nodepthWriteDesc.FrontFaceStencilDepthFailOp = STENCIL_OP_KEEP;
+		nodepthWriteDesc.BackFaceStencilFailOp = nodepthWriteDesc.FrontFaceStencilFailOp = STENCIL_OP_KEEP;
+		nodepthWriteDesc.BackFaceStencilPassOp = nodepthWriteDesc.FrontFaceStencilPassOp = STENCIL_OP_KEEP;
+		nodepthWriteDesc.BackFaceStencilFunc = nodepthWriteDesc.BackFaceStencilFunc = CF_Equal;
+		DepthStencilStatePtr _noDepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&nodepthWriteDesc, 0);
+		_LightingEffect->BindDepthStencilState(_noDepthWriteState);
 
 		_FourLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr fVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"LightingVS");
 		ShaderObjectPtr fPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"FourLightingPS");
 		_FourLightEffect->BindShader(fVertexShader);
 		_FourLightEffect->BindShader(fPixelShader);
+		_FourLightEffect->LinkShaders();
+
 		BlendDesc bDesc;
 		bDesc.BlendEnable = true;
 		bDesc.BlendOp = BLEND_OP_ADD;
@@ -299,23 +316,17 @@ namespace Disorder
 
 		TileTexVertex vertex[4];
 		vertex[0].position = glm::vec3(-1.f, 1.f, 0.f);
+		vertex[0].texcoord = glm::vec2(0.f, 1.f); // used for openGL, not used for dx.
 		vertex[1].position = glm::vec3(-1.0f, -1.0f, 0.0f);
+		vertex[1].texcoord = glm::vec2(0.f, 0.f);
 		vertex[2].position = glm::vec3(1.0f, 1.0f, 0.0f);
+		vertex[2].texcoord = glm::vec2(1.f, 1.0f);
 		vertex[3].position = glm::vec3(1.0f, -1.0f, 0.0f);
+		vertex[3].texcoord = glm::vec2(1.0f, 0.0f);
+ 
+	
 		_LightingTile = SimpleTile("DeferLightingTile",vertex,_LightingEffect);
-
-		DepthStencilDesc nodepthWriteDesc;
-		nodepthWriteDesc.DepthEnable = true;
-		nodepthWriteDesc.DepthWrite = false;
-		nodepthWriteDesc.DepthFunc = CF_Less;
-		nodepthWriteDesc.StencilEnable = true;
-		nodepthWriteDesc.BackFaceStencilDepthFailOp = nodepthWriteDesc.FrontFaceStencilDepthFailOp = STENCIL_OP_KEEP;
-		nodepthWriteDesc.BackFaceStencilFailOp = nodepthWriteDesc.FrontFaceStencilFailOp = STENCIL_OP_KEEP;
-		nodepthWriteDesc.BackFaceStencilPassOp = nodepthWriteDesc.FrontFaceStencilPassOp = STENCIL_OP_KEEP;
-		nodepthWriteDesc.BackFaceStencilFunc = nodepthWriteDesc.BackFaceStencilFunc = CF_Equal;
-		DepthStencilStatePtr _noDepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&nodepthWriteDesc,0);
-		_LightingEffect->BindDepthStencilState(_noDepthWriteState);
-
+ 
 		GEngine->RenderSurfaceCache->GBuffer = RenderGBuffer::Create(GConfig->pRenderConfig->SizeX,GConfig->pRenderConfig->SizeY);
 	}
 
@@ -341,10 +352,10 @@ namespace Disorder
 		static bool sSaveTest = false;
 		if( sSaveTest )
 		{
-			GEngine->RenderEngine->SaveSurfaceView(GEngine->RenderSurfaceCache->GBuffer->DepthShaderView, "GBuffer_DepthStencilBuffer.bmp");
-			GEngine->RenderEngine->SaveSurfaceView(GEngine->RenderSurfaceCache->GBuffer->BasicColorShaderView, "GBuffer_BaseColorBuffer.bmp");
-			GEngine->RenderEngine->SaveSurfaceView(GEngine->RenderSurfaceCache->GBuffer->NormalDataShaderView, "GBuffer_NormalBuffer.bmp");
-			GEngine->RenderEngine->SaveSurfaceView(GEngine->RenderSurfaceCache->GBuffer->SpecularDataShaderView, "GBuffer_SpecularBuffer.bmp");
+			//GEngine->RenderEngine->SaveSurfaceView(GEngine->RenderSurfaceCache->GBuffer->DepthShaderView, "GBuffer_DepthStencilBuffer.bmp");
+			//GEngine->RenderEngine->SaveSurfaceView(GEngine->RenderSurfaceCache->GBuffer->BasicColorShaderView, "GBuffer_BaseColorBuffer.bmp");
+			//GEngine->RenderEngine->SaveSurfaceView(GEngine->RenderSurfaceCache->GBuffer->NormalDataShaderView, "GBuffer_NormalBuffer.bmp");
+			//GEngine->RenderEngine->SaveSurfaceView(GEngine->RenderSurfaceCache->GBuffer->SpecularDataShaderView, "GBuffer_SpecularBuffer.bmp");
 
 			sSaveTest = false;
 		}

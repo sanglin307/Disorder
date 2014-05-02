@@ -1,0 +1,21 @@
+
+#version 330
+
+ 
+layout (location = 0) in vec3 Position;
+layout (location = 3) in vec2 TextureUV;
+
+out block 
+{
+  vec2 UV;
+} Out;
+ 
+ void main(void)
+ {
+    gl_Position = vec4(Position,1.0f);
+    Out.UV = vec2(TextureUV.x,1.0 - TextureUV.y) ; //
+ }
+ 
+ 
+
+

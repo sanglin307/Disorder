@@ -1,0 +1,47 @@
+
+uniform sampler2D GBufferDepthTexture;
+uniform sampler2D GBufferColorSpecIntTexture;
+uniform sampler2D GBufferNormalTexture;
+uniform sampler2D GBufferSpecPowTexture;
+
+struct GBufferData
+{
+	float Depth;
+	vec3 Color;
+	vec3 Normal;
+	vec3 SpecularColor;
+	float SpecularExp;
+};
+ 
+vec3 CalculateWorldPos(vec2 csPos, float depth)
+{
+	vec4 position = vec4(csPos.x,csPos.y,depth,1.0f);
+	position =  CameraViewProjInv * position;
+	return vec3(position.x/position.w,position.y/position.w,position.z/position.w);
+}
+
+GBufferData UnpackGBuffer(vec2 location)
+{
+	GBufferData Out;
+    ivec2 screenPos = ivec2(location.x*ScreenWidth,location.y*ScreenHeight);
+
+	float depth = texelFetch(GBufferDepthTexture,screenPos,0).x;
+	Out.Depth = depth * 2 - 1;  // [0,1] to [-1,1]
+
+	vec4 baseColorSpecInt = texelFetch(GBufferColorSpecIntTexture,screenPos,0);
+	Out.Color = baseColorSpecInt.xyz;
+	Out.SpecularExp = baseColorSpecInt.w * 10.f;
+	Out.Normal = texelFetch(GBufferNormalTexture,screenPos,0).xyz;
+	Out.Normal = normalize(Out.Normal * 2.0 - 1.0);
+	Out.SpecularColor = texelFetch(GBufferSpecPowTexture,screenPos,0).xyz;
+
+	return Out;
+}
+
+void MaterialFromGBuffer(GBufferData gbd, inout Material mat)
+{
+	mat.Normal = gbd.Normal;
+	mat.DiffuseColor.xyz = gbd.Color;
+	mat.SpecularColor = gbd.SpecularColor;
+	mat.SpecularExp = gbd.SpecularExp;
+}

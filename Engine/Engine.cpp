@@ -26,7 +26,7 @@ namespace Disorder
 
 	   RenderResourceMgr->Init();
 
-	   viewport->SetRenderPath(RPT_ForwardLighting);
+	   viewport->SetRenderPath(RPT_DeferredShading);
 	   SceneImporter->Init();
 
 	   GameCanvas = Canvas::Create(viewport->SizeX,viewport->SizeY);
@@ -60,6 +60,8 @@ namespace Disorder
 
    void Engine::Exit()
    {
+	   RenderResourceMgr->Exit();
+	 
 	   GWorld->Exit();
 	   GSceneManager->Exit();
 	   GameClient->Exit();

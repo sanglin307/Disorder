@@ -306,25 +306,25 @@ namespace Disorder
 		{
 			propertyType = eSP_Int;
 			length = 1;
-			size = sizeof(GLdouble)* length;
+			size = sizeof(GLint)* length;
 		}
 		else if (type == GL_INT_VEC2)
 		{
 			propertyType = eSP_Int;
 			length = 2;
-			size = sizeof(GLdouble)* length;
+			size = sizeof(GLint)* length;
 		}
 		else if (type == GL_INT_VEC3)
 		{
 			propertyType = eSP_Int;
 			length = 3;
-			size = sizeof(GLdouble)* length;
+			size = sizeof(GLint)* length;
 		}
 		else if (type == GL_INT_VEC4)
 		{
 			propertyType = eSP_Int;
 			length = 4;
-			size = sizeof(GLdouble)* length;
+			size = sizeof(GLint)* length;
 		}
 		else if (type == GL_SAMPLER_2D || type == GL_SAMPLER_1D || type == GL_SAMPLER_3D || type == GL_SAMPLER_CUBE)
 		{
@@ -356,6 +356,7 @@ namespace Disorder
 	{
 		EffectReflection = GLProgramReflection::Create();
 
+		glUseProgram(_GLHandle);
 		// input
 		GLint inputNumber;
 		glGetProgramInterfaceiv(_GLHandle, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &inputNumber);
@@ -478,9 +479,32 @@ namespace Disorder
 				   pBlock->Members.push_back(desc);
 				   pBlock->MembersRef.push_back(desc.ParamRef);
 			    }
-
+ 
 				EffectReflection->ResourceArray.push_back(desc);
 			}
+
+			class ResourceSorter
+			{
+			public:
+				bool operator () (GLShaderResourceBinding& a, GLShaderResourceBinding& b) const
+				{
+					return a.Location < b.Location;
+				};
+			};
+
+			std::sort(EffectReflection->ResourceArray.begin(), EffectReflection->ResourceArray.end(), ResourceSorter());
+
+			//bind texture
+			int bindTexUnit = 0;
+			for (size_t i = 0; i < EffectReflection->ResourceArray.size(); i++)
+			{
+				if (EffectReflection->ResourceArray[i].Type == GL_SAMPLER_2D)
+				{
+					glUniform1i(EffectReflection->ResourceArray[i].Location, bindTexUnit);
+					bindTexUnit++;
+				}
+			}
+
 		}
 
 		for (size_t i = 0; i < EffectReflection->UniformBlockArray.size(); i++)
@@ -489,6 +513,8 @@ namespace Disorder
 			GLShaderPropertyManagerPtr glMgr = boost::dynamic_pointer_cast<GLShaderPropertyManager>(mgr);
 			BOOST_ASSERT(glMgr->Validate(&(EffectReflection->UniformBlockArray[i])));
 		}
+
+		glUseProgram(0);
 	}
 
 	GLRenderEffectPtr GLRenderEffect::Create()
@@ -527,18 +553,20 @@ namespace Disorder
 		if (!_uniformBlock)
 			return;
 
-		BYTE* pData = new BYTE[_uniformBlock->BlockSize];
-		BYTE* pDest = pData;
+		if (!_content)
+			_content = new BYTE[_uniformBlock->BlockSize];
+
+		BYTE* pDest = _content;
 		for (unsigned int j = 0; j<_uniformBlock->Members.size(); j++)
 		{
 			GLShaderResourceBinding* vaDesc = &(_uniformBlock->Members[j]);
-			pDest = pData + vaDesc->Offset;
+			pDest = _content + vaDesc->Offset;
 			void *pSrc = vaDesc->ParamRef->GetData();
 			memcpy(pDest, pSrc, vaDesc->Size);
 		}
 
-		GEngine->RenderEngine->UpdateSubresource(_uniformBlock->BufferParamRef->GetDataAsConstBuffer(), pData, _uniformBlock->BlockSize);
-		delete pData;
+		GEngine->RenderEngine->UpdateSubresource(_uniformBlock->BufferParamRef->GetDataAsConstBuffer(), _content, _uniformBlock->BlockSize);
+		 
 	}
 
 	GLShaderPropertyManager::~GLShaderPropertyManager()

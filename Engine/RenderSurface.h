@@ -87,7 +87,7 @@ namespace Disorder
 		ShaderPropertyPtr _GBufferColorSpecIntTexture;
 		ShaderPropertyPtr _GBufferNormalTexture;
 		ShaderPropertyPtr _GBufferSpecPowTexture;
-		ShaderPropertyPtr _GBufferPointSampler;
+
 		ShaderPropertyPtr _SurfaceVisTex;
 		ShaderPropertyPtr _SurfaceSampler;
 
@@ -104,10 +104,12 @@ namespace Disorder
 	class RenderSurfaceCache
 	{
 	public:
+		~RenderSurfaceCache();
 		RenderSurfacePtr MainTarget;
 		RenderGBufferPtr GBuffer;
 
 		static RenderSurfaceCachePtr Create();
+ 
 	private:
 		RenderSurfaceCache(){}
 	};

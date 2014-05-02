@@ -5,7 +5,6 @@ Texture2D<float4> GBufferColorSpecIntTexture;
 Texture2D<float3> GBufferNormalTexture;
 Texture2D<float4> GBufferSpecPowTexture;
 
-SamplerState    GBufferPointSampler;
 
 struct GBufferData
 {
@@ -85,7 +84,7 @@ ScenePSOutput ScenePS( SceneVSOutput In )
 	return PackGBuffer(DiffuseColor, normalize(In.NormalWorld), SpecularColor, SpecularExp);
 }
  
-GBufferData UnpackGBuffer(int2 location)
+GBufferData UnpackGBuffer(float2 location)
 {
 	GBufferData Out;
 	int3 location3 = int3(location, 0);

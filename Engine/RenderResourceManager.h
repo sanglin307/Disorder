@@ -11,6 +11,7 @@ namespace Disorder
 		 
 	public:
 		virtual void Init();
+		virtual void Exit();
 		virtual ShaderObjectPtr CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel,std::string const& entryPoint) = 0;
 		virtual RenderLayoutPtr CreateRenderLayout(RenderEffectPtr const& renderEffect,TopologyType topologyType,bool soloBuffer) = 0;
 		virtual RenderBufferPtr CreateBuffer(RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData,int bindingPoint = 0) = 0;

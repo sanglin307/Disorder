@@ -34,6 +34,8 @@ namespace Disorder
 			 ++iter;
 		 }
 
+		 BOOST_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
 		 return GLRenderSurfacePtr(pSurface);
 	 }
 
@@ -46,13 +48,7 @@ namespace Disorder
 				buffers.push_back(i - SL_RenderTarget1 + GL_COLOR_ATTACHMENT0);
 			}
 		}
-
-		// single buffer
-		if (buffers.size() == 1 && buffers[0] == GL_COLOR_ATTACHMENT0)
-		{
-			buffers.clear();
-			buffers.push_back(GL_BACK);
-		}
+ 
 	}
 
 	 void* GLRenderSurface::GetHandle()

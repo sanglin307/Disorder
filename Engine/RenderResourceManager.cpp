@@ -6,6 +6,15 @@ namespace Disorder
 	BlendStatePtr RenderResourceManager::DefaultBlentState = 0;
 	DepthStencilStatePtr RenderResourceManager::DefaultDepthStencilState = 0;
 
+	void RenderResourceManager::Exit()
+	{
+		RenderResourceManager::DefaultRasterizeState = NULL;
+		RenderResourceManager::DefaultBlentState = NULL;
+		RenderResourceManager::DefaultDepthStencilState = NULL;
+
+		_shaderMap.empty();
+		_propertyManagerMap.empty();
+	}
 
 	void RenderResourceManager::Init()
 	{

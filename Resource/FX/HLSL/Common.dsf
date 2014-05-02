@@ -3,6 +3,8 @@ cbuffer SceneProperty
 {
 	float3 AmbientLowColor;
 	float3 AmbientUpperColor;
+	int    ScreenWidth;
+	int    ScreenHeight;
 }
 
 cbuffer CameraTransforms
@@ -36,6 +38,23 @@ cbuffer DirectionLightProperty
 	float3 DirectionLightDir;	
 	float  DirectionLightIntensity;
 } 
+
+cbuffer ForwardFourLights 
+{
+	float4 ForwardLightPosX	;	
+	float4 ForwardLightPosY	;	
+	float4 ForwardLightPosZ	;	
+	float4 ForwardLightDirX	;	
+	float4 ForwardLightDirY	;	
+	float4 ForwardLightDirZ	;	
+	float4 ForwardLightRangeRcp	;	
+	float4 ForwardSpotCosOuterCone	;	
+	float4 ForwardSpotCosInnerConeRcp;	
+	float4 ForwardCapsuleLen;			
+	float4 ForwardLightColorR;			
+	float4 ForwardLightColorG;		
+	float4 ForwardLightColorB;			
+}
  
 struct Material
 {
@@ -72,23 +91,7 @@ float3 CalculateDirectionLight(float3 position, Material material)
    
    return finalColor;
 }
-
-cbuffer ForwardFourLights 
-{
-	float4 ForwardLightPosX	;	
-	float4 ForwardLightPosY	;	
-	float4 ForwardLightPosZ	;	
-	float4 ForwardLightDirX	;	
-	float4 ForwardLightDirY	;	
-	float4 ForwardLightDirZ	;	
-	float4 ForwardLightRangeRcp	;	
-	float4 ForwardSpotCosOuterCone	;	
-	float4 ForwardSpotCosInnerConeRcp;	
-	float4 ForwardCapsuleLen;			
-	float4 ForwardLightColorR;			
-	float4 ForwardLightColorG;		
-	float4 ForwardLightColorB;			
-}
+ 
 
 /////////////////////////////////////////////////////////////////////////////
 // Pixel shaders

@@ -58,6 +58,7 @@ namespace Disorder
 	{
 		typedef boost::unordered_map<std::string,ShaderPropertyPtr> ShaderPropertyMap;
    public:    // for shader name mapping...................
+	    virtual ~ShaderPropertyManager();
 
         static const std::string sManagerCamera;
         static const std::string sManagerObject;
@@ -111,7 +112,8 @@ namespace Disorder
 		//for scene property
 		static const std::string sAmbientLowColor;
 		static const std::string sAmbientUpperColor;
-	 
+		static const std::string sScreenWidth;
+		static const std::string sScreenHeight;
  
 		//for global property
 		static const std::string sTextTexture;
@@ -123,7 +125,7 @@ namespace Disorder
 		static const std::string sGBufferColorSpecIntTexture;
 		static const std::string sGBufferNormalTexture;
 		static const std::string sGBufferSpecPowTexture;
-		static const std::string sGBufferPointSampler;
+
 		static const std::string sSurfaceVisTex;
 		static const std::string sSurfaceSampler;
 
@@ -138,9 +140,9 @@ namespace Disorder
 
 		virtual void DumpContent();
 	protected:
-		ShaderPropertyManager(const std::string& name):Name(name){}
+		ShaderPropertyManager(const std::string& name) :Name(name), _content(0){}
 		ShaderPropertyMap _shaderPropertyMap;
-       
+		BYTE *_content;
 
 	};
  

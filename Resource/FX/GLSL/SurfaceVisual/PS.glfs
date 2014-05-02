@@ -1,0 +1,17 @@
+
+#version 330
+
+uniform sampler2D SurfaceVisTex;
+
+out vec4 color;
+
+in block 
+{
+  vec2 UV;
+} In;
+
+void main(void)
+{ 
+   color = texture( SurfaceVisTex, In.UV );
+}
+ 

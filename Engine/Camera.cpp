@@ -288,8 +288,7 @@ namespace Disorder
 			return;
  
 		ProjMatrix = Math::ProjFovRH(_FOV,_aspectRatio,_nearPlane,_farPlane);
-		GEngine->RenderEngine->AdjustProjMatrix(ProjMatrix);
-
+	
 		ProjInvMatrix = glm::inverse(ProjMatrix);
 		ViewProjMatrix =  ProjMatrix * ViewMatrix;
 		ViewProjInvMatrix = ViewInvMatrix * ProjInvMatrix  ;

@@ -45,9 +45,7 @@ namespace Disorder
 
 		virtual void OnFrameBegin();
 		virtual void OnFrameEnd();
-
-		virtual void AdjustProjMatrix(const glm::mat4 &matrix);
-
+ 
 		virtual void CreateViewport(void *hWnd);
 
 		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
@@ -308,9 +306,13 @@ namespace Disorder
 
 		GLRenderEngine();
 		bool CreateGLContext(HWND window);
+		void CreateMainTarget();
+
 		void LoadShaderIncludeFiles();
+		void LoadShaderIncludeForPath(const boost::filesystem::path& p);
 		void LoadGLExtensions();
 		void LoadGLProfile();
+		
 		std::vector<std::string> _vGLExtensions;
 
 		HGLRC _hRC;

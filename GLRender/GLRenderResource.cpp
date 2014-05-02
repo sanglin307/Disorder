@@ -242,7 +242,8 @@ namespace Disorder
 		GLenum glType = 0;
         glTexStorage2D(GL_TEXTURE_2D, pTexture->MipLevel,GLRenderEngine::GetPixelFormat(pixelFormat,glFormat,glType), width, height);  
 
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, glFormat, glType, pData->Data);
+		if (pData && pData->Data)
+		    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, glFormat, glType, pData->Data);
  
 		return GLRenderTexture2DPtr(pTexture);
 	}
