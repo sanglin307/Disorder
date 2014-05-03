@@ -26,6 +26,7 @@ namespace Disorder
 	{
 		pRenderConfig = new RenderConfig;
 		pCameraConfig = new CameraConfig;
+		pSceneConfig = new SceneConfig;
 	}
 
 	Config::~Config()
@@ -41,6 +42,12 @@ namespace Disorder
 			delete pCameraConfig;
 			pCameraConfig = 0;
 		}
+
+		if (pSceneConfig)
+		{
+			delete pSceneConfig;
+			pSceneConfig = 0;
+		}
 	}
 
 	
@@ -48,6 +55,7 @@ namespace Disorder
 	{
 		bool result = LoadRenderConfig();
 		result &= LoadCameraConfig();
+		result &= LoadSceneConfig();
 
 		return result;
 
@@ -57,6 +65,7 @@ namespace Disorder
 	{
 		bool result = SaveRenderConfig();
 		result &= SaveCameraConfig();
+		result &= SaveSceneConfig();
 
 		return result;
 	}
@@ -108,6 +117,20 @@ namespace Disorder
 		return true;
 	}
 
+	bool Config::LoadSceneConfig()
+	{
+		BOOST_ASSERT(pSceneConfig);
+
+		std::string sceneConfigFile = GConfig->sConfigPath + "SceneConfig.xml";
+		boost::property_tree::ptree tree;
+		boost::property_tree::read_xml(sceneConfigFile, tree);
+
+		pSceneConfig->LevelName = tree.get("SceneConfig.LevelName", "");
+	 
+		return true;
+	}
+
+
 	bool Config::SaveRenderConfig()
 	{
 		BOOST_ASSERT(pRenderConfig);
@@ -148,6 +171,19 @@ namespace Disorder
 
 		std::string cameraConfigFile = GConfig->sConfigPath + "CameraConfig.xml";
 		boost::property_tree::write_xml(cameraConfigFile,tree);
+
+		return true;
+	}
+
+	bool Config::SaveSceneConfig()
+	{
+		BOOST_ASSERT(pSceneConfig);
+
+		boost::property_tree::ptree tree;
+		tree.put("SceneConfig.LevelName", pSceneConfig->LevelName);
+	 
+		std::string sceneConfigFile = GConfig->sConfigPath + "SceneConfig.xml";
+		boost::property_tree::write_xml(sceneConfigFile, tree);
 
 		return true;
 	}

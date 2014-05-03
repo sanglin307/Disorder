@@ -17,7 +17,8 @@ namespace Disorder
 
 		FontPtr CreateFontFromTrueTypeFile(std::string const& fontName,unsigned int fontSize,unsigned int fontResolution);
 
-		
+		void LoadFontImageData();
+
 	protected:
 		static FontManagerPtr Create();
 

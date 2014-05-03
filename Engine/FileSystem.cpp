@@ -4,7 +4,8 @@ namespace Disorder
 {
 	FileObjectPtr FileObject::Create(std::string const& fileName,std::string const& fileFlag)
 	{
-		FILE *fp = fopen(fileName.c_str(),fileFlag.c_str());
+		FILE *fp = NULL;
+		fopen_s(&fp,fileName.c_str(), fileFlag.c_str());
 		if( !fp )
 		{
 			BOOST_ASSERT(0);

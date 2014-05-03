@@ -557,7 +557,7 @@ namespace Disorder
 
 		for (size_t i = 0; i < _vGLExtensions.size(); i++)
 		{
-			if (!stricmp(extension.c_str(),_vGLExtensions[i].c_str()))
+			if (!_stricmp(extension.c_str(),_vGLExtensions[i].c_str()))
 				return true;
 		}
 

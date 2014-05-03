@@ -32,7 +32,7 @@ extern HINSTANCE GAppInstance;
 #include <boost/smart_ptr/enable_shared_from_this.hpp>
 #include <boost/assert.hpp>
 #include <boost/make_shared.hpp>
-#define BOOST_FILESYSTEM_DYN_LINK
+#define BOOST_FILESYSTEM_STATIC_LINK
 #include <boost/filesystem.hpp>
 //#include <boost/uuid/uuid.hpp>
 //#include <boost/uuid/uuid_generators.hpp>
@@ -207,7 +207,6 @@ namespace Disorder
 #include "RenderDefine.h"
 #include "Image.h"
 #include "VertexFormat.h"
-#include "Texture.h"
 #include "ShaderProperty.h"
 #include "RenderResource.h"
 #include "RenderState.h"

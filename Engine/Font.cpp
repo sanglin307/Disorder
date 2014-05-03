@@ -16,6 +16,15 @@ namespace Disorder
 
 	}
 	
+	void Font::CreateRenderResource(const ImagePtr& image)
+	{
+		SamplerDesc desc;
+		desc.Filter = SF_Min_Mag_Linear_Mip_Point;
+		SamplerStatePtr sampler = GEngine->RenderResourceMgr->CreateSamplerState(&desc);
+		RenderTexture2DPtr fontTexture = GEngine->RenderResourceMgr->CreateTexture2D(sampler, image->GetSpec().format, false, image);
+		_glyphsTexture = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, fontTexture, image->GetSpec().format);
+	}
+
 	void Font::LoadFontFromTrueTypeFile(std::string const& fontName)
 	{
 		FT_Library  ft_library;
@@ -167,18 +176,14 @@ namespace Disorder
 			FT_Done_FreeType(ft_library);
 
 		// save it to image 
-		ImagePtr fontImage = Image::Create(finalWidth,finalHeight,2,imageData);
-		GImageManager->Add(fontName,fontImage);
-		//std::string strImageFileName = fontName + ".tif";
-		//GImageManager->Save(strImageFileName,fontImage);
-
-		SamplerDesc desc;
-		desc.Filter = SF_Min_Mag_Linear_Mip_Point;
-		SamplerStatePtr sampler = GEngine->RenderResourceMgr->CreateSamplerState(&desc);
 		PixelFormat pixelFormat = PF_R8G8_UNORM;
-		RenderTexture2DPtr fontTexture = GEngine->RenderResourceMgr->CreateTexture2D(sampler, pixelFormat, false, fontImage);
-		_glyphsTexture = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource,fontTexture,pixelFormat);
+		ImagePtr fontImage = Image::Create(eIT_PNG, finalWidth, finalHeight, pixelFormat, imageData, data_size);
+		GImageManager->Add(fontName,fontImage);
+		std::string strImageFileName = GConfig->sResourceFontPath + "png\\" + fontName + ".png";
+		GImageManager->Save(strImageFileName,fontImage);
 		delete imageData;
+
+		CreateRenderResource(fontImage);
 	}
 
 

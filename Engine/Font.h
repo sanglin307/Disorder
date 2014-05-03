@@ -27,6 +27,8 @@ namespace Disorder
  
 		void LoadFontFromTrueTypeFile(std::string const& fontName);
 
+		void CreateRenderResource(const ImagePtr& image);
+
 		SurfaceViewPtr const& GetGlyphTexture() const
 		{
 			return _glyphsTexture;

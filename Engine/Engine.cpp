@@ -25,6 +25,7 @@ namespace Disorder
 	   RenderEngine->CreateViewport(viewport->GetWindow());	 
 
 	   RenderResourceMgr->Init();
+	 //  GFontManager->LoadFontImageData();
 
 	   viewport->SetRenderPath(RPT_DeferredShading);
 	   SceneImporter->Init();

@@ -65,7 +65,7 @@ namespace Disorder
 			if (_cachedShaderPath[_cachedShaderPathCount] != 0)
 				delete[] _cachedShaderPath[_cachedShaderPathCount];
 			_cachedShaderPath[_cachedShaderPathCount] = new char[iter->first.size() + 1];
-			strncpy(_cachedShaderPath[_cachedShaderPathCount], iter->first.c_str(), iter->first.size());
+			strncpy_s(_cachedShaderPath[_cachedShaderPathCount], iter->first.size() + 1, iter->first.c_str(), iter->first.size());
 			_cachedShaderPath[_cachedShaderPathCount][iter->first.size()] = 0;
 			_cachedShaderPathLengh[_cachedShaderPathCount] = iter->first.size();
 			_cachedShaderPathCount++;

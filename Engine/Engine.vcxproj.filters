@@ -122,6 +122,9 @@
     <None Include="..\Resource\FX\GLSL\SurfaceVisual\PS.glfs">
       <Filter>GLSL\SurfaceVisual</Filter>
     </None>
+    <None Include="..\Config\SceneConfig.xml">
+      <Filter>Config</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Geometry.h">

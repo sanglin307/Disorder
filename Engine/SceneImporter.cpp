@@ -68,15 +68,6 @@ namespace Disorder
 		if( !lImportStatus )
 		{
 			GLogger->Error("Call to FbxImporter::Initialize() failed.\n");
-			GLogger->Error(lImporter->GetLastErrorString());
-
-			if (lImporter->GetLastErrorID() == FbxIOBase::eFileVersionNotSupportedYet ||
-				lImporter->GetLastErrorID() == FbxIOBase::eFileVersionNotSupportedAnymore)
-			{
-				std::stringstream stream;
-				stream << "FBX file format version for this FBX SDK is " << lSDKMajor <<"," << lSDKMinor<<","<< lSDKRevision;
-				GLogger->Error(stream.str());
-			}
 
 			return NULL;
 		}
@@ -103,29 +94,10 @@ namespace Disorder
 		// Import the scene.
 		lStatus = lImporter->Import(lscene);
 
-		if(lStatus == false && lImporter->GetLastErrorID() == FbxIOBase::ePasswordError)
+		if(lStatus == false )
 		{
 			GLogger->Error("FBX file need a password!!!!");
 			return NULL;
-		/*	FBXSDK_printf("Please enter password: ");
-
-			lPassword[0] = '\0';
-
-			FBXSDK_CRT_SECURE_NO_WARNING_BEGIN
-			scanf("%s", lPassword);
-			FBXSDK_CRT_SECURE_NO_WARNING_END
-
-			FbxString lString(lPassword);
-
-			IOS_REF.SetStringProp(IMP_FBX_PASSWORD,      lString);
-			IOS_REF.SetBoolProp(IMP_FBX_PASSWORD_ENABLE, true);
-
-			lStatus = lImporter->Import(pScene);
-
-			if(lStatus == false && lImporter->GetLastErrorID() == FbxIOBase::ePasswordError)
-			{
-				FBXSDK_printf("\nPassword is wrong, import aborted.\n");
-			}*/
 		}
 
 		LevelPtr level = Level::Create(sceneName);

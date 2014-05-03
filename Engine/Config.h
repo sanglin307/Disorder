@@ -54,6 +54,15 @@ namespace Disorder
 		};
 	};
 
+	struct SceneConfig
+	{
+		std::string LevelName;
+
+		SceneConfig::SceneConfig()
+		{
+			LevelName = "";
+		}
+	};
  
 	class Config : public Singleton<Config>
 	{
@@ -77,7 +86,7 @@ namespace Disorder
 
 		RenderConfig* pRenderConfig; 
 		CameraConfig* pCameraConfig;
-
+		SceneConfig* pSceneConfig;
 		
 
 	private:
@@ -86,6 +95,8 @@ namespace Disorder
 
 		bool LoadRenderConfig();
 		bool LoadCameraConfig();
+		bool LoadSceneConfig();
+		bool SaveSceneConfig();
 		bool SaveRenderConfig();
 		bool SaveCameraConfig();
 

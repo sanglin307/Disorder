@@ -717,7 +717,8 @@ namespace Disorder
 		D3D11_MAPPED_SUBRESOURCE MappedResource;
 		_pImmediateContext->Map(pStageTex2D,D3D11CalcSubresource(0, 0, 1),D3D11_MAP_READ,0,&MappedResource);
 		
-		ImagePtr image = Image::Create(desc.Width,desc.Height,tex->Format,MappedResource.pData);
+		int dataSize = desc.Width * desc.Height * RenderEngine::ComputePixelSizeBits(tex->Format) / 8;
+		ImagePtr image = Image::Create(eIT_PNG,desc.Width,desc.Height,tex->Format,(BYTE*)MappedResource.pData,dataSize);
 		GImageManager->Save(fileName,image);
 
 		_pImmediateContext->Unmap(pStageTex2D,D3D11CalcSubresource(0, 0, 1));
