@@ -90,8 +90,8 @@ namespace Disorder
 	{
 		HRESULT hr = S_OK;
 
-		FileObjectPtr fileptr = GEngine->FileManager->OpenFile(fileName,"rt");
-		std::string shaderContent = GEngine->FileManager->ReadFile(fileptr);
+		FileObjectPtr fileptr = GEngine->FileManager->OpenTextFile(fileName,eF_Read);
+		std::string shaderContent = fileptr->ReadText();
 
 		DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 	#ifdef _DEBUG

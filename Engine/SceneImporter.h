@@ -32,6 +32,7 @@ namespace Disorder
 		void ProcessHierarchy(FbxNode* pNode,GameObjectPtr const& gameObject);
 		void ProcessContent(FbxNode* pNode,GameObjectPtr const& gameObject);
 		void ProcessMesh(FbxNode* pNode,GameObjectPtr const& gameObject);
+		void ProcessTextures(FbxMesh *pMesh, GeometryPtr const& geometry);
 		void ProcessGeometry(FbxMesh *pMesh,GeometryPtr const& geometry);
 		void ProcessMaterials(FbxMesh *pMesh,std::vector<SurfaceMaterialPtr> & materials,int &usedMaterial);
 		void ProcessLight(FbxNode* pNode,GameObjectPtr const& gameObject);

@@ -586,8 +586,8 @@ namespace Disorder
 					filekey[i] = '/';
 			}
 
-			FileObjectPtr file = GEngine->FileManager->OpenFile(path, "rt");
-			std::string content = GEngine->FileManager->ReadFile(file);
+			FileObjectPtr file = GEngine->FileManager->OpenTextFile(path, eF_Read);
+			std::string content = file->ReadText();
 			if (ShaderObject::sMapIncludeFiles.find(filekey) == ShaderObject::sMapIncludeFiles.end())
 			{
 				ShaderObject::sMapIncludeFiles.insert(std::pair<std::string, std::string>(filekey, content));

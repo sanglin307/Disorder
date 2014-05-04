@@ -7,9 +7,10 @@ namespace Disorder
 
 	void Logger::Init()
 	{
-		_errorFile = GEngine->FileManager->OpenFile(GConfig->sLogPath + "Error.log","wt");
-		_warningFile = GEngine->FileManager->OpenFile(GConfig->sLogPath + "Warning.log", "wt");
-		_infoFile = GEngine->FileManager->OpenFile(GConfig->sLogPath + "Info.log", "wt");
+		_errorFile = GEngine->FileManager->OpenTextFile(GConfig->sLogPath + "Error.log",eF_Write);
+		_warningFile = GEngine->FileManager->OpenTextFile(GConfig->sLogPath + "Warning.log", eF_Write);
+		_infoFile = GEngine->FileManager->OpenTextFile(GConfig->sLogPath + "Info.log", eF_Write);
+
 		_thread =  boost::thread(LoggerRunner());
 	}
 
@@ -56,34 +57,34 @@ namespace Disorder
 		std::list<LogObj>::const_iterator iter = _errorCache.begin();
 		while(iter != _errorCache.end())
 		{
-			GEngine->FileManager->WriteFile(_errorFile,iter->content);
-			GEngine->FileManager->WriteFile(_errorFile,"\n");
+			_errorFile->Write(iter->content);
+			_errorFile->Write("\n");
 			iter++;
 		}
 		_errorCache.clear();
-		GEngine->FileManager->Flush(_errorFile);
+		_errorFile->Flush();
 
 		boost::mutex::scoped_lock warninglock(_warningMutex);
 		iter = _warningCache.begin();
 		while(iter != _warningCache.end())
 		{
-			GEngine->FileManager->WriteFile(_warningFile,iter->content);
-			GEngine->FileManager->WriteFile(_warningFile,"\n");
+			_warningFile->Write(iter->content);
+			_warningFile->Write("\n");
 			iter++;
 		}
 		_warningCache.clear();
-		GEngine->FileManager->Flush(_warningFile);
+		_warningFile->Flush();
 
 		boost::mutex::scoped_lock infolock(_infoMutex);
 		iter = _infoCache.begin();
 		while(iter != _infoCache.end())
 		{
-			GEngine->FileManager->WriteFile(_infoFile,iter->content);
-			GEngine->FileManager->WriteFile(_infoFile,"\n");
+			_infoFile->Write(iter->content);
+			_infoFile->Write("\n");
 			iter++;
 		}
 		_infoCache.clear();
-		GEngine->FileManager->Flush(_infoFile);
+		_infoFile->Flush();
 
 	}
 

@@ -50,7 +50,7 @@ namespace Disorder
 		size_t dotPos = fileName.find_first_of('.');
 		std::string sceneName = dotPos == std::string::npos ? fileName : fileName.substr(0,dotPos);
 		FbxScene* lscene = FbxScene::Create(_sdkManager, sceneName.c_str());
-		
+	 
 		BOOST_ASSERT(lscene);
 
 		if( !lscene )
@@ -975,6 +975,140 @@ namespace Disorder
 			usedMaterial = leMaterial->GetIndexArray().GetAt(0);
 			 
 		}
+	}
+
+	/*void DisplayTextureInfo(FbxTexture* pTexture, int pBlendMode)
+	{
+		FbxFileTexture *lFileTexture = FbxCast<FbxFileTexture>(pTexture);
+		FbxProceduralTexture *lProceduralTexture = FbxCast<FbxProceduralTexture>(pTexture);
+
+		DisplayString("            Name: \"", (char *)pTexture->GetName(), "\"");
+		if (lFileTexture)
+		{
+			DisplayString("            Type: File Texture");
+			DisplayString("            File Name: \"", (char *)lFileTexture->GetFileName(), "\"");
+		}
+		else if (lProceduralTexture)
+		{
+			DisplayString("            Type: Procedural Texture");
+		}
+		DisplayDouble("            Scale U: ", pTexture->GetScaleU());
+		DisplayDouble("            Scale V: ", pTexture->GetScaleV());
+		DisplayDouble("            Translation U: ", pTexture->GetTranslationU());
+		DisplayDouble("            Translation V: ", pTexture->GetTranslationV());
+		DisplayBool("            Swap UV: ", pTexture->GetSwapUV());
+		DisplayDouble("            Rotation U: ", pTexture->GetRotationU());
+		DisplayDouble("            Rotation V: ", pTexture->GetRotationV());
+		DisplayDouble("            Rotation W: ", pTexture->GetRotationW());
+
+		const char* lAlphaSources[] = { "None", "RGB Intensity", "Black" };
+
+		DisplayString("            Alpha Source: ", lAlphaSources[pTexture->GetAlphaSource()]);
+		DisplayDouble("            Cropping Left: ", pTexture->GetCroppingLeft());
+		DisplayDouble("            Cropping Top: ", pTexture->GetCroppingTop());
+		DisplayDouble("            Cropping Right: ", pTexture->GetCroppingRight());
+		DisplayDouble("            Cropping Bottom: ", pTexture->GetCroppingBottom());
+
+		const char* lMappingTypes[] = { "Null", "Planar", "Spherical", "Cylindrical",
+			"Box", "Face", "UV", "Environment" };
+
+		DisplayString("            Mapping Type: ", lMappingTypes[pTexture->GetMappingType()]);
+
+		if (pTexture->GetMappingType() == FbxTexture::ePlanar)
+		{
+			const char* lPlanarMappingNormals[] = { "X", "Y", "Z" };
+
+			DisplayString("            Planar Mapping Normal: ", lPlanarMappingNormals[pTexture->GetPlanarMappingNormal()]);
+		}
+
+		const char* lBlendModes[] = { "Translucent", "Add", "Modulate", "Modulate2" };
+		if (pBlendMode >= 0)
+			DisplayString("            Blend Mode: ", lBlendModes[pBlendMode]);
+		DisplayDouble("            Alpha: ", pTexture->GetDefaultAlpha());
+
+		if (lFileTexture)
+		{
+			const char* lMaterialUses[] = { "Model Material", "Default Material" };
+			DisplayString("            Material Use: ", lMaterialUses[lFileTexture->GetMaterialUse()]);
+		}
+
+		const char* pTextureUses[] = { "Standard", "Shadow Map", "Light Map",
+			"Spherical Reflexion Map", "Sphere Reflexion Map", "Bump Normal Map" };
+
+		DisplayString("            Texture Use: ", pTextureUses[pTexture->GetTextureUse()]);
+		DisplayString("");
+
+	}*/
+ 
+	 
+	void FbxSceneImporter::ProcessTextures(FbxMesh *pMesh, GeometryPtr const& geometry)
+	{
+		int lMaterialIndex;
+		FbxProperty lProperty;
+		if (pMesh->GetNode() == NULL)
+			return;
+
+		int lNbMat = pMesh->GetNode()->GetSrcObjectCount<FbxSurfaceMaterial>();
+		for (lMaterialIndex = 0; lMaterialIndex < lNbMat; lMaterialIndex++)
+		{
+			FbxSurfaceMaterial *lMaterial = pMesh->GetNode()->GetSrcObject<FbxSurfaceMaterial>(lMaterialIndex);
+			bool lDisplayHeader = true;
+
+			//go through all the possible textures
+			if (lMaterial)
+			{
+				int lTextureIndex;
+				FBXSDK_FOR_EACH_TEXTURE(lTextureIndex)
+				{
+					lProperty = lMaterial->FindProperty(FbxLayerElement::sTextureChannelNames[lTextureIndex]);
+					if (lProperty.IsValid())
+					{
+						int lTextureCount = lProperty.GetSrcObjectCount<FbxTexture>();
+
+						for (int j = 0; j < lTextureCount; ++j)
+						{
+							//Here we have to check if it's layeredtextures, or just textures:
+							FbxLayeredTexture *lLayeredTexture = lProperty.GetSrcObject<FbxLayeredTexture>(j);
+							if (lLayeredTexture)
+							{
+								FbxLayeredTexture *lLayeredTexture = lProperty.GetSrcObject<FbxLayeredTexture>(j);
+								int lNbTextures = lLayeredTexture->GetSrcObjectCount<FbxTexture>();
+								for (int k = 0; k<lNbTextures; ++k)
+								{
+									FbxTexture* lTexture = lLayeredTexture->GetSrcObject<FbxTexture>(k);
+									if (lTexture)
+									{
+										//NOTE the blend mode is ALWAYS on the LayeredTexture and NOT the one on the texture.
+										//Why is that?  because one texture can be shared on different layered textures and might
+										//have different blend modes.
+
+										FbxLayeredTexture::EBlendMode lBlendMode;
+										lLayeredTexture->GetTextureBlendMode(k, lBlendMode);
+										//DisplayString("    Textures for ", lProperty.GetName());
+										//DisplayInt("        Texture ", k);
+									//	DisplayTextureInfo(lTexture, (int)lBlendMode);
+									}
+
+								}
+							}
+							else
+							{
+								//no layered texture simply get on the property
+								FbxTexture* lTexture = lProperty.GetSrcObject<FbxTexture>(j);
+								if (lTexture)
+								{
+									//DisplayString("    Textures for ", pProperty.GetName());
+									//DisplayInt("        Texture ", j);
+								//	DisplayTextureInfo(lTexture, -1);
+								}
+							}
+						}
+					}//end if pProperty
+				}
+
+			}//end if(lMaterial)
+
+		}// end for lMaterialIndex     
 	}
 
 	void FbxSceneImporter::ProcessMesh(FbxNode *pNode,GameObjectPtr const& gameObject)

@@ -76,8 +76,8 @@ namespace Disorder
 	bool GLShaderObject::LoadShaderFromFile(std::string const& fileName, std::string const& entryPoint, ShaderType shaderType)
 	{
 		PrepareShaderPathInclude();
-		FileObjectPtr file = GEngine->FileManager->OpenFile(fileName,"rt");
-		std::string shaderContent = GEngine->FileManager->ReadFile(file);
+		FileObjectPtr file = GEngine->FileManager->OpenTextFile(fileName, eF_Read);
+		std::string shaderContent = file->ReadText();
 
 		_GLHandle = glCreateShader(GLShaderObject::GetOpenGLShaderType(shaderType));
 		const char* pSource = shaderContent.c_str();

@@ -16,6 +16,23 @@ namespace Disorder
 
 	}
 	
+	void Font::SaveFontLayout(const std::string& fontName)
+	{
+		//unsigned int _fontSize; // in pixel.
+		//unsigned int _fontRevolution;
+		//int   _fontMaxBearingY;
+		//UINT _characterSpacer;
+		//CodePointMap _codePointMap;
+
+
+
+	}
+
+	void Font::LoadFontLayout(const std::string& fontName)
+	{
+
+	}
+
 	void Font::CreateRenderResource(const ImagePtr& image)
 	{
 		SamplerDesc desc;
