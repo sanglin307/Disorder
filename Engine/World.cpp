@@ -19,6 +19,11 @@ namespace Disorder
 		 {
 			 GSceneManager->CreateDefaultCamera();
 		 }
+
+		 if (GSceneManager->GetLightsList().size() == 0)
+		 {
+			 GSceneManager->CreateDefaultLight();
+		 }
  
 
 		 GEngine->RenderResourceMgr->DumpContent();

@@ -198,6 +198,7 @@ namespace Disorder
 		GImageManager->Add(fontName,fontImage);
 		std::string strImageFileName = GConfig->sResourceFontPath + "png\\" + fontName + ".png";
 		GImageManager->Save(strImageFileName,fontImage);
+
 		delete imageData;
 
 		CreateRenderResource(fontImage);

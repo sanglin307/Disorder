@@ -26,7 +26,7 @@ namespace Disorder
 		boost::filesystem::directory_iterator enditer;
 		for (boost::filesystem::directory_iterator fileiter(p); fileiter != enditer; ++fileiter)
 		{
-			ImagePtr image = GImageManager->Load(fileiter->path().string(), PF_R8G8_UNORM);
+			ImagePtr image = GImageManager->Load(fileiter->path().string());
 			if (image)
 			{
 				FontPtr font = Font::Create(25, 96);

@@ -32,7 +32,10 @@ namespace Disorder
 		void ProcessHierarchy(FbxNode* pNode,GameObjectPtr const& gameObject);
 		void ProcessContent(FbxNode* pNode,GameObjectPtr const& gameObject);
 		void ProcessMesh(FbxNode* pNode,GameObjectPtr const& gameObject);
-		void ProcessTextures(FbxMesh *pMesh, GeometryPtr const& geometry);
+		void ProcessTextures(FbxSurfaceMaterial *pMaterial, SurfaceMaterialPtr& materials);
+		void ProcessFileTexture(const char* propertyName,FbxFileTexture* pTexture,SurfaceMaterialPtr& materials);
+		void ProcessLayerTexture(const char* propertyName, FbxLayeredTexture* pTexture, SurfaceMaterialPtr& materials);
+		void ProcessProceduralTexture(const char* propertyName, FbxProceduralTexture* pTexture, SurfaceMaterialPtr& materials);
 		void ProcessGeometry(FbxMesh *pMesh,GeometryPtr const& geometry);
 		void ProcessMaterials(FbxMesh *pMesh,std::vector<SurfaceMaterialPtr> & materials,int &usedMaterial);
 		void ProcessLight(FbxNode* pNode,GameObjectPtr const& gameObject);
@@ -42,6 +45,7 @@ namespace Disorder
 
 
 		FbxManager* _sdkManager;
+		std::string _cachedCurrentScene;
      
 	};
 }

@@ -40,7 +40,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;..\..\External\openEXR\lib\include;..\..\External\glew-1.10.0\include;..\..\External\glm-0.9.5;..\..\External\lpng1610;..\..\External\zlib;$(IncludePath)</IncludePath>
+    <IncludePath>$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;..\..\External\openEXR\lib\include;..\..\External\glew-1.10.0\include;..\..\External\glm-0.9.5;..\..\External\lpng1610;..\..\External\zlib;..\..\External\jpeg-9a;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

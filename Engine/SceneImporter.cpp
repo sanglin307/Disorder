@@ -48,12 +48,12 @@ namespace Disorder
 
 		//Create an FBX scene. This object holds most objects imported/exported from/to files.
 		size_t dotPos = fileName.find_first_of('.');
-		std::string sceneName = dotPos == std::string::npos ? fileName : fileName.substr(0,dotPos);
-		FbxScene* lscene = FbxScene::Create(_sdkManager, sceneName.c_str());
+		_cachedCurrentScene = dotPos == std::string::npos ? fileName : fileName.substr(0, dotPos);
+		FbxScene* lscene = FbxScene::Create(_sdkManager, _cachedCurrentScene.c_str());
 	 
 		BOOST_ASSERT(lscene);
 
-		if( !lscene )
+		if (!lscene)
 		{
 			GLogger->Error("Error: Unable to create FBX scene!\n");
 		    return NULL;
@@ -67,8 +67,8 @@ namespace Disorder
 		
 		if( !lImportStatus )
 		{
-			GLogger->Error("Call to FbxImporter::Initialize() failed.\n");
-
+			GLogger->Error(std::string("Call to FbxImporter::Initialize() failed.") + lImporter->GetStatus().GetErrorString());
+			_cachedCurrentScene = "";
 			return NULL;
 		}
  
@@ -97,21 +97,30 @@ namespace Disorder
 		if(lStatus == false )
 		{
 			GLogger->Error("FBX file need a password!!!!");
+			_cachedCurrentScene = "";
 			return NULL;
 		}
-
-		LevelPtr level = Level::Create(sceneName);
-
-	
-		PreProcessGlobalSetting(lscene,level);
  
-		ProcessHierarchy(lscene,level);
+		LevelPtr level = Level::Create(_cachedCurrentScene);
 
-		PostProcessGlobalSetting(lscene,level);
+		PreProcessGlobalSetting(lscene, level);
+
+		// Convert mesh, NURBS and patch into triangle mesh
+		FbxGeometryConverter lGeomConverter(_sdkManager);
+		lGeomConverter.Triangulate(lscene, /*replace*/true);
+
+		// Split meshes per material, so that we only have one material per mesh (for VBO support)
+		lGeomConverter.SplitMeshesPerMaterial(lscene, /*replace*/true);
+ 
+		ProcessHierarchy(lscene, level);
+
+		PostProcessGlobalSetting(lscene, level);
 		// Destroy the importer.
 		lImporter->Destroy();
 
 		GWorld->AddLevel(level);
+
+		_cachedCurrentScene = "";
 
 		return level;
 	}
@@ -119,15 +128,23 @@ namespace Disorder
 	void FbxSceneImporter::PreProcessGlobalSetting(FbxScene* lscene,LevelPtr const& level)
 	{
 		FbxGlobalSettings &rGlobalSetting =  lscene->GetGlobalSettings();
+ 
+		//Axis
+		FbxAxisSystem SceneAxisSystem = rGlobalSetting.GetAxisSystem();
+		FbxAxisSystem OurAxisSystem(FbxAxisSystem::eYAxis, FbxAxisSystem::eParityOdd, FbxAxisSystem::eRightHanded);
+		if (SceneAxisSystem != OurAxisSystem)
+		{
+			OurAxisSystem.ConvertScene(lscene);
+		}
 
-		//
-		FbxAxisSystem &rAxisSystem = rGlobalSetting.GetAxisSystem();
-		FbxAxisSystem::ECoordSystem coordSystem = rAxisSystem.GetCoorSystem();
-
-		int upSign = 1;
-		int frontSign = 1;
-		FbxAxisSystem::EUpVector upVec = rAxisSystem.GetUpVector(upSign);
-		FbxAxisSystem::EFrontVector frontVec = rAxisSystem.GetFrontVector(frontSign);
+		//system unit
+		FbxSystemUnit SceneSystemUnit = rGlobalSetting.GetSystemUnit();
+		if (SceneSystemUnit.GetScaleFactor() != 1.0)
+		{
+			//The unit is centimeter.
+			FbxSystemUnit::cm.ConvertScene(lscene);
+		}
+ 
 
 		FbxColor ambient = rGlobalSetting.GetAmbientColor();
 		level->SetAmbientColor(glm::vec4((float)ambient.mRed, (float)ambient.mGreen, (float)ambient.mBlue, (float)ambient.mAlpha));
@@ -247,6 +264,7 @@ namespace Disorder
 
 		CameraPtr cameraPtr = Camera::Create(pNode->GetName());
 		BOOST_ASSERT(pNode->GetTarget() == NULL); // don't process target node now.
+
 		FbxDouble3& position = pCamera->Position.Get();
 		FbxDouble3& target = pCamera->InterestPosition.Get();
 		FbxDouble3& upVec = pCamera->UpVector.Get();
@@ -739,6 +757,37 @@ namespace Disorder
  
 	}
 
+	void FbxSceneImporter::ProcessTextures(FbxSurfaceMaterial *pMaterial, SurfaceMaterialPtr& materials)
+	{
+		if (!pMaterial)
+			return;
+
+		FbxProperty lFbxProp = pMaterial->GetFirstProperty();
+		while (lFbxProp.IsValid())
+		{
+			if (lFbxProp.GetSrcObjectCount<FbxTexture>() > 0)
+			{
+				for (int j = 0; j<lFbxProp.GetSrcObjectCount<FbxFileTexture>(); ++j)
+				{
+					FbxFileTexture *lTex = lFbxProp.GetSrcObject<FbxFileTexture>(j);
+					ProcessFileTexture(lFbxProp.GetNameAsCStr(), lTex, materials);
+				}
+				for (int j = 0; j<lFbxProp.GetSrcObjectCount<FbxLayeredTexture>(); ++j)
+				{
+					FbxLayeredTexture *lTex = lFbxProp.GetSrcObject<FbxLayeredTexture>(j);
+					ProcessLayerTexture(lFbxProp.GetNameAsCStr(), lTex, materials);
+				}
+				for (int j = 0; j<lFbxProp.GetSrcObjectCount<FbxProceduralTexture>(); ++j)
+				{
+					FbxProceduralTexture *lTex = lFbxProp.GetSrcObject<FbxProceduralTexture>(j);
+					ProcessProceduralTexture(lFbxProp.GetNameAsCStr(), lTex, materials);
+				}
+			}
+
+			lFbxProp = pMaterial->GetNextProperty(lFbxProp);
+		}
+	}
+
 	void FbxSceneImporter::ProcessMaterials(FbxMesh *pMesh,std::vector<SurfaceMaterialPtr> & materials, int &usedMaterial)
 	{
 		int lMaterialCount = 0;
@@ -753,8 +802,9 @@ namespace Disorder
 			FbxColor theColor;
 
 			for (int lCount = 0; lCount < lMaterialCount; lCount ++)
-			{
+			{			
 				FbxSurfaceMaterial *lMaterial = lNode->GetMaterial(lCount);
+				SurfaceMaterialPtr material = SurfaceMaterial::Create(lMaterial->GetName());
 				//Get the implementation to see if it's a hardware shader.
 				const FbxImplementation* lImplementation = GetImplementation(lMaterial, FBXSDK_IMPLEMENTATION_HLSL);
 				if(lImplementation)
@@ -788,15 +838,14 @@ namespace Disorder
 					FbxBindingTable const* lTable = lImplementation->GetRootTable();
 					size_t lEntryNum = lTable->GetEntryCount();
 
-					for(int i=0;i <(int)lEntryNum; ++i)
+					for( int i=0;i < (int)lEntryNum; ++i)
 					{
 						const FbxBindingTableEntry& lEntry = lTable->GetEntry(i);
 						const char* lEntrySrcType = lEntry.GetEntryType(true); 
 						FbxProperty lFbxProp;
  
 						FbxString lTest = lEntry.GetSource();
-						FBXSDK_printf("            Entry: %s\n", lTest.Buffer());
- 
+						
 						if ( strcmp( FbxPropertyEntryView::sEntryType, lEntrySrcType ) == 0 )
 						{   
 							lFbxProp = lMaterial->FindPropertyHierarchical(lEntry.GetSource()); 
@@ -809,6 +858,7 @@ namespace Disorder
 						{
 							lFbxProp = lImplementation->GetConstants().FindHierarchical(lEntry.GetSource());
 						}
+
 						if(lFbxProp.IsValid())
 						{
 							if( lFbxProp.GetSrcObjectCount<FbxTexture>() > 0 )
@@ -817,17 +867,17 @@ namespace Disorder
 								for(int j=0; j<lFbxProp.GetSrcObjectCount<FbxFileTexture>(); ++j)
 								{
 									FbxFileTexture *lTex = lFbxProp.GetSrcObject<FbxFileTexture>(j);
-									FBXSDK_printf("           File Texture: %s\n", lTex->GetFileName());
+									ProcessFileTexture(lFbxProp.GetNameAsCStr(),lTex, material);
 								}
 								for(int j=0; j<lFbxProp.GetSrcObjectCount<FbxLayeredTexture>(); ++j)
 								{
 									FbxLayeredTexture *lTex = lFbxProp.GetSrcObject<FbxLayeredTexture>(j);
-									FBXSDK_printf("        Layered Texture: %s\n", lTex->GetName());
+									ProcessLayerTexture(lFbxProp.GetNameAsCStr(), lTex, material);
 								}
 								for(int j=0; j<lFbxProp.GetSrcObjectCount<FbxProceduralTexture>(); ++j)
 								{
 									FbxProceduralTexture *lTex = lFbxProp.GetSrcObject<FbxProceduralTexture>(j);
-									FBXSDK_printf("     Procedural Texture: %s\n", lTex->GetName());
+									ProcessProceduralTexture(lFbxProp.GetNameAsCStr(), lTex, material);
 								}
 							}
 							else
@@ -888,7 +938,6 @@ namespace Disorder
 									FbxDouble4x4 lDouble44 = lFbxProp.Get<FbxDouble4x4>();
 									for(int j=0; j<4; ++j)
 									{
-
 										FbxVector4 lVect;
 										lVect[0] = lDouble44[j][0];
 										lVect[1] = lDouble44[j][1];
@@ -902,64 +951,74 @@ namespace Disorder
 						}   
 					}
 				} //if(lImplementation)
-				else if (lMaterial->GetClassId().Is(FbxSurfacePhong::ClassId))
+				else
 				{
-					// We found a Phong material.  Display its properties.
-					// Display the Ambient Color
-					SurfaceMaterialPtr material = SurfaceMaterial::Create(lMaterial->GetName());
-					material->ShaderModel = lMaterial->ShadingModel.Get().Buffer();
+					if (lMaterial->GetClassId().Is(FbxSurfacePhong::ClassId))
+					{
+						// We found a Phong material.  Display its properties.
+						// Display the Ambient Color
+						material->ShaderModel = lMaterial->ShadingModel.Get().Buffer();
 
-					FbxSurfacePhong* lPhoneMaterial = (FbxSurfacePhong *) lMaterial;
- 
-					// Display the Diffuse Color
-					material->DiffuseColor.x = (float)lPhoneMaterial->Diffuse.Get()[0];
-					material->DiffuseColor.y = (float)lPhoneMaterial->Diffuse.Get()[1];
-					material->DiffuseColor.z = (float)lPhoneMaterial->Diffuse.Get()[2];
+						FbxSurfacePhong* lPhoneMaterial = (FbxSurfacePhong *)lMaterial;
 
-					// Display the Specular Color (unique to Phong materials)
-					material->SpecularColor.x = (float)lPhoneMaterial->Specular.Get()[0];
-					material->SpecularColor.y = (float)lPhoneMaterial->Specular.Get()[1];
-					material->SpecularColor.z = (float)lPhoneMaterial->Specular.Get()[2];
+						// Display the Diffuse Color
+						material->DiffuseColor.x = (float)lPhoneMaterial->Diffuse.Get()[0];
+						material->DiffuseColor.y = (float)lPhoneMaterial->Diffuse.Get()[1];
+						material->DiffuseColor.z = (float)lPhoneMaterial->Diffuse.Get()[2];
 
-					// Display the Emissive Color
-					material->EmissiveColor.x = (float)lPhoneMaterial->Emissive.Get()[0];
-					material->EmissiveColor.y = (float)lPhoneMaterial->Emissive.Get()[1];
-					material->EmissiveColor.z = (float)lPhoneMaterial->Emissive.Get()[2];
+						// Display the Specular Color (unique to Phong materials)
+						material->SpecularColor.x = (float)lPhoneMaterial->Specular.Get()[0];
+						material->SpecularColor.y = (float)lPhoneMaterial->Specular.Get()[1];
+						material->SpecularColor.z = (float)lPhoneMaterial->Specular.Get()[2];
 
-					//Opacity is Transparency factor now
-					material->Transparency = (float)(lPhoneMaterial->TransparencyFactor.Get());
+						// Display the Emissive Color
+						material->EmissiveColor.x = (float)lPhoneMaterial->Emissive.Get()[0];
+						material->EmissiveColor.y = (float)lPhoneMaterial->Emissive.Get()[1];
+						material->EmissiveColor.z = (float)lPhoneMaterial->Emissive.Get()[2];
 
-					// Display the Shininess
-					material->SpecularExp = (float)lPhoneMaterial->Shininess.Get();
- 
-					materials.push_back(material);
-				}
-				else if(lMaterial->GetClassId().Is(FbxSurfaceLambert::ClassId) )
-				{
-					// We found a Lambert material. Display its properties.
-					// Display the Ambient Color
-					SurfaceMaterialPtr material = SurfaceMaterial::Create(lMaterial->GetName());
-			        material->ShaderModel = lMaterial->ShadingModel.Get().Buffer();
+						//Opacity is Transparency factor now
+						material->Transparency = (float)(lPhoneMaterial->TransparencyFactor.Get());
 
-					FbxSurfaceLambert* lLambertMaterial = (FbxSurfaceLambert *)lMaterial;
+						// Display the Shininess
+						material->SpecularExp = (float)lPhoneMaterial->Shininess.Get();
+						if (material->SpecularExp > 10)
+							material->SpecularExp = 10;
 
-					// Display the Diffuse Color
-					material->DiffuseColor.x = (float)lLambertMaterial->Diffuse.Get()[0];
-					material->DiffuseColor.y = (float)lLambertMaterial->Diffuse.Get()[1];
-					material->DiffuseColor.z = (float)lLambertMaterial->Diffuse.Get()[2];
+						//textures
+						ProcessTextures(lPhoneMaterial, material);
 
-					// Display the Emissive
-					material->EmissiveColor.x = (float)lLambertMaterial->Emissive.Get()[0];
-					material->EmissiveColor.y = (float)lLambertMaterial->Emissive.Get()[1];
-					material->EmissiveColor.z = (float)lLambertMaterial->Emissive.Get()[2];
+						materials.push_back(material);
+					}
+					else if (lMaterial->GetClassId().Is(FbxSurfaceLambert::ClassId))
+					{
+						// We found a Lambert material. Display its properties.
+						// Display the Ambient Color
+						material->ShaderModel = lMaterial->ShadingModel.Get().Buffer();
 
-					// Display the Opacity
-					material->Transparency = (float)(lLambertMaterial->TransparencyFactor.Get());
-					materials.push_back(material);
-				}
-                else
-				{
-					GLogger->Warning("Unkown Material type!");
+						FbxSurfaceLambert* lLambertMaterial = (FbxSurfaceLambert *)lMaterial;
+
+						// Display the Diffuse Color
+						material->DiffuseColor.x = (float)lLambertMaterial->Diffuse.Get()[0];
+						material->DiffuseColor.y = (float)lLambertMaterial->Diffuse.Get()[1];
+						material->DiffuseColor.z = (float)lLambertMaterial->Diffuse.Get()[2];
+
+						// Display the Emissive
+						material->EmissiveColor.x = (float)lLambertMaterial->Emissive.Get()[0];
+						material->EmissiveColor.y = (float)lLambertMaterial->Emissive.Get()[1];
+						material->EmissiveColor.z = (float)lLambertMaterial->Emissive.Get()[2];
+
+						// Display the Opacity
+						material->Transparency = (float)(lLambertMaterial->TransparencyFactor.Get());
+
+						//textures
+						ProcessTextures(lLambertMaterial, material);
+						materials.push_back(material);
+
+					}
+					else
+					{
+						GLogger->Warning("Unkown Material type!");
+					}
 				}
           
            }//for (int lCount = 0; lCount < lMaterialCount; lCount ++)
@@ -1040,77 +1099,61 @@ namespace Disorder
 
 	}*/
  
-	 
-	void FbxSceneImporter::ProcessTextures(FbxMesh *pMesh, GeometryPtr const& geometry)
+	void FbxSceneImporter::ProcessFileTexture(const char* propertyName, FbxFileTexture* pTexture, SurfaceMaterialPtr& materials)
 	{
-		int lMaterialIndex;
-		FbxProperty lProperty;
-		if (pMesh->GetNode() == NULL)
+		if (materials->TexutureChannelMap.find(propertyName) != materials->TexutureChannelMap.end())
 			return;
 
-		int lNbMat = pMesh->GetNode()->GetSrcObjectCount<FbxSurfaceMaterial>();
-		for (lMaterialIndex = 0; lMaterialIndex < lNbMat; lMaterialIndex++)
+		const FbxString lFileName = pTexture->GetFileName();
+		FbxString lLoadFileName = lFileName;
+		boost::filesystem::path p(lFileName.Buffer());
+		if (!boost::filesystem::exists(p) || !boost::filesystem::is_regular_file(p))
 		{
-			FbxSurfaceMaterial *lMaterial = pMesh->GetNode()->GetSrcObject<FbxSurfaceMaterial>(lMaterialIndex);
-			bool lDisplayHeader = true;
+			const FbxString lAbsFbxFileName = FbxPathUtils::Resolve(lFileName);
+			const FbxString lAbsFolderName = FbxPathUtils::GetFolderName(lAbsFbxFileName);
+			const FbxString lLoadFileName = FbxPathUtils::Bind(lAbsFolderName, pTexture->GetRelativeFileName());
 
-			//go through all the possible textures
-			if (lMaterial)
+			p = boost::filesystem::path(lLoadFileName.Buffer());
+			if (!boost::filesystem::exists(p) || !boost::filesystem::is_regular_file(p))
 			{
-				int lTextureIndex;
-				FBXSDK_FOR_EACH_TEXTURE(lTextureIndex)
+				const FbxString lTextureFileName = FbxPathUtils::GetFileName(lFileName);
+				const FbxString lLoadFileName = FbxPathUtils::Bind(lAbsFolderName, lTextureFileName);
+
+				p = boost::filesystem::path(lLoadFileName.Buffer());
+				if (!boost::filesystem::exists(p) || !boost::filesystem::is_regular_file(p))
 				{
-					lProperty = lMaterial->FindProperty(FbxLayerElement::sTextureChannelNames[lTextureIndex]);
-					if (lProperty.IsValid())
-					{
-						int lTextureCount = lProperty.GetSrcObjectCount<FbxTexture>();
-
-						for (int j = 0; j < lTextureCount; ++j)
-						{
-							//Here we have to check if it's layeredtextures, or just textures:
-							FbxLayeredTexture *lLayeredTexture = lProperty.GetSrcObject<FbxLayeredTexture>(j);
-							if (lLayeredTexture)
-							{
-								FbxLayeredTexture *lLayeredTexture = lProperty.GetSrcObject<FbxLayeredTexture>(j);
-								int lNbTextures = lLayeredTexture->GetSrcObjectCount<FbxTexture>();
-								for (int k = 0; k<lNbTextures; ++k)
-								{
-									FbxTexture* lTexture = lLayeredTexture->GetSrcObject<FbxTexture>(k);
-									if (lTexture)
-									{
-										//NOTE the blend mode is ALWAYS on the LayeredTexture and NOT the one on the texture.
-										//Why is that?  because one texture can be shared on different layered textures and might
-										//have different blend modes.
-
-										FbxLayeredTexture::EBlendMode lBlendMode;
-										lLayeredTexture->GetTextureBlendMode(k, lBlendMode);
-										//DisplayString("    Textures for ", lProperty.GetName());
-										//DisplayInt("        Texture ", k);
-									//	DisplayTextureInfo(lTexture, (int)lBlendMode);
-									}
-
-								}
-							}
-							else
-							{
-								//no layered texture simply get on the property
-								FbxTexture* lTexture = lProperty.GetSrcObject<FbxTexture>(j);
-								if (lTexture)
-								{
-									//DisplayString("    Textures for ", pProperty.GetName());
-									//DisplayInt("        Texture ", j);
-								//	DisplayTextureInfo(lTexture, -1);
-								}
-							}
-						}
-					}//end if pProperty
+					GLogger->Warning(std::string(propertyName) + std::string("Can't find file:") + lLoadFileName.Buffer());
+					return;
 				}
-
-			}//end if(lMaterial)
-
-		}// end for lMaterialIndex     
+			}
+		}
+ 
+		std::string suffix = lFileName.Right(3).Buffer();
+		if (!GImageManager->IsSupported(suffix))
+		{
+			GLogger->Error("Not supported texture format! :" + suffix);
+			return;
+		}
+ 
+		ImagePtr img = GImageManager->Load(lLoadFileName.Buffer());	 
+		if (img != NULL && img->GetResource() != NULL )
+		{
+			materials->TexutureChannelMap.insert(std::pair<std::string, RenderTexture2DPtr>(propertyName, img->GetResource()));
+		}
 	}
 
+	void FbxSceneImporter::ProcessLayerTexture(const char* propertyName, FbxLayeredTexture* pTexture, SurfaceMaterialPtr& materials)
+	{
+		GLogger->Error("Not support layer texture now!");
+		BOOST_ASSERT(0);
+	}
+
+	void FbxSceneImporter::ProcessProceduralTexture(const char* propertyName, FbxProceduralTexture* pTexture, SurfaceMaterialPtr& materials)
+	{
+		GLogger->Error("Not support procedural texture now!");
+		BOOST_ASSERT(0);
+	}
+ 
 	void FbxSceneImporter::ProcessMesh(FbxNode *pNode,GameObjectPtr const& gameObject)
 	{
 		 FbxMesh* lMesh = (FbxMesh*) pNode->GetNodeAttribute ();
@@ -1133,7 +1176,6 @@ namespace Disorder
 			 SurfaceMaterialPtr mat = SurfaceMaterial::Create("DefaultMaterial");
 		     geometryRender->SetGeometry(geometry,mat);
 		 }
-
 
 		//DisplayMaterialMapping(lMesh);
 		/*DisplayMaterial(lMesh);

@@ -20,6 +20,8 @@ namespace Disorder
 		 float SpecularExp;
 		 float Transparency;
 
+		 std::map<std::string, RenderTexture2DPtr> TexutureChannelMap;
+
 		void UpdateShaderProperty();
 	
         const ShaderPropertyManagerPtr& GetShaderPropertyManager() const
@@ -34,10 +36,14 @@ namespace Disorder
 		SurfaceMaterial(std::string const& name);
         ShaderPropertyManagerPtr _propertyManager;
 
+		// tex data
+		ShaderPropertyPtr _DiffuseTexProperty;
+
+
+		// non-tex data
 		ShaderPropertyPtr  _DiffuseColorProperty;
         ShaderPropertyPtr  _EmissiveColorProperty;
 		ShaderPropertyPtr  _SpecularColorProperty;
-
 		ShaderPropertyPtr  _SpecularExpProperty;
         ShaderPropertyPtr  _TransparencyFactorProperty;
 	};

@@ -76,6 +76,15 @@ namespace Disorder
 		_propertyManager->UpdateShaderProperty();
 	}
 
+	void SceneManager::CreateDefaultLight()
+	{
+		BOOST_ASSERT(_vLightList.size() == 0);
+		GameObjectPtr go = GameObject::Create("DefaultDirLight");
+		DirectionLightPtr light = DirectionLight::Create("DefaultDirLight");
+		go->AddComponent(light);
+		GWorld->GetLevel()->AddGameObject(go);
+	}
+
 	void SceneManager::CreateDefaultCamera()
 	{
 		BOOST_ASSERT(_mDefaultCamera == NULL);
@@ -95,8 +104,7 @@ namespace Disorder
 	{
 		if( _mDefaultCamera != NULL )
 		{
-			GEngine->GameClient->ReleaseInputListener(_mDefaultCamera);
-			
+			GEngine->GameClient->ReleaseInputListener(_mDefaultCamera);		
 		}
 
 		GEngine->GameClient->AddInputListener(camera);

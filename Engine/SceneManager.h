@@ -27,6 +27,8 @@ namespace Disorder
 		LightPtr GetLight(std::string const& name);
 		CameraPtr GetCamera(std::string const& name);
 
+		void CreateDefaultLight();
+
 		void CreateDefaultCamera();
 		const CameraPtr& GetDefaultCamera() const
 		{
