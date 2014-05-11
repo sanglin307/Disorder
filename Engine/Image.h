@@ -6,6 +6,8 @@
 
 #include "jpeglib.h"
 
+#include "RenderState.h"
+
 namespace Disorder
 {
 	enum EImageType
@@ -70,6 +72,7 @@ namespace Disorder
 		friend class Singleton<ImageManager>;
 	public:
 		ImagePtr Load(std::string const& fileName, bool reloadIfExist = false);
+		ImagePtr Load(std::string const& fileName, SamplerDesc* desc, bool reloadIfExist = false);
 		bool Save(std::string const& fileName,ImagePtr const& image);
 		void Add(std::string const& imageName,ImagePtr const& image);
 		ImagePtr Find(std::string const& imageName);

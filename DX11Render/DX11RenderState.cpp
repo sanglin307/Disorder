@@ -66,6 +66,8 @@ namespace Disorder
 		else if( pDesc->CullMode == RCM_CullBack)
 			desc.CullMode = D3D11_CULL_BACK;
 
+	
+
 		desc.DepthBias = pDesc->DepthBias;
 		desc.DepthBiasClamp = pDesc->DepthBiasClamp;		
 		desc.SlopeScaledDepthBias = pDesc->SlopeScaledDepthBias;
@@ -82,10 +84,8 @@ namespace Disorder
 		if (GConfig->pRenderConfig->MultiSampleCount > 1)
 			desc.MultisampleEnable = true;
 		desc.AntialiasedLineEnable = pDesc->AntialiasedLineEnable;
-
-
+ 
 		desc.ScissorEnable = pDesc->ScissorEnable;
-		
 
 		ID3D11RasterizerState *pState;
 		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 

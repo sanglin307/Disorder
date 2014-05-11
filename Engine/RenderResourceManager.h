@@ -35,7 +35,8 @@ namespace Disorder
 		static RasterizeStatePtr DefaultRasterizeState;
 		static BlendStatePtr DefaultBlentState;
 		static DepthStencilStatePtr DefaultDepthStencilState;
-
+		
+		static SurfaceViewPtr DefaultWhiteTexture2D;
 
 	protected:
 		ShaderMap _shaderMap;

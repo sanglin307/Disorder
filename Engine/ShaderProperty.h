@@ -129,6 +129,9 @@ namespace Disorder
 		static const std::string sSurfaceVisTex;
 		static const std::string sSurfaceSampler;
 
+		static const std::string sDiffuseTexture;
+		static const std::string sDiffuseSampler;
+
 	public:
 		std::string Name;
  

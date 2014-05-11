@@ -9,7 +9,7 @@ Material PrepareMaterial(float3 normal, float2 UV)
 	material.Normal = normalize(normal);
 
 	// Sample the texture and convert to linear space
-    material.DiffuseColor = DiffuseColor;
+    material.DiffuseColor = DiffuseColor * DiffuseTexture.Sample(DiffuseSampler,UV).xyz;
 	material.SpecularColor = SpecularColor;
 	material.SpecularExp = SpecularExp;
  
@@ -20,14 +20,16 @@ struct VS_INPUT
 {
     float3 Position  : POSITION;
     float3 Normal : NORMAL;
+	float2 UV0  : TEXCOORD0;
 };
 
 //--------------------------------------------------------------------------------------
 struct VS_OUTPUT
 {
     float4 Position : SV_POSITION;
-    float3 NormalWorld: TEXCOORD0; 
-	float3 PositionWorld: TEXCOORD1;
+    float3 NormalWorld: COLOR0; 
+	float3 PositionWorld: COLOR1;
+	float2 UV0 : TEXCOORD0;
 };
  
 //--------------------------------------------------------------------------------------
@@ -41,7 +43,8 @@ VS_OUTPUT SceneVS( VS_INPUT input )
 	
     output.Position = mul( CameraViewProj,output.Position);
     output.NormalWorld = mul(WorldNormalTransform,float4(input.Normal,1.0)).xyz;
-	
+	output.UV0 = input.UV0;
+
     return output;
 }
 
@@ -51,7 +54,7 @@ VS_OUTPUT SceneVS( VS_INPUT input )
  
 float4 BaseLightingPS( VS_OUTPUT input ) : SV_Target
 {
-    Material mat = PrepareMaterial(input.NormalWorld,(float2)0);
+    Material mat = PrepareMaterial(input.NormalWorld,input.UV0);
 
 	float3 finalColor = CalculateAmbient(mat.Normal,mat.DiffuseColor);
 
@@ -65,7 +68,7 @@ float4 BaseLightingPS( VS_OUTPUT input ) : SV_Target
 float4 FourLightingPS( VS_OUTPUT In ) : SV_TARGET
 {
 	// Prepare the material structure
-	Material material = PrepareMaterial(In.NormalWorld, (float2)0);
+	Material material = PrepareMaterial(In.NormalWorld, In.UV0);
 
 	// Calculate the spot light color
 	float3 finalColor = CalculateFourLights(In.PositionWorld, material);

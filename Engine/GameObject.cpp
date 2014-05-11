@@ -156,7 +156,7 @@ namespace Disorder
 			_wldRot = parentRot * _locRot;
 			_wldScale = parentScale / _locScale;
 		 
-			_wldPos = parentRot * ( parentScale / _locPos);
+			_wldPos = parentRot * ( parentScale * _locPos);
 			_wldPos += parent->GetWorldPosition();
 		}
 		else

@@ -1020,7 +1020,7 @@ namespace Disorder
 						GLogger->Warning("Unkown Material type!");
 					}
 				}
-          
+				material->UpdateTextureResource();
            }//for (int lCount = 0; lCount < lMaterialCount; lCount ++)
         }
 
@@ -1101,10 +1101,18 @@ namespace Disorder
  
 	void FbxSceneImporter::ProcessFileTexture(const char* propertyName, FbxFileTexture* pTexture, SurfaceMaterialPtr& materials)
 	{
-		if (materials->TexutureChannelMap.find(propertyName) != materials->TexutureChannelMap.end())
+		if (materials->TextureChannelMap.find(propertyName) != materials->TextureChannelMap.end())
 			return;
 
 		const FbxString lFileName = pTexture->GetFileName();
+
+		FbxTexture::EWrapMode wrapU = pTexture->GetWrapModeU();
+		FbxTexture::EWrapMode wrapV = pTexture->GetWrapModeV();
+		double scaleU = pTexture->GetScaleU();
+		double scaleV = pTexture->GetScaleV();
+		double transU = pTexture->GetTranslationU();
+		double transV = pTexture->GetTranslationV();
+
 		FbxString lLoadFileName = lFileName;
 		boost::filesystem::path p(lFileName.Buffer());
 		if (!boost::filesystem::exists(p) || !boost::filesystem::is_regular_file(p))
@@ -1135,10 +1143,22 @@ namespace Disorder
 			return;
 		}
  
-		ImagePtr img = GImageManager->Load(lLoadFileName.Buffer());	 
+		SamplerDesc desc;
+		if (wrapU == FbxTexture::eRepeat)
+			desc.AddressU = TAM_Wrap;
+		else if (wrapU == FbxTexture::eClamp)
+			desc.AddressU = TAM_Clamp;
+
+		if (wrapV == FbxTexture::eRepeat)
+			desc.AddressV = TAM_Wrap;
+		else if (wrapV == FbxTexture::eClamp)
+			desc.AddressV = TAM_Clamp;
+
+		ImagePtr img = GImageManager->Load(lLoadFileName.Buffer(),&desc);	 
 		if (img != NULL && img->GetResource() != NULL )
 		{
-			materials->TexutureChannelMap.insert(std::pair<std::string, RenderTexture2DPtr>(propertyName, img->GetResource()));
+			const RenderTexture2DPtr texRes = img->GetResource();
+			materials->TextureChannelMap.insert(std::pair<std::string, RenderTexture2DPtr>(propertyName, texRes));
 		}
 	}
 

@@ -32,6 +32,10 @@ cbuffer MaterialProperty
 	float  SpecularExp;	
 }
 
+SamplerState DiffuseSampler;
+Texture2D DiffuseTexture;
+
+
 cbuffer DirectionLightProperty
 {
 	float3 DirectionLightColor;

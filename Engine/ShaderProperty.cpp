@@ -174,6 +174,9 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sSpecularExp =  "SpecularExp";
 	const std::string ShaderPropertyManager::sTransparency = "Transparency";
 	
+	// for Material Texture
+	const std::string ShaderPropertyManager::sDiffuseTexture = "DiffuseTexture";
+	const std::string ShaderPropertyManager::sDiffuseSampler = "DiffuseSampler";
 
     // Forward Dirction LightProperty
     const std::string ShaderPropertyManager::sDirectionLightIntensity = "DirectionLightIntensity";
@@ -217,6 +220,7 @@ namespace Disorder
 
 	const std::string ShaderPropertyManager::sSurfaceVisTex = "SurfaceVisTex";
 	const std::string ShaderPropertyManager::sSurfaceSampler = "SurfaceSampler";
+
 
 
 	ShaderPropertyPtr ShaderPropertyManager::GetProperty(std::string const& name)

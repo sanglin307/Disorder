@@ -32,6 +32,8 @@ layout(std140) uniform MaterialProperty
 	float SpecularExp;	
 };
 
+uniform sampler2D DiffuseTexture;
+
 layout(std140) uniform DirectionLightProperty
 {
 	vec3 DirectionLightColor;

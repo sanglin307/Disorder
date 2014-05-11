@@ -8,6 +8,7 @@ in block
 {
     vec3 NormalWorld; 
 	vec3 PositionWorld;
+	vec2 UV0;
 }In;
 
 out vec4 Color;
@@ -20,7 +21,7 @@ Material PrepareMaterial(vec3 normal, vec2 UV)
 	material.Normal = normalize(normal);
 
 	// Sample the texture and convert to linear space
-    material.DiffuseColor = DiffuseColor;
+    material.DiffuseColor = texture(DiffuseTexture,UV).xyz * DiffuseColor;
 	material.SpecularColor = SpecularColor;
 	material.SpecularExp = SpecularExp;
  
@@ -30,7 +31,7 @@ Material PrepareMaterial(vec3 normal, vec2 UV)
 void main(void)
 {
 	// Prepare the material structure
-	Material material = PrepareMaterial(In.NormalWorld, vec2(0,0));
+	Material material = PrepareMaterial(In.NormalWorld, In.UV0);
 
 	// Calculate the spot light color
 	vec3 finalColor = CalculateFourLights(In.PositionWorld, material);

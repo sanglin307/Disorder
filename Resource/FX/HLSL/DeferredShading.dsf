@@ -26,14 +26,16 @@ struct SceneVSInput
 {
     float3 Position  : POSITION;
     float3 Normal : NORMAL;
+	float2 UV0  : TEXCOORD0;
 };
 
 //--------------------------------------------------------------------------------------
 struct SceneVSOutput
 {
     float4 Position : SV_POSITION;
-    float3 NormalWorld: TEXCOORD0; 
-	float3 PositionWorld: TEXCOORD1;
+    float3 NormalWorld: COLOR0; 
+	float3 PositionWorld: COLOR1;
+	float2 UV0 : TEXCOORD0;
 };
 
 SceneVSOutput SceneVS( SceneVSInput input )
@@ -42,13 +44,10 @@ SceneVSOutput SceneVS( SceneVSInput input )
     output.Position = mul( WorldTransform,float4(input.Position,1.0f));
 	output.PositionWorld = output.Position.xyz;
     output.Position = mul( CameraViewProj,output.Position);
+	  
+    output.NormalWorld = mul(WorldNormalTransform,float4(input.Normal,1.0)).xyz;
+    output.UV0 = input.UV0;
 
-  // output.Position = mul( CameraView,output.Position);
-  // output.Position = mul( CameraProjection,output.Position);
-   
-  
-   output.NormalWorld = mul(WorldNormalTransform,float4(input.Normal,1.0)).xyz;
-	
     return output;
 }
 
@@ -78,10 +77,10 @@ ScenePSOutput PackGBuffer(float3 BaseColor, float3 Normal, float3 SpecColor, flo
 ScenePSOutput ScenePS( SceneVSOutput In )
 { 
     // Lookup mesh texture and modulate it with diffuse
-   // float3 DiffuseColor = DiffuseTexture.Sample( LinearSampler, In.UV );
-	//DiffuseColor *= DiffuseColor;
+    float3 dc = DiffuseTexture.Sample( DiffuseSampler, In.UV0 );
+	dc *= DiffuseColor;
 
-	return PackGBuffer(DiffuseColor, normalize(In.NormalWorld), SpecularColor, SpecularExp);
+	return PackGBuffer(dc, normalize(In.NormalWorld), SpecularColor, SpecularExp);
 }
  
 GBufferData UnpackGBuffer(float2 location)

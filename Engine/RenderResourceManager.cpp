@@ -2,15 +2,19 @@
 
 namespace Disorder
 {
-	RasterizeStatePtr RenderResourceManager::DefaultRasterizeState = 0;
-	BlendStatePtr RenderResourceManager::DefaultBlentState = 0;
-	DepthStencilStatePtr RenderResourceManager::DefaultDepthStencilState = 0;
+	RasterizeStatePtr RenderResourceManager::DefaultRasterizeState = NULL;
+	BlendStatePtr RenderResourceManager::DefaultBlentState = NULL;
+	DepthStencilStatePtr RenderResourceManager::DefaultDepthStencilState = NULL;
+
+	SurfaceViewPtr RenderResourceManager::DefaultWhiteTexture2D = NULL;
 
 	void RenderResourceManager::Exit()
 	{
 		RenderResourceManager::DefaultRasterizeState = NULL;
 		RenderResourceManager::DefaultBlentState = NULL;
 		RenderResourceManager::DefaultDepthStencilState = NULL;
+
+		RenderResourceManager::DefaultWhiteTexture2D = NULL;
 
 		_shaderMap.empty();
 		_propertyManagerMap.empty();
@@ -26,6 +30,15 @@ namespace Disorder
 
 		DepthStencilDesc dsDesc;
 		DefaultDepthStencilState = CreateDepthStencilState(&dsDesc,0);
+
+		unsigned int pixelData[16];
+		memset(pixelData, 0xFF, 16 * sizeof(unsigned int));
+		BufferInitData data;
+		data.Data = pixelData;
+		data.RowPitch = 4 * 4;
+		data.SlicePitch = 0;
+		RenderTexture2DPtr tex = CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, 4, 4, false, false, SV_ShaderResource, &data);
+		DefaultWhiteTexture2D = CreateSurfaceView(SV_ShaderResource, tex, PF_R8G8B8A8_UNORM);
 
 		RegisterPropertyManager(ShaderPropertyManager::sManagerCamera);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerObject);

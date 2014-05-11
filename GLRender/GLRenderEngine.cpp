@@ -194,11 +194,11 @@ namespace Disorder
 		case PF_R8G8B8A8_UNORM_SRGB:
 		case PF_R8G8B8A8_SNORM:
 			glFormat = GL_RGBA;
-			glType = GL_UNSIGNED_INT_8_8_8_8;
+			glType = GL_UNSIGNED_BYTE;
 			return GL_RGBA8;
 		case PF_R8G8B8A8_UINT:
 			glFormat = GL_RGBA;
-			glType = GL_UNSIGNED_INT_8_8_8_8;
+			glType = GL_UNSIGNED_BYTE;
 			return GL_RGBA8UI;
 		case PF_R8G8B8A8_SINT:
 			glFormat = GL_RGBA;

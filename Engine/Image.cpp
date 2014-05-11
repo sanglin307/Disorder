@@ -5,42 +5,59 @@ namespace Disorder
 {
 	InitialiseSingleton(ImageManager);
 
+	ImagePtr ImageManager::Load(std::string const& fileName, SamplerDesc* desc, bool reloadIfExist)
+	{
+		if (!reloadIfExist)
+		{
+			if (_mapImages.find(fileName) != _mapImages.end())
+				return _mapImages[fileName];
+		}
+
+		int pos = fileName.find_last_of('.');
+		if (pos == -1)
+			return NULL;
+
+		std::string suffix = fileName.substr(pos + 1);
+		boost::to_lower(suffix);
+		if (suffix == "png")
+		{
+			ImagePtr img = LoadPng(fileName);
+			if (img != NULL)
+			{
+				if (desc != NULL)
+				{
+					SamplerStatePtr sampler = GEngine->RenderResourceMgr->CreateSamplerState(desc);
+					img->SetResource(GEngine->RenderResourceMgr->CreateTexture2D(sampler, img->GetSpec().format, false, img));
+				}
+				else
+				    img->SetResource(GEngine->RenderResourceMgr->CreateTexture2D(NULL, img->GetSpec().format, false, img));
+			}
+
+			return img;
+		}
+		else if (suffix == "jpg")
+		{
+			ImagePtr img = LoadJpg(fileName);
+			if (img != NULL)
+			{
+				if (desc != NULL)
+				{
+					SamplerStatePtr sampler = GEngine->RenderResourceMgr->CreateSamplerState(desc);
+					img->SetResource(GEngine->RenderResourceMgr->CreateTexture2D(sampler, img->GetSpec().format, false, img));
+				}
+				else
+					img->SetResource(GEngine->RenderResourceMgr->CreateTexture2D(NULL, img->GetSpec().format, false, img));
+			}
+
+			return img;
+		}
+
+		return NULL;
+	}
+
 	ImagePtr ImageManager::Load(std::string const& fileName,bool reloadIfExist)
 	{
-		 if( !reloadIfExist )
-		 {
-			 if( _mapImages.find(fileName) != _mapImages.end() )
-				 return _mapImages[fileName];
-		 }
-
-		 int pos = fileName.find_last_of('.');
-		 if (pos == -1)
-			 return NULL;
-
-		 std::string suffix = fileName.substr(pos+1);
-		 boost::to_lower(suffix);
-		 if (suffix == "png")
-		 {
-			 ImagePtr img = LoadPng(fileName);
-			 if (img != NULL)
-			 {
-				 img->SetResource(GEngine->RenderResourceMgr->CreateTexture2D(NULL, img->GetSpec().format, false, img));
-			 }
-
-			 return img;
-		 }
-		 else if (suffix == "jpg")
-		 {
-			 ImagePtr img = LoadJpg(fileName);
-			 if (img != NULL)
-			 {
-				 img->SetResource(GEngine->RenderResourceMgr->CreateTexture2D(NULL, img->GetSpec().format, false, img));
-			 }
-
-			 return img;
-		 }
-
-		 return NULL;
+		return Load(fileName, NULL, reloadIfExist);
 	}
 
 	void ImageManager::Add(std::string const& imageName,ImagePtr const& image)
