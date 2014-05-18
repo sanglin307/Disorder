@@ -39,6 +39,16 @@ namespace Disorder
 	};
 	
  
+	class DX11RenderTextureCube : public RenderTextureCube
+	{
+	public:
+
+	protected:
+		DX11RenderTextureCube() {};
+
+	public:
+
+	};
 
 }
 

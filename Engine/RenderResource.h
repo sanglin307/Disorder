@@ -69,6 +69,10 @@ namespace Disorder
 	class RenderTexture3D: public RenderTexture
 	{
 	};
+
+	class RenderTextureCube : public RenderTexture
+	{
+	};
 }
 
 

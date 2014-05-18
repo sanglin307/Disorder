@@ -126,6 +126,8 @@ namespace Disorder
 	typedef boost::shared_ptr<RenderTexture2D> RenderTexture2DPtr;
 	class RenderTexture3D;
 	typedef boost::shared_ptr<RenderTexture3D> RenderTexture3DPtr;
+	class RenderTextureCube;
+	typedef boost::shared_ptr<RenderTextureCube> RenderTextureCubePtr;
 	class SurfaceView;
 	typedef boost::shared_ptr<SurfaceView> SurfaceViewPtr;
 	class RenderSurface;
@@ -134,6 +136,8 @@ namespace Disorder
 	typedef boost::shared_ptr<RenderGBuffer> RenderGBufferPtr;
 	class RenderSurfaceCache;
 	typedef boost::shared_ptr<RenderSurfaceCache> RenderSurfaceCachePtr;
+	class ShadowMap;
+	typedef boost::shared_ptr<ShadowMap> ShadowMapPtr;
 	class RenderPath;
 	typedef boost::shared_ptr<RenderPath> RenderPathPtr;
 	class ForwardRenderPath;
@@ -222,6 +226,7 @@ namespace Disorder
 #include "RenderResourceManager.h"
 #include "RenderEffect.h"
 #include "RenderEngine.h"
+#include "ShadowMap.h"
 #include "RenderPath.h"
 #include "Viewport.h"
 #include "SceneImporter.h"

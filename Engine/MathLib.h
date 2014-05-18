@@ -152,7 +152,8 @@ namespace Disorder
 		static  void ConvertToSphericalCoord(const glm::vec3& pos,const glm::vec3& origin,float &radius,float &yAngle,float &zAngle);	
 		static  void ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const glm::vec3& origin,glm::vec3& pos);
 		
-		static glm::mat4 ProjFovRH(float fieldOfViewY,float aspectRatio,float znearPlane,float zfarPlane);		
+		static glm::mat4 ProjFovRH(float fieldOfViewY,float aspectRatio,float znearPlane,float zfarPlane);	
+		static glm::mat4 OrthoRH(float width, float height, float znearPlane, float zfarPlane);
 		static glm::mat4 ViewMatrixRH(const glm::vec3 &eye,const glm::vec3 &center,const glm::vec3 &up);
 		static glm::mat4 ViewMatrixRH(const glm::vec3 &eye,const glm::vec3 &xAxis,const glm::vec3 &yAxis,const glm::vec3 &zAxis);
 

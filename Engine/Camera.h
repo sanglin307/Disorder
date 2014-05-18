@@ -10,6 +10,12 @@ namespace Disorder
 		eSphericalTargetMode,
 	};
 
+	enum ECameraProjectMode
+	{
+		ePerspectiveCamera,
+		eOrthoCamera,
+	};
+
 	class CameraUpdateStrategy
 	{
 	public:
@@ -89,6 +95,8 @@ namespace Disorder
 		glm::mat4 ProjInvMatrix;
 		glm::mat4 ViewProjInvMatrix;
  
+		ECameraProjectMode ProjectMode;
+
 		void LookAt(const glm::vec3& eyePos,const glm::vec3& lookAt,const glm::vec3& upVec);
 	    void ProjCalculate(float FOV, float nearPlane,float farPlane);
 

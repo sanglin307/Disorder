@@ -125,6 +125,9 @@
     <None Include="..\Config\SceneConfig.xml">
       <Filter>Config</Filter>
     </None>
+    <None Include="..\Resource\FX\HLSL\ShadowMap.dsf">
+      <Filter>HLSL</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Geometry.h">
@@ -257,6 +260,9 @@
     <ClInclude Include="Plane.h">
       <Filter>Mathematics</Filter>
     </ClInclude>
+    <ClInclude Include="ShadowMap.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -376,6 +382,9 @@
     </ClCompile>
     <ClCompile Include="Plane.cpp">
       <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowMap.cpp">
+      <Filter>RenderSystem</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

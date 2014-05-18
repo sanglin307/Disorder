@@ -124,6 +124,24 @@ namespace Disorder
 	}
 
 	//////////////////////////////////////////////////////////////////////////////////////////
+ 
+	void ForwardRenderPath::GenerateShadowMap(const std::vector<LightPtr>& lightArray)
+	{
+		if (lightArray.size() == 0)
+			return;
+
+		for (size_t i = 0; i < lightArray.size(); i++)
+		{
+			if (!lightArray[i]->CastShadows)
+				continue;
+
+			if (lightArray[i]->ShadowMapData == NULL)
+				lightArray[i]->ShadowMapData = ShadowMap::Create(1024, 1024);
+
+
+		}
+	}
+
 	void ForwardRenderPath::Render()
 	{
 		CameraPtr mainCamera = GSceneManager->GetDefaultCamera();
@@ -236,8 +254,7 @@ namespace Disorder
 		dsDesc.DepthFunc = CF_Less_Equal;
 		DepthStencilStatePtr noDepthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dsDesc,0);
 		_FourLightEffect->BindDepthStencilState(noDepthState);
-
-
+ 
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////

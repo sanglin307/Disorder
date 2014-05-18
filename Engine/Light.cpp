@@ -4,13 +4,11 @@ namespace Disorder
 {
 
 	Light::Light(std::string const& name)
-		:Component(name,CT_Light)
+		:Component(name, CT_Light), Color(glm::vec3(1.0f)), ShadowColor(glm::vec3(0.f))
 	{
 		LightType = LT_None;
-		Color = glm::vec3(1.0f);
 		Intensity = 0.8f; 
-		CastShadows = false;
-		ShadowColor = glm::vec3(0.f);
+		CastShadows = true;
 	}
  
 	//////////////////////////////////////////////////////////////////////////////////
@@ -34,6 +32,20 @@ namespace Disorder
 	{
 		return true;
 	}
+
+	void DirectionLight::GetViewMatrix(glm::mat4& viewMatrix)
+	{
+		GameObjectPtr go = GetBase();
+		glm::vec3 beginPos = go->GetWorldPosition();
+		glm::vec3 endPos = beginPos + GetDirection() * 2.f;
+		viewMatrix = Math::ViewMatrixRH(beginPos,endPos,glm::vec3(0,1,0));
+	}
+
+	void DirectionLight::GetProjMatrix( glm::mat4& projMatrix)
+	{
+		projMatrix = Math::ProjFovRH(Math::HALF_PI, 1, 0.1f, 100000);
+	}
+
 
 	glm::vec3 DirectionLight::GetDirection()
 	{

@@ -91,6 +91,14 @@ namespace Disorder
 			return res;
 	}
 
+	glm::mat4 Math::OrthoRH(float width, float height, float znearPlane, float zfarPlane)
+	{
+		return glm::mat4(2 / width, 0, 0, 0,
+			0, 2 / height, 0, 0,
+			0, 0, 1 / (znearPlane - zfarPlane), 0,
+			0, 0, znearPlane / (znearPlane - zfarPlane), 1);
+	}
+
 	// fov use rad, opengl
    glm::mat4 Math::ProjFovRH(float fieldOfViewY,float aspectRatio,float znearPlane,float zfarPlane)
    {

@@ -121,6 +121,7 @@
     <None Include="..\Resource\FX\HLSL\DeferredShading.dsf" />
     <None Include="..\Resource\FX\HLSL\ForwardLighting.dsf" />
     <None Include="..\Resource\FX\HLSL\ScreenTiles.dsf" />
+    <None Include="..\Resource\FX\HLSL\ShadowMap.dsf" />
     <None Include="..\Resource\FX\HLSL\SurfaceVisual.dsf" />
     <None Include="TodoList.txt" />
   </ItemGroup>
@@ -164,6 +165,7 @@
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="MathLib.h" />
     <ClInclude Include="ShaderProperty.h" />
+    <ClInclude Include="ShadowMap.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="VertexFormat.h" />
@@ -212,6 +214,7 @@
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="GameTime.cpp" />
     <ClCompile Include="ShaderProperty.cpp" />
+    <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="Viewport.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>

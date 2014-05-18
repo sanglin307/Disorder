@@ -152,6 +152,7 @@ namespace Disorder
     const std::string ShaderPropertyManager::sManagerDirectionLight = "DirectionLightProperty";
 	const std::string ShaderPropertyManager::sManagerForwardFourLight = "ForwardFourLights";
 	const std::string ShaderPropertyManager::sManagerScene = "SceneProperty";
+	const std::string ShaderPropertyManager::sManagerShadowMapGen = "ShadowMapGen";
 	const std::string ShaderPropertyManager::sManagerGlobal = "Global";
 
 	// for CameraTransforms
@@ -204,6 +205,9 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sScreenWidth = "ScreenWidth";
 	const std::string ShaderPropertyManager::sScreenHeight = "ScreenHeight";
 
+	const std::string ShaderPropertyManager::sShadowMapWorld = "ShadowMapWorld";
+	const std::string ShaderPropertyManager::sShadowMapView = "ShadowMapView";
+	const std::string ShaderPropertyManager::sShadowMapProj = "ShadowMapProj";
 
 	// Global 
 	const std::string ShaderPropertyManager::sTextTexture = "TextTexture";

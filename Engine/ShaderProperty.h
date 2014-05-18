@@ -67,6 +67,7 @@ namespace Disorder
 		static const std::string sManagerForwardFourLight;
 		static const std::string sManagerScene;
 		static const std::string sManagerGBufferUnpack;
+		static const std::string sManagerShadowMapGen;
         static const std::string sManagerGlobal; // used to save global constant buffer,sampler,texture
 		
         // for CameraTransforms
@@ -115,6 +116,11 @@ namespace Disorder
 		static const std::string sScreenWidth;
 		static const std::string sScreenHeight;
  
+		// ShadowMapGen
+		static const std::string sShadowMapWorld;
+		static const std::string sShadowMapView;
+		static const std::string sShadowMapProj;
+
 		//for global property
 		static const std::string sTextTexture;
 		static const std::string sTextSampler;

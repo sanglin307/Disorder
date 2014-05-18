@@ -31,9 +31,13 @@ namespace Disorder
 		glm::vec3   ShadowColor;
 		ELightDecayType DecayType;
 
+		ShadowMapPtr ShadowMapData;
+
 		virtual bool Touch(RendererPtr renderObject) = 0;
 		virtual void DebugDraw(){};
-		
+		virtual void GetViewMatrix( glm::mat4& viewMatrix){};
+		virtual void GetProjMatrix( glm::mat4& projMatrix){};
+
 	protected:
 		Light(std::string const& name);
 	};
@@ -50,6 +54,9 @@ namespace Disorder
 		glm::vec3 GetDirection();
 		virtual bool Touch(RendererPtr renderObject);
 		virtual void DebugDraw();
+
+		virtual void GetViewMatrix( glm::mat4& viewMatrix);
+		virtual void GetProjMatrix( glm::mat4& projMatrix);
 	};
 
 	class PointLight : public Light

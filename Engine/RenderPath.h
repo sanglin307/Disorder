@@ -48,6 +48,7 @@ namespace Disorder
 	{
 	public:
 		virtual void Render();
+		void GenerateShadowMap(const std::vector<LightPtr>& lightArray);
 		static ForwardRenderPathPtr Create();
 
 	protected:
@@ -56,7 +57,6 @@ namespace Disorder
  
 		RenderEffectPtr _DirectionLightEffect;
 		RenderEffectPtr _FourLightEffect;
-
 	};
 
 	class DeferredShading : public RenderPath
