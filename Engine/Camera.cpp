@@ -227,7 +227,7 @@ namespace Disorder
 		:Component(name,CT_Camera)
 	{
 
-		ProjectMode = eOrthoCamera;
+		ProjectMode = ePerspectiveCamera;
 		_nearPlane = GConfig->pCameraConfig->NearClip;
 		_farPlane = GConfig->pCameraConfig->FarClip;
 		_FOV = GConfig->pCameraConfig->FOV * Math::fDeg2Rad;
@@ -293,12 +293,7 @@ namespace Disorder
 			ProjMatrix = Math::ProjFovRH(_FOV, _aspectRatio, _nearPlane, _farPlane);
 		else if (ProjectMode == eOrthoCamera)
 		{
-			float left = - GConfig->pRenderConfig->SizeX / 2.f;
-			float right = GConfig->pRenderConfig->SizeX / 2.f;
-			float top = GConfig->pRenderConfig->SizeY / 2.f;
-			float bottom = -GConfig->pRenderConfig->SizeY / 2.f;
-			ProjMatrix = glm::ortho(left,right,bottom,top,_nearPlane,_farPlane);//Math::OrthoRH(, (float)GConfig->pRenderConfig->SizeY, _nearPlane, _farPlane);
-		    test = Math::OrthoRH((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, _nearPlane, _farPlane);;
+			ProjMatrix = Math::OrthoRH(40, 30, _nearPlane, _farPlane);    
 		}
 	
 		ProjInvMatrix = glm::inverse(ProjMatrix);

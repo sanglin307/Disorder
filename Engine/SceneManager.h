@@ -9,7 +9,7 @@ namespace Disorder
 	{	
 		friend class Singleton<SceneManager>;
 
-		typedef boost::unordered_map<std::string,RendererPtr>  RendererMap;
+		typedef boost::unordered_map<std::string, GeometryRendererPtr>  RendererMap;
 		typedef boost::unordered_map<std::string,LightPtr> LightMap;
 		typedef boost::unordered_map<std::string,CameraPtr> CameraMap;
 
@@ -19,11 +19,11 @@ namespace Disorder
 		void Exit();
 	    void Tick(float deltaSeconds);
 
-		void AddRenderer(RendererPtr const& renderer);
+		void AddRenderer(GeometryRendererPtr const& renderer);
 		void AddLight(LightPtr const& light);
 		void AddCamera(CameraPtr const& camera);
 
-		RendererPtr GetRenderer(std::string const& name);
+		GeometryRendererPtr GetRenderer(std::string const& name);
 		LightPtr GetLight(std::string const& name);
 		CameraPtr GetCamera(std::string const& name);
 
@@ -36,9 +36,8 @@ namespace Disorder
 		}
 
 		void SetDefaultCamera(CameraPtr const& camera);
-
-		void UpdateLight();
-		void GetRendererList(CameraPtr const camera,std::vector<RendererPtr>& renderObjList) const;
+ 
+		void GetRendererList(CameraPtr const camera, std::vector<GeometryRendererPtr>& renderObjList) const;
 		const std::vector<LightPtr>& GetLightsList() const
 		{
 			return _vLightList;
@@ -66,7 +65,7 @@ namespace Disorder
 		CameraPtr   _mDefaultCamera;
 
 		std::vector<LightPtr> _vLightList;
-		std::vector<RendererPtr> _vRenderObjects;
+		std::vector<GeometryRendererPtr> _vRenderObjects;
 
 		SceneImporterPtr _sceneImporter;
 

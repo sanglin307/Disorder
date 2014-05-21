@@ -51,14 +51,23 @@ VS_OUTPUT SceneVS( VS_INPUT input )
 //--------------------------------------------------------------------------------------
 // Pixel Shader
 //--------------------------------------------------------------------------------------
- 
+
+  // no light ,use ambient only.
+float4 BasePassPS( VS_OUTPUT input) : SV_Target
+{
+	Material mat = PrepareMaterial(input.NormalWorld,input.UV0);
+	float3 finalColor = CalculateAmbient(mat.Normal,mat.DiffuseColor);
+
+	return float4(finalColor,1.0f);
+}
+
 float4 BaseLightingPS( VS_OUTPUT input ) : SV_Target
 {
     Material mat = PrepareMaterial(input.NormalWorld,input.UV0);
 
-	float3 finalColor = CalculateAmbient(mat.Normal,mat.DiffuseColor);
+	//float3 finalColor = CalculateAmbient(mat.Normal,mat.DiffuseColor);
 
-	finalColor += CalculateDirectionLight(input.PositionWorld,mat);
+	float3 finalColor = CalculateDirectionLight(input.PositionWorld,mat);
 
     return float4(finalColor,1.0f);
 }

@@ -18,6 +18,7 @@ namespace Disorder
 
 		BoxSphereBounds                         BoundingBox;
 
+		bool CastShadow;
 		TopologyType PrimitiveType;
 
 		void CalculateBounding();

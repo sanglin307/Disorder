@@ -12,6 +12,7 @@ namespace Disorder
 	}
 
 	Geometry::Geometry()
+		:CastShadow(true)
 	{
 
 	}

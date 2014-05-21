@@ -8,23 +8,6 @@ namespace Disorder
 	{
 	}
  
-	void Renderer::AddLight(LightPtr & light)
-	{
-		if( light->LightType == LT_Directional )
-		{
-			DirectionLightPtr dLight = boost::dynamic_pointer_cast<DirectionLight>(light);
-			_vDirectionLights.push_back(dLight);
-		}
-		else
-			_vNonDirectionLights.push_back(light);
-	}
-
-	void Renderer::ClearLight()
-	{
-		_vNonDirectionLights.clear();
-		_vDirectionLights.clear();
-	}
-
 //////////////////////////////////////////////////////////////////////////
 
 	void BatchScreenString::SetTexture(SurfaceViewPtr const& texture)
@@ -321,7 +304,7 @@ namespace Disorder
 		_renderLayout->FinishBufferBinding(effect);
 	}
 
-	 void GeometryRenderer::PreRender(CameraPtr const& camera)
+	 void GeometryRenderer::UpdateShaderProperty()
 	 {
 		 GetBase()->UpdateShaderProperty();
 		 if( _material != NULL )
@@ -457,11 +440,7 @@ namespace Disorder
 
 	  }
 
-	 void GeometryRenderer::PostRender(CameraPtr const& camera)
-	 {	 
-	 }
- 
-
+	 
 	void GeometryRenderer::Render(CameraPtr const& camera)
 	{
 		BOOST_ASSERT(_renderLayout != NULL);

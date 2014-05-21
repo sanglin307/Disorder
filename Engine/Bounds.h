@@ -33,6 +33,18 @@ namespace Disorder
 			return (BMax - BMin)*0.5f;
 		}
 
+		void GetCorners(std::vector<glm::vec3>& cornerPos) const
+		{
+			cornerPos.push_back(BMin);
+			cornerPos.push_back(glm::vec3(BMin.x, BMin.y, BMax.z));
+			cornerPos.push_back(glm::vec3(BMin.x, BMax.y, BMin.z));
+			cornerPos.push_back(glm::vec3(BMin.x, BMax.y, BMax.z));
+			cornerPos.push_back(BMax);
+			cornerPos.push_back(glm::vec3(BMax.x, BMin.y, BMin.z));
+			cornerPos.push_back(glm::vec3(BMax.x, BMin.y, BMax.z));
+			cornerPos.push_back(glm::vec3(BMax.x, BMax.y, BMin.z));			
+		}
+
 		void GetCenterAndExtents(glm::vec3 & center, glm::vec3 & Extents) const
 		{
 			Extents = GetExtent();
@@ -63,7 +75,7 @@ namespace Disorder
 			ret.BMax.z = Max(BMax.z, b.BMax.z);
 			return ret;
 		}
-
+ 
 		inline  bool Overlaps(const BoxBounds &b) const 
 		{
 			bool x = (BMax.x >= b.BMin.x) && (BMin.x <= b.BMax.x);

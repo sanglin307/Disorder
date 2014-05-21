@@ -18,13 +18,16 @@ namespace Disorder
 			return _height;
 		}
 
-		void PrepareRender(const glm::mat4& wldMat, const glm::mat4& viewMat, const glm::mat4& projMat);
+		void PrepareRender(const glm::mat4& viewMat, const glm::mat4& projMat);
+		void RenderObject(const CameraPtr& camera, const GeometryRendererPtr object);
+
+		void UpdateShaderProperty();
 
 	protected:
 		ShadowMap(unsigned int width,unsigned int height);
 
 		ShaderPropertyManagerPtr _propertyMgr;
-		ShaderPropertyPtr _wldMatrix;
+
 		ShaderPropertyPtr _viewMatrix;
 		ShaderPropertyPtr _projMatrix;
  
@@ -34,6 +37,9 @@ namespace Disorder
 		RenderSurfacePtr _renderTarget;
 		unsigned int _width;
 		unsigned int _height;
+
+		glm::mat4 _viewMat;
+		glm::mat4 _projMat;
 
 		static SurfaceViewPtr sDepthBufferView;
 		static RenderEffectPtr sDepthGenEffect;

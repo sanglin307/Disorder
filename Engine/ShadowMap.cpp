@@ -17,7 +17,7 @@ namespace Disorder
 		_height = height;
 
 		_propertyMgr = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerShadowMapGen);
-		_wldMatrix = _propertyMgr->CreateProperty(ShaderPropertyManager::sShadowMapWorld, eSP_Float,16);
+	
 		_viewMatrix = _propertyMgr->CreateProperty(ShaderPropertyManager::sShadowMapView, eSP_Float,16);
 		_projMatrix = _propertyMgr->CreateProperty(ShaderPropertyManager::sShadowMapProj, eSP_Float, 16);
  
@@ -48,11 +48,28 @@ namespace Disorder
 		_renderTarget = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 	}
 
-	void ShadowMap::PrepareRender(const glm::mat4& wldMat, const glm::mat4& viewMat, const glm::mat4& projMat)
+	void ShadowMap::PrepareRender(const glm::mat4& viewMat, const glm::mat4& projMat)
 	{
+		_viewMat = viewMat;
+		_projMat = projMat;
+		UpdateShaderProperty();
 		//prepared buffer
 		GEngine->RenderEngine->SetRenderTarget(_renderTarget);
 		GEngine->RenderEngine->ClearRenderSurface(_renderTarget, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
+	}
+
+	void ShadowMap::UpdateShaderProperty()
+	{
+		_viewMatrix->SetData(glm::value_ptr(_viewMat));
+		_projMatrix->SetData(glm::value_ptr(_projMat));
+ 
+		_propertyMgr->UpdateShaderProperty();
+	}
+
+	void ShadowMap::RenderObject(const CameraPtr& camera,const GeometryRendererPtr object)
+	{
+		object->SetRenderEffect(sDepthGenEffect);
+		object->Render(camera);
 
 	}
 }

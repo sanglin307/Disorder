@@ -1,20 +1,21 @@
+#include "Common.dsf"
 
 cbuffer ShadowMapGen
 {
-	matrix ShadowMapWorld;
 	matrix ShadowMapView; 
 	matrix ShadowMapProj;
 }
 
- 
 struct VS_INPUT
 {
-    float4 position : POSITION;
+    float3 Position  : POSITION;
+    float3 Normal : NORMAL;
+	float2 UV0  : TEXCOORD0;
 };
 
 struct VS_OUTPUT
 {
-    float4 position : SV_POSITION;
+    float4 Position : SV_POSITION;
     float4 depthPosition : TEXTURE0;
 };
 
@@ -26,16 +27,13 @@ VS_OUTPUT DepthVertexShader(VS_INPUT input)
 {
     VS_OUTPUT output;
  
-	// Change the position vector to be 4 units for proper matrix calculations.
-    input.position.w = 1.0f;
-
 	// Calculate the position of the vertex against the world, view, and projection matrices.
-    output.position = mul(ShadowMapWorld,input.position);
-    output.position = mul(ShadowMapView,output.position);
-    output.position = mul(ShadowMapProj,output.position);
+    output.Position = mul(WorldTransform,input.Position);
+    output.Position = mul(ShadowMapView,output.Position);
+    output.Position = mul(ShadowMapProj,output.Position);
 
 	// Store the position value in a second input value for depth value calculations.
-	output.depthPosition = output.position;
+	output.depthPosition = output.Position;
 	
 	return output;
 }

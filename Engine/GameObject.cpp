@@ -56,7 +56,7 @@ namespace Disorder
 		component->SetBase(shared_from_this());
 		if( component->ComponentType == CT_Renderer )
 		{
-			RendererPtr renderer = boost::dynamic_pointer_cast<Renderer>(component);
+			GeometryRendererPtr renderer = boost::dynamic_pointer_cast<GeometryRenderer>(component);
 			if( renderer != NULL )
 				GSceneManager->AddRenderer(renderer);
 			else

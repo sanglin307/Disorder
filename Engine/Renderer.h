@@ -10,28 +10,14 @@ namespace Disorder
 		Renderer(std::string const& name);
 		virtual ~Renderer(){};
 
-		virtual void PreRender(CameraPtr const& camera){};
 		virtual void Render(CameraPtr const& camera) = 0;
-		virtual void PostRender(CameraPtr const& camera){};
 
 		virtual bool Overlaps(const Frustrum& frustrum)
 		{
 			return true;
 		}
  
-		virtual void AddLight(LightPtr & light);
-		virtual void ClearLight();
-		
-		const std::vector<LightPtr>& GetNonDirectionLights() const
-		{
-			return _vNonDirectionLights;
-		}
-
-		const std::vector<DirectionLightPtr>& GetDirectionLights() const
-		{
-			return _vDirectionLights;
-		}
-
+	 
 
 		const RenderLayoutPtr& GetRenderLayout() const
 		{
@@ -56,8 +42,6 @@ namespace Disorder
 	protected:
 		RenderEffectPtr _renderEffect;
 		RenderLayoutPtr _renderLayout;
-		std::vector<DirectionLightPtr> _vDirectionLights;
-		std::vector<LightPtr> _vNonDirectionLights;
 	};
  
 	class BatchScreenString : public Renderer
@@ -117,7 +101,7 @@ namespace Disorder
 	private:
 		  GeometryPtr _geometryObject;
 	      SurfaceMaterialPtr _material;
-
+		 
 	private:
 
 		  void DrawAxis(CameraPtr const& camera);
@@ -133,10 +117,16 @@ namespace Disorder
 		  virtual void BuildRenderLayout(RenderEffectPtr const& effect,bool releaseOld);
 
 		  virtual bool Overlaps(const Frustrum& frustrum);		 
-		  virtual void PreRender(CameraPtr const& camera);
+		  void UpdateShaderProperty();
 		  virtual void Render(CameraPtr const& camera);
-		  virtual void PostRender(CameraPtr const& camera);
+		  
 		  virtual void DebugDraw();
+
+		  const GeometryPtr GetGeometry() const
+		  {
+			  return _geometryObject;
+		  }
+
 	protected:
  
 		// for each light

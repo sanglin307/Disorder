@@ -94,12 +94,7 @@ namespace Disorder
  
 		for(int i=0;i<8;i++ )
 		{ 
-			glm::vec4 temp(_Points[i].x, _Points[i].y, _Points[i].z, 1);
-			temp = viewProjInvMatrix * temp;
-			temp = temp / temp.w;
-			_Points[i].x = temp.x;
-			_Points[i].y = temp.y;
-			_Points[i].z = temp.z;
+			Math::Transform(viewProjInvMatrix, _Points[i]);
 		}
 
 		_Planes[PS_Near]   = Plane(_Points[0],_Points[1],_Points[2]);

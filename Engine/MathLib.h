@@ -149,6 +149,9 @@ namespace Disorder
 			return float(rand()) / (float)RAND_MAX;
 		}
 
+		static void CalcMinMax(const std::vector<glm::vec3>& posList, glm::vec3& min, glm::vec3& max);
+		static void Transform(const glm::mat4& mat,glm::vec3& pos);
+
 		static  void ConvertToSphericalCoord(const glm::vec3& pos,const glm::vec3& origin,float &radius,float &yAngle,float &zAngle);	
 		static  void ConvertFromSphericalCoord(float radius,float yAngle,float zAngle,const glm::vec3& origin,glm::vec3& pos);
 		

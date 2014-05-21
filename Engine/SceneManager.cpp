@@ -46,7 +46,7 @@ namespace Disorder
 			_mDefaultCamera->DebugDraw();
 	}
 
-	void SceneManager::GetRendererList(CameraPtr const camera,std::vector<RendererPtr>& renderObjList) const
+	void SceneManager::GetRendererList(CameraPtr const camera, std::vector<GeometryRendererPtr>& renderObjList) const
 	{
 		if( _vRenderObjects.size() == 0 )
 			return;
@@ -112,7 +112,7 @@ namespace Disorder
 
 	}
 
-	RendererPtr SceneManager::GetRenderer(std::string const& name)
+	GeometryRendererPtr SceneManager::GetRenderer(std::string const& name)
 	{
 		if( _mRenderObjects.find(name) != _mRenderObjects.end() )
 			return _mRenderObjects.at(name);
@@ -143,20 +143,7 @@ namespace Disorder
 		if(_mCameraObjects.find(camera->Name) == _mCameraObjects.end())
 			_mCameraObjects.insert(std::pair<std::string,CameraPtr>(camera->Name,camera));
 	}
-
-	void SceneManager::UpdateLight()
-	{
-		for(unsigned int i=0;i<_vRenderObjects.size();i++ )
-		{
-			_vRenderObjects[i]->ClearLight();
-			for(unsigned int j=0;j<_vLightList.size();j++)
-			{
-				if( _vLightList[j]->Touch(_vRenderObjects[i]) )
-				   _vRenderObjects[i]->AddLight(_vLightList[j]);
-			}
-		}
-	}
-
+ 
 	void SceneManager::AddLight(LightPtr const& light)
 	{
 		BOOST_ASSERT(light->Name != "");
@@ -168,13 +155,13 @@ namespace Disorder
 		}
 	}
 
-	void SceneManager::AddRenderer(RendererPtr const& renderer)
+	void SceneManager::AddRenderer(GeometryRendererPtr const& renderer)
 	{
 		BOOST_ASSERT(renderer->Name != "");
 
 		if( _mRenderObjects.find(renderer->Name) == _mRenderObjects.end() )
 		{
-			_mRenderObjects.insert(std::pair<std::string,RendererPtr>(renderer->Name,renderer));
+			_mRenderObjects.insert(std::pair<std::string, GeometryRendererPtr>(renderer->Name, renderer));
 			_vRenderObjects.push_back(renderer);
 		}
 	}
@@ -187,8 +174,6 @@ namespace Disorder
 			iter->second->Tick(deltaSeconds);
 			iter++;
 		}
-
-		UpdateLight();
 	}
  
 

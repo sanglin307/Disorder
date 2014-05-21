@@ -205,7 +205,6 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sScreenWidth = "ScreenWidth";
 	const std::string ShaderPropertyManager::sScreenHeight = "ScreenHeight";
 
-	const std::string ShaderPropertyManager::sShadowMapWorld = "ShadowMapWorld";
 	const std::string ShaderPropertyManager::sShadowMapView = "ShadowMapView";
 	const std::string ShaderPropertyManager::sShadowMapProj = "ShadowMapProj";
 

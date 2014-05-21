@@ -97,6 +97,42 @@ namespace Disorder
 			0, 2 / height, 0, 0,
 			0, 0, 1 / (znearPlane - zfarPlane), 0,
 			0, 0, znearPlane / (znearPlane - zfarPlane), 1);
+ 
+	}
+
+	void Math::CalcMinMax(const std::vector<glm::vec3>& posList, glm::vec3& min, glm::vec3& max)
+	{
+		max = min = glm::vec3(0, 0, 0);
+		for (size_t i = 0; i < posList.size(); i++)
+		{
+			if (posList[i].x < min.x)
+				min.x = posList[i].x;
+
+			if (posList[i].y < min.y)
+				min.y = posList[i].y;
+
+			if (posList[i].z < min.z)
+				min.z = posList[i].z;
+
+			if (posList[i].x > max.x)
+				max.x = posList[i].x;
+
+			if (posList[i].y > max.y)
+				max.y = posList[i].y;
+
+			if (posList[i].z > max.z)
+				max.z = posList[i].z;
+		}
+	}
+
+	void Math::Transform(const glm::mat4& mat, glm::vec3& pos)
+	{
+		glm::vec4 temp(pos.x, pos.y, pos.z, 1);
+		temp = mat * temp;
+		temp = temp / temp.w;
+		pos.x = temp.x;
+		pos.y = temp.y;
+		pos.z = temp.z;
 	}
 
 	// fov use rad, opengl

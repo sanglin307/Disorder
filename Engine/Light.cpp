@@ -32,20 +32,42 @@ namespace Disorder
 	{
 		return true;
 	}
-
-	void DirectionLight::GetViewMatrix(glm::mat4& viewMatrix)
+ 
+	bool DirectionLight::Overlaps(const Frustrum& frustrum)
 	{
-		GameObjectPtr go = GetBase();
-		glm::vec3 beginPos = go->GetWorldPosition();
-		glm::vec3 endPos = beginPos + GetDirection() * 2.f;
-		viewMatrix = Math::ViewMatrixRH(beginPos,endPos,glm::vec3(0,1,0));
+		return true;
 	}
 
-	void DirectionLight::GetProjMatrix( glm::mat4& projMatrix)
+	void DirectionLight::UpdateVisibleBounding(const BoxBounds& bb)
 	{
-		projMatrix = Math::ProjFovRH(Math::HALF_PI, 1, 0.1f, 100000);
-	}
+		//// calc centriod of light box 
+		glm::vec3 boxSize = bb.BMax - bb.BMin;
+		//Vector3 centroid = lightBox.Min + (boxSize / 2.0f);
+		glm::vec3 center = bb.GetCenter();
+		//// calc distance of centroid to one of the box's corners 
+		float distance = glm::distance(center, bb.BMin);
+		glm::vec3 dir = GetDirection();
+		glm::vec3 lightPosition = center - (dir * distance);
 
+		// create lights view matrix, so that it is looking right to the center of the bounding box 
+		ShadowViewMatrix = Math::ViewMatrixRH(lightPosition, center, glm::vec3(0, 1, 0));
+		std::vector<glm::vec3> points;
+		bb.GetCorners(points);
+
+		// bring light box points into light's view space             
+		for (size_t i = 0; i < points.size(); i++)
+			Math::Transform(ShadowViewMatrix, points[i]);
+		
+		glm::vec3 min;
+		glm::vec3 max;
+		Math::CalcMinMax(points,min,max);
+
+		float clipDistance = Abs(max.z - min.z);
+
+		//// create ortographic projection  You want to use -max.Z as your zNear, and -min.Z as your zFar.  Otherwise your zFar won't be large enough. 
+		ShadowProjMatrix = Math::OrthoRH(max.x - min.x, max.y - min.y, 0, clipDistance);
+ 
+	}
 
 	glm::vec3 DirectionLight::GetDirection()
 	{
@@ -90,6 +112,13 @@ namespace Disorder
 
 	void PointLight::DebugDraw()
 	{
+	}
+
+	bool PointLight::Overlaps(const Frustrum& frustrum)
+	{
+		GameObjectPtr lightGo = GetBase();
+		SphereBounds bound(lightGo->GetWorldPosition(),Range);
+		return frustrum.Overlaps(bound);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,6 +169,15 @@ namespace Disorder
 		glm::vec3 Dir = GetDirection();
 		float angle = glm::angle(Dir, renderDirect);  
 		return angle < SpotOuterAngle;
- 
+	}
+
+	bool SpotLight::Overlaps(const Frustrum& frustrum)
+	{
+		//rough calculate
+		GameObjectPtr lightGo = GetBase();
+		float BoundsRadius = Math::Sqrtf(1.25f * Range * Range - Range * Range * SpotOuterAngle);
+		SphereBounds bound(lightGo->GetWorldPosition() + .5f * GetDirection() * Range, BoundsRadius);
+
+		return frustrum.Overlaps(bound);
 	}
 }

@@ -30,13 +30,19 @@ namespace Disorder
 		bool      CastShadows;
 		glm::vec3   ShadowColor;
 		ELightDecayType DecayType;
-
-		ShadowMapPtr ShadowMapData;
+ 
+		glm::mat4 ShadowViewMatrix;
+		glm::mat4 ShadowProjMatrix;
 
 		virtual bool Touch(RendererPtr renderObject) = 0;
+		virtual bool Overlaps(const Frustrum& frustrum) = 0;
+		 
+
 		virtual void DebugDraw(){};
-		virtual void GetViewMatrix( glm::mat4& viewMatrix){};
-		virtual void GetProjMatrix( glm::mat4& projMatrix){};
+		 
+
+		//visible bounding is the camera view visible ones
+		virtual void UpdateVisibleBounding(const BoxBounds& bb){};
 
 	protected:
 		Light(std::string const& name);
@@ -53,10 +59,10 @@ namespace Disorder
 		static DirectionLightPtr Create(std::string const& name);
 		glm::vec3 GetDirection();
 		virtual bool Touch(RendererPtr renderObject);
+		virtual bool Overlaps(const Frustrum& frustrum);
 		virtual void DebugDraw();
 
-		virtual void GetViewMatrix( glm::mat4& viewMatrix);
-		virtual void GetProjMatrix( glm::mat4& projMatrix);
+		virtual void UpdateVisibleBounding(const BoxBounds& bb);
 	};
 
 	class PointLight : public Light
@@ -69,6 +75,7 @@ namespace Disorder
 		glm::vec3 GetPosition();
 		static PointLightPtr Create(std::string const& name);
 		virtual bool Touch(RendererPtr renderObject);
+		virtual bool Overlaps(const Frustrum& frustrum);
         virtual void DebugDraw();
 	};
 
@@ -85,6 +92,7 @@ namespace Disorder
 		glm::vec3 GetPosition();
 		static SpotLightPtr Create(std::string const& name);
 		virtual bool Touch(RendererPtr renderObject);
+		virtual bool Overlaps(const Frustrum& frustrum);
 		virtual void DebugDraw();
  
 	};

@@ -46,6 +46,7 @@ namespace Disorder
 		RegisterPropertyManager(ShaderPropertyManager::sManagerDirectionLight);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerForwardFourLight);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerScene);
+		RegisterPropertyManager(ShaderPropertyManager::sManagerShadowMapGen);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerGlobal);
 	}
  

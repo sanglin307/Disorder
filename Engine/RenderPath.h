@@ -4,6 +4,7 @@
 
 namespace Disorder
 {
+ 
 	class RenderPath
 	{
 	public:
@@ -17,7 +18,7 @@ namespace Disorder
 	protected:
 
 		RenderPath();
-		void SetDirectionLight(const std::vector<DirectionLightPtr>& directionLightArray);
+		void SetDirectionLight(const DirectionLightPtr& directionLight);
 		void SetFourLight(const std::vector<LightPtr>& lightArray);
 
 		ShaderPropertyManagerPtr _DirectionLightPropertyManager;
@@ -48,15 +49,18 @@ namespace Disorder
 	{
 	public:
 		virtual void Render();
-		void GenerateShadowMap(const std::vector<LightPtr>& lightArray);
 		static ForwardRenderPathPtr Create();
 
 	protected:
-
 		ForwardRenderPath();
  
+		void BasePassRender(const CameraPtr& camera, const std::vector<GeometryRendererPtr>& renderList);
+		void RenderLights(const CameraPtr& camera, const std::vector<GeometryRendererPtr>& renderList);
+
+		RenderEffectPtr _BasePassEffect;
 		RenderEffectPtr _DirectionLightEffect;
 		RenderEffectPtr _FourLightEffect;
+		std::map<LightPtr, ShadowMapPtr> _LightShaowMaps;
 	};
 
 	class DeferredShading : public RenderPath
