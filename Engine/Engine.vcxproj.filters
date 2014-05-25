@@ -53,27 +53,6 @@
     <None Include="..\Config\RenderConfig.xml">
       <Filter>Config</Filter>
     </None>
-    <None Include="..\Resource\FX\HLSL\2DText.dsf">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\HLSL\BatchLines.dsf">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\HLSL\Common.dsf">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\HLSL\DeferredShading.dsf">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\HLSL\ScreenTiles.dsf">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\HLSL\SurfaceVisual.dsf">
-      <Filter>HLSL</Filter>
-    </None>
-    <None Include="..\Resource\FX\HLSL\ForwardLighting.dsf">
-      <Filter>HLSL</Filter>
-    </None>
     <None Include="..\Resource\FX\GLSL\2DText\PS.glfs">
       <Filter>GLSL\2DText</Filter>
     </None>
@@ -125,7 +104,28 @@
     <None Include="..\Config\SceneConfig.xml">
       <Filter>Config</Filter>
     </None>
-    <None Include="..\Resource\FX\HLSL\ShadowMap.dsf">
+    <None Include="..\Resource\FX\HLSL\2DText.hlsl">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\HLSL\BatchLines.hlsl">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\HLSL\Common.hlsl">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\HLSL\DeferredShading.hlsl">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\HLSL\ScreenTiles.hlsl">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\HLSL\ForwardLighting.hlsl">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\HLSL\ShadowMap.hlsl">
+      <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\HLSL\SurfaceVisual.hlsl">
       <Filter>HLSL</Filter>
     </None>
   </ItemGroup>

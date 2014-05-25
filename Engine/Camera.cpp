@@ -262,6 +262,23 @@ namespace Disorder
 
 	}
 
+	// now for debug use 
+	void Camera::UpdateViewProjMatrix(const glm::mat4& viewMat, const glm::mat4& projMat)
+	{
+		ViewMatrix = viewMat;
+		ProjMatrix = projMat;
+		ProjInvMatrix = glm::inverse(ProjMatrix);
+		ViewInvMatrix = glm::inverse(ViewMatrix);
+		ViewProjMatrix = ProjMatrix * ViewMatrix;
+		ViewProjInvMatrix = ViewInvMatrix * ProjInvMatrix;
+
+		CameraFrustrum.Construct(ViewProjInvMatrix);
+
+		_InvalidViewMatrix = false;
+		_InvalidProjMatrix = false;
+		UpdateShaderProperty();
+	}
+
 	void Camera::UpdateViewMatrix()
 	{
 		if( !_InvalidViewMatrix )
@@ -288,7 +305,6 @@ namespace Disorder
 		if( !_InvalidProjMatrix )
 			return;
 		
-		glm::mat4 test;
 		if (ProjectMode == ePerspectiveCamera)
 			ProjMatrix = Math::ProjFovRH(_FOV, _aspectRatio, _nearPlane, _farPlane);
 		else if (ProjectMode == eOrthoCamera)

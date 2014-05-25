@@ -31,6 +31,17 @@ namespace Disorder
 		_vRenderObjects.empty();
 	}
 
+	void SceneManager::UpdateBoundingBox()
+	{
+		_sceneBounds.BMin = _sceneBounds.BMax = glm::vec3(0, 0, 0);
+		for (size_t i = 0; i < _vRenderObjects.size(); i++)
+		{
+			const GeometryPtr geometry = _vRenderObjects[i]->GetGeometry();
+			BoxBounds box = geometry->BoundingBox.GetBox();
+			_sceneBounds.Union(box);
+		}
+	}
+
 	void SceneManager::DebugDraw()
 	{
 		if( !EnableDebugDraw )
@@ -44,6 +55,18 @@ namespace Disorder
 
 		if( _mDefaultCamera != NULL )
 			_mDefaultCamera->DebugDraw();
+	}
+
+	void SceneManager::GetRendererList(std::vector<GeometryRendererPtr>& renderObjList) const
+	{
+		if (_vRenderObjects.size() == 0)
+			return;
+
+		renderObjList.reserve(_vRenderObjects.size());
+		for (size_t i = 0; i<_vRenderObjects.size(); i++)
+		{
+		     renderObjList.push_back(_vRenderObjects[i]);
+		}
 	}
 
 	void SceneManager::GetRendererList(CameraPtr const camera, std::vector<GeometryRendererPtr>& renderObjList) const

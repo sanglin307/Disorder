@@ -1,4 +1,4 @@
-#include "Common.dsf"
+#include "Common.hlsl"
 
 Texture2D<float> GBufferDepthTexture;
 Texture2D<float4> GBufferColorSpecIntTexture;

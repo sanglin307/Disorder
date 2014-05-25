@@ -28,7 +28,7 @@ namespace Disorder
 		return DirectionLightPtr(pLight);
 	}
 
-	bool DirectionLight::Touch(RendererPtr renderObject)
+	bool DirectionLight::Touch(GeometryRendererPtr renderObject)
 	{
 		return true;
 	}
@@ -38,21 +38,21 @@ namespace Disorder
 		return true;
 	}
 
-	void DirectionLight::UpdateVisibleBounding(const BoxBounds& bb)
+	void DirectionLight::CalculateShadowMatrix()
 	{
+		const BoxBounds& sceneBounds = GSceneManager->GetSceneBoundingBox();
 		//// calc centriod of light box 
-		glm::vec3 boxSize = bb.BMax - bb.BMin;
-		//Vector3 centroid = lightBox.Min + (boxSize / 2.0f);
-		glm::vec3 center = bb.GetCenter();
-		//// calc distance of centroid to one of the box's corners 
-		float distance = glm::distance(center, bb.BMin);
+		glm::vec3 boxSize = sceneBounds.BMax - sceneBounds.BMin;
+	
+		glm::vec3 center = sceneBounds.GetCenter();
+		float distance = glm::distance(center, sceneBounds.BMin);
 		glm::vec3 dir = GetDirection();
 		glm::vec3 lightPosition = center - (dir * distance);
 
 		// create lights view matrix, so that it is looking right to the center of the bounding box 
 		ShadowViewMatrix = Math::ViewMatrixRH(lightPosition, center, glm::vec3(0, 1, 0));
 		std::vector<glm::vec3> points;
-		bb.GetCorners(points);
+		sceneBounds.GetCorners(points);
 
 		// bring light box points into light's view space             
 		for (size_t i = 0; i < points.size(); i++)
@@ -66,7 +66,6 @@ namespace Disorder
 
 		//// create ortographic projection  You want to use -max.Z as your zNear, and -min.Z as your zFar.  Otherwise your zFar won't be large enough. 
 		ShadowProjMatrix = Math::OrthoRH(max.x - min.x, max.y - min.y, 0, clipDistance);
- 
 	}
 
 	glm::vec3 DirectionLight::GetDirection()
@@ -103,11 +102,12 @@ namespace Disorder
 		return PointLightPtr(pLight);
 	}
 
-	bool PointLight::Touch(RendererPtr renderObject)
+	bool PointLight::Touch(GeometryRendererPtr renderObject)
 	{
 		GameObjectPtr lightGo = GetBase();
 		GameObjectPtr renderGo = renderObject->GetBase(); 
-		return Range * Range > glm::distance2(lightGo->GetWorldPosition(),renderGo->GetWorldPosition());
+		float objRadius = renderObject->GetGeometry()->BoundingBox.SphereRadius;
+		return (Range + objRadius) * (Range + objRadius) > glm::distance2(lightGo->GetWorldPosition(), renderGo->GetWorldPosition());
 	}
 
 	void PointLight::DebugDraw()
@@ -154,14 +154,15 @@ namespace Disorder
 	{
 	}
 
-	bool SpotLight::Touch(RendererPtr renderObject)
+	bool SpotLight::Touch(GeometryRendererPtr renderObject)
 	{
 		GameObjectPtr lightGo = GetBase();
 		GameObjectPtr renderGo = renderObject->GetBase();
 		 
 		glm::vec3 renderPos = renderGo->GetWorldPosition();
 		glm::vec3 lightPos = lightGo->GetWorldPosition();
-		bool bRange = Range * Range > glm::distance2(lightPos,renderPos);
+		float objRadius = renderObject->GetGeometry()->BoundingBox.SphereRadius;
+		bool bRange = (objRadius + Range) * (objRadius + Range) > glm::distance2(lightPos, renderPos);
 		if( bRange == false )
 			return false;
 
@@ -179,5 +180,15 @@ namespace Disorder
 		SphereBounds bound(lightGo->GetWorldPosition() + .5f * GetDirection() * Range, BoundsRadius);
 
 		return frustrum.Overlaps(bound);
+	}
+
+	void SpotLight::CalculateShadowMatrix()
+	{
+		GameObjectPtr lightGo = GetBase();
+		glm::vec3 lightPos = lightGo->GetWorldPosition();
+		glm::vec3 Dir = GetDirection();
+
+		ShadowViewMatrix = Math::ViewMatrixRH(lightPos, lightPos + Dir, glm::vec3(0, 1, 0));
+		ShadowProjMatrix = Math::ProjFovRH(SpotOuterAngle, 1, 0.1f, Range);
 	}
 }

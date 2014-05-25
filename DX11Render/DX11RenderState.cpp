@@ -17,16 +17,16 @@ namespace Disorder
         ZeroMemory( &samDesc, sizeof(samDesc) );
 
 		samDesc.MaxAnisotropy = pSamplerDesc->MaxAnisotropy;
-		samDesc.Filter = DX11RenderEngine::GetD3DFilter(pSamplerDesc->Filter);
-		samDesc.AddressU = DX11RenderEngine::GetD3DAddressMode(pSamplerDesc->AddressU);
-		samDesc.AddressV = DX11RenderEngine::GetD3DAddressMode(pSamplerDesc->AddressV);
-		samDesc.AddressW = DX11RenderEngine::GetD3DAddressMode(pSamplerDesc->AddressW);
+		samDesc.Filter = DX11RenderEngine::GetD3DFilter(pSamplerDesc->Filter, pSamplerDesc->CompareTypeSampler);
+		samDesc.AddressU =  DX11RenderEngine::GetD3DAddressMode(pSamplerDesc->AddressU);
+		samDesc.AddressV =  DX11RenderEngine::GetD3DAddressMode(pSamplerDesc->AddressV);
+		samDesc.AddressW =  DX11RenderEngine::GetD3DAddressMode(pSamplerDesc->AddressW);
 		samDesc.BorderColor[0] = pSamplerDesc->BorderColor[0];
 		samDesc.BorderColor[1] = pSamplerDesc->BorderColor[1];
 		samDesc.BorderColor[2] = pSamplerDesc->BorderColor[2];
 		samDesc.BorderColor[3] = pSamplerDesc->BorderColor[3];
-		samDesc.ComparisonFunc = DX11RenderEngine::GetD3DComparisonFunc(pSamplerDesc->CompareFunc);
-        samDesc.MaxLOD = pSamplerDesc->MaxLOD;
+		samDesc.ComparisonFunc =  DX11RenderEngine::GetD3DComparisonFunc(pSamplerDesc->CompareFunc);
+		samDesc.MaxLOD = pSamplerDesc->MaxLOD;
 		samDesc.MinLOD = pSamplerDesc->MinLOD;
 		samDesc.MipLODBias = pSamplerDesc->MipLODBias;
 
@@ -35,7 +35,7 @@ namespace Disorder
 		ID3D11SamplerState *pSamplerState;
 
 		HRESULT hr = renderEngine->D3DDevice()->CreateSamplerState( &samDesc, &pSamplerState );
-		BOOST_ASSERT(hr==S_OK);
+		BOOST_ASSERT(hr == S_OK);
 
 		pSampler->D3DInterface = MakeComPtr<ID3D11SamplerState>(pSamplerState);
 

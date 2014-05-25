@@ -115,14 +115,14 @@
     <None Include="..\Resource\FX\GLSL\ForwardLighting\SceneVS.glvs" />
     <None Include="..\Resource\FX\GLSL\SurfaceVisual\PS.glfs" />
     <None Include="..\Resource\FX\GLSL\SurfaceVisual\VS.glvs" />
-    <None Include="..\Resource\FX\HLSL\2DText.dsf" />
-    <None Include="..\Resource\FX\HLSL\BatchLines.dsf" />
-    <None Include="..\Resource\FX\HLSL\Common.dsf" />
-    <None Include="..\Resource\FX\HLSL\DeferredShading.dsf" />
-    <None Include="..\Resource\FX\HLSL\ForwardLighting.dsf" />
-    <None Include="..\Resource\FX\HLSL\ScreenTiles.dsf" />
-    <None Include="..\Resource\FX\HLSL\ShadowMap.dsf" />
-    <None Include="..\Resource\FX\HLSL\SurfaceVisual.dsf" />
+    <None Include="..\Resource\FX\HLSL\2DText.hlsl" />
+    <None Include="..\Resource\FX\HLSL\BatchLines.hlsl" />
+    <None Include="..\Resource\FX\HLSL\Common.hlsl" />
+    <None Include="..\Resource\FX\HLSL\DeferredShading.hlsl" />
+    <None Include="..\Resource\FX\HLSL\ForwardLighting.hlsl" />
+    <None Include="..\Resource\FX\HLSL\ScreenTiles.hlsl" />
+    <None Include="..\Resource\FX\HLSL\ShadowMap.hlsl" />
+    <None Include="..\Resource\FX\HLSL\SurfaceVisual.hlsl" />
     <None Include="TodoList.txt" />
   </ItemGroup>
   <ItemGroup>

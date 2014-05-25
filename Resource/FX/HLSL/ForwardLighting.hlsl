@@ -1,4 +1,4 @@
-#include "Common.dsf"
+#include "Common.hlsl"
 
  
 Material PrepareMaterial(float3 normal, float2 UV)
@@ -40,7 +40,6 @@ VS_OUTPUT SceneVS( VS_INPUT input )
     VS_OUTPUT output;
     output.Position = mul(WorldTransform, float4(input.Position,1.0f));
 	output.PositionWorld = output.Position.xyz;
-	
     output.Position = mul( CameraViewProj,output.Position);
     output.NormalWorld = mul(WorldNormalTransform,float4(input.Normal,1.0)).xyz;
 	output.UV0 = input.UV0;
@@ -61,27 +60,37 @@ float4 BasePassPS( VS_OUTPUT input) : SV_Target
 	return float4(finalColor,1.0f);
 }
 
-float4 BaseLightingPS( VS_OUTPUT input ) : SV_Target
+float4 DirectionLightingPS( VS_OUTPUT input ) : SV_Target
 {
     Material mat = PrepareMaterial(input.NormalWorld,input.UV0);
 
-	//float3 finalColor = CalculateAmbient(mat.Normal,mat.DiffuseColor);
-
 	float3 finalColor = CalculateDirectionLight(input.PositionWorld,mat);
 
-    return float4(finalColor,1.0f);
+	float shadowValue = PCFShadow(input.PositionWorld);
+	return float4(finalColor * shadowValue, 1.0f);
 }
 
-
-
-float4 FourLightingPS( VS_OUTPUT In ) : SV_TARGET
+float4 PointLightingPS( VS_OUTPUT In ) : SV_TARGET
 {
 	// Prepare the material structure
 	Material material = PrepareMaterial(In.NormalWorld, In.UV0);
 
 	// Calculate the spot light color
-	float3 finalColor = CalculateFourLights(In.PositionWorld, material);
+	float3 finalColor = CalculatePointLight(In.PositionWorld, material);
 
 	// Return the final color
 	return float4(finalColor, 1.0);
+}
+
+float4 SpotLightingPS( VS_OUTPUT In ) : SV_TARGET
+{
+	// Prepare the material structure
+	Material material = PrepareMaterial(In.NormalWorld, In.UV0);
+
+	// Calculate the spot light color
+	float3 finalColor = CalculateSpotLight(In.PositionWorld, material);
+
+	float shadowValue = PCFShadow(In.PositionWorld);
+	// Return the final color
+	return float4(finalColor * shadowValue, 1.0);
 }

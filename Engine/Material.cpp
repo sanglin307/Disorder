@@ -47,6 +47,7 @@ namespace Disorder
 		else
 		{
 			_DiffuseTexProperty->SetData(RenderResourceManager::DefaultWhiteTexture2D);
+			_DiffuseSampler->SetData(RenderResourceManager::DefaultSamplerState);
 		}
 
 		_DiffuseColorProperty->SetData(glm::value_ptr(DiffuseColor));

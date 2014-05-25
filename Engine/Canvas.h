@@ -8,7 +8,7 @@ namespace Disorder
 	{
 	public:
        
-		unsigned int GetStringLength(float fsize,std::string const& str);
+		unsigned int GetStringLength(std::string const& str,float scale = 1.0f);
 		void DrawString(unsigned int xPos, unsigned int yPos, std::string const& str, glm::vec4 const& color = glm::vec4(1.0f),float scale = 1.0f);	  // screen pos
 		void DrawLine(glm::vec3 const& beginPos, glm::vec4 const& beginColor, glm::vec3 const& endPos, glm::vec4 const& endColor);
 

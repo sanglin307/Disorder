@@ -20,12 +20,29 @@ namespace Disorder
 		RenderPath();
 		void SetDirectionLight(const DirectionLightPtr& directionLight);
 		void SetFourLight(const std::vector<LightPtr>& lightArray);
+		void SetPointLight(const PointLightPtr& pointLight);
+		void SetSpotLight(const SpotLightPtr& spotLight);
 
 		ShaderPropertyManagerPtr _DirectionLightPropertyManager;
 		ShaderPropertyPtr _DirectionLightIntensityProperty;
 		ShaderPropertyPtr _DirectionLightDirProperty;
 		ShaderPropertyPtr _DirectionLightColorProperty;
 
+		ShaderPropertyManagerPtr _PointLightPropertyManager;
+		ShaderPropertyPtr _PointLightPosProperty;
+		ShaderPropertyPtr _PointLightColorProperty;
+		ShaderPropertyPtr _PointLightIntensityProperty;
+		ShaderPropertyPtr _PointLightRangeRcpProperty;
+
+		ShaderPropertyManagerPtr _SpotLightPropertyManager;
+		ShaderPropertyPtr _SpotLightPosProperty;
+		ShaderPropertyPtr _SpotLightDirProperty;
+		ShaderPropertyPtr _SpotLightColorProperty;
+		ShaderPropertyPtr _SpotLightIntensityProperty;
+		ShaderPropertyPtr _SpotLightRangeRcpProperty;
+		ShaderPropertyPtr _SpotLightCosOuterConeProperty;
+		ShaderPropertyPtr _SpotLightCosInnerConeRcpProperty;
+ 
 		ShaderPropertyManagerPtr _LightFourPropertyManager;
 		ShaderPropertyPtr ForwardLightPosX;
 		ShaderPropertyPtr ForwardLightPosY;
@@ -56,11 +73,10 @@ namespace Disorder
  
 		void BasePassRender(const CameraPtr& camera, const std::vector<GeometryRendererPtr>& renderList);
 		void RenderLights(const CameraPtr& camera, const std::vector<GeometryRendererPtr>& renderList);
-
 		RenderEffectPtr _BasePassEffect;
 		RenderEffectPtr _DirectionLightEffect;
-		RenderEffectPtr _FourLightEffect;
-		std::map<LightPtr, ShadowMapPtr> _LightShaowMaps;
+		RenderEffectPtr _PointLightEffect;
+		RenderEffectPtr _SpotLightEffect;
 	};
 
 	class DeferredShading : public RenderPath

@@ -26,8 +26,10 @@ namespace Disorder
 
 	   RenderResourceMgr->Init();
 	 //  GFontManager->LoadFontImageData();
+	   // shadowMap
+	   GEngine->RenderSurfaceCache->ShadowMapBuffer = ShadowMap::Create(1024, 1024);
 
-	   viewport->SetRenderPath(RPT_DeferredShading);
+	   viewport->SetRenderPath(RPT_ForwardLighting);
 	   SceneImporter->Init();
 
 	   GameCanvas = Canvas::Create(viewport->SizeX,viewport->SizeY);
@@ -82,7 +84,7 @@ namespace Disorder
 		std::stringstream strstream;
 		strstream << "Drawed triangle num:" << _lastFrameDrawTriNumber;
 		std::string drawstr = strstream.str();
-		unsigned int length = canvas->GetStringLength(1.0f,drawstr);
+		unsigned int length = canvas->GetStringLength(drawstr);
 		canvas->DrawString(GConfig->pRenderConfig->SizeX - 5 - length, 10, drawstr);
    }
 

@@ -65,6 +65,8 @@ namespace Disorder
         static const std::string sManagerMaterial;
         static const std::string sManagerDirectionLight;
 		static const std::string sManagerForwardFourLight;
+		static const std::string sManagerPointLight;
+		static const std::string sManagerSpotLight;
 		static const std::string sManagerScene;
 		static const std::string sManagerGBufferUnpack;
 		static const std::string sManagerShadowMapGen;
@@ -95,6 +97,21 @@ namespace Disorder
         static const std::string sDirectionLightDir;
         static const std::string sDirectionLightColor;
 
+		// point light
+		static const std::string sPointLightPos;
+		static const std::string sPointLightColor;
+		static const std::string sPointLightIntensity;
+		static const std::string sPointLightRangeRcp;
+ 
+		// spot light
+		static const std::string sSpotLightPos;
+		static const std::string sSpotLightDir;
+		static const std::string sSpotLightColor;
+		static const std::string sSpotLightIntensity;
+		static const std::string sSpotLightRangeRcp;
+		static const std::string sSpotLightCosOuterCone;
+		static const std::string sSpotLightCosInnerConeRcp;
+ 
 		//forward four light
 		static const std::string sForwardLightPosX;
 		static const std::string sForwardLightPosY;
@@ -137,6 +154,9 @@ namespace Disorder
 
 		static const std::string sDiffuseTexture;
 		static const std::string sDiffuseSampler;
+
+		static const std::string sShadowSampler;
+		static const std::string sShadowMapTexture2D;
 
 	public:
 		std::string Name;

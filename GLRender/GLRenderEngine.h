@@ -50,9 +50,12 @@ namespace Disorder
 
 		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
 
+		virtual void SetRenderTarget(const SurfaceViewPtr& renderView);
 		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget, bool useReadOnlyDepthStencil = false);
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
 		virtual void SetPrimitiveTopology(TopologyType topologyType);
+
+		virtual void SetViewport(float width, float height, float minDepth, float maxDepth, float topX, float topY){};
 
 		virtual void SetEffect(RenderEffectPtr const& effect);
 		virtual void DrawIndexed(unsigned int indexCount, unsigned int startIndexLocation, int baseVertexLocation);

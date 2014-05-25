@@ -151,6 +151,8 @@ namespace Disorder
     const std::string ShaderPropertyManager::sManagerMaterial = "MaterialProperty";
     const std::string ShaderPropertyManager::sManagerDirectionLight = "DirectionLightProperty";
 	const std::string ShaderPropertyManager::sManagerForwardFourLight = "ForwardFourLights";
+	const std::string ShaderPropertyManager::sManagerPointLight = "PointLightProperty";
+	const std::string ShaderPropertyManager::sManagerSpotLight = "SpotLightProperty";
 	const std::string ShaderPropertyManager::sManagerScene = "SceneProperty";
 	const std::string ShaderPropertyManager::sManagerShadowMapGen = "ShadowMapGen";
 	const std::string ShaderPropertyManager::sManagerGlobal = "Global";
@@ -179,6 +181,10 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sDiffuseTexture = "DiffuseTexture";
 	const std::string ShaderPropertyManager::sDiffuseSampler = "DiffuseSampler";
 
+	// for shadow map
+	const std::string ShaderPropertyManager::sShadowSampler = "ShadowSampler";
+	const std::string ShaderPropertyManager::sShadowMapTexture2D = "ShadowMapTexture2D";
+
     // Forward Dirction LightProperty
     const std::string ShaderPropertyManager::sDirectionLightIntensity = "DirectionLightIntensity";
     const std::string ShaderPropertyManager::sDirectionLightDir = "DirectionLightDir";
@@ -198,6 +204,21 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sForwardLightColorR = "ForwardLightColorR";
 	const std::string ShaderPropertyManager::sForwardLightColorG = "ForwardLightColorG";
 	const std::string ShaderPropertyManager::sForwardLightColorB = "ForwardLightColorB";
+
+	// point light
+	const std::string ShaderPropertyManager::sPointLightPos = "PointLightPos";
+	const std::string ShaderPropertyManager::sPointLightColor = "PointLightColor";
+	const std::string ShaderPropertyManager::sPointLightIntensity = "PointLightIntensity";
+	const std::string ShaderPropertyManager::sPointLightRangeRcp = "PointLightRangeRcp";
+
+	// spot light
+	const std::string ShaderPropertyManager::sSpotLightPos = "SpotLightPos";
+	const std::string ShaderPropertyManager::sSpotLightDir = "SpotLightDir";
+	const std::string ShaderPropertyManager::sSpotLightColor = "SpotLightColor";
+	const std::string ShaderPropertyManager::sSpotLightIntensity = "SpotLightIntensity";
+	const std::string ShaderPropertyManager::sSpotLightRangeRcp = "SpotLightRangeRcp";
+	const std::string ShaderPropertyManager::sSpotLightCosOuterCone = "SpotLightCosOuterCone";
+	const std::string ShaderPropertyManager::sSpotLightCosInnerConeRcp = "SpotLightCosInnerConeRcp";
 
 	// scene ambient
 	const std::string ShaderPropertyManager::sAmbientLowColor = "AmbientLowColor";

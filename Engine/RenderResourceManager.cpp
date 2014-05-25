@@ -7,6 +7,7 @@ namespace Disorder
 	DepthStencilStatePtr RenderResourceManager::DefaultDepthStencilState = NULL;
 
 	SurfaceViewPtr RenderResourceManager::DefaultWhiteTexture2D = NULL;
+	SamplerStatePtr RenderResourceManager::DefaultSamplerState = NULL;
 
 	void RenderResourceManager::Exit()
 	{
@@ -31,6 +32,9 @@ namespace Disorder
 		DepthStencilDesc dsDesc;
 		DefaultDepthStencilState = CreateDepthStencilState(&dsDesc,0);
 
+		SamplerDesc samplerDesc;
+		DefaultSamplerState = CreateSamplerState(&samplerDesc);
+
 		unsigned int pixelData[16];
 		memset(pixelData, 0xFF, 16 * sizeof(unsigned int));
 		BufferInitData data;
@@ -44,6 +48,8 @@ namespace Disorder
 		RegisterPropertyManager(ShaderPropertyManager::sManagerObject);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerMaterial);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerDirectionLight);
+		RegisterPropertyManager(ShaderPropertyManager::sManagerPointLight);
+		RegisterPropertyManager(ShaderPropertyManager::sManagerSpotLight);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerForwardFourLight);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerScene);
 		RegisterPropertyManager(ShaderPropertyManager::sManagerShadowMapGen);

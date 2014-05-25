@@ -37,6 +37,7 @@ namespace Disorder
 		static DepthStencilStatePtr DefaultDepthStencilState;
 		
 		static SurfaceViewPtr DefaultWhiteTexture2D;
+		static SamplerStatePtr DefaultSamplerState;
 
 	protected:
 		ShaderMap _shaderMap;

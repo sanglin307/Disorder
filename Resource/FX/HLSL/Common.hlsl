@@ -32,6 +32,15 @@ cbuffer MaterialProperty
 	float  SpecularExp;	
 }
 
+cbuffer ShadowMapGen
+{
+	matrix ShadowMapView; 
+	matrix ShadowMapProj;
+}
+
+SamplerComparisonState ShadowSampler;
+Texture2D<float>  ShadowMapTexture2D;
+
 SamplerState DiffuseSampler;
 Texture2D DiffuseTexture;
 
@@ -59,6 +68,25 @@ cbuffer ForwardFourLights
 	float4 ForwardLightColorG;		
 	float4 ForwardLightColorB;			
 }
+
+cbuffer PointLightProperty
+{
+    float3 PointLightPos;
+	float3 PointLightColor;
+	float PointLightIntensity;
+	float PointLightRangeRcp;
+}
+
+cbuffer SpotLightProperty
+{
+   float3 SpotLightPos;
+   float3 SpotLightDir;
+   float3 SpotLightColor;
+   float SpotLightIntensity;
+   float SpotLightRangeRcp;
+   float SpotLightCosOuterCone;
+   float SpotLightCosInnerConeRcp;
+}
  
 struct Material
 {
@@ -84,18 +112,37 @@ float3 CalculateDirectionLight(float3 position, Material material)
 {
    //diffuse
    float3 lightColor = DirectionLightIntensity * DirectionLightColor.rgb;
-   float NDotL = max(dot(-DirectionLightDir, material.Normal),0);
+	   float NDotL = saturate(dot(-DirectionLightDir, material.Normal));
    float3 finalColor = lightColor * NDotL * material.DiffuseColor;
    
    //specular
    float3 ToEye = normalize(CameraPosition - position);
    float3 reflectVector = reflect(DirectionLightDir,material.Normal);
-   float NDotH = max(dot(reflectVector, ToEye),0);
+   float NDotH = saturate(dot(reflectVector, ToEye));
    finalColor += lightColor * saturate(pow(NDotH, material.SpecularExp)) * material.SpecularColor;
    
    return finalColor;
 }
  
+ float PCFShadow( float3 position )
+{
+	// Transform the world position to shadow projected space
+	float4 posShadowMap = mul(ShadowMapView,float4(position,1.0));
+    posShadowMap = mul(ShadowMapProj,posShadowMap);
+
+	// Transform the position to shadow clip space
+	float3 UVD = posShadowMap.xyz / posShadowMap.w;
+
+	// Convert to shadow map UV values
+	UVD.xy = 0.5 * UVD.xy + 0.5;
+	UVD.y = 1.0 - UVD.y;
+
+	UVD.z -= 0.005f;
+
+	// Compute the hardware PCF value
+	return ShadowMapTexture2D.SampleCmpLevelZero(ShadowSampler, UVD.xy, UVD.z).r;
+	//return ShadowMapTexture2D.Sample(DiffuseSampler,UVD.xy).r;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // Pixel shaders
@@ -169,3 +216,51 @@ float3 CalculateFourLights(float3 position, Material material)
 	return finalColor;
 }
 
+float3 CalculatePointLight(float3 position, Material material)
+{
+	float3 ToEye = normalize(CameraPosition.xyz - position);
+    float3 ToLight = PointLightPos - position;
+ 
+	// range Attenuation
+	float DistToLightNorm = 1.0 - saturate(length(ToLight) * PointLightRangeRcp);
+	float Attn = DistToLightNorm * DistToLightNorm;
+
+	//diffuse
+	float diffuse = saturate(dot(ToLight, material.Normal));
+    float3 diffuseColor = PointLightColor * diffuse * material.DiffuseColor;
+   
+    //specular
+    float3 reflectVector = reflect(-ToLight,material.Normal);
+	float specular = saturate(dot(reflectVector, ToEye));
+    float3 specularColor = PointLightColor * saturate(pow(specular, material.SpecularExp)) * material.SpecularColor;
+
+	return PointLightIntensity *Attn * (diffuseColor + specularColor);
+}
+
+
+float3 CalculateSpotLight(float3 position, Material material)
+{
+	float3 ToEye = normalize(CameraPosition.xyz - position);
+	float3 ToLight = SpotLightPos - position;
+
+    // Cone attenuation
+	float cosAng = dot(-SpotLightDir, ToLight);
+	float conAtt = saturate((cosAng - SpotLightCosOuterCone) * SpotLightCosInnerConeRcp);
+	conAtt *= conAtt;
+
+	// range Attenuation
+	float DistToLightNorm = 1.0 - saturate(length(ToLight) * SpotLightRangeRcp);
+	float Attn = DistToLightNorm * DistToLightNorm;
+	Attn *= conAtt;
+   
+    //diffuse
+	float diffuse = saturate(dot(ToLight, material.Normal));
+    float3 diffuseColor = SpotLightColor * diffuse * material.DiffuseColor;
+   
+    //specular
+    float3 reflectVector = reflect(-ToLight,material.Normal);
+	float specular = saturate(dot(reflectVector, ToEye));
+	float3 specularColor = SpotLightColor * saturate(pow(specular, material.SpecularExp)) * material.SpecularColor;
+
+	return SpotLightIntensity *Attn * (diffuseColor + specularColor);
+}

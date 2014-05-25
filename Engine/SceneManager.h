@@ -37,7 +37,10 @@ namespace Disorder
 
 		void SetDefaultCamera(CameraPtr const& camera);
  
+		// get render list according camera
 		void GetRendererList(CameraPtr const camera, std::vector<GeometryRendererPtr>& renderObjList) const;
+		void GetRendererList(std::vector<GeometryRendererPtr>& renderObjList) const;
+
 		const std::vector<LightPtr>& GetLightsList() const
 		{
 			return _vLightList;
@@ -50,8 +53,13 @@ namespace Disorder
 		}
 
 		void UpdateShaderProperty();
-		
+		void UpdateBoundingBox();
 		void DebugDraw();
+
+		const BoxBounds& GetSceneBoundingBox() const
+		{
+			return _sceneBounds;
+		}
 
 		bool EnableDebugDraw;
 
@@ -63,7 +71,7 @@ namespace Disorder
         LightMap    _mLightObjects;	
 		CameraMap   _mCameraObjects;
 		CameraPtr   _mDefaultCamera;
-
+		BoxBounds   _sceneBounds;
 		std::vector<LightPtr> _vLightList;
 		std::vector<GeometryRendererPtr> _vRenderObjects;
 

@@ -76,10 +76,10 @@ namespace Disorder
 	{
 		_SamplerDesc()
 		:Filter(SF_Min_Mag_Mip_Linear), AddressU(TAM_Clamp), AddressV(TAM_Clamp), AddressW(TAM_Clamp),
-		MipLODBias(0.f), MaxAnisotropy(1), CompareFunc(CF_None)
+		MipLODBias(0.f), MaxAnisotropy(1), CompareFunc(CF_None), CompareTypeSampler(false)
 		{
 			BorderColor[0] = BorderColor[1] = BorderColor[2] = BorderColor[3] = 1.0f;
-			MinLOD = std::numeric_limits<float>::min();
+			MinLOD = 0.f;
 			MaxLOD = std::numeric_limits<float>::max();
 		}
 		SamplerFilter Filter;
@@ -92,6 +92,7 @@ namespace Disorder
 		float BorderColor[4];
 		float MinLOD;
 		float MaxLOD;
+		bool CompareTypeSampler;
 	} SamplerDesc;
 
 	class RenderState

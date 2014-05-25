@@ -17,10 +17,16 @@ namespace Disorder
 		virtual void OnFrameEnd();
 
 		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
- 
+		virtual void ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color);
+		virtual void ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
+
+		virtual void SetViewport(float width, float height, float minDepth, float maxDepth, float topX, float topY);
+
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
 	
 		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,bool useReadOnlyDepthStencil = false);
+		virtual void SetRenderTarget(const SurfaceViewPtr& renderView);
+
 		virtual void SetPrimitiveTopology(TopologyType topologyType);
 
 		virtual void SetEffect(RenderEffectPtr const& technique);
@@ -61,7 +67,7 @@ namespace Disorder
 		static D3D11_BLEND GetD3DBlendDesc(BlendOptions blendOptions);
 		static D3D11_COMPARISON_FUNC GetD3DComparisonFunc(ComparisonFunc func);
 		static D3D11_STENCIL_OP GetD3DStencilOp(StencilOperation op);
-		static D3D11_FILTER GetD3DFilter(SamplerFilter filter);
+		static D3D11_FILTER GetD3DFilter(SamplerFilter filter,bool bCompareTypeFilter = false);
 		static D3D11_TEXTURE_ADDRESS_MODE GetD3DAddressMode(TextureAddressMode addrMode);
 
 	protected:
@@ -72,8 +78,7 @@ namespace Disorder
 		virtual void SetBlendState(BlendStatePtr const& blendState);
 		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState);
 		virtual void SetDepthStencilState(DepthStencilStatePtr const& depthStencilState);
-		virtual void ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color);
-		virtual void ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
+		
 
 	private:
 		DX11RenderEngine();

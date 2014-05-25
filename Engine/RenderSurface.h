@@ -107,6 +107,7 @@ namespace Disorder
 		~RenderSurfaceCache();
 		RenderSurfacePtr MainTarget;
 		RenderGBufferPtr GBuffer;
+		ShadowMapPtr ShadowMapBuffer;
 
 		static RenderSurfaceCachePtr Create();
  

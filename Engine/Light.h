@@ -34,7 +34,7 @@ namespace Disorder
 		glm::mat4 ShadowViewMatrix;
 		glm::mat4 ShadowProjMatrix;
 
-		virtual bool Touch(RendererPtr renderObject) = 0;
+		virtual bool Touch(GeometryRendererPtr renderObject) = 0;
 		virtual bool Overlaps(const Frustrum& frustrum) = 0;
 		 
 
@@ -42,7 +42,7 @@ namespace Disorder
 		 
 
 		//visible bounding is the camera view visible ones
-		virtual void UpdateVisibleBounding(const BoxBounds& bb){};
+		virtual void CalculateShadowMatrix(){};
 
 	protected:
 		Light(std::string const& name);
@@ -58,11 +58,11 @@ namespace Disorder
 
 		static DirectionLightPtr Create(std::string const& name);
 		glm::vec3 GetDirection();
-		virtual bool Touch(RendererPtr renderObject);
+		virtual bool Touch(GeometryRendererPtr renderObject);
 		virtual bool Overlaps(const Frustrum& frustrum);
 		virtual void DebugDraw();
 
-		virtual void UpdateVisibleBounding(const BoxBounds& bb);
+		virtual void CalculateShadowMatrix();
 	};
 
 	class PointLight : public Light
@@ -74,7 +74,7 @@ namespace Disorder
 		float Range;
 		glm::vec3 GetPosition();
 		static PointLightPtr Create(std::string const& name);
-		virtual bool Touch(RendererPtr renderObject);
+		virtual bool Touch(GeometryRendererPtr renderObject);
 		virtual bool Overlaps(const Frustrum& frustrum);
         virtual void DebugDraw();
 	};
@@ -91,8 +91,9 @@ namespace Disorder
 		glm::vec3 GetDirection();
 		glm::vec3 GetPosition();
 		static SpotLightPtr Create(std::string const& name);
-		virtual bool Touch(RendererPtr renderObject);
+		virtual bool Touch(GeometryRendererPtr renderObject);
 		virtual bool Overlaps(const Frustrum& frustrum);
+		virtual void CalculateShadowMatrix();
 		virtual void DebugDraw();
  
 	};

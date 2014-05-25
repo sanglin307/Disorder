@@ -509,6 +509,11 @@ namespace Disorder
 		GEngine->RenderSurfaceCache->MainTarget = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 	}
 
+	void GLRenderEngine::SetRenderTarget(const SurfaceViewPtr& renderView)
+	{
+
+	}
+
 	void GLRenderEngine::CreateViewport(void *hWnd)
 	{
 		if (_hRC)

@@ -2,32 +2,28 @@ FBX file format version for file Mangonel.FBX is 7,3,0
 Shader Object :BatchLines:PS
 Shader Object :BatchLines:VS
 Shader Object :2DText:PS
-Shader Object :SurfaceVisual:PS
-Shader Object :SurfaceVisual:VS
-Shader Object :DeferredShading:FourLightingPS
-Shader Object :DeferredShading:BaseLightingPS
 Shader Object :2DText:VS
-Shader Object :DeferredShading:LightingVS
-Shader Object :DeferredShading:ScenePS
-Shader Object :DeferredShading:SceneVS
+Shader Object :ForwardLighting:SpotLightingPS
+Shader Object :ForwardLighting:PointLightingPS
+Shader Object :ForwardLighting:BasePassPS
+Shader Object :ForwardLighting:DirectionLightingPS
+Shader Object :ForwardLighting:SceneVS
+Shader Object :ShadowMap:DepthVertexShader
 Shader Property Manager Name :Global
- ****** Shader Property :TextTexture
- ****** Shader Property :SurfaceVisTex
- ****** Shader Property :GBufferColorSpecIntTexture
- ****** Shader Property :GBufferDepthTexture
  ****** Shader Property :TextSampler
  ****** Shader Property :DirectionLightProperty
- ****** Shader Property :GBufferSpecPowTexture
- ****** Shader Property :GBufferNormalTexture
- ****** Shader Property :SceneProperty
  ****** Shader Property :DiffuseTexture
- ****** Shader Property :SurfaceSampler
- ****** Shader Property :ForwardFourLights
+ ****** Shader Property :SpotLightProperty
  ****** Shader Property :DiffuseSampler
  ****** Shader Property :MaterialProperty
+ ****** Shader Property :SceneProperty
  ****** Shader Property :ObjectTransform
  ****** Shader Property :CameraTransforms
-Shader Property Manager Name :ShadowMapGen
+ ****** Shader Property :PointLightProperty
+ ****** Shader Property :ShadowMapGen
+ ****** Shader Property :TextTexture
+ ****** Shader Property :ShadowSampler
+ ****** Shader Property :ShadowMapTexture2D
 Shader Property Manager Name :SceneProperty
  ****** Shader Property :ScreenHeight
  ****** Shader Property :ScreenWidth
@@ -47,6 +43,22 @@ Shader Property Manager Name :ForwardFourLights
  ****** Shader Property :ForwardLightPosZ
  ****** Shader Property :ForwardLightPosY
  ****** Shader Property :ForwardLightPosX
+Shader Property Manager Name :SpotLightProperty
+ ****** Shader Property :SpotLightCosOuterCone
+ ****** Shader Property :SpotLightRangeRcp
+ ****** Shader Property :SpotLightIntensity
+ ****** Shader Property :SpotLightColor
+ ****** Shader Property :SpotLightDir
+ ****** Shader Property :SpotLightCosInnerConeRcp
+ ****** Shader Property :SpotLightPos
+Shader Property Manager Name :ShadowMapGen
+ ****** Shader Property :ShadowMapProj
+ ****** Shader Property :ShadowMapView
+Shader Property Manager Name :PointLightProperty
+ ****** Shader Property :PointLightIntensity
+ ****** Shader Property :PointLightRangeRcp
+ ****** Shader Property :PointLightColor
+ ****** Shader Property :PointLightPos
 Shader Property Manager Name :DirectionLightProperty
  ****** Shader Property :DirectionLightColor
  ****** Shader Property :DirectionLightDir

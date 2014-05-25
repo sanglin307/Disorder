@@ -130,6 +130,9 @@ namespace Disorder
 		void UpdateShaderProperty();
 
 		static CameraPtr Create(std::string const& name);
+
+		void UpdateViewProjMatrix(const glm::mat4& viewMat, const glm::mat4& projMat);
+
 	private:
 
 		Camera(std::string const& name);

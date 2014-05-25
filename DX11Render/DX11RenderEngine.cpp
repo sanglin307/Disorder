@@ -166,18 +166,22 @@ namespace Disorder
 		GEngine->RenderSurfaceCache->MainTarget = DX11RenderSurface::Create(viewMap);
  
 		// Setup the viewport
-		D3D11_VIEWPORT vp;
-		vp.Width = (FLOAT)GConfig->pRenderConfig->SizeX;
-		vp.Height = (FLOAT)GConfig->pRenderConfig->SizeY;
-		vp.MinDepth = 0.0f;
-		vp.MaxDepth = 1.0f;
-		vp.TopLeftX = 0;
-		vp.TopLeftY = 0;
-		_pImmediateContext->RSSetViewports( 1, &vp );
-
+		SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
+ 
+	
 	}
 
-
+	void DX11RenderEngine::SetViewport(float width, float height, float minDepth, float maxDepth, float topX, float topY)
+	{
+		 D3D11_VIEWPORT vp;
+		 vp.Width = width;
+		 vp.Height = height;
+		 vp.MinDepth = minDepth;
+		 vp.MaxDepth = maxDepth;
+		 vp.TopLeftX = topX;
+		 vp.TopLeftY = topY;
+		 _pImmediateContext->RSSetViewports(1, &vp);
+	}
 
 	void DX11RenderEngine::Init()
 	{
@@ -230,6 +234,7 @@ namespace Disorder
 
 	void DX11RenderEngine::SetBlendState(BlendStatePtr const& blendState)
 	{ 
+
 		if (CachedBlendState != blendState || CachedBlendState->BlendFactor[0] != CachedBlendFactor[0] || CachedBlendState->BlendFactor[1] != CachedBlendFactor[1] || 
 			CachedBlendState->BlendFactor[2] != CachedBlendFactor[2] || CachedBlendState->BlendFactor[3] != CachedBlendFactor[3] || 
 			CachedBlendState->SampleMask != CachedBlendSampleMask )
@@ -306,30 +311,76 @@ namespace Disorder
 		return D3D11_TEXTURE_ADDRESS_CLAMP;
 	}
 
-	D3D11_FILTER DX11RenderEngine::GetD3DFilter(SamplerFilter filter)
+	D3D11_FILTER DX11RenderEngine::GetD3DFilter(SamplerFilter filter, bool bCompareTypeFilter)
 	{
 		switch (filter)
 		{
-		case SF_Min_Mag_Mip_Point:
-			return D3D11_FILTER_MIN_MAG_MIP_POINT;
-		case SF_Min_Mag_Point_Mip_Linear:
-			return D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
-		case SF_Min_Point_Mag_Linear_Mip_Point:
-			return D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
-		case SF_Min_Point_Mag_Mip_Linear:
-			return D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
-		case SF_Min_Linear_Mag_Mip_Point:
-			return D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
-		case SF_Min_Linear_Mag_Point_Mip_Linear:
-			return D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
-		case SF_Min_Mag_Linear_Mip_Point:
-			return D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
-		case SF_Min_Mag_Mip_Linear:
-			return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		case SF_Anisotropic:
-			return D3D11_FILTER_ANISOTROPIC;
-		default:
-			BOOST_ASSERT(0);
+			case SF_Min_Mag_Mip_Point:
+			{
+				if (bCompareTypeFilter)
+					return D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
+				else
+					return D3D11_FILTER_MIN_MAG_MIP_POINT;
+			}
+			case SF_Min_Mag_Point_Mip_Linear:
+			{
+				if (bCompareTypeFilter)
+					return D3D11_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR;
+				else
+					return D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+			}
+			case SF_Min_Point_Mag_Linear_Mip_Point:
+			{
+				if (bCompareTypeFilter)
+					return D3D11_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT;
+				else
+					return D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
+			}
+			case SF_Min_Point_Mag_Mip_Linear:
+			{
+				if (bCompareTypeFilter)
+					return D3D11_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR;
+				else
+					return D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
+			}
+			case SF_Min_Linear_Mag_Mip_Point:
+			{
+				if (bCompareTypeFilter)
+					return D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT;
+				else
+					return D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
+			}
+			
+			case SF_Min_Linear_Mag_Point_Mip_Linear:
+			{
+				if (bCompareTypeFilter)
+					return D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+				else
+					return D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+			}	
+			case SF_Min_Mag_Linear_Mip_Point:
+			{
+				if (bCompareTypeFilter)
+					return D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+				else
+					return D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+			}
+			case SF_Min_Mag_Mip_Linear:
+			{
+				if (bCompareTypeFilter)
+					return D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+				else
+					return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+			}
+			case SF_Anisotropic:
+			{
+				if (bCompareTypeFilter)
+					return D3D11_FILTER_COMPARISON_ANISOTROPIC;
+				else
+					return D3D11_FILTER_ANISOTROPIC;
+			}
+			default:
+				BOOST_ASSERT(0);
 		}
 
 		return D3D11_FILTER_MIN_MAG_MIP_POINT;
@@ -681,6 +732,20 @@ namespace Disorder
 					_pImmediateContext->PSSetShaderResources(0,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT ,(ID3D11ShaderResourceView**)&nullArray);
 				}
 			}
+			else
+			{
+				_pImmediateContext->PSSetShader(NULL, NULL, 0);
+
+				void* nullArrayCB[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT] = { NULL };
+				_pImmediateContext->PSSetConstantBuffers(0, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, (ID3D11Buffer**)&nullArrayCB);
+
+				void* nullArraySS[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT] = { NULL };
+				_pImmediateContext->PSSetSamplers(0, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, (ID3D11SamplerState**)&nullArraySS);
+
+				void* nullArraySR[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
+				_pImmediateContext->PSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, (ID3D11ShaderResourceView**)&nullArraySR);
+
+			}
 		}
 	}
 
@@ -726,7 +791,27 @@ namespace Disorder
 		
 	}
 
-	 
+	void DX11RenderEngine::SetRenderTarget(const SurfaceViewPtr& renderView)
+	{
+		DX11SurfaceViewPtr dxView = boost::dynamic_pointer_cast<DX11SurfaceView>(renderView);
+		if (dxView->Type == SV_DepthStencil)
+		{
+			ID3D11RenderTargetView* RT = NULL;
+			ID3D11DepthStencilView* pDepthView = dxView->DepthStencilHandle.get();
+			_pImmediateContext->OMSetRenderTargets(1,&RT, pDepthView);
+		}
+		else if (dxView->Type == SV_RenderTarget)
+		{
+			ID3D11RenderTargetView* RT = (ID3D11RenderTargetView*)dxView->RenderTargetHandle.get();
+			_pImmediateContext->OMSetRenderTargets(1,&RT, NULL);
+		}
+		else
+		{
+			BOOST_ASSERT(0);
+		}
+
+			
+	}
 	 
 	void DX11RenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget,bool useReadOnlyDepthStencil)
 	{
@@ -765,6 +850,7 @@ namespace Disorder
 	    _pImmediateContext->ClearRenderTargetView((ID3D11RenderTargetView*)target->RenderTargetHandle.get(), glm::value_ptr(color));
 	}
 
+	 
 	void DX11RenderEngine::ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
 	{
 		DX11RenderSurfacePtr dxSurface = boost::dynamic_pointer_cast<DX11RenderSurface>(renderSurface);

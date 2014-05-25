@@ -18,9 +18,9 @@ namespace Disorder
 			return _height;
 		}
 
-		void PrepareRender(const glm::mat4& viewMat, const glm::mat4& projMat);
+		void PrepareRenderDepth(const glm::mat4& viewMat, const glm::mat4& projMat);
 		void RenderObject(const CameraPtr& camera, const GeometryRendererPtr object);
-
+		void PrepareRenderLight(const LightPtr& light);
 		void UpdateShaderProperty();
 
 	protected:
@@ -30,19 +30,22 @@ namespace Disorder
 
 		ShaderPropertyPtr _viewMatrix;
 		ShaderPropertyPtr _projMatrix;
+		ShaderPropertyPtr _shadowSampler;
+		ShaderPropertyPtr _shadowTexture2D;
  
 		RenderTexture2DPtr _shadowDataTex;
-		SurfaceViewPtr _targetView;
+		SurfaceViewPtr _depthView;
 		SurfaceViewPtr _shaderView;
-		RenderSurfacePtr _renderTarget;
+		SamplerStatePtr _shadowSamplerState;
+	 
 		unsigned int _width;
 		unsigned int _height;
 
 		glm::mat4 _viewMat;
 		glm::mat4 _projMat;
 
-		static SurfaceViewPtr sDepthBufferView;
 		static RenderEffectPtr sDepthGenEffect;
+		 
 	};
 
 }

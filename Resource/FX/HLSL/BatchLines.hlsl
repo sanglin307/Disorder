@@ -1,4 +1,4 @@
-#include "Common.dsf"
+#include "Common.hlsl"
 
 //--------------------------------------------------------------------------------------
 // shader input/output structure

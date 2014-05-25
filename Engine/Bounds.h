@@ -51,29 +51,24 @@ namespace Disorder
 			center = BMin + Extents;
 		}
 
-		inline BoxBounds Union(const glm::vec3 &p)
+		inline void Union(const glm::vec3 &p)
 		{
-			BoxBounds ret = *this;
-			ret.BMin.x = Min(BMin.x, p.x);
-			ret.BMin.y = Min(BMin.y, p.y);
-			ret.BMin.z = Min(BMin.z, p.z);
-			ret.BMax.x = Max(BMax.x, p.x);
-			ret.BMax.y = Max(BMax.y, p.y);
-			ret.BMax.z = Max(BMax.z, p.z);
-			
-			return ret;
+			BMin.x = Min(BMin.x, p.x);
+			BMin.y = Min(BMin.y, p.y);
+			BMin.z = Min(BMin.z, p.z);
+			BMax.x = Max(BMax.x, p.x);
+			BMax.y = Max(BMax.y, p.y);
+			BMax.z = Max(BMax.z, p.z);
 		}
 
-		inline BoxBounds Union(const BoxBounds &b)
+		inline void Union(const BoxBounds &b)
 		{			 
-			BoxBounds ret;
-			ret.BMin.x = Min(BMin.x, b.BMin.x);
-			ret.BMin.y = Min(BMin.y, b.BMin.y);
-			ret.BMin.z = Min(BMin.z, b.BMin.z);
-			ret.BMax.x = Max(BMax.x, b.BMax.x);
-			ret.BMax.y = Max(BMax.y, b.BMax.y);
-			ret.BMax.z = Max(BMax.z, b.BMax.z);
-			return ret;
+			BMin.x = Min(BMin.x, b.BMin.x);
+			BMin.y = Min(BMin.y, b.BMin.y);
+			BMin.z = Min(BMin.z, b.BMin.z);
+			BMax.x = Max(BMax.x, b.BMax.x);
+			BMax.y = Max(BMax.y, b.BMax.y);
+			BMax.z = Max(BMax.z, b.BMax.z);
 		}
  
 		inline  bool Overlaps(const BoxBounds &b) const 
@@ -261,8 +256,10 @@ namespace Disorder
 		{
 			// Find an axis aligned bounding box for the points.
 			BoxBounds BoundingBox;
+
 			for(unsigned int PointIndex = 0;PointIndex < NumPoints;PointIndex++)
-				BoundingBox = BoundingBox.Union(Points[PointIndex]);
+				BoundingBox.Union(Points[PointIndex]);
+
 			BoundingBox.GetCenterAndExtents(Origin,BoxExtent);
 
 			// Using the center of the bounding box as the origin of the sphere, find the radius of the bounding sphere.

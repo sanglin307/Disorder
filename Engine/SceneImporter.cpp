@@ -166,6 +166,8 @@ namespace Disorder
 			}
 		}
 
+		GSceneManager->UpdateBoundingBox();
+
 	}
 	 
 
@@ -717,7 +719,7 @@ namespace Disorder
 		 if(lLight->LightType.Get() == FbxLight::ePoint )
 		 {
 			 PointLightPtr lightObj = PointLight::Create(gameObject->Name);
-			 lightObj->Range = 10;
+			 lightObj->Range = 50;
 			 lightObj->Color.x = (float)lLight->Color.Get()[0];
 		     lightObj->Color.y= (float)lLight->Color.Get()[1];
 		     lightObj->Color.z = (float)lLight->Color.Get()[2];
@@ -738,14 +740,14 @@ namespace Disorder
 		 else if(lLight->LightType.Get() == FbxLight::eSpot )
 		 {
 			 SpotLightPtr lightObj = SpotLight::Create(gameObject->Name);
-			 lightObj->Range = 10;
+			 lightObj->Range = 50;
 			 lightObj->Color.x = (float)lLight->Color.Get()[0];
 		     lightObj->Color.y = (float)lLight->Color.Get()[1];
 		     lightObj->Color.z = (float)lLight->Color.Get()[2];
 
 		     lightObj->Intensity = (float)lLight->Intensity.Get()/100.f;
-			 lightObj->SpotInnerAngle = (float)lLight->InnerAngle.Get();
-			 lightObj->SpotOuterAngle = (float)lLight->OuterAngle.Get();
+			 lightObj->SpotInnerAngle = (float)lLight->InnerAngle.Get() * Math::fDeg2Rad;
+			 lightObj->SpotOuterAngle = (float)lLight->OuterAngle.Get() * Math::fDeg2Rad;
 
 			 gameObject->AddComponent(lightObj);
 		 }

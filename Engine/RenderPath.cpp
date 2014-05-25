@@ -25,6 +25,22 @@ namespace Disorder
 		ForwardLightColorG = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightColorG,eSP_Float,4);
 		ForwardLightColorB = _LightFourPropertyManager->CreateProperty(ShaderPropertyManager::sForwardLightColorB,eSP_Float,4);
 
+		_PointLightPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerPointLight);
+		_PointLightPosProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightPos,eSP_Float,3);
+		_PointLightColorProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightColor, eSP_Float, 3);
+		_PointLightRangeRcpProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightRangeRcp, eSP_Float, 1);
+		_PointLightIntensityProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightIntensity, eSP_Float, 1);
+
+		_SpotLightPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerSpotLight);
+		_SpotLightPosProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightPos,eSP_Float,3);
+		_SpotLightDirProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightDir, eSP_Float, 3);
+		_SpotLightColorProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightColor, eSP_Float, 3);
+		_SpotLightIntensityProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightIntensity, eSP_Float, 1);
+		_SpotLightRangeRcpProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightRangeRcp, eSP_Float, 1);
+		_SpotLightCosOuterConeProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightCosOuterCone, eSP_Float, 1);
+		_SpotLightCosInnerConeRcpProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightCosInnerConeRcp, eSP_Float, 1);
+
+
 	}
 
 	void RenderPath::SetDirectionLight(const DirectionLightPtr& directionLight)
@@ -36,6 +52,37 @@ namespace Disorder
 		_DirectionLightColorProperty->SetData(glm::value_ptr(directionLight->Color));
 
 		_DirectionLightPropertyManager->UpdateShaderProperty();
+	}
+
+	void RenderPath::SetPointLight(const PointLightPtr& pointLight)
+	{
+		glm::vec3 pos = pointLight->GetPosition();
+		_PointLightPosProperty->SetData(glm::value_ptr(pos));
+		_PointLightColorProperty->SetData(glm::value_ptr(pointLight->Color));
+		float rangeRcp = 1.0f / pointLight->Range;
+		_PointLightRangeRcpProperty->SetData(&rangeRcp);
+		_PointLightIntensityProperty->SetData(&pointLight->Intensity);
+		_PointLightPropertyManager->UpdateShaderProperty();
+	}
+
+	void RenderPath::SetSpotLight(const SpotLightPtr& spotLight)
+	{
+		glm::vec3 spotPos = spotLight->GetPosition();
+		glm::vec3 spotDir = spotLight->GetDirection();
+
+		float rangeRcp = 1.0f / spotLight->Range;
+		float innerRcp = 1.0f / Math::Cosf(spotLight->SpotInnerAngle);
+		float outerCone = Math::Cosf(spotLight->SpotOuterAngle);
+
+		_SpotLightPosProperty->SetData(glm::value_ptr(spotPos));
+		_SpotLightDirProperty->SetData(glm::value_ptr(spotDir));
+		_SpotLightColorProperty->SetData(glm::value_ptr(spotLight->Color));
+		_SpotLightRangeRcpProperty->SetData(&rangeRcp);
+		_SpotLightCosOuterConeProperty->SetData(&outerCone);
+		_SpotLightCosInnerConeRcpProperty->SetData(&innerRcp);
+		_SpotLightIntensityProperty->SetData(&spotLight->Intensity);
+		_SpotLightPropertyManager->UpdateShaderProperty();
+
 	}
 
 	void RenderPath::SetFourLight(const std::vector<LightPtr>& lightArray)
@@ -124,90 +171,71 @@ namespace Disorder
 		const std::vector<LightPtr>& lightList = GSceneManager->GetLightsList();
 		if (lightList.size() == 0)
 			return;
+ 
+		std::vector<GeometryRendererPtr> allGeometryList;
+		GSceneManager->GetRendererList(allGeometryList);
 
-		BoxBounds sceneBounds;
-		for (size_t i = 0; i < renderList.size(); i++)
-		{
-			const GeometryPtr geometry = renderList[i]->GetGeometry();
-			BoxBounds box = geometry->BoundingBox.GetBox();
-			sceneBounds.Union(box);
-		}
-
-		// render shadow
-		/*for (size_t i = 0; i < lightList.size(); i++)
+		for (size_t i = 0; i < lightList.size(); i++)
 		{
 			LightPtr light = lightList[i];
-			if (!light->CastShadows)
+
+			// render shadow
+			if (!light->CastShadows || light->LightType == LT_Point)
 				continue;
 
-			light->UpdateVisibleBounding(sceneBounds);
-			std::map<LightPtr, ShadowMapPtr>::iterator iter = _LightShaowMaps.find(light);
-			ShadowMapPtr shadowMap = NULL;
-			if (iter != _LightShaowMaps.end())
+			light->CalculateShadowMatrix();
+			// begin render depth
+			GEngine->RenderSurfaceCache->ShadowMapBuffer->PrepareRenderDepth(light->ShadowViewMatrix, light->ShadowProjMatrix);	
+			for (size_t j = 0; j < allGeometryList.size(); j++)
 			{
-				shadowMap = iter->second;
-			}
-			else
-			{
-				shadowMap = ShadowMap::Create(1024, 1024);
-				_LightShaowMaps.insert(std::pair<LightPtr, ShadowMapPtr>(light, shadowMap));
-			}
-
-			shadowMap->PrepareRender(light->ShadowViewMatrix, light->ShadowProjMatrix);
-			
-			for (size_t j = 0; j < renderList.size(); j++)
-			{
-				if (!renderList[j]->GetGeometry()->CastShadow)
+				if (!allGeometryList[j]->GetGeometry()->CastShadow)
 					continue;
 
-				if (!light->Touch(renderList[j]))
+				if (!light->Touch(allGeometryList[j]))
 					continue;
 
-				shadowMap->RenderObject(camera, renderList[j]);
+				GEngine->RenderSurfaceCache->ShadowMapBuffer->RenderObject(camera, allGeometryList[j]);
 			}
-		}
-*/
 
-		// render light
-		for (unsigned int i = 0; i < renderList.size(); i++)
-		{
-			GeometryRendererPtr obj = renderList[i];
-			obj->UpdateShaderProperty();
-			std::vector<LightPtr> lightArray;
-			for (size_t j = 0; j < lightList.size(); j++)
+			// render object
+			GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget);
+			GEngine->RenderEngine->SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
+			GEngine->RenderSurfaceCache->ShadowMapBuffer->PrepareRenderLight(light);
+
+			if (light->LightType == LT_Directional)
 			{
-				LightPtr light = lightList[j];
+				DirectionLightPtr dirLight = boost::dynamic_pointer_cast<DirectionLight>(light);
+				SetDirectionLight(dirLight);
+			}
+			else if (light->LightType == LT_Point)
+			{
+				PointLightPtr pointLight = boost::dynamic_pointer_cast<PointLight>(light);
+				SetPointLight(pointLight);
+			}
+			else if (light->LightType == LT_Spot)
+			{
+				SpotLightPtr spotLight = boost::dynamic_pointer_cast<SpotLight>(light);
+				SetSpotLight(spotLight);
+			}
+
+			for (unsigned int i = 0; i < renderList.size(); i++)
+			{
+				GeometryRendererPtr obj = renderList[i];
 				if (!light->Touch(obj))
 					continue;
-
+				obj->UpdateShaderProperty();
 				if (light->LightType == LT_Directional)
-				{
-					SetDirectionLight(boost::dynamic_pointer_cast<DirectionLight>(light));
 					obj->SetRenderEffect(_DirectionLightEffect);
-					obj->Render(camera);
-				}
-				else
-				{
-					lightArray.push_back(light);
-					if (lightArray.size() == 4)
-					{
-						SetFourLight(lightArray);
-						obj->SetRenderEffect(_FourLightEffect);
-						obj->Render(camera);
-						lightArray.clear();
-					}
-				}
-			}
+				else if (light->LightType == LT_Point)
+					obj->SetRenderEffect(_PointLightEffect);
+				else if (light->LightType == LT_Spot)
+					obj->SetRenderEffect(_SpotLightEffect);
 
-			if (lightArray.size() > 0)
-			{
-				SetFourLight(lightArray);
-				obj->SetRenderEffect(_FourLightEffect);
 				obj->Render(camera);
-			}
  
+			}
 		}
-
+ 
 	}
 
 	void ForwardRenderPath::BasePassRender(const CameraPtr& camera, const std::vector<GeometryRendererPtr>& renderList)
@@ -267,26 +295,34 @@ namespace Disorder
 	ForwardRenderPath::ForwardRenderPath()
 	{
 		_type = RPT_ForwardLighting;
+
+		_BasePassEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ForwardLighting", SM_4_0, "SceneVS");
 		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "ForwardLighting", SM_4_0, "BasePassPS");
-		_BasePassEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		_BasePassEffect->BindShader(vertexShader);
 		_BasePassEffect->BindShader(pixelShader);
 		_BasePassEffect->LinkShaders();
 
 		_DirectionLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr dvertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"SceneVS");
-		ShaderObjectPtr dpixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"BaseLightingPS");
+		ShaderObjectPtr dpixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"DirectionLightingPS");
 		_DirectionLightEffect->BindShader(dvertexShader);
 		_DirectionLightEffect->BindShader(dpixelShader);
 		_DirectionLightEffect->LinkShaders();
  
-		_FourLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr fVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"SceneVS");
-		ShaderObjectPtr fPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"FourLightingPS");
-		_FourLightEffect->BindShader(fVertexShader);
-		_FourLightEffect->BindShader(fPixelShader);
-		_FourLightEffect->LinkShaders();
+		_PointLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
+		ShaderObjectPtr pVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"SceneVS");
+		ShaderObjectPtr pPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"PointLightingPS");
+		_PointLightEffect->BindShader(pVertexShader);
+		_PointLightEffect->BindShader(pPixelShader);
+		_PointLightEffect->LinkShaders();
+
+		_SpotLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
+		ShaderObjectPtr sVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ForwardLighting", SM_4_0, "SceneVS");
+		ShaderObjectPtr sPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "ForwardLighting", SM_4_0, "SpotLightingPS");
+		_SpotLightEffect->BindShader(sVertexShader);
+		_SpotLightEffect->BindShader(sPixelShader);
+		_SpotLightEffect->LinkShaders();
 
 		BlendDesc bDesc;
 		bDesc.BlendEnable = true;
@@ -298,13 +334,16 @@ namespace Disorder
 		bDesc.DestBlendAlpha = BLEND_ONE;
 		BlendStatePtr blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc,1);
 		_DirectionLightEffect->BindBlendState(blendState);
-		_FourLightEffect->BindBlendState(blendState);
+		_PointLightEffect->BindBlendState(blendState);
+		_SpotLightEffect->BindBlendState(blendState);
  
 		DepthStencilDesc dsDesc;
 		dsDesc.DepthFunc = CF_Less_Equal;
+		dsDesc.DepthWrite = false;
 		DepthStencilStatePtr noDepthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dsDesc,0);
 		_DirectionLightEffect->BindDepthStencilState(noDepthState);
-		_FourLightEffect->BindDepthStencilState(noDepthState);
+		_PointLightEffect->BindDepthStencilState(noDepthState);
+		_SpotLightEffect->BindDepthStencilState(noDepthState);
  
 	}
 
