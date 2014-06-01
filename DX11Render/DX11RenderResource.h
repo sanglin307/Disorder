@@ -27,8 +27,9 @@ namespace Disorder
 	{
 	public:
 
-		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, BufferInitData const* pData);
+		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize,BufferInitData const* pData);
 		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat, bool bMultiSample,ImagePtr const& image);
+		static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image);
 	    static DX11RenderTexture2DPtr Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,ID3D11Texture2DPtr DXInterface);
 		virtual void * GetHandle();
 	protected:
@@ -39,16 +40,6 @@ namespace Disorder
 	};
 	
  
-	class DX11RenderTextureCube : public RenderTextureCube
-	{
-	public:
-
-	protected:
-		DX11RenderTextureCube() {};
-
-	public:
-
-	};
 
 }
 

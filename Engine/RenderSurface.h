@@ -8,7 +8,8 @@ namespace Disorder
 	enum ESurfaceFlag
 	{
 		SF_ReadOnlyDepth = 0x1L,
-		SF_ReadOnlyStencil = 0x2L
+		SF_ReadOnlyStencil = 0x2L,
+		SF_CubeMap = 0x4L
 	};
 
 	enum ESurfaceViewType

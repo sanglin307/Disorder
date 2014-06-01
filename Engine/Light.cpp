@@ -121,6 +121,43 @@ namespace Disorder
 		return frustrum.Overlaps(bound);
 	}
 
+	void PointLight::CalculateShadowMatrix()
+	{
+		GameObjectPtr lightGo = GetBase();
+		glm::vec3 lightPos = lightGo->GetWorldPosition();
+	
+		// +X
+		glm::vec3 vLookDir(lightPos.x + 1,lightPos.y,lightPos.z);
+		glm::vec3 vUpDir(0,1,0);
+		ShadowViewMatrix[0] = Math::ViewMatrixRH(lightPos, vLookDir, vUpDir);
+		
+		// -X
+		vLookDir = glm::vec3(lightPos.x - 1, lightPos.y, lightPos.z);
+		ShadowViewMatrix[1] = Math::ViewMatrixRH(lightPos, vLookDir, vUpDir);
+
+		// +Y
+		vLookDir = glm::vec3(lightPos.x, lightPos.y + 1, lightPos.z);
+		vUpDir = glm::vec3(0,0,1);
+		ShadowViewMatrix[2] = Math::ViewMatrixRH(lightPos, vLookDir, vUpDir);
+
+		// -Y
+		vLookDir = glm::vec3(lightPos.x, lightPos.y - 1, lightPos.z);
+		vUpDir = glm::vec3(0, 0, -1);
+		ShadowViewMatrix[3] = Math::ViewMatrixRH(lightPos, vLookDir, vUpDir);
+
+		// +Z
+		vLookDir = glm::vec3(lightPos.x, lightPos.y, lightPos.z + 1);
+		vUpDir = glm::vec3(0, 1, 0);
+		ShadowViewMatrix[4] = Math::ViewMatrixRH(lightPos, vLookDir, vUpDir);
+
+		// -Z
+		vLookDir = glm::vec3(lightPos.x, lightPos.y, lightPos.z - 1);
+		vUpDir = glm::vec3(0, 1, 0);
+		ShadowViewMatrix[5] = Math::ViewMatrixRH(lightPos, vLookDir, vUpDir);
+
+		ShadowProjMatrix = Math::ProjFovRH(Math::HALF_PI, 1, 0.01f, Range);
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	SpotLight::SpotLight(std::string const& name)

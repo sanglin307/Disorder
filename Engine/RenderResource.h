@@ -59,7 +59,7 @@ namespace Disorder
         unsigned int MipLevel;
 		unsigned int MultiSampleCount;
 		unsigned int MultiSampleQuality;
-
+		int ArraySize;
 		SamplerStatePtr Sampler;
 	protected:
 
@@ -69,10 +69,7 @@ namespace Disorder
 	class RenderTexture3D: public RenderTexture
 	{
 	};
-
-	class RenderTextureCube : public RenderTexture
-	{
-	};
+ 
 }
 
 

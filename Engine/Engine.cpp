@@ -27,7 +27,8 @@ namespace Disorder
 	   RenderResourceMgr->Init();
 	 //  GFontManager->LoadFontImageData();
 	   // shadowMap
-	   GEngine->RenderSurfaceCache->ShadowMapBuffer = ShadowMap::Create(1024, 1024);
+	   unsigned int shadowSize = GConfig->pRenderConfig->ShadowMapSize;
+	   GEngine->RenderSurfaceCache->ShadowMapBuffer = ShadowMap::Create(shadowSize, shadowSize);
 
 	   viewport->SetRenderPath(RPT_ForwardLighting);
 	   SceneImporter->Init();

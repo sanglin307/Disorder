@@ -64,7 +64,6 @@ namespace Disorder
         static const std::string sManagerObject;
         static const std::string sManagerMaterial;
         static const std::string sManagerDirectionLight;
-		static const std::string sManagerForwardFourLight;
 		static const std::string sManagerPointLight;
 		static const std::string sManagerSpotLight;
 		static const std::string sManagerScene;
@@ -112,30 +111,13 @@ namespace Disorder
 		static const std::string sSpotLightCosOuterCone;
 		static const std::string sSpotLightCosInnerConeRcp;
  
-		//forward four light
-		static const std::string sForwardLightPosX;
-		static const std::string sForwardLightPosY;
-		static const std::string sForwardLightPosZ;
-		static const std::string sForwardLightDirX;
-		static const std::string sForwardLightDirY;
-		static const std::string sForwardLightDirZ;
-		static const std::string sForwardLightRangeRcp;
-		static const std::string sForwardSpotCosOuterCone;
-		static const std::string sForwardSpotCosInnerConeRcp;
-		static const std::string sForwardCapsuleLen;
-		static const std::string sForwardLightColorR;
-		static const std::string sForwardLightColorG;
-		static const std::string sForwardLightColorB;
-
 		//for scene property
 		static const std::string sAmbientLowColor;
 		static const std::string sAmbientUpperColor;
-		static const std::string sScreenWidth;
-		static const std::string sScreenHeight;
  
 		// ShadowMapGen
-		static const std::string sShadowMapWorld;
 		static const std::string sShadowMapView;
+		static const std::string sShadowMapViewArray;
 		static const std::string sShadowMapProj;
 
 		//for global property
@@ -157,6 +139,10 @@ namespace Disorder
 
 		static const std::string sShadowSampler;
 		static const std::string sShadowMapTexture2D;
+		static const std::string sShadowMapTextureCube;
+
+		static const std::string sSkyboxTexture;
+		static const std::string sSkyboxSampler;
 
 	public:
 		std::string Name;

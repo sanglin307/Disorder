@@ -4,6 +4,7 @@
 namespace Disorder
 {
 	std::map<std::string,std::string> ShaderObject::sMapIncludeFiles;
+	std::map<std::string,std::string> ShaderObject::_mapShaderMacro;
 
 	void ShaderObject::SetShaderMacro(std::string const& name,std::string const& value)
 	{
@@ -25,6 +26,8 @@ namespace Disorder
 	{
 		if( _vertexShader != NULL )
 			_vertexShader->UpdateShaderParameter();
+		if (_geometryShader != NULL)
+			_geometryShader->UpdateShaderParameter();
 		if( _pixelShader != NULL )
 			_pixelShader->UpdateShaderParameter();
 	}

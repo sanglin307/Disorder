@@ -35,19 +35,19 @@ namespace Disorder
 		SamplerStatePtr pointState = GEngine->RenderResourceMgr->CreateSamplerState(&sDesc);
 		_SurfaceSampler->SetData(pointState);
  
-		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R24G8_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource, NULL);
+		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R24G8_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource,1, NULL);
 		DepthBufferView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, depthStencilTex, PF_D24_UNORM_S8_UINT, SF_ReadOnlyDepth | SF_ReadOnlyStencil);
 		DepthShaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, depthStencilTex, PF_R24_UNORM_X8_TYPELESS);
 
-		RenderTexture2DPtr basicColorTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, width, height, false, false, SV_RenderTarget | SV_ShaderResource, NULL);
+		RenderTexture2DPtr basicColorTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, width, height, false, false, SV_RenderTarget | SV_ShaderResource,1, NULL);
 		BasicColorShaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, basicColorTex, PF_R8G8B8A8_UNORM);
 		BasicColorTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, basicColorTex, PF_R8G8B8A8_UNORM);
 
-		RenderTexture2DPtr normalTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R11G11B10_FLOAT, width, height, false, false, SV_RenderTarget | SV_ShaderResource, NULL);
+		RenderTexture2DPtr normalTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R11G11B10_FLOAT, width, height, false, false, SV_RenderTarget | SV_ShaderResource, 1,NULL);
 		NormalDataShaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, normalTex, PF_R11G11B10_FLOAT);
 		NormalDataTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, normalTex, PF_R11G11B10_FLOAT);
 
-		RenderTexture2DPtr specularTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, width, height, false, false, SV_RenderTarget | SV_ShaderResource, NULL);
+		RenderTexture2DPtr specularTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, width, height, false, false, SV_RenderTarget | SV_ShaderResource, 1,NULL);
 		SpecularDataShaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, specularTex, PF_R8G8B8A8_UNORM);
 		SpecularDataTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, specularTex, PF_R8G8B8A8_UNORM);
 

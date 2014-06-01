@@ -5,5 +5,5 @@
   <ResX>1280</ResX>
   <ResY>720</ResY>
   <MultiSampleCount>1</MultiSampleCount>
-  <SyncInterval>1</SyncInterval>
+  <SyncInterval>0</SyncInterval>
 </RenderConfig>

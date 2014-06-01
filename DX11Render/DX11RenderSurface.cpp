@@ -31,13 +31,28 @@ namespace Disorder
 			D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
 			SRVDesc.Format = DX11RenderEngine::GetPixelFormat(format);
 			RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(resource);
-			if (tex->MultiSampleCount > 1)
-				SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+			
+			if (tex->ArraySize == 6 && flag & SF_CubeMap)
+			{
+				SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+				SRVDesc.TextureCube.MostDetailedMip = 0;
+				SRVDesc.TextureCube.MipLevels = 1;
+			}
 			else
-				SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			SRVDesc.Texture2D.MostDetailedMip = 0;
-			SRVDesc.Texture2D.MipLevels = 1;
-			renderEngine->D3DDevice()->CreateShaderResourceView((ID3D11Resource *)resource->GetHandle(), &SRVDesc, &pShaderResourceView);
+			{
+				if (tex->MultiSampleCount > 1)
+					SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+				else
+				{
+					SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+					SRVDesc.Texture2D.MostDetailedMip = 0;
+					SRVDesc.Texture2D.MipLevels = 1;
+				}
+			}
+			
+			
+			HRESULT hr = renderEngine->D3DDevice()->CreateShaderResourceView((ID3D11Resource *)resource->GetHandle(), &SRVDesc, &pShaderResourceView);
+			BOOST_ASSERT(SUCCEEDED(hr));
 			pSurface->ShaderResourceHandle = MakeComPtr<ID3D11ShaderResourceView>(pShaderResourceView);
 		}
 		else if (type == SV_DepthStencil)
@@ -47,13 +62,36 @@ namespace Disorder
 			ZeroMemory(&descDSV, sizeof(descDSV));
 			descDSV.Format = DX11RenderEngine::GetPixelFormat(format);
 			RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(resource);
-			if (tex->MultiSampleCount > 1)
-				descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+			if (tex->ArraySize > 1)
+			{
+				if (tex->MultiSampleCount > 1)
+				{
+					descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
+					descDSV.Texture2DMSArray.ArraySize = tex->ArraySize;
+					descDSV.Texture2DMSArray.FirstArraySlice = 0;
+				}
+				else
+				{
+					descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+					descDSV.Texture2DArray.ArraySize = tex->ArraySize;
+					descDSV.Texture2DArray.FirstArraySlice = 0;
+					descDSV.Texture2DArray.MipSlice = 0;
+				}
+			}
 			else
-				descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-			descDSV.Texture2D.MipSlice = 0;
+			{
+				if (tex->MultiSampleCount > 1)
+					descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+				else
+					descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
-			renderEngine->D3DDevice()->CreateDepthStencilView((ID3D11Resource *)resource->GetHandle(), &descDSV, &pDepthStencilView);
+				descDSV.Texture2D.MipSlice = 0;
+			}
+			
+			
+ 
+			HRESULT hr = renderEngine->D3DDevice()->CreateDepthStencilView((ID3D11Resource *)resource->GetHandle(), &descDSV, &pDepthStencilView);
+			BOOST_ASSERT(SUCCEEDED(hr));
 			pSurface->DepthStencilHandle = MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView);
 
 			ID3D11DepthStencilView* pDepthStencilViewReadOnly = NULL;
@@ -64,7 +102,8 @@ namespace Disorder
 				if (flag & SF_ReadOnlyStencil)
 					descDSV.Flags |= D3D11_DSV_READ_ONLY_STENCIL;
 
-				renderEngine->D3DDevice()->CreateDepthStencilView((ID3D11Resource *)resource->GetHandle(), &descDSV, &pDepthStencilViewReadOnly);
+				hr = renderEngine->D3DDevice()->CreateDepthStencilView((ID3D11Resource *)resource->GetHandle(), &descDSV, &pDepthStencilViewReadOnly);
+				BOOST_ASSERT(SUCCEEDED(hr));
 				pSurface->ReadonlyDepthStencil = MakeComPtr<ID3D11DepthStencilView>(pDepthStencilViewReadOnly);
 			}
 			else
@@ -77,12 +116,25 @@ namespace Disorder
 			D3D11_RENDER_TARGET_VIEW_DESC SRVDesc;
 			SRVDesc.Format = DX11RenderEngine::GetPixelFormat(format);
 			RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(resource);
-			if (tex->MultiSampleCount > 1)
-				SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+
+			if (tex->ArraySize > 1)
+			{
+				if (tex->MultiSampleCount > 1)
+					SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+				else
+					SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+			}
 			else
-				SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+			{
+				if (tex->MultiSampleCount > 1)
+					SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+				else
+					SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+			}
+			
 			SRVDesc.Texture2D.MipSlice = 0;
-			renderEngine->D3DDevice()->CreateRenderTargetView((ID3D11Resource *)resource->GetHandle(), &SRVDesc, &pRenderTargetView);
+			HRESULT hr = renderEngine->D3DDevice()->CreateRenderTargetView((ID3D11Resource *)resource->GetHandle(), &SRVDesc, &pRenderTargetView);
+			BOOST_ASSERT(SUCCEEDED(hr));
 			pSurface->RenderTargetHandle = MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView);
 		}
 		else

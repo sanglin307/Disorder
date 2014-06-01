@@ -26,8 +26,8 @@ namespace Disorder
 		virtual bool LoadShaderFromFile(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType) = 0;
 		virtual void ShaderReflection() = 0;
 
-		void SetShaderMacro(std::string const& name,std::string const& value);
-		void RemoveShaderMacro(std::string const& name);
+		static void SetShaderMacro(std::string const& name,std::string const& value);
+		static void RemoveShaderMacro(std::string const& name);
 
 		static std::map<std::string,std::string> sMapIncludeFiles; // key: filename, value: content. 
 
@@ -38,7 +38,7 @@ namespace Disorder
 		std::string _entryPoint;
 		ShaderType _type;
 		ShaderModel _shaderModel;
-		std::map<std::string,std::string> _mapShaderMacro;       // key: name, value : definition.
+		static std::map<std::string,std::string> _mapShaderMacro;       // key: name, value : definition.
 		
 	};
  
@@ -55,12 +55,19 @@ namespace Disorder
 			return _pixelShader;
 		}
 
+		inline ShaderObjectPtr const& GetGeometryShader() const
+		{
+			return _geometryShader;
+		}
+
 		virtual void BindShader(ShaderObjectPtr const& shaderObject)
 		{
 			if( shaderObject->GetType() == ST_VertexShader )
 				_vertexShader = shaderObject;
-			else if( shaderObject->GetType() == ST_PixelShader )
+			else if (shaderObject->GetType() == ST_PixelShader)
 				_pixelShader = shaderObject;
+			else if (shaderObject->GetType() == ST_GeometryShader)
+				_geometryShader = shaderObject;
 			else
 			   BOOST_ASSERT(0);
 
@@ -113,6 +120,7 @@ namespace Disorder
 		// shader slot!
 		ShaderObjectPtr _vertexShader;
 		ShaderObjectPtr _pixelShader;
+		ShaderObjectPtr _geometryShader;
 
 		RasterizeStatePtr _rasterizeState;
 		BlendStatePtr _blendState;

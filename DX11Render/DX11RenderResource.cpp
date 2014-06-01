@@ -249,6 +249,34 @@ namespace Disorder
 
 	}
 
+	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image)
+	{
+		if (image.size() == 0)
+			return NULL;
+
+		const ImageSpec &spec = image[0]->GetSpec();
+		BYTE* pData = new BYTE[spec.dataSize*image.size()];
+		BYTE* pDest = pData;
+		std::vector<BufferInitData> vBufferInitData;
+		for (size_t i = 0; i < image.size(); i++)
+		{
+			BOOST_ASSERT(spec.dataSize == image[i]->GetSpec().dataSize);
+			memcpy(pDest, image[i]->GetImageData(), spec.dataSize);
+			BufferInitData data;
+			data.Data = pDest;
+			data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat) / 8 * spec.width;
+			data.SlicePitch = 0;
+			vBufferInitData.push_back(data);
+			pDest += spec.dataSize;
+
+		}
+
+		DX11RenderTexture2DPtr result = Create(pixelFormat, spec.width, spec.height, false, bMultiSample, SV_ShaderResource, image.size(), vBufferInitData.data());
+		delete pData;
+
+		return result;
+	}
+
 	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, bool bMultiSample,ImagePtr const& image)
 	{
 		const ImageSpec &spec = image->GetSpec();
@@ -256,10 +284,10 @@ namespace Disorder
 		data.Data = image->GetImageData();
 		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat)/8 * spec.width;
 		data.SlicePitch = 0;
-		return Create(pixelFormat,spec.width,spec.height,false,bMultiSample,SV_ShaderResource,&data);
+		return Create(pixelFormat,spec.width,spec.height,false,bMultiSample,SV_ShaderResource,1,&data);
 	}
 
-	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample,unsigned int viewFlag, BufferInitData const* pData)
+	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample,unsigned int viewFlag,int arraySize, BufferInitData const* pData)
 	{
 		DX11RenderTexture2D* pTexture = new DX11RenderTexture2D;
 
@@ -267,6 +295,7 @@ namespace Disorder
 		pTexture->Width = width;
 		pTexture->Height = height;
 		pTexture->ViewFlag = viewFlag;
+		pTexture->ArraySize = arraySize;
 
 		if (bMultiSample && !pData)
 		{
@@ -287,6 +316,7 @@ namespace Disorder
 		if( bMipmap )
 		{
 			desc.MipLevels = pTexture->MipLevel = 0;
+			desc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
 		}
 		else 
 		{
@@ -295,7 +325,7 @@ namespace Disorder
  
 		desc.SampleDesc.Count = pTexture->MultiSampleCount;
 		desc.SampleDesc.Quality = pTexture->MultiSampleQuality;
-		desc.ArraySize = 1;
+		desc.ArraySize = arraySize;
 		desc.Format = DX11RenderEngine::GetPixelFormat(pixelFormat);
 		desc.Usage = D3D11_USAGE_DEFAULT;
 
@@ -309,19 +339,28 @@ namespace Disorder
 		 
 
 		desc.CPUAccessFlags = 0;
-        desc.MiscFlags = 0;
+		// cube map
+		if ( arraySize == 6)
+			desc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
 
 		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
 
 		ID3D11Texture2D* pTex2D = NULL;
 		if( pData != NULL )
 		{
-			D3D11_SUBRESOURCE_DATA InitData;
-			ZeroMemory( &InitData, sizeof(InitData) );
-			InitData.pSysMem = pData->Data;
-			InitData.SysMemPitch = pData->RowPitch;
-			InitData.SysMemSlicePitch = pData->SlicePitch;
-			HRESULT hr = renderEngine->D3DDevice()->CreateTexture2D( &desc, &InitData, &pTex2D );
+			std::vector<D3D11_SUBRESOURCE_DATA> vInitData;
+			for (int i = 0; i < arraySize; i++)
+			{
+				D3D11_SUBRESOURCE_DATA InitData;
+				ZeroMemory(&InitData, sizeof(InitData));
+				InitData.pSysMem = pData->Data;
+				InitData.SysMemPitch = pData->RowPitch;
+				InitData.SysMemSlicePitch = pData->SlicePitch;
+				vInitData.push_back(InitData);
+				pData ++;
+			}
+			
+			HRESULT hr = renderEngine->D3DDevice()->CreateTexture2D(&desc, vInitData.data(), &pTex2D);
 			BOOST_ASSERT(hr==S_OK);
 		}
 		else
@@ -354,5 +393,5 @@ namespace Disorder
 		return DX11RenderTexture2DPtr(pTex);
 	}
 	 
-	
+ 
 }

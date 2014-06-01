@@ -14,8 +14,7 @@ namespace Disorder
 		_sAmbientLowerProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientLowColor,eSP_Float,3);
 		_sAmbientUpperProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientUpperColor,eSP_Float,3);
 		
-		_sScreenWidthProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sScreenWidth, eSP_Int, 1);
-		_sScreenHeightProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sScreenHeight, eSP_Int, 1);
+		_skyBox = Skybox::Create();
 
 		EnableDebugDraw = true;
 	}
@@ -77,7 +76,7 @@ namespace Disorder
 		renderObjList.reserve(_vRenderObjects.size());
 		for(size_t i=0;i<_vRenderObjects.size();i++)
 		{
-			if(_vRenderObjects[i]->Overlaps(camera->CameraFrustrum))
+			//if(_vRenderObjects[i]->Overlaps(camera->CameraFrustrum))
 				renderObjList.push_back(_vRenderObjects[i]);
 		}
 	}
@@ -92,9 +91,7 @@ namespace Disorder
 	{
 		_sAmbientLowerProperty->SetData(glm::value_ptr(_vAmbientLowerColor));
 		_sAmbientUpperProperty->SetData(glm::value_ptr(_vAmbientUpperColor));
-	 
-		_sScreenWidthProperty->SetData(&GConfig->pRenderConfig->SizeX);
-		_sScreenHeightProperty->SetData(&GConfig->pRenderConfig->SizeY);
+ 
 
 		_propertyManager->UpdateShaderProperty();
 	}

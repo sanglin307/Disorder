@@ -126,8 +126,6 @@ namespace Disorder
 	typedef boost::shared_ptr<RenderTexture2D> RenderTexture2DPtr;
 	class RenderTexture3D;
 	typedef boost::shared_ptr<RenderTexture3D> RenderTexture3DPtr;
-	class RenderTextureCube;
-	typedef boost::shared_ptr<RenderTextureCube> RenderTextureCubePtr;
 	class SurfaceView;
 	typedef boost::shared_ptr<SurfaceView> SurfaceViewPtr;
 	class RenderSurface;
@@ -148,6 +146,8 @@ namespace Disorder
 	typedef boost::shared_ptr<FontManager> FontManagerPtr;
 	class Font;
 	typedef boost::shared_ptr<Font> FontPtr;
+	class Skybox;
+	typedef boost::shared_ptr<Skybox> SkyboxPtr;
 	class SamplerState;
 	typedef boost::shared_ptr<SamplerState> SamplerStatePtr;
 	class RasterizeState;
@@ -218,7 +218,7 @@ namespace Disorder
 #include "Material.h"
 #include "Font.h"
 #include "FontManager.h"
-
+#include "Skybox.h"
 #include "RenderLayout.h"
 #include "Geometry.h"
 #include "Renderer.h"

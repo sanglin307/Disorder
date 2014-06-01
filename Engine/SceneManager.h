@@ -61,6 +61,11 @@ namespace Disorder
 			return _sceneBounds;
 		}
 
+		const SkyboxPtr& GetSkybox() const
+		{
+			return _skyBox;
+		}
+
 		bool EnableDebugDraw;
 
 	protected:
@@ -72,6 +77,8 @@ namespace Disorder
 		CameraMap   _mCameraObjects;
 		CameraPtr   _mDefaultCamera;
 		BoxBounds   _sceneBounds;
+		SkyboxPtr   _skyBox;
+
 		std::vector<LightPtr> _vLightList;
 		std::vector<GeometryRendererPtr> _vRenderObjects;
 
@@ -83,8 +90,7 @@ namespace Disorder
 		ShaderPropertyPtr _sAmbientLowerProperty;
 		ShaderPropertyPtr _sAmbientUpperProperty;
 
-		ShaderPropertyPtr _sScreenWidthProperty;
-		ShaderPropertyPtr _sScreenHeightProperty;
+	 
 
 		ShaderPropertyManagerPtr _propertyManager;
 

@@ -1115,26 +1115,35 @@ namespace Disorder
 		double transU = pTexture->GetTranslationU();
 		double transV = pTexture->GetTranslationV();
 
-		FbxString lLoadFileName = lFileName;
-		boost::filesystem::path p(lFileName.Buffer());
+		std::string LoadFileName = lFileName.Buffer();
+		boost::filesystem::path p(LoadFileName);
 		if (!boost::filesystem::exists(p) || !boost::filesystem::is_regular_file(p))
 		{
-			const FbxString lAbsFbxFileName = FbxPathUtils::Resolve(lFileName);
-			const FbxString lAbsFolderName = FbxPathUtils::GetFolderName(lAbsFbxFileName);
-			const FbxString lLoadFileName = FbxPathUtils::Bind(lAbsFolderName, pTexture->GetRelativeFileName());
+			size_t pos = LoadFileName.find("/Fbx/");
+			if ( pos == std::string::npos )
+				pos = LoadFileName.find("\\Fbx\\");
 
-			p = boost::filesystem::path(lLoadFileName.Buffer());
-			if (!boost::filesystem::exists(p) || !boost::filesystem::is_regular_file(p))
+			if (pos == std::string::npos)
+				return;
+
+			if (pos + 5 < LoadFileName.size())
 			{
-				const FbxString lTextureFileName = FbxPathUtils::GetFileName(lFileName);
-				const FbxString lLoadFileName = FbxPathUtils::Bind(lAbsFolderName, lTextureFileName);
+				LoadFileName = LoadFileName.substr(pos + 5);
+				LoadFileName = GConfig->sResourceFBXPath + LoadFileName;
 
-				p = boost::filesystem::path(lLoadFileName.Buffer());
+				p = boost::filesystem::path(LoadFileName);
 				if (!boost::filesystem::exists(p) || !boost::filesystem::is_regular_file(p))
 				{
-					GLogger->Warning(std::string(propertyName) + std::string("Can't find file:") + lLoadFileName.Buffer());
+
+					GLogger->Warning(std::string(propertyName) + std::string("Can't find file:") + lFileName.Buffer());
 					return;
+
 				}
+			}
+			else
+			{
+				GLogger->Warning(std::string(propertyName) + std::string("Can't find file:") + lFileName.Buffer());
+				return;
 			}
 		}
  
@@ -1156,7 +1165,7 @@ namespace Disorder
 		else if (wrapV == FbxTexture::eClamp)
 			desc.AddressV = TAM_Clamp;
 
-		ImagePtr img = GImageManager->Load(lLoadFileName.Buffer(),&desc);	 
+		ImagePtr img = GImageManager->Load(LoadFileName, &desc);
 		if (img != NULL && img->GetResource() != NULL )
 		{
 			const RenderTexture2DPtr texRes = img->GetResource();

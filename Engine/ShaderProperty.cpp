@@ -150,7 +150,6 @@ namespace Disorder
     const std::string ShaderPropertyManager::sManagerObject = "ObjectTransform";
     const std::string ShaderPropertyManager::sManagerMaterial = "MaterialProperty";
     const std::string ShaderPropertyManager::sManagerDirectionLight = "DirectionLightProperty";
-	const std::string ShaderPropertyManager::sManagerForwardFourLight = "ForwardFourLights";
 	const std::string ShaderPropertyManager::sManagerPointLight = "PointLightProperty";
 	const std::string ShaderPropertyManager::sManagerSpotLight = "SpotLightProperty";
 	const std::string ShaderPropertyManager::sManagerScene = "SceneProperty";
@@ -184,27 +183,15 @@ namespace Disorder
 	// for shadow map
 	const std::string ShaderPropertyManager::sShadowSampler = "ShadowSampler";
 	const std::string ShaderPropertyManager::sShadowMapTexture2D = "ShadowMapTexture2D";
+	const std::string ShaderPropertyManager::sShadowMapTextureCube = "ShadowMapTextureCube";
+
 
     // Forward Dirction LightProperty
     const std::string ShaderPropertyManager::sDirectionLightIntensity = "DirectionLightIntensity";
     const std::string ShaderPropertyManager::sDirectionLightDir = "DirectionLightDir";
     const std::string ShaderPropertyManager::sDirectionLightColor = "DirectionLightColor";
  
-	// forward four light property
-	const std::string ShaderPropertyManager::sForwardLightPosX = "ForwardLightPosX";
-	const std::string ShaderPropertyManager::sForwardLightPosY = "ForwardLightPosY";
-	const std::string ShaderPropertyManager::sForwardLightPosZ = "ForwardLightPosZ";
-	const std::string ShaderPropertyManager::sForwardLightDirX = "ForwardLightDirX";
-	const std::string ShaderPropertyManager::sForwardLightDirY = "ForwardLightDirY";
-	const std::string ShaderPropertyManager::sForwardLightDirZ = "ForwardLightDirZ";
-	const std::string ShaderPropertyManager::sForwardLightRangeRcp = "ForwardLightRangeRcp";
-	const std::string ShaderPropertyManager::sForwardSpotCosOuterCone = "ForwardSpotCosOuterCone";
-	const std::string ShaderPropertyManager::sForwardSpotCosInnerConeRcp = "ForwardSpotCosInnerConeRcp";
-	const std::string ShaderPropertyManager::sForwardCapsuleLen = "ForwardCapsuleLen";
-	const std::string ShaderPropertyManager::sForwardLightColorR = "ForwardLightColorR";
-	const std::string ShaderPropertyManager::sForwardLightColorG = "ForwardLightColorG";
-	const std::string ShaderPropertyManager::sForwardLightColorB = "ForwardLightColorB";
-
+	 
 	// point light
 	const std::string ShaderPropertyManager::sPointLightPos = "PointLightPos";
 	const std::string ShaderPropertyManager::sPointLightColor = "PointLightColor";
@@ -223,10 +210,9 @@ namespace Disorder
 	// scene ambient
 	const std::string ShaderPropertyManager::sAmbientLowColor = "AmbientLowColor";
 	const std::string ShaderPropertyManager::sAmbientUpperColor = "AmbientUpperColor";
-	const std::string ShaderPropertyManager::sScreenWidth = "ScreenWidth";
-	const std::string ShaderPropertyManager::sScreenHeight = "ScreenHeight";
-
+	 
 	const std::string ShaderPropertyManager::sShadowMapView = "ShadowMapView";
+	const std::string ShaderPropertyManager::sShadowMapViewArray = "ShadowMapViewArray";
 	const std::string ShaderPropertyManager::sShadowMapProj = "ShadowMapProj";
 
 	// Global 
@@ -245,6 +231,8 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sSurfaceVisTex = "SurfaceVisTex";
 	const std::string ShaderPropertyManager::sSurfaceSampler = "SurfaceSampler";
 
+	const std::string ShaderPropertyManager::sSkyboxTexture = "SkyboxTexture";
+	const std::string ShaderPropertyManager::sSkyboxSampler = "SkyboxSampler";
 
 
 	ShaderPropertyPtr ShaderPropertyManager::GetProperty(std::string const& name)

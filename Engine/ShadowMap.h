@@ -18,33 +18,40 @@ namespace Disorder
 			return _height;
 		}
 
-		void PrepareRenderDepth(const glm::mat4& viewMat, const glm::mat4& projMat);
-		void RenderObject(const CameraPtr& camera, const GeometryRendererPtr object);
+		void PrepareRenderDepth(const LightPtr& light);
+		void RenderObject(const CameraPtr& camera, const LightPtr& light, const GeometryRendererPtr object);
 		void PrepareRenderLight(const LightPtr& light);
-		void UpdateShaderProperty();
-
+	 
 	protected:
 		ShadowMap(unsigned int width,unsigned int height);
 
 		ShaderPropertyManagerPtr _propertyMgr;
 
 		ShaderPropertyPtr _viewMatrix;
+		ShaderPropertyPtr _viewArrayMatrix;
 		ShaderPropertyPtr _projMatrix;
+
 		ShaderPropertyPtr _shadowSampler;
 		ShaderPropertyPtr _shadowTexture2D;
+		ShaderPropertyPtr _shadowTextureCube;
  
-		RenderTexture2DPtr _shadowDataTex;
-		SurfaceViewPtr _depthView;
-		SurfaceViewPtr _shaderView;
+		// 2D texture used to direction light and spot light
+		RenderTexture2DPtr _shadowDataTex2D;
+		SurfaceViewPtr _depthView2D;
+		SurfaceViewPtr _shaderView2D;
+
+		// cube texture used to point light
+		RenderTexture2DPtr _shadowDataTexCube;
+		SurfaceViewPtr _depthViewCube;
+		SurfaceViewPtr _shaderViewCube;
+
 		SamplerStatePtr _shadowSamplerState;
 	 
 		unsigned int _width;
 		unsigned int _height;
-
-		glm::mat4 _viewMat;
-		glm::mat4 _projMat;
-
-		static RenderEffectPtr sDepthGenEffect;
+ 
+		RenderEffectPtr _DepthGenEffect;
+		RenderEffectPtr _DepthCubeGenEffect;
 		 
 	};
 

@@ -156,7 +156,7 @@ namespace Disorder
  
 		SurfaceViewPtr rtView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, BackBufferTex,GConfig->pRenderConfig->ColorFormat);
  
-		RenderTexture2DPtr DepthBufferTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, true, SV_DepthStencil, NULL);
+		RenderTexture2DPtr DepthBufferTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, true, SV_DepthStencil,1, NULL);
 
 		SurfaceViewPtr dsView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, DepthBufferTex, GConfig->pRenderConfig->DepthStencilFormat);
 
@@ -628,14 +628,17 @@ namespace Disorder
 		{			 
 			void* nullArrayInputRes[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT  ] = { NULL };
 			_pImmediateContext->VSSetConstantBuffers(0,D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT  ,(ID3D11Buffer**)&nullArrayInputRes);
+			_pImmediateContext->GSSetConstantBuffers(0, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, (ID3D11Buffer**)&nullArrayInputRes);
 			_pImmediateContext->PSSetConstantBuffers(0,D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT ,(ID3D11Buffer**)&nullArrayInputRes);
 
 			void* nullArraySampler[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT] = { NULL };
 			_pImmediateContext->VSSetSamplers(0,D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT,(ID3D11SamplerState**)&nullArraySampler);
+			_pImmediateContext->GSSetSamplers(0, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, (ID3D11SamplerState**)&nullArraySampler);
 			_pImmediateContext->PSSetSamplers(0,D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT,(ID3D11SamplerState**)&nullArraySampler);
 
 			void* nullArray[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
 			_pImmediateContext->VSSetShaderResources(0,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT ,(ID3D11ShaderResourceView**)&nullArray);
+			_pImmediateContext->GSSetShaderResources(0,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, (ID3D11ShaderResourceView**)&nullArray);
 			_pImmediateContext->PSSetShaderResources(0,D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT ,(ID3D11ShaderResourceView**)&nullArray);
 		}
 		else
@@ -691,6 +694,54 @@ namespace Disorder
 
 			}
 
+			ShaderObjectPtr geometryShader = effect->GetGeometryShader();
+			if (geometryShader != NULL)
+			{
+				ID3D11GeometryShader *pShader = (ID3D11GeometryShader *)(geometryShader->GetHandle());
+				_pImmediateContext->GSSetShader(pShader, NULL, 0);
+
+				DX11ShaderObjectPtr dxGeometryShader = boost::dynamic_pointer_cast<DX11ShaderObject>(geometryShader);
+				std::size_t cbsize = dxGeometryShader->CachedConstBuffer.size();
+				if (cbsize > 0)
+				{
+					_pImmediateContext->GSSetConstantBuffers(0, cbsize, &(dxGeometryShader->CachedConstBuffer[0]));
+				}
+				else
+				{
+					void* nullArray[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT] = { NULL };
+					_pImmediateContext->GSSetConstantBuffers(0, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, (ID3D11Buffer**)&nullArray);
+				}
+
+
+				std::size_t sssize = dxGeometryShader->CachedSamplerState.size();
+				if (sssize > 0)
+				{
+					_pImmediateContext->GSSetSamplers(0, sssize, &(dxGeometryShader->CachedSamplerState[0]));
+				}
+				else
+				{
+					void* nullArray[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT] = { NULL };
+					_pImmediateContext->GSSetSamplers(0, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, (ID3D11SamplerState**)&nullArray);
+				}
+
+
+				std::size_t srsize = dxGeometryShader->CachedShaderResourceView.size();
+				if (srsize > 0)
+				{
+					_pImmediateContext->GSSetShaderResources(0, srsize, &(dxGeometryShader->CachedShaderResourceView[0]));
+				}
+				else
+				{
+					void* nullArray[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
+					_pImmediateContext->GSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, (ID3D11ShaderResourceView**)&nullArray);
+				}
+
+			}
+			else
+			{
+				_pImmediateContext->GSSetShader(NULL, NULL, 0);
+			}
+
 			ShaderObjectPtr pixelShader = effect->GetPixelShader();
 			if( pixelShader != NULL )
 			{
@@ -736,14 +787,14 @@ namespace Disorder
 			{
 				_pImmediateContext->PSSetShader(NULL, NULL, 0);
 
-				void* nullArrayCB[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT] = { NULL };
+			/*	void* nullArrayCB[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT] = { NULL };
 				_pImmediateContext->PSSetConstantBuffers(0, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, (ID3D11Buffer**)&nullArrayCB);
 
 				void* nullArraySS[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT] = { NULL };
 				_pImmediateContext->PSSetSamplers(0, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, (ID3D11SamplerState**)&nullArraySS);
 
 				void* nullArraySR[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
-				_pImmediateContext->PSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, (ID3D11ShaderResourceView**)&nullArraySR);
+				_pImmediateContext->PSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, (ID3D11ShaderResourceView**)&nullArraySR);*/
 
 			}
 		}

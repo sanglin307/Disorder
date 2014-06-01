@@ -3,8 +3,6 @@ cbuffer SceneProperty
 {
 	float3 AmbientLowColor;
 	float3 AmbientUpperColor;
-	int    ScreenWidth;
-	int    ScreenHeight;
 }
 
 cbuffer CameraTransforms
@@ -35,11 +33,13 @@ cbuffer MaterialProperty
 cbuffer ShadowMapGen
 {
 	matrix ShadowMapView; 
+	matrix ShadowMapViewArray[6];
 	matrix ShadowMapProj;
 }
 
 SamplerComparisonState ShadowSampler;
 Texture2D<float>  ShadowMapTexture2D;
+TextureCube<float>       ShadowMapTextureCube;
 
 SamplerState DiffuseSampler;
 Texture2D DiffuseTexture;
@@ -52,22 +52,7 @@ cbuffer DirectionLightProperty
 	float  DirectionLightIntensity;
 } 
 
-cbuffer ForwardFourLights 
-{
-	float4 ForwardLightPosX	;	
-	float4 ForwardLightPosY	;	
-	float4 ForwardLightPosZ	;	
-	float4 ForwardLightDirX	;	
-	float4 ForwardLightDirY	;	
-	float4 ForwardLightDirZ	;	
-	float4 ForwardLightRangeRcp	;	
-	float4 ForwardSpotCosOuterCone	;	
-	float4 ForwardSpotCosInnerConeRcp;	
-	float4 ForwardCapsuleLen;			
-	float4 ForwardLightColorR;			
-	float4 ForwardLightColorG;		
-	float4 ForwardLightColorB;			
-}
+ 
 
 cbuffer PointLightProperty
 {
@@ -123,7 +108,61 @@ float3 CalculateDirectionLight(float3 position, Material material)
    
    return finalColor;
 }
- 
+
+float PCFShadowCubeMap(float3 position)
+{
+	matrix selectShadowMat;
+	float3 lightDir = normalize(position - PointLightPos);
+	float3 dirValue = abs(lightDir);
+	if (dirValue.x > dirValue.y && dirValue.x > dirValue.z) // x is max component
+	{
+		lightDir.z = -lightDir.z;   // right hand coordinate to left hand....
+		if (lightDir.x < 0)
+			selectShadowMat = ShadowMapViewArray[1];
+		else
+			selectShadowMat = ShadowMapViewArray[0];
+	}
+	else if (dirValue.y > dirValue.x && dirValue.y > dirValue.z) // y is max component
+	{
+		lightDir.z = -lightDir.z;   // right hand coordinate to left hand....
+		//lightDir.x = -lightDir.x;
+		if (lightDir.y < 0)
+			selectShadowMat = ShadowMapViewArray[3];
+		else
+			selectShadowMat = ShadowMapViewArray[2];
+	}
+	else
+	{
+		lightDir.x = -lightDir.x;
+		if (lightDir.z < 0)
+		{
+			selectShadowMat = ShadowMapViewArray[5];
+		}
+		else
+		{
+			selectShadowMat = ShadowMapViewArray[4];
+		}
+	}
+
+	float4 posShadowMap = mul(selectShadowMat, float4(position, 1.0));
+		posShadowMap = mul(ShadowMapProj, posShadowMap);
+
+	float3 UVD = posShadowMap.xyz / posShadowMap.w;
+
+	return ShadowMapTextureCube.SampleCmp(ShadowSampler, lightDir, UVD.z).r;
+	//float4 vshadow;
+	////float offset = 0.01;
+	//vshadow.x =  ShadowMapTextureCube.SampleCmp(ShadowSampler, lightDir,UVD.z).r;
+	//vshadow.y = ShadowMapTextureCube.SampleCmp(ShadowSampler, lightDir + float3(offset,0,0), UVD.z).r;
+	//vshadow.z = ShadowMapTextureCube.SampleCmp(ShadowSampler, lightDir + float3(0,offset, 0), UVD.z).r;
+	//vshadow.w = ShadowMapTextureCube.SampleCmp(ShadowSampler, lightDir + float3(offset, offset,0), UVD.z).r;
+	//
+	//return lerp(lerp(vshadow.x, vshadow.y, 0.5),
+	//	lerp(vshadow.z, vshadow.w, 0.5),
+	//	0.5);
+
+}
+
  float PCFShadow( float3 position )
 {
 	// Transform the world position to shadow projected space
@@ -137,85 +176,28 @@ float3 CalculateDirectionLight(float3 position, Material material)
 	UVD.xy = 0.5 * UVD.xy + 0.5;
 	UVD.y = 1.0 - UVD.y;
 
-	UVD.z -= 0.005f;
+	//UVD.z -= 0.03f;
+ 
+	//return ShadowMapTexture2D.SampleCmp(ShadowSampler, UVD.xy, UVD.z).r;
 
+	float offset = 1.0f / SHADOWMAPSIZE;
 	// Compute the hardware PCF value
-	return ShadowMapTexture2D.SampleCmpLevelZero(ShadowSampler, UVD.xy, UVD.z).r;
-	//return ShadowMapTexture2D.Sample(DiffuseSampler,UVD.xy).r;
+	float4 vshadow;
+	vshadow.x = ShadowMapTexture2D.SampleCmp(ShadowSampler, UVD.xy, UVD.z).r;
+	vshadow.y = ShadowMapTexture2D.SampleCmp(ShadowSampler, UVD.xy + float2(offset, 0), UVD.z).r;
+	vshadow.z = ShadowMapTexture2D.SampleCmp(ShadowSampler, UVD.xy + float2(0, offset), UVD.z).r;
+	vshadow.w = ShadowMapTexture2D.SampleCmp(ShadowSampler, UVD.xy + float2(offset, offset), UVD.z).r;
+	
+	return lerp(lerp(vshadow.x, vshadow.y, 0.5),
+		                     lerp(vshadow.z, vshadow.w, 0.5),
+		                     0.5);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 // Pixel shaders
 /////////////////////////////////////////////////////////////////////////////
-
-
-float4 dot4x4(float4 aX, float4 aY, float4 aZ, float4 bX, float4 bY, float4 bZ)
-{
-	return aX * bX + aY * bY + aZ * bZ;
-}
-
-// Dot product between a four three component vectors and a single three component vector
-float4 dot4x1(float4 aX, float4 aY, float4 aZ, float3 b)
-{
-	return aX * b.xxxx + aY * b.yyyy + aZ * b.zzzz;
-}
-
-// Four light calculation helper function
-float3 CalculateFourLights(float3 position, Material material)
-{
-	float3 ToEye = CameraPosition.xyz - position;
-   
-	// Find the shortest distance between the pixel and capsules segment
-	float4 ToCapsuleStartX = position.xxxx - ForwardLightPosX;
-	float4 ToCapsuleStartY = position.yyyy - ForwardLightPosY;
-	float4 ToCapsuleStartZ = position.zzzz - ForwardLightPosZ;
-	float4 DistOnLine = dot4x4(ToCapsuleStartX, ToCapsuleStartY, ToCapsuleStartZ, ForwardLightDirX, ForwardLightDirY, ForwardLightDirZ);
-	float4 CapsuleLenSafe = max(ForwardCapsuleLen, 1.e-6);
-	DistOnLine = ForwardCapsuleLen * saturate(DistOnLine / CapsuleLenSafe);
-	float4 PointOnLineX = ForwardLightPosX + ForwardLightDirX * DistOnLine;
-	float4 PointOnLineY = ForwardLightPosY + ForwardLightDirY * DistOnLine;
-	float4 PointOnLineZ = ForwardLightPosZ + ForwardLightDirZ * DistOnLine;
-	float4 ToLightX = PointOnLineX - position.xxxx;
-	float4 ToLightY = PointOnLineY - position.yyyy;
-	float4 ToLightZ = PointOnLineZ - position.zzzz;
-	float4 DistToLightSqr = dot4x4(ToLightX, ToLightY, ToLightZ, ToLightX, ToLightY, ToLightZ);
-	float4 DistToLight = sqrt(DistToLightSqr);
-   
-	// Phong diffuse
-	ToLightX /= DistToLight; // Normalize
-	ToLightY /= DistToLight; // Normalize
-	ToLightZ /= DistToLight; // Normalize
-	float4 NDotL = saturate(dot4x1(ToLightX, ToLightY, ToLightZ, material.Normal));
-	//float3 finalColor = float3(dot(ForwardLightColorR, NDotL), dot(ForwardLightColorG, NDotL), dot(ForwardLightColorB, NDotL));
-   
-	// Blinn specular
-	ToEye = normalize(ToEye);
-	float4 HalfWayX = ToEye.xxxx + ToLightX;
-	float4 HalfWayY = ToEye.yyyy + ToLightY;
-	float4 HalfWayZ = ToEye.zzzz + ToLightZ;
-	float4 HalfWaySize = sqrt(dot4x4(HalfWayX, HalfWayY, HalfWayZ, HalfWayX, HalfWayY, HalfWayZ));
-	float4 NDotH = saturate(dot4x1(HalfWayX / HalfWaySize, HalfWayY / HalfWaySize, HalfWayZ / HalfWaySize, material.Normal));
-	float4 SpecValue = pow(NDotH, material.SpecularExp.xxxx) ;//* material.specIntensity;
-	//finalColor += float3(dot(ForwardLightColorR, SpecValue), dot(ForwardLightColorG, SpecValue), dot(ForwardLightColorB, SpecValue));
-   
-	// Cone attenuation
-	float4 cosAng = dot4x4(ForwardLightDirX, ForwardLightDirY, ForwardLightDirZ, ToLightX, ToLightY, ToLightZ);
-	float4 conAtt = saturate((cosAng - ForwardSpotCosOuterCone) * ForwardSpotCosInnerConeRcp);
-	conAtt *= conAtt;
-   
-	// Attenuation
-	float4 DistToLightNorm = 1.0 - saturate(DistToLight * ForwardLightRangeRcp);
-	float4 Attn = DistToLightNorm * DistToLightNorm;
-	Attn *= conAtt; // Include the cone attenuation
-
-	// Calculate the final color value
-	float4 pixelIntensity = (NDotL + SpecValue) * Attn;
-	float3 finalColor = float3(dot(ForwardLightColorR, pixelIntensity), dot(ForwardLightColorG, pixelIntensity), dot(ForwardLightColorB, pixelIntensity)); 
-	finalColor *= material.DiffuseColor;
-   
-	return finalColor;
-}
-
+ 
+ 
 float3 CalculatePointLight(float3 position, Material material)
 {
 	float3 ToEye = normalize(CameraPosition.xyz - position);

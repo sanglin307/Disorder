@@ -91,10 +91,10 @@ namespace Disorder
 					_zoomPos = mouseEvent.AbsoluteZ;
 				}
 
-				if( _radius < 5 )
+				/*if( _radius < 5 )
 					_radius = 5;
 				if( _radius > 100 )
-					_radius = 100;
+					_radius = 100;*/
 
 				float limit = 3.0f;
 				limit = limit * Math::fDeg2Rad;
@@ -108,6 +108,9 @@ namespace Disorder
 				glm::vec3 finalPos;
 				Math::ConvertFromSphericalCoord(_radius,yAngle,zAngle,_target,finalPos);
  
+				//std::ostringstream o;
+				//o << finalPos.x << finalPos.y << finalPos.z << "::::" << _target.x << _target.y << _target.z;
+				//GLogger->Info(o.str());
 				pCamera->LookAt_(finalPos,_target,glm::vec3(0,1,0));
 				return true;
 			}		
@@ -121,6 +124,7 @@ namespace Disorder
 	void CameraSphereTargetUpdate::SetTarget(Camera *pCamera,const glm::vec3& target)
 	{
 		glm::vec3 viewVec = target - pCamera->EyePos;
+		_radius = glm::length(viewVec);
 		viewVec = glm::normalize(viewVec);
 		_target = pCamera->EyePos + viewVec * _radius ;
 	}
@@ -377,7 +381,7 @@ namespace Disorder
 		}
 		else if( _updateMode == eSphericalTargetMode )
 		{
-			_updateStrategy = CameraSphereTargetUpdate::Create(10,EyePos + Direction() * glm::vec3(10));
+			_updateStrategy = CameraSphereTargetUpdate::Create(10,EyePos - Direction() * glm::vec3(10));
 		}
 
 	}
@@ -390,6 +394,11 @@ namespace Disorder
 		}
 		else if( _updateMode == eSphericalTargetMode )
 		{
+			std::ostringstream str;
+			glm::vec3 target = EyePos - _Direction * glm::vec3(10);
+			//boost::shared_ptr<CameraSphereTargetUpdate> sphere = boost::dynamic_pointer_cast<CameraSphereTargetUpdate>(_updateStrategy);
+			str << "Camera Position:" << EyePos.x << "    " << EyePos.y << "    " << EyePos.z;
+			GEngine->GameCanvas->DrawString(5, GConfig->pRenderConfig->SizeY - 50, str.str());
 			GEngine->GameCanvas->DrawString(5, GConfig->pRenderConfig->SizeY - 25, "Spherical Coordinate Mode");
 		} 
 	}

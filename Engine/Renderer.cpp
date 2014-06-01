@@ -279,6 +279,7 @@ namespace Disorder
 	{
 		_geometryObject = geometry;
 		_material = mat;
+
 	}
 
 	void GeometryRenderer::BuildRenderLayout(RenderEffectPtr const& effect,bool releaseOld)
@@ -399,8 +400,9 @@ namespace Disorder
 	  {
 		 // draw local axis for debug
 		 GameObjectPtr go = GetBase();
-		 glm::vec3 original = go->GetLocalPosition();
-		 float AxisLength = 1.0f;
+		 glm::vec3 original(0, 0, 0);
+
+		 float AxisLength = _geometryObject->BoundingBox.GetSphere().Radius*1.5f;
 		 glm::vec3 xAxis = original + glm::vec3(AxisLength, 0, 0);
 		 glm::vec3 yAxis = original + glm::vec3(0, AxisLength, 0);
 		 glm::vec3 zAxis = original + glm::vec3(0, 0, AxisLength);

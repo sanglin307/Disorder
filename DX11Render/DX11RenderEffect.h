@@ -210,6 +210,7 @@ namespace Disorder
 		DX11ShaderReflectionPtr  ShaderReflect;
 		ID3D11VertexShaderPtr VertexShaderInterface;
 		ID3D11PixelShaderPtr  PixelShaderInterface;
+		ID3D11GeometryShaderPtr GeometryShaderInterface;
 		ID3DBlobPtr DataInterface;
 		std::vector<ID3D11Buffer*> CachedConstBuffer;
 		std::vector<ID3D11SamplerState*> CachedSamplerState;
@@ -234,8 +235,10 @@ namespace Disorder
 			{
 				if( type == ST_VertexShader )
 				    return "vs_4_0";
-				else if( type == ST_PixelShader )
+				else if (type == ST_PixelShader)
 					return "ps_4_0";
+				else if (type == ST_GeometryShader)
+					return "gs_4_0";
 			}
 
 			BOOST_ASSERT(0);

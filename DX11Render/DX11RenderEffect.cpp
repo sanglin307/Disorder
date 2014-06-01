@@ -65,6 +65,8 @@ namespace Disorder
 			return VertexShaderInterface.get();
 		case ST_PixelShader:
 			return PixelShaderInterface.get();
+		case ST_GeometryShader:
+			return GeometryShaderInterface.get();
 		}
 	 
 		BOOST_ASSERT(0);
@@ -103,9 +105,26 @@ namespace Disorder
 	#endif
 
 	 
+		std::vector<D3D_SHADER_MACRO> vShaderMacro;
+		if (_mapShaderMacro.size() > 0)
+		{
+			std::map<std::string, std::string>::const_iterator iter = _mapShaderMacro.begin();
+			while (iter != _mapShaderMacro.end())
+			{
+				D3D_SHADER_MACRO macro;
+				macro.Name = iter->first.c_str();
+				macro.Definition = iter->second.c_str();
+				vShaderMacro.push_back(macro);
+				++iter;
+			}
+			D3D_SHADER_MACRO emptymacro;
+			emptymacro.Name = NULL;
+			emptymacro.Definition = NULL;
+			vShaderMacro.push_back(emptymacro);
+		}
 		ID3DBlob* pErrorBlob;
 		DX11ShaderInclude ShaderInclude;
-		hr = D3DCompile(shaderContent.c_str(),shaderContent.size(),"",NULL,&ShaderInclude,entryPoint.c_str(),shaderModel.c_str(),dwShaderFlags, 0,ppBlobOut, &pErrorBlob);
+		hr = D3DCompile(shaderContent.c_str(), shaderContent.size(), fileName.c_str(), vShaderMacro.data(), &ShaderInclude, entryPoint.c_str(), shaderModel.c_str(), dwShaderFlags, 0, ppBlobOut, &pErrorBlob);
 	 
 		if( FAILED(hr) )
 		{
@@ -172,6 +191,24 @@ namespace Disorder
 
 			 
 			PixelShaderInterface =  MakeComPtr<ID3D11PixelShader>(_pPixelShader);
+			DataInterface = MakeComPtr<ID3DBlob>(pVSBlob);
+			ShaderReflection();
+			return true;
+		}
+		else if (type == ST_GeometryShader)
+		{
+			ID3D11GeometryShader* _pGeometryShader = NULL;
+			hr = renderEngine->D3DDevice()->CreateGeometryShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), NULL, &_pGeometryShader);
+			if (FAILED(hr))
+			{
+				pVSBlob->Release();
+				MessageBox(NULL,
+					L"CreatePixelShader Failed", L"Error", MB_OK);
+				return false;
+			}
+
+
+			GeometryShaderInterface = MakeComPtr<ID3D11GeometryShader>(_pGeometryShader);
 			DataInterface = MakeComPtr<ID3DBlob>(pVSBlob);
 			ShaderReflection();
 			return true;
@@ -271,40 +308,52 @@ namespace Disorder
 					std::string varName = var_desc.Name;
 					EShaderProperty shaderProperty;
 					unsigned int length = 1;
-					if( type_desc.Class == D3D_SVC_SCALAR && type_desc.Type == D3D_SVT_INT)
+					if( type_desc.Class == D3D_SVC_SCALAR)
 					{
-					    shaderProperty = eSP_Int;
-					}
-					else if(type_desc.Class == D3D_SVC_SCALAR && type_desc.Type == D3D_SVT_FLOAT)
-					{
-					    shaderProperty = eSP_Float;
+						length = 1;
+						if (type_desc.Type == D3D_SVT_INT)
+					        shaderProperty = eSP_Int;
+						else if (type_desc.Type == D3D_SVT_FLOAT)
+							shaderProperty = eSP_Float;
+						else if (type_desc.Type == D3D_SVT_DOUBLE)
+							shaderProperty = eSP_Double;
+						else
+							BOOST_ASSERT(0);
 					}
 					else if ( type_desc.Class == D3D_SVC_VECTOR )
 					{		
-						 shaderProperty = eSP_Float;
-						 length = type_desc.Columns;
+						if (type_desc.Type == D3D_SVT_INT)
+							shaderProperty = eSP_Int;
+						else if (type_desc.Type == D3D_SVT_FLOAT)
+							shaderProperty = eSP_Float;
+						else if (type_desc.Type == D3D_SVT_DOUBLE)
+							shaderProperty = eSP_Double;
+						else
+							BOOST_ASSERT(0);
+
+						length = type_desc.Columns > type_desc.Rows ? type_desc.Columns : type_desc.Rows;
 					}
 					else if ( ( type_desc.Class == D3D_SVC_MATRIX_ROWS ) ||
 								( type_desc.Class == D3D_SVC_MATRIX_COLUMNS ) )
 					{
-						shaderProperty = eSP_Float;
-						if ( type_desc.Columns == 4 && type_desc.Rows == 4  ) 
-						{
-							length = 16;
-						}
-						else if( type_desc.Columns == 3 && type_desc.Rows == 3 )
-						{
-							length = 9;
-						}
+						if (type_desc.Type == D3D_SVT_INT)
+							shaderProperty = eSP_Int;
+						else if (type_desc.Type == D3D_SVT_FLOAT)
+							shaderProperty = eSP_Float;
+						else if (type_desc.Type == D3D_SVT_DOUBLE)
+							shaderProperty = eSP_Double;
 						else
-						{
 							BOOST_ASSERT(0);
-						}
+
+						length = type_desc.Columns * type_desc.Rows;
+						 
+					}
+ 
+					if (type_desc.Elements > 0)
+					{
+						length *= type_desc.Elements;
 					}
 
-
-					// we don't support array now
-					BOOST_ASSERT(type_desc.Elements == 0);
 					pParam = propertyManager->CreateProperty(varName,shaderProperty,length);
 
 					constantBuffer.Parameters.push_back( pParam );
@@ -317,6 +366,7 @@ namespace Disorder
 					std::ostringstream error;
 					error << "Const buffer : " << constantBuffer.CBName << " have multi-defination ! in file : " <<  _fileName;
 					GLogger->Error(error.str());
+					BOOST_ASSERT(0);
 					return;
 				}
 
@@ -378,36 +428,9 @@ namespace Disorder
 			ShaderTypeDesc &taDesc = ConstantBuffer->Types[j];
 			ShaderPropertyPtr &paDesc =  ConstantBuffer->Parameters[j];
 			pDest = _content + vaDesc.StartOffset;
-				
-			if( taDesc.Class == D3D_SVC_SCALAR && taDesc.Type == D3D_SVT_INT)
-			{
-				void *pSrc = paDesc->GetData();					
-				memcpy(pDest,pSrc,sizeof(int));
-			}
-			else if(taDesc.Class == D3D_SVC_SCALAR && taDesc.Type == D3D_SVT_FLOAT)
-			{
-				void *pSrc = paDesc->GetData();
-				memcpy(pDest,pSrc,sizeof(float));
-			}
-
-			if(taDesc.Class == D3D_SVC_VECTOR)
-			{
-				BYTE *pSrc = (BYTE*)(paDesc->GetData());
-				if( taDesc.Columns == 3 ) // 128bit pack
-				{ 
-				   memcpy(pDest,pSrc,sizeof(glm::vec3));	 
-				}
-				else if( taDesc.Columns == 4 )
-				{
-					memcpy(pDest,pSrc,sizeof(glm::vec4));
-				}
-			}
-			if(taDesc.Class == D3D_SVC_MATRIX_ROWS ||
-				taDesc.Class == D3D_SVC_MATRIX_COLUMNS)
-			{
-				void *pSrc = paDesc->GetData();
-				memcpy(pDest,pSrc,sizeof(glm::mat4));
-			}
+			
+			void *pSrc = paDesc->GetData();
+			memcpy(pDest, pSrc, vaDesc.Size);
 		}
 				
 		GEngine->RenderEngine->UpdateSubresource(ConstantBuffer->BufferParamRef->GetDataAsConstBuffer(), _content, ConstantBuffer->CBSize);

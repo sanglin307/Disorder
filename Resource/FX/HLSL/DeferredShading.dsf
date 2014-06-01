@@ -1,4 +1,4 @@
-#include "Common.hlsl"
+#include "Common.dsf"
 
 Texture2D<float> GBufferDepthTexture;
 Texture2D<float4> GBufferColorSpecIntTexture;
@@ -132,20 +132,14 @@ LightVSOutput LightingVS( LightVSInput input )
 	return Output;    
 }
 
-float4 BasePassPS(LightVSOutput In) : SV_TARGET
+float4 BaseLightingPS(LightVSOutput In) : SV_TARGET
 {
 	// Unpack the GBuffer
 	GBufferData gbd = UnpackGBuffer(In.Position.xy);
-
-	if (gbd.Depth == 1.0)
-		return float4(0,0,0,0);
-
+	
 	// Convert the data into the material structure
 	Material mat;
 	MaterialFromGBuffer(gbd, mat);
-
-	// drop if z = 1.0f
- 
 
 	// Reconstruct the world position
 	float3 position = CalculateWorldPos(In.ScreenPos, gbd.Depth);
@@ -153,14 +147,14 @@ float4 BasePassPS(LightVSOutput In) : SV_TARGET
 	// Calculate the ambient color
 	float3 finalColor = CalculateAmbient(mat.Normal, mat.DiffuseColor);
 
-	
-	// Return the final color
-	 
+	// Calculate the directional light
+	finalColor += CalculateDirectionLight(position, mat);
 
+	// Return the final color
 	return float4(finalColor, 1.0);
 }
 
-float4 DirectionLightingPS(LightVSOutput In) : SV_TARGET
+float4 FourLightingPS( LightVSOutput In ) : SV_TARGET
 {
 	// Unpack the GBuffer
 	GBufferData gbd = UnpackGBuffer(In.Position.xy);
@@ -171,50 +165,10 @@ float4 DirectionLightingPS(LightVSOutput In) : SV_TARGET
 
 	// Reconstruct the world position
 	float3 position = CalculateWorldPos(In.ScreenPos, gbd.Depth);
- 
-	// Calculate the directional light
-	float3 finalColor = CalculateDirectionLight(position, mat);
+
+	// Calculate the spot light color
+	float3 finalColor = CalculateFourLights(position, mat);
 
 	// Return the final color
-	float shadowValue = PCFShadow(position);
-
-	return float4(finalColor * shadowValue, 1.0f);
-}
-
-float4 SpotLightingPS(LightVSOutput In) : SV_TARGET
-{
-	// Unpack the GBuffer
-	GBufferData gbd = UnpackGBuffer(In.Position.xy);
-
-	// Convert the data into the material structure
-	Material mat;
-	MaterialFromGBuffer(gbd, mat);
-
-	// Reconstruct the world position
-	float3 position = CalculateWorldPos(In.ScreenPos, gbd.Depth);
- 
-	float3 finalColor = CalculateSpotLight(position, mat);
-
-		// Return the final color
-	float shadowValue = PCFShadow(position);
-
-	return float4(finalColor * shadowValue, 1.0f);
-}
-
-float4 PointLightingPS(LightVSOutput In) : SV_TARGET
-{
-	// Unpack the GBuffer
-	GBufferData gbd = UnpackGBuffer(In.Position.xy);
-
-	// Convert the data into the material structure
-	Material mat;
-	MaterialFromGBuffer(gbd, mat);
-
-	// Reconstruct the world position
-	float3 position = CalculateWorldPos(In.ScreenPos, gbd.Depth);
- 
-	float3 finalColor = CalculatePointLight(position, mat);
-
-
-	return float4(finalColor, 1.0f);
+	return float4(finalColor, 1.0);
 }

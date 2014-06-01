@@ -128,6 +128,9 @@
     <None Include="..\Resource\FX\HLSL\SurfaceVisual.hlsl">
       <Filter>HLSL</Filter>
     </None>
+    <None Include="..\Resource\FX\HLSL\Skybox.hlsl">
+      <Filter>HLSL</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Geometry.h">
@@ -263,6 +266,9 @@
     <ClInclude Include="ShadowMap.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -384,6 +390,9 @@
       <Filter>Mathematics</Filter>
     </ClCompile>
     <ClCompile Include="ShadowMap.cpp">
+      <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Skybox.cpp">
       <Filter>RenderSystem</Filter>
     </ClCompile>
   </ItemGroup>

@@ -497,10 +497,10 @@ namespace Disorder
 
 	void GLRenderEngine::CreateMainTarget()
 	{
-		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil, NULL);
+		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil,1, NULL);
 		SurfaceViewPtr DepthBufferView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, depthStencilTex, GConfig->pRenderConfig->DepthStencilFormat, 0);
  
-		RenderTexture2DPtr mainTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->ColorFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_RenderTarget , NULL);
+		RenderTexture2DPtr mainTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->ColorFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_RenderTarget ,1, NULL);
 		SurfaceViewPtr mainTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, mainTex, GConfig->pRenderConfig->ColorFormat);
 
 		std::map<ESurfaceLocation, SurfaceViewPtr> viewMap;

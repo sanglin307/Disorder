@@ -61,6 +61,7 @@ namespace Disorder
 	typedef boost::shared_ptr<ID3D11Buffer> ID3D11BufferPtr;
 	typedef boost::shared_ptr<ID3D11VertexShader> ID3D11VertexShaderPtr;
 	typedef boost::shared_ptr<ID3D11PixelShader>  ID3D11PixelShaderPtr;
+	typedef boost::shared_ptr<ID3D11GeometryShader> ID3D11GeometryShaderPtr;
 	typedef boost::shared_ptr<ID3DBlob> ID3DBlobPtr;
 	typedef boost::shared_ptr<ID3D11DepthStencilView> ID3D11DepthStencilViewPtr;
 	typedef boost::shared_ptr<ID3D11ShaderResourceView> ID3D11ShaderResourceViewPtr;

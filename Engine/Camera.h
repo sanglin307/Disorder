@@ -40,6 +40,7 @@ namespace Disorder
 			return;
 		}
 
+		
 	protected:
 		CameraUpdateStrategy(){};
  
@@ -69,6 +70,11 @@ namespace Disorder
 		static CameraSphereTargetUpdatePtr Create(float fRadius,const glm::vec3& target);
 		
 		virtual void SetTarget(Camera *pCamera,const glm::vec3& target);
+		
+		const glm::vec3& GetTarget() const
+		{
+			return _target;
+		}
 
 	protected:
 		CameraSphereTargetUpdate(float radius,const glm::vec3& target)
@@ -146,7 +152,7 @@ namespace Disorder
 		glm::vec3 EyePos;
 		glm::quat Rotation;
 
-		glm::vec3 _Direction;
+		glm::vec3 _Direction; // right-hand 
 		glm::vec3 _Up;
 		glm::vec3 _Right;
  
