@@ -269,6 +269,9 @@
     <ClInclude Include="Skybox.h">
       <Filter>RenderSystem</Filter>
     </ClInclude>
+    <ClInclude Include="SHA1.h">
+      <Filter>Mathematics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -394,6 +397,9 @@
     </ClCompile>
     <ClCompile Include="Skybox.cpp">
       <Filter>RenderSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="SHA1.cpp">
+      <Filter>Mathematics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

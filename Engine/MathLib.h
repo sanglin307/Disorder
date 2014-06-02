@@ -149,6 +149,9 @@ namespace Disorder
 			return float(rand()) / (float)RAND_MAX;
 		}
 
+		static void HashBuffer(const void* Data, unsigned int DataSize, unsigned char* OutHash);
+		static void HashBuffer(const void* Data, unsigned int DataSize, std::wstring& OutHash);
+
 		static void CalcMinMax(const std::vector<glm::vec3>& posList, glm::vec3& min, glm::vec3& max);
 		static void Transform(const glm::mat4& mat,glm::vec3& pos);
 

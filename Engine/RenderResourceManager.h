@@ -8,7 +8,12 @@ namespace Disorder
 	{
 		typedef boost::unordered_map<std::string,ShaderObjectPtr>  ShaderMap;
 		typedef boost::unordered_map<std::string,ShaderPropertyManagerPtr> ShaderPropertyManagerMap;
-		 
+		typedef boost::unordered_map<std::wstring, DepthStencilStatePtr> DepthStencilMap;
+		
+		typedef boost::unordered_map<std::wstring, SamplerStatePtr> SamplerStateMap;
+		typedef boost::unordered_map<std::wstring, RasterizeStatePtr> RaterizeStateMap;
+		typedef boost::unordered_map<std::wstring, BlendStatePtr> BlendStateMap;
+
 	public:
 		virtual void Init();
 		virtual void Exit();
@@ -32,6 +37,8 @@ namespace Disorder
 		ShaderPropertyManagerPtr GetPropertyManager(std::string const& name);
 
 		void DumpContent();
+ 
+
 	public:
 		static RasterizeStatePtr DefaultRasterizeState;
 		static BlendStatePtr DefaultBlentState;
@@ -43,6 +50,13 @@ namespace Disorder
 	protected:
 		ShaderMap _shaderMap;
 		ShaderPropertyManagerMap _propertyManagerMap;
+		DepthStencilMap _depthStencilMap;
+		
+		SamplerStateMap _samplerStateMap;
+		RaterizeStateMap _rasterizeStateMap;
+		BlendStateMap _blendStateMap;
+
+		
  
 	};
 }

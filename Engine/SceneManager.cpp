@@ -35,8 +35,7 @@ namespace Disorder
 		_sceneBounds.BMin = _sceneBounds.BMax = glm::vec3(0, 0, 0);
 		for (size_t i = 0; i < _vRenderObjects.size(); i++)
 		{
-			const GeometryPtr geometry = _vRenderObjects[i]->GetGeometry();
-			BoxBounds box = geometry->BoundingBox.GetBox();
+			const BoxBounds& box = _vRenderObjects[i]->GetBoxBounds();
 			_sceneBounds.Union(box);
 		}
 	}
@@ -76,7 +75,7 @@ namespace Disorder
 		renderObjList.reserve(_vRenderObjects.size());
 		for(size_t i=0;i<_vRenderObjects.size();i++)
 		{
-			//if(_vRenderObjects[i]->Overlaps(camera->CameraFrustrum))
+			if(_vRenderObjects[i]->Overlaps(camera->CameraFrustrum))
 				renderObjList.push_back(_vRenderObjects[i]);
 		}
 	}
@@ -183,6 +182,7 @@ namespace Disorder
 		{
 			_mRenderObjects.insert(std::pair<std::string, GeometryRendererPtr>(renderer->Name, renderer));
 			_vRenderObjects.push_back(renderer);
+			renderer->UpdateBoundingBox();
 		}
 	}
 

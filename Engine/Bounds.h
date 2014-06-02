@@ -20,7 +20,7 @@ namespace Disorder
 
 		bool IsValid() const
 		{
-			return BMin.x < BMax.x && BMin.y < BMax.y && BMin.z < BMax.z;
+			return BMin.x <= BMax.x && BMin.y <= BMax.y && BMin.z <= BMax.z;
 		}
 
 		glm::vec3 GetCenter() const
@@ -71,6 +71,15 @@ namespace Disorder
 			BMax.z = Max(BMax.z, b.BMax.z);
 		}
  
+		BoxBounds(const glm::vec3* Points, unsigned int NumPoints)
+		{
+			BMin = glm::vec3(Math::POS_INFINITY, Math::POS_INFINITY, Math::POS_INFINITY);
+			BMax = glm::vec3(Math::NEG_INFINITY, Math::NEG_INFINITY, Math::NEG_INFINITY);
+
+			for (unsigned int PointIndex = 0; PointIndex < NumPoints; PointIndex++)
+				Union(Points[PointIndex]);
+		}
+
 		inline  bool Overlaps(const BoxBounds &b) const 
 		{
 			bool x = (BMax.x >= b.BMin.x) && (BMin.x <= b.BMax.x);

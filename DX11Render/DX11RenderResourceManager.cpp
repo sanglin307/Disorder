@@ -28,21 +28,50 @@ namespace Disorder
 
 	DepthStencilStatePtr DX11RenderResourceManager::CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef)
 	{
+		std::wstring hashKey;
+		Math::HashBuffer(pDepthStencilDesc, sizeof(DepthStencilDesc), hashKey);
+		if (_depthStencilMap.find(hashKey) != _depthStencilMap.end())
+			return _depthStencilMap.at(hashKey);
+
 		DepthStencilStatePtr state = DX11DepthStencilState::Create(pDepthStencilDesc,stencilRef);
+
+		_depthStencilMap.insert(std::pair<std::wstring, DepthStencilStatePtr>(hashKey, state));
+
 		return state;
 	}
 
 	RasterizeStatePtr DX11RenderResourceManager::CreateRasterizeState(RasterizeDesc *pDesc)
 	{
+		std::wstring hashKey;
+		Math::HashBuffer(pDesc, sizeof(RasterizeDesc), hashKey);
+		if (_rasterizeStateMap.find(hashKey) != _rasterizeStateMap.end())
+			return _rasterizeStateMap.at(hashKey);
+
 		RasterizeStatePtr state = DX11RasterizeState::Create(pDesc);
 
+		_rasterizeStateMap.insert(std::pair<std::wstring, RasterizeStatePtr>(hashKey, state));
 		return state;
 	}
 
+	void DX11RenderResourceManager::UpdateRenderLayout(const std::wstring& hashKey, ID3D11InputLayoutPtr layout)
+	{
+		if (_renderLayoutMap.find(hashKey) != _renderLayoutMap.end())
+			return;
+
+		_renderLayoutMap.insert(std::pair<std::wstring, ID3D11InputLayoutPtr>(hashKey, layout));
+	}
+
+	ID3D11InputLayoutPtr DX11RenderResourceManager::GetRenderLayout(const std::wstring& hashKey)
+	{
+		if (_renderLayoutMap.find(hashKey) != _renderLayoutMap.end())
+			return _renderLayoutMap.at(hashKey);
+
+		return NULL;
+	}
 
 	RenderLayoutPtr DX11RenderResourceManager::CreateRenderLayout(RenderEffectPtr const& renderEffect,TopologyType topologyType,bool soloBuffer)
 	{
- 
+
 		RenderLayoutPtr renderLayout = DX11RenderLayout::Create(renderEffect,topologyType,soloBuffer);
 		return renderLayout;
 	}
@@ -104,7 +133,15 @@ namespace Disorder
 
 	SamplerStatePtr DX11RenderResourceManager::CreateSamplerState(SamplerDesc* pSamplerDesc)
 	{
+		std::wstring hashKey;
+		Math::HashBuffer(pSamplerDesc, sizeof(SamplerDesc), hashKey);
+		if (_samplerStateMap.find(hashKey) != _samplerStateMap.end())
+			return _samplerStateMap.at(hashKey);
+
 		SamplerStatePtr sampler = DX11SamplerState::Create(pSamplerDesc);
+
+		_samplerStateMap.insert(std::pair<std::wstring, SamplerStatePtr>(hashKey, sampler));
+
 		return sampler;
 	}
 
@@ -112,8 +149,15 @@ namespace Disorder
 
 	BlendStatePtr DX11RenderResourceManager::CreateBlendState(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable,bool IndependentBlendEnable)
 	{
+		std::wstring hashKey;
+		Math::HashBuffer(pBlendDescArray, sizeof(BlendDesc)*BlendArraySize, hashKey);
+		if (_blendStateMap.find(hashKey) != _blendStateMap.end())
+			return _blendStateMap.at(hashKey);
+
 		DX11BlendStatePtr blendState = DX11BlendState::Create(pBlendDescArray,BlendArraySize,AlphaToCoverageEnable,IndependentBlendEnable);
-		 
+		
+		_blendStateMap.insert(std::pair<std::wstring, BlendStatePtr>(hashKey, blendState));
+
 		return blendState;
 	}
 

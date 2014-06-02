@@ -168,6 +168,8 @@ namespace Disorder
 		if( mainCamera == NULL )
 			return;
 
+		GSceneManager->UpdateBoundingBox();
+
 		GEngine->RenderEngine->OnFrameBegin();
 
 		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget);

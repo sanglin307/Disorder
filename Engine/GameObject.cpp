@@ -167,6 +167,14 @@ namespace Disorder
 		}
 
 		_worldMatrix = glm::translate(_wldPos) * glm::scale(_wldScale) * glm::toMat4(_wldRot);
+		for (size_t i = 0; i < _vComponents.size(); i++)
+		{
+			if (_vComponents[i]->ComponentType == CT_Renderer)
+			{
+				GeometryRendererPtr renderer = boost::dynamic_pointer_cast<GeometryRenderer>(_vComponents[i]);
+				renderer->UpdateBoundingBox();
+			}
+		}
 
 		for(std::map<std::string,GameObjectPtr>::const_iterator iter=_mapChildren.begin();iter != _mapChildren.end();iter++)
 		{

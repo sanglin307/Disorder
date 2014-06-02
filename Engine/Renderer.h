@@ -101,7 +101,8 @@ namespace Disorder
 	private:
 		  GeometryPtr _geometryObject;
 	      SurfaceMaterialPtr _material;
-		 
+		  RenderLayoutPtr _shadowLayout;
+		  BoxBounds    _boxBounds;
 	private:
 
 		  void DrawAxis(CameraPtr const& camera);
@@ -111,29 +112,30 @@ namespace Disorder
 
 	public:
 		 
+		const BoxBounds& GetBoxBounds() const
+		{
+			return _boxBounds;
+		}
+
 		  static GeometryRendererPtr Create(std::string const& name);
 
           void SetGeometry(GeometryPtr const& geometry,SurfaceMaterialPtr const& mat);
 		  virtual void BuildRenderLayout(RenderEffectPtr const& effect,bool releaseOld);
 
+		  void UpdateBoundingBox();
+
 		  virtual bool Overlaps(const Frustrum& frustrum);		 
 		  void UpdateShaderProperty();
 		  virtual void Render(CameraPtr const& camera);
-		  
+		  virtual void RenderShadow(CameraPtr const& camera, RenderEffectPtr shadowEffect);
+
 		  virtual void DebugDraw();
 
 		  const GeometryPtr GetGeometry() const
 		  {
 			  return _geometryObject;
 		  }
-
-	protected:
  
-		// for each light
-		ShaderPropertyPtr _LightTypeProperty;
-		ShaderPropertyPtr _LightIntensityProperty;
-		ShaderPropertyPtr _LightPosProperty;
-		ShaderPropertyPtr _LightColorProperty;
 	};
 }
 

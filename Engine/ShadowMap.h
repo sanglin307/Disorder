@@ -52,7 +52,6 @@ namespace Disorder
  
 		RenderEffectPtr _DepthGenEffect;
 		RenderEffectPtr _DepthCubeGenEffect;
-		 
 	};
 
 }

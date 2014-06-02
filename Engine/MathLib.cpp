@@ -168,5 +168,21 @@ namespace Disorder
 	   return ViewMatrixRH(eye,xaxis,yaxis,zaxis);
    }
 
+
+   void Math::HashBuffer(const void* Data, unsigned int DataSize, unsigned char* OutHash)
+   {
+	   CSHA1 Sha;
+	   Sha.Update((const unsigned char*)Data, DataSize);
+	   Sha.Final();
+	   Sha.GetHash(OutHash);
+   }
+
+   void Math::HashBuffer(const void* Data, unsigned int DataSize, std::wstring& OutHash)
+   {
+	   CSHA1 Sha;
+	   Sha.Update((const unsigned char*)Data, DataSize);
+	   Sha.Final();
+	   Sha.ReportHashStl(OutHash, CSHA1::REPORT_HEX_SHORT);
+   }
      
 }

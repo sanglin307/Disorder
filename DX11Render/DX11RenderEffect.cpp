@@ -8,47 +8,59 @@ namespace Disorder
  
 	void DX11ShaderObject::UpdateShaderParameter()
 	{
-		CachedShaderResourceView.clear();
-		CachedConstBuffer.clear();
-		CachedSamplerState.clear();
+		if (_bCacheRefresh)
+		{
+			CachedConstBuffer.clear();
+			CachedSamplerState.clear();
  
-		for(unsigned  int i=0;i<ShaderReflect->ResourceBindings.size();++i)
+			for (unsigned int i = 0; i < ShaderReflect->ResourceBindings.size(); ++i)
+			{
+				ShaderPropertyPtr res = ShaderReflect->ResourceBindings[i].ParamRef;
+				if (ShaderReflect->ResourceBindings[i].Type == D3D_SIT_CBUFFER)
+				{
+					if (res == NULL || res->GetDataAsConstBuffer() == NULL)
+					{
+						std::stringstream stream;
+						stream << "vertex shader's constant buffer is null " << GetShaderName() << "," << ShaderReflect->ConstantBuffers[i].CBName;
+						GLogger->Error(stream.str());
+						continue;
+					}
+					CachedConstBuffer.push_back((ID3D11Buffer*)(res->GetDataAsConstBuffer()->GetHandle()));
+				}
+				else if (ShaderReflect->ResourceBindings[i].Type == D3D_SIT_SAMPLER)
+				{
+					if (res == NULL || res->GetDataAsSampler() == NULL)
+					{
+						std::stringstream stream;
+						stream << "vertex shader's sampler state is null " << GetShaderName() << "," << ShaderReflect->ResourceBindings[i].Name;
+						GLogger->Error(stream.str());
+						continue;
+					}
+					CachedSamplerState.push_back((ID3D11SamplerState*)(res->GetDataAsSampler()->GetHandle()));
+				}
+			}
+
+		    _bCacheRefresh = false;
+		}
+
+		CachedShaderResourceView.clear();
+		for (unsigned int i = 0; i < ShaderReflect->ResourceBindings.size(); ++i)
 		{
 			ShaderPropertyPtr res = ShaderReflect->ResourceBindings[i].ParamRef;
-			if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_CBUFFER )
+			if (ShaderReflect->ResourceBindings[i].Type == D3D_SIT_TEXTURE)
 			{
-				if( res == NULL || res->GetDataAsConstBuffer() == NULL)
+				if (res == NULL || res->GetDataAsShaderResource() == NULL)
 				{
 					std::stringstream stream;
-					stream << "vertex shader's constant buffer is null "<< GetShaderName() <<"," << ShaderReflect->ConstantBuffers[i].CBName;
-					GLogger->Error(stream.str());
-					continue;
-				}
-				CachedConstBuffer.push_back((ID3D11Buffer*)(res->GetDataAsConstBuffer()->GetHandle()));
-			}
-			else if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_TEXTURE )
-			{			
-				if( res == NULL || res->GetDataAsShaderResource() == NULL)
-				{
-					std::stringstream stream;
-					stream << "vertex shader's shader resource is null "<< GetShaderName() <<"," << ShaderReflect->ResourceBindings[i].Name;
+					stream << "vertex shader's shader resource is null " << GetShaderName() << "," << ShaderReflect->ResourceBindings[i].Name;
 					GLogger->Error(stream.str());
 					continue;
 				}
 				CachedShaderResourceView.push_back((ID3D11ShaderResourceView*)(res->GetDataAsShaderResource()->GetHandle()));
 			}
-			else if( ShaderReflect->ResourceBindings[i].Type == D3D_SIT_SAMPLER )
-			{
-				if( res == NULL || res->GetDataAsSampler() == NULL)
-				{
-					std::stringstream stream;
-					stream << "vertex shader's sampler state is null "<< GetShaderName() <<"," << ShaderReflect->ResourceBindings[i].Name;
-					GLogger->Error(stream.str());
-					continue;
-				}
-				CachedSamplerState.push_back((ID3D11SamplerState*)(res->GetDataAsSampler()->GetHandle()));
-			}
 		}
+
+		
 	}
 
 	DX11ShaderObjectPtr DX11ShaderObject::Create(std::string const& effectName,std::string const& entryPoint,ShaderType shaderType,ShaderModel shaderModel)

@@ -1,4 +1,4 @@
-FBX file format version for file ShadowTest.FBX is 7,3,0
+FBX file format version for file Mangonel.FBX is 7,3,0
 Shader Object :Skybox:PS
 Shader Object :BatchLines:PS
 Shader Object :Skybox:VS
@@ -23,9 +23,9 @@ Shader Property Manager Name :Global
  ****** Shader Property :MaterialProperty
  ****** Shader Property :SceneProperty
  ****** Shader Property :CameraTransforms
- ****** Shader Property :ObjectTransform
  ****** Shader Property :PointLightProperty
  ****** Shader Property :ShadowMapGen
+ ****** Shader Property :ObjectTransform
  ****** Shader Property :TextTexture
  ****** Shader Property :ShadowSampler
  ****** Shader Property :DiffuseTexture

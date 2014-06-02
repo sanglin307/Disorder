@@ -124,12 +124,16 @@ float PCFShadowCubeMap(float3 position)
 	}
 	else if (dirValue.y > dirValue.x && dirValue.y > dirValue.z) // y is max component
 	{
-		lightDir.z = -lightDir.z;   // right hand coordinate to left hand....
-		//lightDir.x = -lightDir.x;
 		if (lightDir.y < 0)
+		{
 			selectShadowMat = ShadowMapViewArray[3];
+			lightDir.x = -lightDir.x;
+		}
 		else
+		{
 			selectShadowMat = ShadowMapViewArray[2];
+			lightDir.z = -lightDir.z;
+		}
 	}
 	else
 	{
@@ -148,18 +152,7 @@ float PCFShadowCubeMap(float3 position)
 		posShadowMap = mul(ShadowMapProj, posShadowMap);
 
 	float3 UVD = posShadowMap.xyz / posShadowMap.w;
-
 	return ShadowMapTextureCube.SampleCmp(ShadowSampler, lightDir, UVD.z).r;
-	//float4 vshadow;
-	////float offset = 0.01;
-	//vshadow.x =  ShadowMapTextureCube.SampleCmp(ShadowSampler, lightDir,UVD.z).r;
-	//vshadow.y = ShadowMapTextureCube.SampleCmp(ShadowSampler, lightDir + float3(offset,0,0), UVD.z).r;
-	//vshadow.z = ShadowMapTextureCube.SampleCmp(ShadowSampler, lightDir + float3(0,offset, 0), UVD.z).r;
-	//vshadow.w = ShadowMapTextureCube.SampleCmp(ShadowSampler, lightDir + float3(offset, offset,0), UVD.z).r;
-	//
-	//return lerp(lerp(vshadow.x, vshadow.y, 0.5),
-	//	lerp(vshadow.z, vshadow.w, 0.5),
-	//	0.5);
 
 }
 

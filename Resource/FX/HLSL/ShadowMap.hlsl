@@ -3,8 +3,8 @@
 struct VS_INPUT
 {
     float3 Position  : POSITION;
-    float3 Normal : NORMAL;
-	float2 UV0  : TEXCOORD0;
+   // float3 Normal : NORMAL;
+	//float2 UV0  : TEXCOORD0;
 };
  
 
@@ -20,7 +20,8 @@ struct CubeMapGSOut
 float4 DepthVertexShader(VS_INPUT input) : SV_Position
 { 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
-    float4 position = float4(input.Position,1.f); //mul(WorldTransform,input.Position);
+    float4 position = float4(input.Position,1.f);
+	position = mul(WorldTransform, position);
     position = mul(ShadowMapView,position);
     position = mul(ShadowMapProj,position);
 

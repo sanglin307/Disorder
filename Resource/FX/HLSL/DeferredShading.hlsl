@@ -77,7 +77,7 @@ ScenePSOutput PackGBuffer(float3 BaseColor, float3 Normal, float3 SpecColor, flo
 ScenePSOutput ScenePS( SceneVSOutput In )
 { 
     // Lookup mesh texture and modulate it with diffuse
-    float3 dc = DiffuseTexture.Sample( DiffuseSampler, In.UV0 );
+    float3 dc = DiffuseTexture.Sample( DiffuseSampler, In.UV0 ).xyz;
 	dc *= DiffuseColor;
 
 	return PackGBuffer(dc, normalize(In.NormalWorld), SpecularColor, SpecularExp);
@@ -142,10 +142,7 @@ float4 BasePassPS(LightVSOutput In) : SV_TARGET
 
 	// Convert the data into the material structure
 	Material mat;
-	MaterialFromGBuffer(gbd, mat);
-
-	// drop if z = 1.0f
- 
+	MaterialFromGBuffer(gbd, mat); 
 
 	// Reconstruct the world position
 	float3 position = CalculateWorldPos(In.ScreenPos, gbd.Depth);
@@ -215,6 +212,7 @@ float4 PointLightingPS(LightVSOutput In) : SV_TARGET
  
 	float3 finalColor = CalculatePointLight(position, mat);
 
+	float shadowValue = PCFShadowCubeMap(position);
 
-	return float4(finalColor, 1.0f);
+	return float4(finalColor*shadowValue, 1.0f);
 }

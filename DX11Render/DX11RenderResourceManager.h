@@ -5,6 +5,8 @@ namespace Disorder
 {
 	class DX11RenderResourceManager : public RenderResourceManager
 	{
+		typedef boost::unordered_map<std::wstring, ID3D11InputLayoutPtr> RenderLayoutMap;
+
 	public :
 		virtual RenderLayoutPtr CreateRenderLayout(RenderEffectPtr const& renderEffect,TopologyType topologyType,bool soloBuffer);
 		virtual ShaderObjectPtr CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel,std::string const& entryPoint);
@@ -28,9 +30,12 @@ namespace Disorder
 		virtual void RegisterPropertyManager(std::string const& name);
 		static DX11RenderResourceManagerPtr Create();
 
+		void UpdateRenderLayout(const std::wstring& hashKey, ID3D11InputLayoutPtr layout);
+		ID3D11InputLayoutPtr GetRenderLayout(const std::wstring& hashKey);
+
 	private:
 		DX11RenderResourceManager(){}
-
+		RenderLayoutMap _renderLayoutMap;
 	
 	};
 }

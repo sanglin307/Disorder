@@ -266,7 +266,7 @@ namespace Disorder
 
 	bool GeometryRenderer::Overlaps(const Frustrum& frustrum)
 	{
-		return frustrum.Overlaps( _geometryObject->BoundingBox.GetBox());
+		return frustrum.Overlaps(_boxBounds);
 	}
  
 	GeometryRendererPtr GeometryRenderer::Create(std::string const& name)
@@ -279,7 +279,25 @@ namespace Disorder
 	{
 		_geometryObject = geometry;
 		_material = mat;
+		UpdateBoundingBox();
+	}
 
+	void GeometryRenderer::UpdateBoundingBox()
+	{
+		GameObjectPtr go = GetBase();
+		if (go == NULL)
+			return;
+
+		const glm::mat4& worldMat = go->GetWorldMatrix();
+		_boxBounds = _geometryObject->BoundingBox.GetBox();
+		std::vector<glm::vec3> corners;
+		_boxBounds.GetCorners(corners);
+		for (size_t i = 0; i < corners.size(); i++)
+		{
+			Math::Transform(worldMat, corners[i]);
+		}
+	 
+		_boxBounds = BoxBounds(corners.data(), corners.size());
 	}
 
 	void GeometryRenderer::BuildRenderLayout(RenderEffectPtr const& effect,bool releaseOld)
@@ -317,7 +335,7 @@ namespace Disorder
 	 void GeometryRenderer::DrawBoundingBox(CameraPtr const& camera)
 	 {
 
-		 glm::vec4 boxVec1( _geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
+		/* glm::vec4 boxVec1( _geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
 			                _geometryObject->BoundingBox.Origin.y - _geometryObject->BoundingBox.BoxExtent.y,
 						    _geometryObject->BoundingBox.Origin.z - _geometryObject->BoundingBox.BoxExtent.z,1);
 		 glm::vec4 boxVec2(_geometryObject->BoundingBox.Origin.x + _geometryObject->BoundingBox.BoxExtent.x,
@@ -360,17 +378,26 @@ namespace Disorder
 		 boxVec5 = boxVec5 / boxVec5.w;
 		 boxVec6 = boxVec6 / boxVec6.w;
 		 boxVec7 = boxVec7 / boxVec7.w;
-		 boxVec8 = boxVec8 / boxVec8.w;
+		 boxVec8 = boxVec8 / boxVec8.w;*/
 	 
 
-		 glm::vec3 b1(boxVec1.x, boxVec1.y, boxVec1.z);
-		 glm::vec3 b2(boxVec2.x, boxVec2.y, boxVec2.z);
-		 glm::vec3 b3(boxVec3.x, boxVec3.y, boxVec3.z);
-		 glm::vec3 b4(boxVec4.x, boxVec4.y, boxVec4.z);
-		 glm::vec3 b5(boxVec5.x, boxVec5.y, boxVec5.z);
-		 glm::vec3 b6(boxVec6.x, boxVec6.y, boxVec6.z);
-		 glm::vec3 b7(boxVec7.x, boxVec7.y, boxVec7.z);
-		 glm::vec3 b8(boxVec8.x, boxVec8.y, boxVec8.z);
+		 //glm::vec3 b1(boxVec1.x, boxVec1.y, boxVec1.z);
+		 //glm::vec3 b2(boxVec2.x, boxVec2.y, boxVec2.z);
+		 //glm::vec3 b3(boxVec3.x, boxVec3.y, boxVec3.z);
+		 //glm::vec3 b4(boxVec4.x, boxVec4.y, boxVec4.z);
+		 //glm::vec3 b5(boxVec5.x, boxVec5.y, boxVec5.z);
+		 //glm::vec3 b6(boxVec6.x, boxVec6.y, boxVec6.z);
+		 //glm::vec3 b7(boxVec7.x, boxVec7.y, boxVec7.z);
+		 //glm::vec3 b8(boxVec8.x, boxVec8.y, boxVec8.z);
+
+		 glm::vec3 b1(_boxBounds.BMin.x, _boxBounds.BMin.y, _boxBounds.BMin.z);
+		 glm::vec3 b2(_boxBounds.BMax.x, _boxBounds.BMin.y, _boxBounds.BMin.z);
+		 glm::vec3 b3(_boxBounds.BMax.x, _boxBounds.BMin.y, _boxBounds.BMax.z);
+		 glm::vec3 b4(_boxBounds.BMin.x, _boxBounds.BMin.y, _boxBounds.BMax.z);
+		 glm::vec3 b5(_boxBounds.BMin.x, _boxBounds.BMax.y, _boxBounds.BMax.z);
+		 glm::vec3 b6(_boxBounds.BMax.x, _boxBounds.BMax.y, _boxBounds.BMax.z);
+		 glm::vec3 b7(_boxBounds.BMax.x, _boxBounds.BMax.y, _boxBounds.BMin.z);
+		 glm::vec3 b8(_boxBounds.BMin.x, _boxBounds.BMax.y, _boxBounds.BMin.z);
 
 		 glm::vec4 color(1.0f,0,0,1.0f);
 		 GEngine->GameCanvas->DrawLine(b1,color,b2,color);
@@ -379,9 +406,9 @@ namespace Disorder
 		 GEngine->GameCanvas->DrawLine(b4,color,b1,color);
 
 		 GEngine->GameCanvas->DrawLine(b4,color,b5,color);
-	     GEngine->GameCanvas->DrawLine(b1,color,b6,color);
+	     GEngine->GameCanvas->DrawLine(b1,color,b8,color);
 		 GEngine->GameCanvas->DrawLine(b2,color,b7,color);
-	     GEngine->GameCanvas->DrawLine(b3,color,b8,color);
+	     GEngine->GameCanvas->DrawLine(b3,color,b6,color);
 
 		 GEngine->GameCanvas->DrawLine(b5,color,b6,color);
 		 GEngine->GameCanvas->DrawLine(b6,color,b7,color);
@@ -457,6 +484,27 @@ namespace Disorder
 		renderEngine->SetEffect(_renderEffect);
 		renderEngine->DrawIndexed(_geometryObject->Indices.size(),0,0);
 		 
+	}
+
+	void GeometryRenderer::RenderShadow(CameraPtr const& camera, RenderEffectPtr shadowEffect)
+	{
+		if (_shadowLayout == NULL)
+		{
+			_shadowLayout = GEngine->RenderResourceMgr->CreateRenderLayout(shadowEffect, TT_TriangleList, true);
+			_shadowLayout->BindVertexBuffer(_renderLayout->GetVertexBuffers()[0]);
+			_shadowLayout->BindIndexBuffer(_renderLayout->GetIndexBuffer());
+			_shadowLayout->FinishBufferBinding(shadowEffect);
+		}
+
+		if (_renderEffect == NULL)
+			return;
+
+		GameObjectPtr gameObject = _baseObject.lock();
+		RenderEnginePtr renderEngine = GEngine->RenderEngine;
+
+		renderEngine->SetRenderLayout(_shadowLayout);
+		renderEngine->SetEffect(shadowEffect);
+		renderEngine->DrawIndexed(_geometryObject->Indices.size(), 0, 0);
 	}
 
 

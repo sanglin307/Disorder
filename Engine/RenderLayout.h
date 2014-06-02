@@ -14,6 +14,11 @@ namespace Disorder
 			_vertexBuffers.push_back(renderBuffer);
         }
 
+		void UnBindVertexBuffer()
+		{
+			_vertexBuffers.clear();
+		}
+
          void BindIndexBuffer(RenderBufferPtr const& renderBuffer)
         {
              _indexBuffer = renderBuffer; 

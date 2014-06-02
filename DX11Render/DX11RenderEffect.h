@@ -212,11 +212,14 @@ namespace Disorder
 		ID3D11PixelShaderPtr  PixelShaderInterface;
 		ID3D11GeometryShaderPtr GeometryShaderInterface;
 		ID3DBlobPtr DataInterface;
+
 		std::vector<ID3D11Buffer*> CachedConstBuffer;
 		std::vector<ID3D11SamplerState*> CachedSamplerState;
 		std::vector<ID3D11ShaderResourceView*> CachedShaderResourceView;
 
 	private:
+
+		bool _bCacheRefresh;
 
 		HRESULT CompileShaderFromFile(std::string const& fileName, std::string const& entryPoint, std::string const& shaderModel, ID3DBlob** ppBlobOut);
 
@@ -227,6 +230,7 @@ namespace Disorder
 			_type = shaderType;
 			_shaderModel = shaderModel;
 
+			_bCacheRefresh = true;
 		}
 
 		inline std::string GetShaderModelDes(ShaderType type)

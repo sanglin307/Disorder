@@ -142,7 +142,7 @@ namespace Disorder
 
 		// -Y
 		vLookDir = glm::vec3(lightPos.x, lightPos.y - 1, lightPos.z);
-		vUpDir = glm::vec3(0, 0, -1);
+		vUpDir = glm::vec3(0, 0, 1);
 		ShadowViewMatrix[3] = Math::ViewMatrixRH(lightPos, vLookDir, vUpDir);
 
 		// +Z

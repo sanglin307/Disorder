@@ -40,7 +40,6 @@ namespace Disorder
 		_DepthCubeGenEffect->BindShader(geometryShader);
 		_DepthCubeGenEffect->LinkShaders();
 
-		
 		RasterizeDesc rDesc;
 		rDesc.DepthBias = 50;
 		rDesc.SlopeScaledDepthBias = 27.0f;
@@ -130,14 +129,12 @@ namespace Disorder
 		if (light->LightType != LT_Point)
 		{
 			object->UpdateShaderProperty();
-			object->SetRenderEffect(_DepthGenEffect);
-			object->Render(camera);
+			object->RenderShadow(camera, _DepthGenEffect);
 		}
 		else
 		{
 			object->UpdateShaderProperty();
-			object->SetRenderEffect(_DepthCubeGenEffect);
-			object->Render(camera);
+			object->RenderShadow(camera, _DepthCubeGenEffect);
 		}
 
 	}

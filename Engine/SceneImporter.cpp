@@ -166,7 +166,7 @@ namespace Disorder
 			}
 		}
 
-		GSceneManager->UpdateBoundingBox();
+	
 
 	}
 	 
@@ -287,6 +287,7 @@ namespace Disorder
         FbxVector4* lControlPoints = pMesh->GetControlPoints(); 
 		int vertexCount = pMesh->GetControlPointsCount();
 
+		geometry->Name = pMesh->GetName();
 		geometry->ControllPositions.resize(vertexCount);
 		// Vertex read
 		for(int i=0;i<vertexCount;i++)
@@ -1232,9 +1233,10 @@ namespace Disorder
 		glm::vec3 position((float)lTmpVector[0], (float)lTmpVector[1], (float)lTmpVector[2]);
 		lTmpVector =  pNode->EvaluateLocalRotation();
 	
-		glm::quat rot = glm::angleAxis((float)lTmpVector[0] * Math::fDeg2Rad, glm::vec3(1, 0, 0)) *
-			             glm::angleAxis((float)lTmpVector[1] * Math::fDeg2Rad, glm::vec3(0, 1, 0)) *
-			             glm::angleAxis((float)lTmpVector[2] * Math::fDeg2Rad, glm::vec3(0, 0, 1));
+		glm::quat rot = glm::angleAxis((float)lTmpVector[2] * Math::fDeg2Rad, glm::vec3(0, 0, 1)) *
+			            glm::angleAxis((float)lTmpVector[1] * Math::fDeg2Rad, glm::vec3(0, 1, 0)) *
+			            glm::angleAxis((float)lTmpVector[0] * Math::fDeg2Rad, glm::vec3(1, 0, 0));
+
 		lTmpVector = pNode->EvaluateLocalScaling();
 		glm::vec3 scale((float)lTmpVector[0], (float)lTmpVector[1], (float)lTmpVector[2]);
 		std::string name(pNode->GetName());

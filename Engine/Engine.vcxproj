@@ -165,6 +165,7 @@
     <ClInclude Include="SceneImporter.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="MathLib.h" />
+    <ClInclude Include="SHA1.h" />
     <ClInclude Include="ShaderProperty.h" />
     <ClInclude Include="ShadowMap.h" />
     <ClInclude Include="Singleton.h" />
@@ -215,6 +216,7 @@
     <ClCompile Include="SceneImporter.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="GameTime.cpp" />
+    <ClCompile Include="SHA1.cpp" />
     <ClCompile Include="ShaderProperty.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="Skybox.cpp" />

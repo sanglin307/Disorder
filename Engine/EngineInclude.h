@@ -6,7 +6,8 @@
 #pragma once
 
 #ifdef WIN32
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+#define WIN32_LEAN_AND_MEAN 
+#define _CRT_SECURE_NO_WARNINGS 
 #include <Windows.h>
 extern HINSTANCE GAppInstance;
 #endif
@@ -15,6 +16,7 @@ extern HINSTANCE GAppInstance;
 #undef max
 
 //std lib
+#include <stdlib.h> 
 #include <cmath>
 #include <string>
 #include <sstream>
@@ -195,6 +197,7 @@ namespace Disorder
 }
 
 //project related
+#include "SHA1.h"
 #include "Singleton.h"
 #include "Plane.h"
 #include "MathLib.h"
