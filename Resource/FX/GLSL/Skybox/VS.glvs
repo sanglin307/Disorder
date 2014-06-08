@@ -1,0 +1,26 @@
+#version 330
+#extension GL_ARB_shading_language_include : require
+
+#include </common.gls>
+
+layout (location = 0) in vec3 Position;
+
+out block 
+{
+  vec3 CubeUVW;
+} Out;
+ 
+ void main(void)
+ {
+    mat4 worldMat = 
+	mat4( vec4(1, 0, 0, 0),
+		  vec4(0, 1, 0, 0),
+		  vec4(0, 0, 1, 0),
+		  vec4(CameraPosition.x, CameraPosition.y,  CameraPosition.z, 1));
+
+    gl_Position = vec4(Position,1.0f);
+	gl_Position = worldMat * gl_Position;
+	gl_Position = CameraViewProj * gl_Position;
+
+    Out.CubeUVW = Position ; 
+ }

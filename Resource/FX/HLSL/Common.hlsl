@@ -3,6 +3,9 @@ cbuffer SceneProperty
 {
 	float3 AmbientLowColor;
 	float3 AmbientUpperColor;
+	int    ScreenWidth;
+	int    ScreenHeight;
+	int    ShadowMapSize;
 }
 
 cbuffer CameraTransforms
@@ -173,7 +176,7 @@ float PCFShadowCubeMap(float3 position)
  
 	//return ShadowMapTexture2D.SampleCmp(ShadowSampler, UVD.xy, UVD.z).r;
 
-	float offset = 1.0f / SHADOWMAPSIZE;
+	float offset = 1.0f / ShadowMapSize;
 	// Compute the hardware PCF value
 	float4 vshadow;
 	vshadow.x = ShadowMapTexture2D.SampleCmp(ShadowSampler, UVD.xy, UVD.z).r;
@@ -185,11 +188,6 @@ float PCFShadowCubeMap(float3 position)
 		                     lerp(vshadow.z, vshadow.w, 0.5),
 		                     0.5);
 }
-
-/////////////////////////////////////////////////////////////////////////////
-// Pixel shaders
-/////////////////////////////////////////////////////////////////////////////
- 
  
 float3 CalculatePointLight(float3 position, Material material)
 {

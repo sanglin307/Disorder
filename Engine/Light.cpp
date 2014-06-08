@@ -20,6 +20,7 @@ namespace Disorder
 		:Light(name)
 	{
 		LightType = LT_Directional;
+		CastShadows = false;
 	}
 
 	DirectionLightPtr DirectionLight::Create(std::string const& name)
@@ -88,6 +89,8 @@ namespace Disorder
 	{
 		LightType = LT_Point;
 		Range = 10.0f;
+
+
 	}
 
 	glm::vec3 PointLight::GetPosition()

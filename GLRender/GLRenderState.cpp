@@ -27,7 +27,7 @@ namespace Disorder
 		glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_WRAP_T,GLRenderEngine::GetGLAddressMode(pSamplerDesc->AddressV));
 		glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_WRAP_R,GLRenderEngine::GetGLAddressMode(pSamplerDesc->AddressW));
 
-	 
+		 
 		if( pSamplerDesc->Filter == SF_Min_Mag_Mip_Point )
 		{
 			glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
@@ -78,7 +78,7 @@ namespace Disorder
 		glSamplerParameterf(pState->_stateHandle,GL_TEXTURE_MAX_LOD,pSamplerDesc->MaxLOD);
 		glSamplerParameterf(pState->_stateHandle,GL_TEXTURE_LOD_BIAS,pSamplerDesc->MipLODBias);
 
-		if( pSamplerDesc->CompareFunc == CF_None )
+		if( pSamplerDesc->CompareTypeSampler == false || pSamplerDesc->CompareFunc == CF_None )
 		    glSamplerParameteri(pState->_stateHandle,GL_TEXTURE_COMPARE_MODE, GL_NONE);
 		else
 		{

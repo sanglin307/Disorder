@@ -34,7 +34,7 @@ namespace Disorder
 		unsigned int MotionFrames;
 		bool HDR;
 		bool Gamma;
-		unsigned int ShadowMapSize;
+		int ShadowMapSize;
 
 		RenderConfig::RenderConfig()
 		{

@@ -44,6 +44,12 @@
     <Filter Include="GLSL\SurfaceVisual">
       <UniqueIdentifier>{82539860-2ecc-4c3e-a979-4f0e6acfce32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GLSL\ShadowMap">
+      <UniqueIdentifier>{ff389d9a-0d55-4405-8c45-f9fe9e9d0c1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLSL\Skybox">
+      <UniqueIdentifier>{6138af05-5fe0-4ed0-81c7-0b6717d1adca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="TodoList.txt" />
@@ -79,12 +85,6 @@
     </None>
     <None Include="..\Resource\FX\GLSL\DeferredShading\SceneVS.glvs">
       <Filter>GLSL\DeferredShading</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\ForwardLighting\BaseLightingPS.glfs">
-      <Filter>GLSL\ForwardLighting</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\ForwardLighting\FourLightingPS.glfs">
-      <Filter>GLSL\ForwardLighting</Filter>
     </None>
     <None Include="..\Resource\FX\GLSL\ForwardLighting\SceneVS.glvs">
       <Filter>GLSL\ForwardLighting</Filter>
@@ -130,6 +130,33 @@
     </None>
     <None Include="..\Resource\FX\HLSL\Skybox.hlsl">
       <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ShadowMap\DepthVertexShader.glvs">
+      <Filter>GLSL\ShadowMap</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ForwardLighting\BasePassPS.glfs">
+      <Filter>GLSL\ForwardLighting</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ForwardLighting\DirectionLightingPS.glfs">
+      <Filter>GLSL\ForwardLighting</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ForwardLighting\PointLightingPS.glfs">
+      <Filter>GLSL\ForwardLighting</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ForwardLighting\SpotLightingPS.glfs">
+      <Filter>GLSL\ForwardLighting</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ShadowMap\DepthCubeMapVS.glvs">
+      <Filter>GLSL\ShadowMap</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\ShadowMap\DepthCubeMapGS.glgs">
+      <Filter>GLSL\ShadowMap</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\Skybox\VS.glvs">
+      <Filter>GLSL\Skybox</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\Skybox\PS.glfs">
+      <Filter>GLSL\Skybox</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -225,18 +225,18 @@ namespace Disorder
 		case PF_D32_FLOAT:
 			glFormat = GL_DEPTH_COMPONENT;
 			glType = GL_FLOAT;
-			return GL_R32F;
+			return GL_DEPTH_COMPONENT32F;
 		case PF_R32_TYPELESS:
 		case PF_R32_FLOAT:
-			glFormat = GL_R;
+			glFormat = GL_RED;
 			glType = GL_FLOAT;
 			return GL_R32F;	
 		case PF_R32_UINT:
-			glFormat = GL_R;
+			glFormat = GL_RED;
 			glType = GL_UNSIGNED_INT;
 			return GL_R32UI;
 		case PF_R32_SINT :
-			glFormat = GL_R;
+			glFormat = GL_RED;
 			glType = GL_INT;
 			return GL_R32I;
 		case PF_R24G8_TYPELESS:		
@@ -509,10 +509,7 @@ namespace Disorder
 		GEngine->RenderSurfaceCache->MainTarget = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 	}
 
-	void GLRenderEngine::SetRenderTarget(const SurfaceViewPtr& renderView)
-	{
-
-	}
+ 
 
 	void GLRenderEngine::CreateViewport(void *hWnd)
 	{
@@ -534,6 +531,12 @@ namespace Disorder
 
 		_debugLayer = GLDebugLayer::Create();
 		_debugLayer->Init();
+	}
+
+	void GLRenderEngine::SetViewport(float width, float height, float minDepth, float maxDepth, float topX, float topY)
+	{
+		glViewport((GLint)topX, (GLint)topY, (GLsizei)width, (GLsizei)height);
+		glDepthRange(minDepth, maxDepth);
 	}
 
 	void GLRenderEngine::LoadGLProfile()
@@ -900,7 +903,26 @@ namespace Disorder
 		std::vector<GLenum> bufferArray;
 		GLSurface->GetGLDrawBuffers(bufferArray);
 		 
-		_renderCache.CacheMultiDrawBuffers(bufferArray);
+		if (bufferArray.size() > 0)
+			_renderCache.CacheMultiDrawBuffers(bufferArray);
+		else
+			_renderCache.CacheSingleDrawBuffer(GL_NONE);
+	}
+
+	bool GLRenderEngine::IsTextureSamplerResouce(GLenum type)
+	{
+		if (type == GL_SAMPLER_2D || type == GL_SAMPLER_2D_SHADOW)
+			return true;
+		if (type == GL_SAMPLER_1D || type == GL_SAMPLER_1D_SHADOW)
+			return true;
+		
+		if (type == GL_SAMPLER_CUBE || type == GL_SAMPLER_CUBE_SHADOW)
+			return true;
+
+		if (type == GL_SAMPLER_3D)
+			return true;
+
+		return false;
 	}
 
 	void GLRenderEngine::SetRenderLayout(RenderLayoutPtr const& renderLayout)
@@ -945,13 +967,21 @@ namespace Disorder
 		for (size_t i = 0; i < effectGL->EffectReflection->ResourceArray.size(); i++)
 		{
 			pDesc = &(effectGL->EffectReflection->ResourceArray[i]);
-			if (pDesc->Type == GL_SAMPLER_2D)
+			if (GLRenderEngine::IsTextureSamplerResouce(pDesc->Type))
 			{
 				SurfaceViewPtr tex = pDesc->ParamRef->GetDataAsShaderResource();
 				GLRenderTexture2DPtr res = boost::dynamic_pointer_cast<GLRenderTexture2D>(tex->Resource);
-				texBinding.push_back((GLuint)res->GetHandle());
+				if (pDesc->Type == GL_SAMPLER_CUBE)
+					glBindTexture(GL_TEXTURE_CUBE_MAP, (GLuint)res->GetHandle());
+				else
+				    texBinding.push_back((GLuint)res->GetHandle());
 				if (res->Sampler)
 				    samplerBinding.push_back((GLuint)res->Sampler->GetHandle());
+				else
+				{
+					//default texture binding
+					samplerBinding.push_back((GLuint)RenderResourceManager::DefaultSamplerState->GetHandle());
+				}
 				
 			}
 		}

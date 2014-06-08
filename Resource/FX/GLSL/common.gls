@@ -2,6 +2,7 @@ layout(std140) uniform SceneProperty
 {
 	int    ScreenWidth;
 	int    ScreenHeight;
+	int    ShadowMapSize;
 	vec3 AmbientLowColor;
 	vec3 AmbientUpperColor;
 
@@ -16,6 +17,13 @@ layout(std140) uniform CameraTransforms
 	mat4 CameraProjInv;
 	mat4 CameraViewProjInv;
 	vec3 CameraPosition;
+};
+
+layout(std140) uniform ShadowMapGen
+{
+	mat4 ShadowMapView; 
+	mat4 ShadowMapViewArray[6];
+	mat4 ShadowMapProj;
 };
 
 layout(std140) uniform ObjectTransform
@@ -33,6 +41,8 @@ layout(std140) uniform MaterialProperty
 };
 
 uniform sampler2D DiffuseTexture;
+uniform sampler2D ShadowMapTexture2D;
+uniform samplerCube ShadowMapTextureCube;
 
 layout(std140) uniform DirectionLightProperty
 {
@@ -40,6 +50,25 @@ layout(std140) uniform DirectionLightProperty
 	vec3 DirectionLightDir;	
 	float DirectionLightIntensity;
 } ;
+
+layout(std140) uniform PointLightProperty
+{
+    vec3 PointLightPos;
+	vec3 PointLightColor;
+	float PointLightIntensity;
+	float PointLightRangeRcp;
+};
+
+layout(std140) uniform SpotLightProperty
+{
+   vec3 SpotLightPos;
+   vec3 SpotLightDir;
+   vec3 SpotLightColor;
+   float SpotLightIntensity;
+   float SpotLightRangeRcp;
+   float SpotLightCosOuterCone;
+   float SpotLightCosInnerConeRcp;
+};
  
 struct Material
 {
@@ -77,93 +106,157 @@ vec3 CalculateDirectionLight(vec3 position, Material material)
    return finalColor;
 }
 
-layout(std140) uniform ForwardFourLights 
+vec3 CalculatePointLight(vec3 position, Material material)
 {
-	vec4 ForwardLightPosX	;	
-	vec4 ForwardLightPosY	;	
-	vec4 ForwardLightPosZ	;	
-	vec4 ForwardLightDirX	;	
-	vec4 ForwardLightDirY	;	
-	vec4 ForwardLightDirZ	;	
-	vec4 ForwardLightRangeRcp	;	
-	vec4 ForwardSpotCosOuterCone	;	
-	vec4 ForwardSpotCosInnerConeRcp;	
-	vec4 ForwardCapsuleLen;			
-	vec4 ForwardLightColorR;			
-	vec4 ForwardLightColorG;		
-	vec4 ForwardLightColorB;			
-};
+	vec3 ToEye = normalize(CameraPosition.xyz - position);
+    vec3 ToLight = PointLightPos - position;
+ 
+	// range Attenuation
+	float DistToLightNorm = 1.0 - clamp(length(ToLight) * PointLightRangeRcp,0.0,1.0);
+	float Attn = DistToLightNorm * DistToLightNorm;
 
-/////////////////////////////////////////////////////////////////////////////
-// Pixel shaders
-/////////////////////////////////////////////////////////////////////////////
+	//diffuse
+	float diffuse = clamp(dot(ToLight, material.Normal),0.0,1.0);
+    vec3 diffuseColor = PointLightColor * diffuse * material.DiffuseColor;
+   
+    //specular
+    vec3 reflectVector = reflect(-ToLight,material.Normal);
+	float specular = clamp(dot(reflectVector, ToEye),0.0,1.0);
+    vec3 specularColor = PointLightColor * clamp(pow(specular, material.SpecularExp),0.0,1.0) * material.SpecularColor;
 
-
-vec4 dot4x4(vec4 aX, vec4 aY, vec4 aZ, vec4 bX, vec4 bY, vec4 bZ)
-{
-	return aX * bX + aY * bY + aZ * bZ;
+	return PointLightIntensity *Attn * (diffuseColor + specularColor);
 }
 
-// Dot product between a four three component vectors and a single three component vector
-vec4 dot4x1(vec4 aX, vec4 aY, vec4 aZ, vec3 b)
+vec3 CalculateSpotLight(vec3 position, Material material)
 {
-	return aX * b.xxxx + aY * b.yyyy + aZ * b.zzzz;
-}
+	vec3 ToEye = normalize(CameraPosition.xyz - position);
+	vec3 ToLight = SpotLightPos - position;
 
-// Four light calculation helper function
-vec3 CalculateFourLights(vec3 position, Material material)
-{
-	vec3 ToEye = CameraPosition.xyz - position;
-   
-	// Find the shortest distance between the pixel and capsules segment
-	vec4 ToCapsuleStartX = position.xxxx - ForwardLightPosX;
-	vec4 ToCapsuleStartY = position.yyyy - ForwardLightPosY;
-	vec4 ToCapsuleStartZ = position.zzzz - ForwardLightPosZ;
-	vec4 DistOnLine = dot4x4(ToCapsuleStartX, ToCapsuleStartY, ToCapsuleStartZ, ForwardLightDirX, ForwardLightDirY, ForwardLightDirZ);
-	vec4 CapsuleLenSafe = max(ForwardCapsuleLen, 1.e-6);
-	DistOnLine = ForwardCapsuleLen * clamp(DistOnLine / CapsuleLenSafe,0.0,1.0);
-	vec4 PointOnLineX = ForwardLightPosX + ForwardLightDirX * DistOnLine;
-	vec4 PointOnLineY = ForwardLightPosY + ForwardLightDirY * DistOnLine;
-	vec4 PointOnLineZ = ForwardLightPosZ + ForwardLightDirZ * DistOnLine;
-	vec4 ToLightX = PointOnLineX - position.xxxx;
-	vec4 ToLightY = PointOnLineY - position.yyyy;
-	vec4 ToLightZ = PointOnLineZ - position.zzzz;
-	vec4 DistToLightSqr = dot4x4(ToLightX, ToLightY, ToLightZ, ToLightX, ToLightY, ToLightZ);
-	vec4 DistToLight = sqrt(DistToLightSqr);
-   
-	// Phong diffuse
-	ToLightX /= DistToLight; // Normalize
-	ToLightY /= DistToLight; // Normalize
-	ToLightZ /= DistToLight; // Normalize
-	vec4 NDotL = clamp(dot4x1(ToLightX, ToLightY, ToLightZ, material.Normal),0.0,1.0);
-	//vec3 finalColor = vec3(dot(ForwardLightColorR, NDotL), dot(ForwardLightColorG, NDotL), dot(ForwardLightColorB, NDotL));
-   
-	// Blinn specular
-	ToEye = normalize(ToEye);
-	vec4 HalfWayX = ToEye.xxxx + ToLightX;
-	vec4 HalfWayY = ToEye.yyyy + ToLightY;
-	vec4 HalfWayZ = ToEye.zzzz + ToLightZ;
-	vec4 HalfWaySize = sqrt(dot4x4(HalfWayX, HalfWayY, HalfWayZ, HalfWayX, HalfWayY, HalfWayZ));
-	vec4 NDotH = clamp(dot4x1(HalfWayX / HalfWaySize, HalfWayY / HalfWaySize, HalfWayZ / HalfWaySize, material.Normal),0.0,1.0);
-	vec4 SpecValue = pow(NDotH, vec4(material.SpecularExp,material.SpecularExp,material.SpecularExp,material.SpecularExp)) ;//* material.specIntensity;
-	//finalColor += vec3(dot(ForwardLightColorR, SpecValue), dot(ForwardLightColorG, SpecValue), dot(ForwardLightColorB, SpecValue));
-   
-	// Cone attenuation
-	vec4 cosAng = dot4x4(ForwardLightDirX, ForwardLightDirY, ForwardLightDirZ, ToLightX, ToLightY, ToLightZ);
-	vec4 conAtt = clamp((cosAng - ForwardSpotCosOuterCone) * ForwardSpotCosInnerConeRcp,0.0,1.0);
+    // Cone attenuation
+	float cosAng = dot(-SpotLightDir, ToLight);
+	float conAtt = clamp((cosAng - SpotLightCosOuterCone) * SpotLightCosInnerConeRcp,0.0,1.0);
 	conAtt *= conAtt;
-   
-	// Attenuation
-	vec4 DistToLightNorm = 1.0 - clamp(DistToLight * ForwardLightRangeRcp,0.0,1.0);
-	vec4 Attn = DistToLightNorm * DistToLightNorm;
-	Attn *= conAtt; // Include the cone attenuation
 
-	// Calculate the final color value
-	vec4 pixelIntensity = (NDotL + SpecValue) * Attn;
-	vec3 finalColor = vec3(dot(ForwardLightColorR, pixelIntensity), dot(ForwardLightColorG, pixelIntensity), dot(ForwardLightColorB, pixelIntensity)); 
-	finalColor *= material.DiffuseColor;
+	// range Attenuation
+	float DistToLightNorm = 1.0 - clamp(length(ToLight) * SpotLightRangeRcp,0.0,1.0);
+	float Attn = DistToLightNorm * DistToLightNorm;
+	Attn *= conAtt;
    
-	return finalColor;
+    //diffuse
+	float diffuse = clamp(dot(ToLight, material.Normal),0.0,1.0);
+    vec3 diffuseColor = SpotLightColor * diffuse * material.DiffuseColor;
+   
+    //specular
+    vec3 reflectVector = reflect(-ToLight,material.Normal);
+	float specular = clamp(dot(reflectVector, ToEye),0.0,1.0);
+	vec3 specularColor = SpotLightColor * clamp(pow(specular, material.SpecularExp),0.0,1.0) * material.SpecularColor;
+
+	return SpotLightIntensity *Attn * (diffuseColor + specularColor);
 }
 
+float PCFShadowCubeMap(vec3 position)
+{
+	mat4 selectShadowMat;
+	vec3 lightDir = normalize(position - PointLightPos);
+	vec3 dirValue = abs(lightDir);
+	if (dirValue.x > dirValue.y && dirValue.x > dirValue.z) // x is max component
+	{
+		//lightDir.z = -lightDir.z;   // right hand coordinate to left hand....
+		if (lightDir.x < 0)
+			selectShadowMat = ShadowMapViewArray[1];
+		else
+			selectShadowMat = ShadowMapViewArray[0];
+	}
+	else if (dirValue.y > dirValue.x && dirValue.y > dirValue.z) // y is max component
+	{
+		if (lightDir.y < 0)
+		{
+			selectShadowMat = ShadowMapViewArray[3];
+			//lightDir.x = -lightDir.x;
+		}
+		else
+		{
+			selectShadowMat = ShadowMapViewArray[2];
+			//lightDir.z = -lightDir.z;
+		}
+	}
+	else
+	{
+		//lightDir.x = -lightDir.x;
+		if (lightDir.z < 0)
+		{
+			selectShadowMat = ShadowMapViewArray[5];
+		}
+		else
+		{
+			selectShadowMat = ShadowMapViewArray[4];
+		}
+	}
 
+	vec4 posShadowMap = selectShadowMat * vec4(position, 1.0);
+	posShadowMap = ShadowMapProj * posShadowMap;
+
+	vec3 UVD = posShadowMap.xyz / posShadowMap.w;
+	float depth =  texture(ShadowMapTextureCube,lightDir).r;
+	if (UVD.z >= depth)
+	    return 1.0f;
+	else
+	    return 0;
+
+}
+
+ float PCFShadow( vec3 position )
+{
+	// Transform the world position to shadow projected space
+	vec4 posShadowMap = ShadowMapView *vec4(position,1.0);
+    posShadowMap = ShadowMapProj * posShadowMap;
+
+	// Transform the position to shadow clip space
+	vec3 UVD = posShadowMap.xyz / posShadowMap.w;
+
+	// Convert to shadow map UV values
+	UVD.xyz = 0.5 * UVD.xyz + 0.5;
+
+	//UVD.z -= 0.005f;
+	 
+	 return texture(ShadowMapTexture2D,UVD.xy).r < UVD.z ? 0.f : 1.0f;
+	 //float offset = 1.0f / 1024;
+	/* vec4 vshadow;
+	 vshadow.x = texture(ShadowMapTexture2D,UVD.xy).r < UVD.z ? 0.f : 1.0f;
+	 vshadow.y = texture(ShadowMapTexture2D,UVD.xy + vec2(offset, 0)).r < UVD.z ? 0.f : 1.0f;
+	 vshadow.z = texture(ShadowMapTexture2D,UVD.xy + vec2(0, offset)).r < UVD.z ? 0.f : 1.0f;
+	 vshadow.w = texture(ShadowMapTexture2D,UVD.xy + vec2(offset, offset)).r < UVD.z ? 0.f : 1.0f;
+
+	 return mix(vshadow.x, vshadow.y, 0.5);
+	 return mix(mix(vshadow.x, vshadow.y, 0.5),
+		                     mix(vshadow.z, vshadow.w, 0.5),
+		                     0.5);*/
+ 
+   // return texture(ShadowMapTexture2D, UVD);
+	/*float offset = 1.0f / ShadowMapSize;
+	// Compute the hardware PCF value
+	vec4 vshadow;
+	vshadow.x = texture(ShadowMapTexture2D, UVD);
+	vshadow.y = texture(ShadowMapTexture2D,UVD + vec3(offset, 0,0));
+	vshadow.z = texture(ShadowMapTexture2D,UVD + vec3(0, offset,0));
+	vshadow.w = texture(ShadowMapTexture2D,UVD + vec3(offset, offset,0));
+	
+	return mix(mix(vshadow.x, vshadow.y, 0.5),
+		                     mix(vshadow.z, vshadow.w, 0.5),
+		                     0.5);*/
+}
+
+Material PrepareMaterial(vec3 normal, vec2 UV)
+{
+	Material material;
+
+	// Normalize the interpulated vertex normal
+	material.Normal = normalize(normal);
+
+	// Sample the texture and convert to linear space
+    material.DiffuseColor = texture(DiffuseTexture,UV).xyz * DiffuseColor;
+	material.SpecularColor = SpecularColor;
+	material.SpecularExp = SpecularExp;
+ 
+	return material;
+} 

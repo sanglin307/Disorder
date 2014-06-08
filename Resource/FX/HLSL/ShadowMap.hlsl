@@ -3,8 +3,6 @@
 struct VS_INPUT
 {
     float3 Position  : POSITION;
-   // float3 Normal : NORMAL;
-	//float2 UV0  : TEXCOORD0;
 };
  
 

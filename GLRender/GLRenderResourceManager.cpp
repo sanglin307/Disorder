@@ -52,7 +52,7 @@ namespace Disorder
 
 	RenderTexture2DPtr GLRenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample,unsigned int viewFlag,int arraySize, BufferInitData const* pData)
 	{
-		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat, width, hight, bMipmap, bMultiSample, pData);
+		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat, width, hight, bMipmap, bMultiSample,viewFlag, arraySize, pData);
 		texture->Sampler = sampler;
 		return texture;
 	}
@@ -76,7 +76,9 @@ namespace Disorder
 
 	RenderTexture2DPtr GLRenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image)
 	{
-		return NULL;
+		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat, bMultiSample, image);
+		texture->Sampler = sampler;
+		return texture;
 	}
 
 	SamplerStatePtr GLRenderResourceManager::CreateSamplerState(SamplerDesc* pSamplerDesc)

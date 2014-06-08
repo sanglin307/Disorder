@@ -213,23 +213,48 @@ namespace Disorder
 		data.Data = image->GetImageData();
 		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat)/8 * spec.width;
 		data.SlicePitch = 0;
-		std::vector<ESurfaceLocation> loc;
-		return Create(pixelFormat,spec.width,spec.height,false,bMultiSample,&data);
+
+		return Create(pixelFormat, spec.width, spec.height, false, bMultiSample, SV_ShaderResource,1, &data);
 	}
 
-	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, BufferInitData const* pData)
+	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image)
 	{
-		GLRenderTexture2D *pTexture = new GLRenderTexture2D;
+		if (image.size() == 0)
+			return NULL;
+
+		const ImageSpec &spec = image[0]->GetSpec();
+		BYTE* pData = new BYTE[spec.dataSize*image.size()];
+		BYTE* pDest = pData;
+		
+		for (size_t i = 0; i < image.size(); i++)
+		{
+			BOOST_ASSERT(spec.dataSize == image[i]->GetSpec().dataSize);
+			memcpy(pDest, image[i]->GetImageData(), spec.dataSize);
+			pDest += spec.dataSize;
+		}
+
+		BufferInitData data; // only one struct
+		data.Data = pData;
+		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat) / 8 * spec.width;
+		data.SlicePitch = spec.dataSize;
+
+		GLRenderTexture2DPtr result = Create(pixelFormat, spec.width, spec.height, false, bMultiSample,SV_ShaderResource, image.size(), &data);
+		delete pData;
+
+		return result;
+	}
+
+	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData)
+	{
+		GLRenderTexture2D *pTexture = new GLRenderTexture2D(arraySize);
 
 		pTexture->Format = pixelFormat;
 		pTexture->Height = height;
 		pTexture->Width = width;
-	
-		glBindTexture(GL_TEXTURE_2D, pTexture->_texHandle);
+		pTexture->ArraySize = arraySize;
 
 		if (bMipmap)
-		{
-	 
+		{ 
 	        unsigned int w = Math::LogTwo(width);
 			unsigned int h = Math::LogTwo(height);
 
@@ -240,17 +265,79 @@ namespace Disorder
      
 		GLenum glFormat = 0;
 		GLenum glType = 0; //
-		glTexStorage2D(GL_TEXTURE_2D, pTexture->MipLevel, GLRenderEngine::GetPixelFormat(pixelFormat, glFormat, glType), width, height);
+		GLenum storageFormat = GLRenderEngine::GetPixelFormat(pixelFormat, glFormat, glType);
+		if (viewFlag & SV_DepthStencil)  //depth view ...
+		{
+			glFormat = GL_DEPTH_COMPONENT;
+			if (storageFormat == GL_R32F)
+				storageFormat = GL_DEPTH_COMPONENT32F;
+			else if (storageFormat == GL_R16)
+				storageFormat = GL_DEPTH_COMPONENT16;
+		}
+
+		if (arraySize == 6)
+			pTexture->_texFormat = GL_TEXTURE_CUBE_MAP;
+		else
+			pTexture->_texFormat = GL_TEXTURE_2D;
+
+		// for layer texture rendering
+		if (arraySize > 1 && arraySize != 6 && (viewFlag & SV_DepthStencil || viewFlag & SV_RenderTarget))
+		{
+			pTexture->_texFormat = GL_TEXTURE_2D_ARRAY;
+			glBindTexture(pTexture->_texFormat, pTexture->_texHandle);
+			glTexStorage3D(pTexture->_texFormat, pTexture->MipLevel, storageFormat, width, height, arraySize);
+		}
+		else if (pTexture->_texFormat == GL_TEXTURE_CUBE_MAP)
+		{
+			glBindTexture(pTexture->_texFormat, pTexture->_texHandle);
+			
+		}
+		else
+		{
+			glBindTexture(pTexture->_texFormat, pTexture->_texHandle);
+			glTexStorage2D(pTexture->_texFormat, pTexture->MipLevel, storageFormat, width, height);
+		}
+		
 
 		if (pData && pData->Data)
-		    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, glFormat, glType, pData->Data);
+		{
+			if (arraySize == 1)
+				glTexSubImage2D(pTexture->_texFormat, 0, 0, 0, width, height, glFormat, glType, pData->Data);
+			else if (arraySize == 6 && pTexture->_texFormat == GL_TEXTURE_CUBE_MAP)
+			{
+				glTexStorage2D(pTexture->_texFormat, pTexture->MipLevel, storageFormat, width, height);
+				glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+				for (unsigned int i = 0; i < 6; i++)
+				{
+					void *offset = (BYTE*)pData->Data + pData->SlicePitch * i;
+					glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, 0, 0, width, height, glFormat, glType, offset);
+				}
+			}
+		}
+		else
+		{
+			if (arraySize == 6 && pTexture->_texFormat == GL_TEXTURE_CUBE_MAP)
+			{
+				glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+				for (unsigned int i = 0; i < 6; i++)
+				{
+					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, storageFormat,
+						width, height, 0, glFormat, glType, NULL);
+				}
+			}
+		}
  
+		if (bMipmap)
+			glGenerateMipmap(pTexture->_texFormat);
+		
+
 		return GLRenderTexture2DPtr(pTexture);
 	}
 
-	GLRenderTexture2D::GLRenderTexture2D()
+	GLRenderTexture2D::GLRenderTexture2D(int arraySize)
 	{
 		glGenTextures(1,&_texHandle);
+		
 	}
 
 	GLRenderTexture2D::~GLRenderTexture2D()

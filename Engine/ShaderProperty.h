@@ -112,6 +112,9 @@ namespace Disorder
 		static const std::string sSpotLightCosInnerConeRcp;
  
 		//for scene property
+		static const std::string sScreenWidth;
+		static const std::string sScreenHeight;
+		static const std::string sShadowMapSize;
 		static const std::string sAmbientLowColor;
 		static const std::string sAmbientUpperColor;
  

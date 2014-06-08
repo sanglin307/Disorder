@@ -16,9 +16,14 @@ namespace Disorder
 		{
 			return ".glfs";
 		}
+		else if (type == ST_GeometryShader)
+		{
+			return ".glgs";
+		}
 		else
 		{
 			GLogger->Error("Unsupported shader type!");
+			BOOST_ASSERT(0);
 			return "";
 		}
 	}
@@ -204,14 +209,15 @@ namespace Disorder
 			propertyType = GL_INT;
 			lenght = 4;
 		}
-		else if (type == GL_SAMPLER_2D)
+		else if (GLRenderEngine::IsTextureSamplerResouce(type))
 		{
-			propertyType = GL_SAMPLER_2D;
+			propertyType = type;
 			lenght = 1;
 		}
 		else
 		{
 			GLogger->Error("We don't support this shader property type now");
+			BOOST_ASSERT(0);
 		}
 	}
 
@@ -326,7 +332,7 @@ namespace Disorder
 			length = 4;
 			size = sizeof(GLint)* length;
 		}
-		else if (type == GL_SAMPLER_2D || type == GL_SAMPLER_1D || type == GL_SAMPLER_3D || type == GL_SAMPLER_CUBE)
+		else if (GLRenderEngine::IsTextureSamplerResouce(type))
 		{
 			propertyType = eSP_ShaderResource;
 			length = 1;
@@ -343,8 +349,10 @@ namespace Disorder
 	{
 		if( shaderObject->GetType() == ST_VertexShader )
 			_vertexShader = shaderObject;
-		else if( shaderObject->GetType() == ST_PixelShader )
+		else if (shaderObject->GetType() == ST_PixelShader)
 			_pixelShader = shaderObject;
+		else if (shaderObject->GetType() == ST_GeometryShader)
+			_geometryShader = shaderObject;
 		else
 			BOOST_ASSERT(0);
 
@@ -433,7 +441,7 @@ namespace Disorder
 		{
 			// for block var : location invalid
 			// for golbal var : block_index,offset invalid
-			const GLenum props[] = { GL_TYPE, GL_LOCATION, GL_BLOCK_INDEX, GL_OFFSET };
+			const GLenum props[] = { GL_TYPE, GL_LOCATION, GL_BLOCK_INDEX, GL_OFFSET, GL_ARRAY_SIZE };
 		
 			for (int i = 0; i < uniformNumber; i++)
 			{
@@ -441,13 +449,26 @@ namespace Disorder
 				char name[128];
 				glGetProgramResourceName(_GLHandle, GL_UNIFORM, i, sizeof(name), NULL, name);
 
-				GLint params[4];
-				glGetProgramResourceiv(_GLHandle, GL_UNIFORM, i, 4, props, 4, NULL, params);
-				desc.Name = name;
+				GLint params[5];
+				memset(params, 0, sizeof(params));
+				glGetProgramResourceiv(_GLHandle, GL_UNIFORM, i, 5, props, 5, NULL, params);
+				int arraySize = params[4];
+				std::string pureName = name;
+				if (arraySize > 0)
+				{
+					int pos = pureName.find('[');
+					if (pos != std::string::npos)
+					{
+						pureName = pureName.substr(0, pos);
+					}
+				}
+				desc.Name = pureName;
 				desc.Type = params[0];
 				desc.Location = params[1];
 				desc.BlockIndex = params[2];
 				desc.Offset = params[3];
+
+				
 
 				GLShaderUniformBlock *pBlock = NULL;
 				ShaderPropertyManagerPtr manager = NULL;
@@ -471,6 +492,12 @@ namespace Disorder
 				EShaderProperty shaderProperty;
 				int length;
 				GLRenderEffect::GetShaderPropertyTypeLength(desc.Type, shaderProperty, length,desc.Size);
+
+				if (arraySize > 0)
+				{
+					length *= arraySize;
+					desc.Size *= arraySize;
+				}
 
 				desc.ParamRef = manager->CreateProperty(desc.Name, shaderProperty, length);
 
@@ -498,7 +525,7 @@ namespace Disorder
 			int bindTexUnit = 0;
 			for (size_t i = 0; i < EffectReflection->ResourceArray.size(); i++)
 			{
-				if (EffectReflection->ResourceArray[i].Type == GL_SAMPLER_2D)
+				if (GLRenderEngine::IsTextureSamplerResouce(EffectReflection->ResourceArray[i].Type))
 				{
 					glUniform1i(EffectReflection->ResourceArray[i].Location, bindTexUnit);
 					bindTexUnit++;

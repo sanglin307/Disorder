@@ -20,21 +20,33 @@ namespace Disorder
 
 		 glBindFramebuffer(GL_FRAMEBUFFER, pSurface->_frameBuffer);
 		 std::map<ESurfaceLocation, SurfaceViewPtr>::const_iterator iter = viewMap.cbegin();
+		 bool bHaveColorAttach = false;
 		 while (iter != viewMap.cend())
 		 {
 			 pSurface->_surfacesViewArray[iter->first] = iter->second;
 
-			 if ( iter->first == SL_DepthStencil )
-				 glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, (GLuint)iter->second->Resource->GetHandle(), 0);
+			 if (iter->first == SL_DepthStencil)
+			 {
+				 glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, (GLuint)iter->second->Resource->GetHandle(), 0);
+			 }
 			 else if (iter->first >= SL_RenderTarget1 && iter->first <= SL_RenderTarget8)
 			 {
 				 GLenum loc = iter->first - SL_RenderTarget1 + GL_COLOR_ATTACHMENT0;
 				 glFramebufferTexture(GL_FRAMEBUFFER, loc, (GLuint)(GLuint)iter->second->Resource->GetHandle(), 0);
+				 bHaveColorAttach = true;
 			 }
+
 			 ++iter;
 		 }
 
-		 BOOST_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+		 if (!bHaveColorAttach)
+		 {
+			 glDrawBuffer(GL_NONE);
+			 glReadBuffer(GL_NONE);
+		 }
+ 
+		 GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		 BOOST_ASSERT(result == GL_FRAMEBUFFER_COMPLETE);
 
 		 return GLRenderSurfacePtr(pSurface);
 	 }
@@ -59,6 +71,7 @@ namespace Disorder
 	 GLRenderSurface::GLRenderSurface()
 	 {
 		 glGenFramebuffers(1, &_frameBuffer);
+		 
 	 }
 
 	 GLRenderSurface::~GLRenderSurface()

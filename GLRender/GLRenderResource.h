@@ -35,13 +35,15 @@ namespace Disorder
 	public:
 		~GLRenderTexture2D();
 
-		static GLRenderTexture2DPtr Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, BufferInitData const* pData);
+		static GLRenderTexture2DPtr Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData);
 		static GLRenderTexture2DPtr Create(PixelFormat pixelFormat, bool bMultiSample,ImagePtr const& image);
-	   
+		static GLRenderTexture2DPtr Create(PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image);
+
 		virtual void * GetHandle();
 	protected:
-		GLRenderTexture2D();
+		GLRenderTexture2D(int arraySize);
  
+		GLuint _texFormat;
 		GLuint _texHandle;
 		 
 	};

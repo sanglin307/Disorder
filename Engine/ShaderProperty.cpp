@@ -210,6 +210,9 @@ namespace Disorder
 	// scene ambient
 	const std::string ShaderPropertyManager::sAmbientLowColor = "AmbientLowColor";
 	const std::string ShaderPropertyManager::sAmbientUpperColor = "AmbientUpperColor";
+	const std::string ShaderPropertyManager::sScreenWidth = "ScreenWidth";
+	const std::string ShaderPropertyManager::sScreenHeight = "ScreenHeight";
+	const std::string ShaderPropertyManager::sShadowMapSize = "ShadowMapSize";
 	 
 	const std::string ShaderPropertyManager::sShadowMapView = "ShadowMapView";
 	const std::string ShaderPropertyManager::sShadowMapViewArray = "ShadowMapViewArray";

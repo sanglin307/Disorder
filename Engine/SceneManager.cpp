@@ -13,7 +13,10 @@ namespace Disorder
 		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerScene);
 		_sAmbientLowerProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientLowColor,eSP_Float,3);
 		_sAmbientUpperProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sAmbientUpperColor,eSP_Float,3);
-		
+		_sScreenWidthProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sScreenWidth, eSP_Int, 1);
+		_sScreenHeightProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sScreenHeight, eSP_Int, 1);
+		_sShadowMapSizeProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sShadowMapSize, eSP_Int, 1);
+
 		_skyBox = Skybox::Create();
 
 		EnableDebugDraw = true;
@@ -91,6 +94,9 @@ namespace Disorder
 		_sAmbientLowerProperty->SetData(glm::value_ptr(_vAmbientLowerColor));
 		_sAmbientUpperProperty->SetData(glm::value_ptr(_vAmbientUpperColor));
  
+		_sScreenWidthProperty->SetData(&GConfig->pRenderConfig->SizeX);
+		_sScreenHeightProperty->SetData(&GConfig->pRenderConfig->SizeY);
+		_sShadowMapSizeProperty->SetData(&GConfig->pRenderConfig->ShadowMapSize);
 
 		_propertyManager->UpdateShaderProperty();
 	}

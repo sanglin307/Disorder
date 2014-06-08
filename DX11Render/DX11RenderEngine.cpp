@@ -842,27 +842,7 @@ namespace Disorder
 		
 	}
 
-	void DX11RenderEngine::SetRenderTarget(const SurfaceViewPtr& renderView)
-	{
-		DX11SurfaceViewPtr dxView = boost::dynamic_pointer_cast<DX11SurfaceView>(renderView);
-		if (dxView->Type == SV_DepthStencil)
-		{
-			ID3D11RenderTargetView* RT = NULL;
-			ID3D11DepthStencilView* pDepthView = dxView->DepthStencilHandle.get();
-			_pImmediateContext->OMSetRenderTargets(1,&RT, pDepthView);
-		}
-		else if (dxView->Type == SV_RenderTarget)
-		{
-			ID3D11RenderTargetView* RT = (ID3D11RenderTargetView*)dxView->RenderTargetHandle.get();
-			_pImmediateContext->OMSetRenderTargets(1,&RT, NULL);
-		}
-		else
-		{
-			BOOST_ASSERT(0);
-		}
-
-			
-	}
+	
 	 
 	void DX11RenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget,bool useReadOnlyDepthStencil)
 	{

@@ -208,10 +208,7 @@ namespace Disorder
 	{
 		_type = RPT_ForwardLighting;
 
-		std::ostringstream strShadowSize;
-		strShadowSize << GConfig->pRenderConfig->ShadowMapSize;
-		ShaderObject::SetShaderMacro("SHADOWMAPSIZE", strShadowSize.str());
-
+	 
 		_BasePassEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ForwardLighting", SM_4_0, "SceneVS");
 		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "ForwardLighting", SM_4_0, "BasePassPS");
@@ -276,10 +273,7 @@ namespace Disorder
 	{
 		_type = RPT_DeferredShading;
 
-		std::ostringstream strShadowSize;
-		strShadowSize << GConfig->pRenderConfig->ShadowMapSize;
-		ShaderObject::SetShaderMacro("SHADOWMAPSIZE", strShadowSize.str());
-
+	 
 		_RenderSceneEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"SceneVS");
 		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"ScenePS");

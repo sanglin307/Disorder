@@ -39,11 +39,18 @@ namespace Disorder
 		RenderTexture2DPtr _shadowDataTex2D;
 		SurfaceViewPtr _depthView2D;
 		SurfaceViewPtr _shaderView2D;
+		RenderSurfacePtr _depthSurface2D;
 
 		// cube texture used to point light
 		RenderTexture2DPtr _shadowDataTexCube;
 		SurfaceViewPtr _depthViewCube;
 		SurfaceViewPtr _shaderViewCube;
+
+		RenderTexture2DPtr _shadowRenderTexCube;
+		SurfaceViewPtr _renderViewCube;
+		SurfaceViewPtr _shaderRenderViewCube;
+
+		RenderSurfacePtr _depthSurfaceCube;
 
 		SamplerStatePtr _shadowSamplerState;
 	 

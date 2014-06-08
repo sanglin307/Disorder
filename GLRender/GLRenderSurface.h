@@ -31,6 +31,7 @@ namespace Disorder
 		GLRenderSurface();
 
 		GLuint _frameBuffer;
+		 
 	};
  
 }

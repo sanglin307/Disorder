@@ -90,6 +90,9 @@ namespace Disorder
 		ShaderPropertyPtr _sAmbientLowerProperty;
 		ShaderPropertyPtr _sAmbientUpperProperty;
 
+		ShaderPropertyPtr _sScreenWidthProperty;
+		ShaderPropertyPtr _sScreenHeightProperty;
+		ShaderPropertyPtr _sShadowMapSizeProperty;
 	 
 
 		ShaderPropertyManagerPtr _propertyManager;

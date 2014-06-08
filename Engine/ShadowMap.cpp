@@ -26,9 +26,6 @@ namespace Disorder
 		_shadowSampler = globalProperty->CreateProperty(ShaderPropertyManager::sShadowSampler, eSP_SampleState, 1);
  
 		_DepthGenEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		std::ostringstream strShadowSize;
-		strShadowSize << GConfig->pRenderConfig->ShadowMapSize;
-		ShaderObject::SetShaderMacro("SHADOWMAPSIZE", strShadowSize.str());
 		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ShadowMap", SM_4_0, "DepthVertexShader");
 		_DepthGenEffect->BindShader(vertexShader);
 		_DepthGenEffect->LinkShaders();
@@ -47,15 +44,6 @@ namespace Disorder
 		_DepthGenEffect->BindRasterizeState(rasterObject);
 		_DepthCubeGenEffect->BindRasterizeState(rasterObject);
 		 
-		_shadowDataTex2D = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R32_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource,1, NULL);
-		_depthView2D = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, _shadowDataTex2D, PF_D32_FLOAT);
-		_shaderView2D = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowDataTex2D, PF_R32_FLOAT);
-
-		_shadowDataTexCube = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R32_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource, 6, NULL);
-		_depthViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, _shadowDataTexCube, PF_D32_FLOAT);
-		_shaderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowDataTexCube, PF_R32_FLOAT,SF_CubeMap);
-
-
 		SamplerDesc sDesc;
 		sDesc.CompareFunc = CF_Less_Equal;
 		sDesc.AddressU = sDesc.AddressV = sDesc.AddressW = TAM_Border;
@@ -63,6 +51,29 @@ namespace Disorder
 		sDesc.MaxAnisotropy = 0;
 		sDesc.CompareTypeSampler = true;
 		_shadowSamplerState = GEngine->RenderResourceMgr->CreateSamplerState(&sDesc);
+
+		_shadowDataTex2D = GEngine->RenderResourceMgr->CreateTexture2D(_shadowSamplerState, PF_R32_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource, 1, NULL);
+		_depthView2D = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, _shadowDataTex2D, PF_D32_FLOAT);
+		_shaderView2D = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowDataTex2D, PF_R32_FLOAT);
+
+		std::map<ESurfaceLocation, SurfaceViewPtr> viewMap;
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, _depthView2D));
+		_depthSurface2D = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
+
+		_shadowDataTexCube = GEngine->RenderResourceMgr->CreateTexture2D(_shadowSamplerState, PF_R32_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource, 6, NULL);
+		_depthViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, _shadowDataTexCube, PF_D32_FLOAT);
+		_shaderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowDataTexCube, PF_R32_FLOAT,SF_CubeMap);
+
+		_shadowRenderTexCube = GEngine->RenderResourceMgr->CreateTexture2D(_shadowSamplerState, PF_R32_TYPELESS, width, height, false, false, SV_RenderTarget | SV_ShaderResource, 6, NULL);
+		_renderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, _shadowRenderTexCube, PF_R32_FLOAT);
+		_shaderRenderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowRenderTexCube, PF_R32_FLOAT, SF_CubeMap);
+
+		viewMap.clear();
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, _depthViewCube));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, _renderViewCube));
+		_depthSurfaceCube = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
+
+	
 	
 
 	}
@@ -94,8 +105,8 @@ namespace Disorder
 			_propertyMgr->UpdateShaderProperty();
 
 			//prepared buffer
-			GEngine->RenderEngine->SetRenderTarget(_depthView2D);
-			GEngine->RenderEngine->ClearDepthStencil(_depthView2D, true, 1.0f, false, 0);
+			GEngine->RenderEngine->SetRenderTarget(_depthSurface2D);
+			GEngine->RenderEngine->ClearRenderSurface(_depthSurface2D, glm::vec4(0), true, 1.0f, false, 0);
 			GEngine->RenderEngine->SetViewport((float)_width, (float)_height, 0.f, 1.f, 0, 0);
 		}
 		else if (light->LightType == LT_Directional)
@@ -106,8 +117,8 @@ namespace Disorder
 			_propertyMgr->UpdateShaderProperty();
 
 			//prepared buffer
-			GEngine->RenderEngine->SetRenderTarget(_depthView2D);
-			GEngine->RenderEngine->ClearDepthStencil(_depthView2D, true, 1.0f, false, 0);
+			GEngine->RenderEngine->SetRenderTarget(_depthSurface2D);
+			GEngine->RenderEngine->ClearRenderSurface(_depthSurface2D, glm::vec4(0), true, 1.0f, false, 0);
 			GEngine->RenderEngine->SetViewport((float)_width, (float)_height, 0.f, 1.f, 0, 0);
 		}
 		else if ( light->LightType == LT_Point )
@@ -118,8 +129,8 @@ namespace Disorder
 
 			_propertyMgr->UpdateShaderProperty();
 			//prepared buffer
-			GEngine->RenderEngine->SetRenderTarget(_depthViewCube);
-			GEngine->RenderEngine->ClearDepthStencil(_depthViewCube, true, 1.0f, false, 0);
+			GEngine->RenderEngine->SetRenderTarget(_depthSurfaceCube);
+			GEngine->RenderEngine->ClearRenderSurface(_depthSurfaceCube, glm::vec4(0), true, 1.0f, false, 0);
 			GEngine->RenderEngine->SetViewport((float)_width, (float)_height, 0.f, 1.f, 0, 0);
 		}
 	}
