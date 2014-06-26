@@ -105,7 +105,7 @@ namespace Disorder
 			}
 
 			// render object
-			GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget);
+			GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
 			GEngine->RenderEngine->SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
 			GEngine->RenderSurfaceCache->ShadowMapBuffer->PrepareRenderLight(light);
 
@@ -172,8 +172,8 @@ namespace Disorder
 
 		GEngine->RenderEngine->OnFrameBegin();
 
-		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget);
-		GEngine->RenderEngine->ClearRenderSurface(GEngine->RenderSurfaceCache->MainTarget, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
+		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
+		GEngine->RenderEngine->ClearRenderSurface(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
  
 		GSceneManager->UpdateShaderProperty();
 		mainCamera->UpdateShaderProperty();
@@ -187,12 +187,21 @@ namespace Disorder
 		// base pass for ambient light and diffuse texture etc
 		BasePassRender(mainCamera, rendererList);
 		RenderLights(mainCamera, rendererList);
- 
-		GEngine->GameCanvas->DrawString(5, 35, "Forward Lighting Mode");
 
+		GEngine->GameCanvas->DrawString(5, 35, "Forward Lighting Mode");
 		GSceneManager->DebugDraw();
 		GEngine->Stat.DrawStat();
-		GEngine->GameCanvas->Render(mainCamera);
+		GEngine->GameCanvas->RenderLines(mainCamera);
+
+		// postprocess not include the string renders.
+		if (GConfig->pRenderConfig->FXAA)
+		{
+			_aaRender->Render(mainCamera, GEngine->RenderSurfaceCache->MainTarget->RenderTargetShaderView);
+			GEngine->RenderEngine->SetEffect(NULL);
+			GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
+		}
+		// the last ... render string.
+		GEngine->GameCanvas->RenderStrings(mainCamera);
 
 		GEngine->RenderEngine->OnFrameEnd();
 	}
@@ -258,6 +267,8 @@ namespace Disorder
 		_DirectionLightEffect->BindDepthStencilState(noDepthState);
 		_PointLightEffect->BindDepthStencilState(noDepthState);
 		_SpotLightEffect->BindDepthStencilState(noDepthState);
+ 
+		_aaRender = FXAA::Create();
  
 	}
 
@@ -381,6 +392,8 @@ namespace Disorder
 		_LightingTile = SimpleTile("DeferLightingTile", vertex, _BasePassEffect);
  
 		GEngine->RenderSurfaceCache->GBuffer = RenderGBuffer::Create(GConfig->pRenderConfig->SizeX,GConfig->pRenderConfig->SizeY);
+
+		_aaRender = FXAA::Create();
 	}
 
 	void DeferredShading::RenderLights(const CameraPtr& camera, const std::vector<GeometryRendererPtr>& renderList)
@@ -415,7 +428,7 @@ namespace Disorder
 			}
 
 			// render object
-			GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget);
+			GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
 			GEngine->RenderEngine->SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
 			GEngine->RenderSurfaceCache->ShadowMapBuffer->PrepareRenderLight(light);
 
@@ -456,8 +469,8 @@ namespace Disorder
 		GSceneManager->UpdateShaderProperty();
 		mainCamera->UpdateShaderProperty();
 
-		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget);
-		GEngine->RenderEngine->ClearRenderSurface(GEngine->RenderSurfaceCache->MainTarget, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
+		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
+		GEngine->RenderEngine->ClearRenderSurface(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
 		
 		GSceneManager->GetSkybox()->Render();
 
@@ -474,7 +487,7 @@ namespace Disorder
 		GEngine->RenderSurfaceCache->GBuffer->UpdateShaderProperty();
 	
 		//lighting pass, draw to main render target
-		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget);
+		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
 
 		//base pass light
 		_LightingTile.SetRenderEffect(_BasePassEffect);
@@ -491,7 +504,18 @@ namespace Disorder
 
 		GEngine->RenderSurfaceCache->GBuffer->DebugVisual();
 
-		GEngine->GameCanvas->Render(mainCamera);
+		GEngine->GameCanvas->RenderLines(mainCamera);
+
+		// postprocess not include the string renders.
+		if (GConfig->pRenderConfig->FXAA)
+		{
+			_aaRender->Render(mainCamera, GEngine->RenderSurfaceCache->MainTarget->RenderTargetShaderView);
+			GEngine->RenderEngine->SetEffect(NULL);
+			GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->GBuffer->MainTargetGDepth);
+		}
+		// the last ... render string.
+
+		GEngine->GameCanvas->RenderStrings(mainCamera);
 
 		GEngine->RenderEngine->SetEffect(NULL);
 		GEngine->RenderEngine->OnFrameEnd();

@@ -12,7 +12,8 @@ namespace Disorder
 		void DrawString(unsigned int xPos, unsigned int yPos, std::string const& str, glm::vec4 const& color = glm::vec4(1.0f),float scale = 1.0f);	  // screen pos
 		void DrawLine(glm::vec3 const& beginPos, glm::vec4 const& beginColor, glm::vec3 const& endPos, glm::vec4 const& endColor);
 
-		void Render(CameraPtr const& camera);
+		void RenderLines(CameraPtr const& camera);
+		void RenderStrings(CameraPtr const& camera);
  
 		const unsigned int GetWidth() const
 		{

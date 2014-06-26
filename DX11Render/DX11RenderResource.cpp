@@ -249,7 +249,7 @@ namespace Disorder
 
 	}
 
-	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image)
+	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image, unsigned int flag)
 	{
 		if (image.size() == 0)
 			return NULL;
@@ -271,7 +271,7 @@ namespace Disorder
 
 		}
 
-		DX11RenderTexture2DPtr result = Create(pixelFormat, spec.width, spec.height, false, bMultiSample, SV_ShaderResource, image.size(), vBufferInitData.data());
+		DX11RenderTexture2DPtr result = Create(pixelFormat, spec.width, spec.height, false, bMultiSample, SV_ShaderResource, image.size(), vBufferInitData.data(),flag);
 		delete pData;
 
 		return result;
@@ -284,10 +284,10 @@ namespace Disorder
 		data.Data = image->GetImageData();
 		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat)/8 * spec.width;
 		data.SlicePitch = 0;
-		return Create(pixelFormat,spec.width,spec.height,false,bMultiSample,SV_ShaderResource,1,&data);
+		return Create(pixelFormat,spec.width,spec.height,false,bMultiSample,SV_ShaderResource,1,&data,0);
 	}
 
-	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample,unsigned int viewFlag,int arraySize, BufferInitData const* pData)
+	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
 	{
 		DX11RenderTexture2D* pTexture = new DX11RenderTexture2D;
 
@@ -340,7 +340,7 @@ namespace Disorder
 
 		desc.CPUAccessFlags = 0;
 		// cube map
-		if ( arraySize == 6)
+		if (arraySize == 6 && (flag & SF_AsCubeMap))
 			desc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
 
 		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
@@ -382,14 +382,19 @@ namespace Disorder
 		return D3DInterface.get();
 	}
 
-	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat,unsigned int width,unsigned int height,ID3D11Texture2DPtr DXInterface)
+	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, unsigned int viewFlag, bool bmipmap, unsigned int multiSampleCount, unsigned int multiSampleQuality, ID3D11Texture2DPtr DXInterface)
 	{
 		DX11RenderTexture2D *pTex = new DX11RenderTexture2D;
 		pTex->Width = width;
 		pTex->Height = height;
 		pTex->Format = pixelFormat;
 		pTex->D3DInterface = DXInterface;
-
+		pTex->Sampler = NULL;
+		pTex->ViewFlag = viewFlag;
+		pTex->MipLevel = bmipmap ? 0 : 1;
+		pTex->MultiSampleCount = multiSampleCount;
+		pTex->MultiSampleQuality = multiSampleQuality;
+		pTex->ArraySize = 1;
 		return DX11RenderTexture2DPtr(pTex);
 	}
 	 

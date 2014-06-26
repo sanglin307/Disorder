@@ -230,13 +230,14 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sGBufferNormalTexture = "GBufferNormalTexture";
 	const std::string ShaderPropertyManager::sGBufferSpecPowTexture = "GBufferSpecPowTexture";
 
-
 	const std::string ShaderPropertyManager::sSurfaceVisTex = "SurfaceVisTex";
 	const std::string ShaderPropertyManager::sSurfaceSampler = "SurfaceSampler";
 
 	const std::string ShaderPropertyManager::sSkyboxTexture = "SkyboxTexture";
 	const std::string ShaderPropertyManager::sSkyboxSampler = "SkyboxSampler";
 
+	const std::string ShaderPropertyManager::sScreenAATexture = "ScreenAATexture";
+	const std::string ShaderPropertyManager::sScreenAASampler = "ScreenAASampler";
 
 	ShaderPropertyPtr ShaderPropertyManager::GetProperty(std::string const& name)
 	{

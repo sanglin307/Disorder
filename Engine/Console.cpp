@@ -30,6 +30,11 @@ namespace Disorder
 			}
 		}
 
+		if (state == IS_Release && key == OIS::KC_F) // FXAA
+		{
+			GConfig->pRenderConfig->FXAA = !GConfig->pRenderConfig->FXAA;
+		}
+
 		return false;
 	}
 

@@ -116,16 +116,16 @@ namespace Disorder
 		return texture;
 	}
 
-	RenderTexture2DPtr DX11RenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image)
+	RenderTexture2DPtr DX11RenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image, unsigned int flag)
 	{
-		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat, bMultiSample, image);
+		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat, bMultiSample, image,flag);
 		texture->Sampler = sampler;
 		return texture;
 	}
 
-	RenderTexture2DPtr DX11RenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag,int arraySize, BufferInitData const* pData)
+	RenderTexture2DPtr DX11RenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
 	{
-		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat,width,height,bMipmap,bMultiSample,viewFlag,arraySize,pData);
+		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat,width,height,bMipmap,bMultiSample,viewFlag,arraySize,pData,flag);
 		texture->Sampler = sampler;
 		return texture;
 

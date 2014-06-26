@@ -1,77 +1,82 @@
 FBX file format version for file Mangonel.FBX is 7,2,0
-Shader Object :BatchLines:main
-Shader Object :BatchLines:main
-Shader Object :Skybox:main
-Shader Object :2DText:main
-Shader Object :ForwardLighting:main
-Shader Object :ForwardLighting:main
-Shader Object :ForwardLighting:main
-Shader Object :2DText:main
-Shader Object :ForwardLighting:main
-Shader Object :ShadowMap:main
-Shader Object :Skybox:main
-Shader Object :ForwardLighting:main
-Shader Object :ShadowMap:main
-Shader Object :ShadowMap:main
+Shader Object :Skybox:PS
+Shader Object :BatchLines:PS
+Shader Object :Skybox:VS
+Shader Object :BatchLines:VS
+Shader Object :2DText:PS
+Shader Object :2DText:VS
+Shader Object :FXAA:PS
+Shader Object :ForwardLighting:SpotLightingPS
+Shader Object :FXAA:PrepareSurfacePS
+Shader Object :ForwardLighting:PointLightingPS
+Shader Object :ForwardLighting:BasePassPS
+Shader Object :ForwardLighting:DirectionLightingPS
+Shader Object :ForwardLighting:SceneVS
+Shader Object :FXAA:VS
+Shader Object :ShadowMap:DepthCubeMapGS
+Shader Object :ShadowMap:DepthCubeMapVS
+Shader Object :ShadowMap:DepthVertexShader
 Shader Property Manager Name :Global
  ****** Shader Property :SkyboxSampler
  ****** Shader Property :SkyboxTexture
- ****** Shader Property :DiffuseSampler
- ****** Shader Property :SpotLightProperty
- ****** Shader Property :SceneProperty
- ****** Shader Property :ShadowMapGen
- ****** Shader Property :PointLightProperty
- ****** Shader Property :ObjectTransform
+ ****** Shader Property :ScreenAATexture
  ****** Shader Property :MaterialProperty
  ****** Shader Property :TextSampler
+ ****** Shader Property :SceneProperty
  ****** Shader Property :DirectionLightProperty
+ ****** Shader Property :ShadowMapTextureCube
+ ****** Shader Property :SpotLightProperty
+ ****** Shader Property :DiffuseSampler
  ****** Shader Property :CameraTransforms
+ ****** Shader Property :PointLightProperty
+ ****** Shader Property :DiffuseTexture
+ ****** Shader Property :ShadowMapGen
+ ****** Shader Property :ScreenAASampler
+ ****** Shader Property :ObjectTransform
  ****** Shader Property :TextTexture
  ****** Shader Property :ShadowSampler
- ****** Shader Property :DiffuseTexture
- ****** Shader Property :ShadowMapTextureCube
  ****** Shader Property :ShadowMapTexture2D
 Shader Property Manager Name :SceneProperty
  ****** Shader Property :ShadowMapSize
- ****** Shader Property :ScreenWidth
  ****** Shader Property :ScreenHeight
+ ****** Shader Property :ScreenWidth
  ****** Shader Property :AmbientUpperColor
  ****** Shader Property :AmbientLowColor
 Shader Property Manager Name :SpotLightProperty
+ ****** Shader Property :SpotLightCosOuterCone
  ****** Shader Property :SpotLightRangeRcp
  ****** Shader Property :SpotLightIntensity
- ****** Shader Property :SpotLightDir
- ****** Shader Property :SpotLightCosOuterCone
- ****** Shader Property :SpotLightPos
- ****** Shader Property :SpotLightCosInnerConeRcp
  ****** Shader Property :SpotLightColor
+ ****** Shader Property :SpotLightDir
+ ****** Shader Property :SpotLightCosInnerConeRcp
+ ****** Shader Property :SpotLightPos
 Shader Property Manager Name :ShadowMapGen
  ****** Shader Property :ShadowMapProj
  ****** Shader Property :ShadowMapViewArray
  ****** Shader Property :ShadowMapView
 Shader Property Manager Name :PointLightProperty
- ****** Shader Property :PointLightRangeRcp
- ****** Shader Property :PointLightPos
  ****** Shader Property :PointLightIntensity
+ ****** Shader Property :PointLightRangeRcp
  ****** Shader Property :PointLightColor
+ ****** Shader Property :PointLightPos
 Shader Property Manager Name :DirectionLightProperty
- ****** Shader Property :DirectionLightIntensity
- ****** Shader Property :DirectionLightDir
  ****** Shader Property :DirectionLightColor
+ ****** Shader Property :DirectionLightDir
+ ****** Shader Property :DirectionLightIntensity
 Shader Property Manager Name :MaterialProperty
  ****** Shader Property :Transparency
  ****** Shader Property :SpecularExp
- ****** Shader Property :SpecularColor
  ****** Shader Property :EmissiveColor
+ ****** Shader Property :SpecularColor
  ****** Shader Property :DiffuseColor
 Shader Property Manager Name :ObjectTransform
- ****** Shader Property :WorldTransform
  ****** Shader Property :WorldNormalTransform
+ ****** Shader Property :WorldTransform
 Shader Property Manager Name :CameraTransforms
  ****** Shader Property :CameraViewProjInv
- ****** Shader Property :CameraViewProj
- ****** Shader Property :CameraViewInv
- ****** Shader Property :CameraView
  ****** Shader Property :CameraProjInv
- ****** Shader Property :CameraProjection
+ ****** Shader Property :CameraViewInv
+ ****** Shader Property :CameraViewProj
  ****** Shader Property :CameraPosition
+ ****** Shader Property :CameraProjection
+ ****** Shader Property :CameraView

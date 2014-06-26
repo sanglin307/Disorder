@@ -28,8 +28,8 @@ namespace Disorder
 		sdesc.Filter = SF_Anisotropic;
 		sdesc.MaxAnisotropy = 16;
 		_skyCubeSampler = GEngine->RenderResourceMgr->CreateSamplerState(&sdesc);
-		_skyTexture = GEngine->RenderResourceMgr->CreateTexture2D(_skyCubeSampler, PF_R8G8B8A8_TYPELESS, false, textureArray);
-		_skyCubeView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _skyTexture, PF_R8G8B8A8_UNORM, SF_CubeMap);
+		_skyTexture = GEngine->RenderResourceMgr->CreateTexture2D(_skyCubeSampler, PF_R8G8B8A8_TYPELESS, false, textureArray, SF_AsCubeMap);
+		_skyCubeView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _skyTexture, PF_R8G8B8A8_UNORM, SF_AsCubeMap);
 		_skyTextureProperty->SetData(_skyCubeView);
 		_skySamplerProperty->SetData(_skyCubeSampler);
 

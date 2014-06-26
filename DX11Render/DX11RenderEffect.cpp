@@ -54,6 +54,7 @@ namespace Disorder
 					std::stringstream stream;
 					stream << "vertex shader's shader resource is null " << GetShaderName() << "," << ShaderReflect->ResourceBindings[i].Name;
 					GLogger->Error(stream.str());
+					BOOST_ASSERT(0);
 					continue;
 				}
 				CachedShaderResourceView.push_back((ID3D11ShaderResourceView*)(res->GetDataAsShaderResource()->GetHandle()));

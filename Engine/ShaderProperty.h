@@ -147,6 +147,9 @@ namespace Disorder
 		static const std::string sSkyboxTexture;
 		static const std::string sSkyboxSampler;
 
+		static const std::string sScreenAATexture;
+		static const std::string sScreenAASampler;
+
 	public:
 		std::string Name;
  

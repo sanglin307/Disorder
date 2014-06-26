@@ -133,14 +133,14 @@ namespace Disorder
 		sd.BufferDesc.Format = dxFormat;
 		sd.BufferDesc.RefreshRate.Numerator = 60;
 		sd.BufferDesc.RefreshRate.Denominator = 1;
-		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;// | DXGI_USAGE_SHADER_INPUT;
+		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
 		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 		sd.OutputWindow = (HWND)hWnd;
 		sd.SampleDesc.Count = GConfig->pRenderConfig->MultiSampleCount;
 		sd.SampleDesc.Quality = GConfig->pRenderConfig->MultiSampleQuality;
 		sd.Windowed = !GConfig->pRenderConfig->FullScreen;
  
-		IDXGISwapChain*       pSwapChain;
+		IDXGISwapChain*  pSwapChain;
 		hr = _pDXGIFactory->CreateSwapChain(_pd3dDevice.get(),&sd,&pSwapChain);
 		BOOST_ASSERT(SUCCEEDED(hr));
 		_pSwapChain = MakeComPtr<IDXGISwapChain>(pSwapChain);
@@ -152,19 +152,23 @@ namespace Disorder
 		ID3D11Texture2D* pBackBuffer = NULL;
 		hr = _pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&pBackBuffer );
 		BOOST_ASSERT(SUCCEEDED(hr));
-		DX11RenderTexture2DPtr BackBufferTex = DX11RenderTexture2D::Create(GConfig->pRenderConfig->ColorFormat,sd.BufferDesc.Width,sd.BufferDesc.Height,MakeComPtr<ID3D11Texture2D>(pBackBuffer));
+		DX11RenderTexture2DPtr BackBufferTex = DX11RenderTexture2D::Create(GConfig->pRenderConfig->ColorFormat, sd.BufferDesc.Width, sd.BufferDesc.Height, SV_RenderTarget | SV_ShaderResource, false, 
+			GConfig->pRenderConfig->MultiSampleCount, GConfig->pRenderConfig->MultiSampleQuality,MakeComPtr<ID3D11Texture2D>(pBackBuffer));
  
 		SurfaceViewPtr rtView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, BackBufferTex,GConfig->pRenderConfig->ColorFormat);
- 
-		RenderTexture2DPtr DepthBufferTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, true, SV_DepthStencil,1, NULL);
+		SurfaceViewPtr srView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, BackBufferTex, GConfig->pRenderConfig->ColorFormat);
+
+		RenderTexture2DPtr DepthBufferTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil,1, NULL,0);
 
 		SurfaceViewPtr dsView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, DepthBufferTex, GConfig->pRenderConfig->DepthStencilFormat);
 
 		std::map<ESurfaceLocation, SurfaceViewPtr> viewMap;
 		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, rtView));
 		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, dsView));
-		GEngine->RenderSurfaceCache->MainTarget = DX11RenderSurface::Create(viewMap);
+		RenderSurfacePtr mainSurface = DX11RenderSurface::Create(viewMap);
  
+		GEngine->RenderSurfaceCache->MainTarget = MainRenderTarget::Create(mainSurface, srView, rtView, dsView);
+
 		// Setup the viewport
 		SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
  
@@ -764,7 +768,7 @@ namespace Disorder
 				std::size_t sssize = dxPixelShader->CachedSamplerState.size();
 				if( sssize > 0 )
 				{
-					_pImmediateContext->PSSetSamplers(0,sssize,&(dxPixelShader->CachedSamplerState[0]));		 
+					_pImmediateContext->PSSetSamplers(0,sssize,&(dxPixelShader->CachedSamplerState[0]));		
 				}
 				else
 				{
@@ -775,7 +779,7 @@ namespace Disorder
 				std::size_t srsize = dxPixelShader->CachedShaderResourceView.size();
 				if( srsize > 0 )
 				{
-					_pImmediateContext->PSSetShaderResources(0,srsize,&(dxPixelShader->CachedShaderResourceView[0]));				 
+					_pImmediateContext->PSSetShaderResources(0,srsize,&(dxPixelShader->CachedShaderResourceView[0]));	
 				}
 				else
 				{
@@ -786,16 +790,6 @@ namespace Disorder
 			else
 			{
 				_pImmediateContext->PSSetShader(NULL, NULL, 0);
-
-			/*	void* nullArrayCB[D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT] = { NULL };
-				_pImmediateContext->PSSetConstantBuffers(0, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT, (ID3D11Buffer**)&nullArrayCB);
-
-				void* nullArraySS[D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT] = { NULL };
-				_pImmediateContext->PSSetSamplers(0, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT, (ID3D11SamplerState**)&nullArraySS);
-
-				void* nullArraySR[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { NULL };
-				_pImmediateContext->PSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, (ID3D11ShaderResourceView**)&nullArraySR);*/
-
 			}
 		}
 	}
@@ -842,7 +836,14 @@ namespace Disorder
 		
 	}
 
-	
+	void DX11RenderEngine::CopyTexture2D(RenderTexture2DPtr srcTexture, RenderTexture2DPtr dstTexture)
+	{
+		BOOST_ASSERT(srcTexture->Height == dstTexture->Height);
+		BOOST_ASSERT(srcTexture->Width == dstTexture->Width);
+		BOOST_ASSERT(srcTexture->Format == dstTexture->Format);
+
+		_pImmediateContext->CopyResource((ID3D11Resource *)dstTexture->GetHandle(), (ID3D11Resource *)srcTexture->GetHandle());
+	}
 	 
 	void DX11RenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget,bool useReadOnlyDepthStencil)
 	{

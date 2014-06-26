@@ -35,6 +35,7 @@ namespace Disorder
 		bool HDR;
 		bool Gamma;
 		int ShadowMapSize;
+		bool FXAA;
 
 		RenderConfig::RenderConfig()
 		{
@@ -52,6 +53,7 @@ namespace Disorder
 			MotionFrames = 0;
 			HDR = false;
 			Gamma = true;
+			FXAA = true;
 			ShadowMapSize = 1024;
 		};
 	};

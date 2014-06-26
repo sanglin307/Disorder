@@ -52,7 +52,7 @@ namespace Disorder
 		sDesc.CompareTypeSampler = true;
 		_shadowSamplerState = GEngine->RenderResourceMgr->CreateSamplerState(&sDesc);
 
-		_shadowDataTex2D = GEngine->RenderResourceMgr->CreateTexture2D(_shadowSamplerState, PF_R32_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource, 1, NULL);
+		_shadowDataTex2D = GEngine->RenderResourceMgr->CreateTexture2D(_shadowSamplerState, PF_R32_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource, 1, NULL,0);
 		_depthView2D = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, _shadowDataTex2D, PF_D32_FLOAT);
 		_shaderView2D = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowDataTex2D, PF_R32_FLOAT);
 
@@ -60,17 +60,17 @@ namespace Disorder
 		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, _depthView2D));
 		_depthSurface2D = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 
-		_shadowDataTexCube = GEngine->RenderResourceMgr->CreateTexture2D(_shadowSamplerState, PF_R32_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource, 6, NULL);
+		_shadowDataTexCube = GEngine->RenderResourceMgr->CreateTexture2D(_shadowSamplerState, PF_R32_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource, 6, NULL, SF_AsCubeMap);
 		_depthViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, _shadowDataTexCube, PF_D32_FLOAT);
-		_shaderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowDataTexCube, PF_R32_FLOAT,SF_CubeMap);
+		_shaderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowDataTexCube, PF_R32_FLOAT, SF_AsCubeMap);
 
-		_shadowRenderTexCube = GEngine->RenderResourceMgr->CreateTexture2D(_shadowSamplerState, PF_R32_TYPELESS, width, height, false, false, SV_RenderTarget | SV_ShaderResource, 6, NULL);
-		_renderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, _shadowRenderTexCube, PF_R32_FLOAT);
-		_shaderRenderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowRenderTexCube, PF_R32_FLOAT, SF_CubeMap);
+		//_shadowRenderTexCube = GEngine->RenderResourceMgr->CreateTexture2D(_shadowSamplerState, PF_R32_TYPELESS, width, height, false, false, SV_RenderTarget | SV_ShaderResource, 6, NULL, SF_AsCubeMap);
+		//_renderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, _shadowRenderTexCube, PF_R32_FLOAT);
+		//_shaderRenderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowRenderTexCube, PF_R32_FLOAT, SF_AsCubeMap);
 
 		viewMap.clear();
 		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, _depthViewCube));
-		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, _renderViewCube));
+		//viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, _renderViewCube));
 		_depthSurfaceCube = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 
 	

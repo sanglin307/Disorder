@@ -45,6 +45,8 @@ namespace Disorder
 	 
 		RenderPathType _type;
 
+		FXAAPtr _aaRender;
+
 	};
 
 	class ForwardRenderPath : public RenderPath

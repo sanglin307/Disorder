@@ -39,7 +39,7 @@ namespace Disorder
 		virtual void* Map(RenderBufferPtr const& buffer,BufferAccess bufferAccess) = 0;
 		virtual void UnMap(RenderBufferPtr const& buffer) = 0;
 		virtual void UpdateSubresource(RenderBufferPtr const& buffer,void* pSrcData,unsigned int srcDataSize) = 0;
-
+		virtual void CopyTexture2D(RenderTexture2DPtr srcTexture, RenderTexture2DPtr dstTexture) = 0;
 		virtual void SaveSurfaceView(SurfaceViewPtr const& surface,std::string const& fileName){};
 
         BlendStatePtr CachedBlendState;

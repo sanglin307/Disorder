@@ -9,7 +9,7 @@ namespace Disorder
 	{
 		SF_ReadOnlyDepth = 0x1L,
 		SF_ReadOnlyStencil = 0x2L,
-		SF_CubeMap = 0x4L
+		SF_AsCubeMap = 0x4L
 	};
 
 	enum ESurfaceViewType
@@ -56,6 +56,28 @@ namespace Disorder
 		std::vector<SurfaceViewPtr> _surfacesViewArray;
 	};
  
+	class MainRenderTarget
+	{
+	public:
+
+		static MainRenderTargetPtr Create(const RenderSurfacePtr renderTargetBuffer, const SurfaceViewPtr renderTargetShaderView, const SurfaceViewPtr renderTargetView, const SurfaceViewPtr depthBufferView);
+
+		RenderSurfacePtr RenderTargetSurface;
+		SurfaceViewPtr RenderTargetShaderView;
+		SurfaceViewPtr RenderTargetView;
+		SurfaceViewPtr DepthBufferView;
+
+	protected:
+
+		MainRenderTarget(const RenderSurfacePtr renderTargetBuffer, const SurfaceViewPtr renderTargetShaderView, const SurfaceViewPtr renderTargetView, const SurfaceViewPtr depthBufferView)
+			:RenderTargetSurface(renderTargetBuffer), RenderTargetShaderView(renderTargetShaderView), RenderTargetView(renderTargetView), DepthBufferView(depthBufferView)
+		{
+		}
+
+		
+
+	};
+
 	class RenderGBuffer
 	{
 	public:
@@ -106,10 +128,10 @@ namespace Disorder
 	{
 	public:
 		~RenderSurfaceCache();
-		RenderSurfacePtr MainTarget;
+		MainRenderTargetPtr MainTarget;
 		RenderGBufferPtr GBuffer;
 		ShadowMapPtr ShadowMapBuffer;
-
+		
 		static RenderSurfaceCachePtr Create();
  
 	private:

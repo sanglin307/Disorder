@@ -50,9 +50,9 @@ namespace Disorder
 		bufferArray.push_back(indexBuffer);
 	}
 
-	RenderTexture2DPtr GLRenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample,unsigned int viewFlag,int arraySize, BufferInitData const* pData)
+	RenderTexture2DPtr GLRenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
 	{
-		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat, width, hight, bMipmap, bMultiSample,viewFlag, arraySize, pData);
+		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat, width, hight, bMipmap, bMultiSample,viewFlag, arraySize, pData,flag);
 		texture->Sampler = sampler;
 		return texture;
 	}
@@ -74,9 +74,9 @@ namespace Disorder
 	    return GLRenderSurface::Create(viewMap);
 	}
 
-	RenderTexture2DPtr GLRenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image)
+	RenderTexture2DPtr GLRenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image, unsigned int flag)
 	{
-		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat, bMultiSample, image);
+		GLRenderTexture2DPtr texture = GLRenderTexture2D::Create(pixelFormat, bMultiSample, image,flag);
 		texture->Sampler = sampler;
 		return texture;
 	}

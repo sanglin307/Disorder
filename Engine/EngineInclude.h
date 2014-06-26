@@ -132,12 +132,16 @@ namespace Disorder
 	typedef boost::shared_ptr<SurfaceView> SurfaceViewPtr;
 	class RenderSurface;
 	typedef boost::shared_ptr<RenderSurface> RenderSurfacePtr;
+	class MainRenderTarget;
+	typedef boost::shared_ptr<MainRenderTarget> MainRenderTargetPtr;
 	class RenderGBuffer;
 	typedef boost::shared_ptr<RenderGBuffer> RenderGBufferPtr;
 	class RenderSurfaceCache;
 	typedef boost::shared_ptr<RenderSurfaceCache> RenderSurfaceCachePtr;
 	class ShadowMap;
 	typedef boost::shared_ptr<ShadowMap> ShadowMapPtr;
+	class FXAA;
+	typedef boost::shared_ptr<FXAA> FXAAPtr;
 	class RenderPath;
 	typedef boost::shared_ptr<RenderPath> RenderPathPtr;
 	class ForwardRenderPath;
@@ -230,6 +234,7 @@ namespace Disorder
 #include "RenderEffect.h"
 #include "RenderEngine.h"
 #include "ShadowMap.h"
+#include "PostProcess.h"
 #include "RenderPath.h"
 #include "Viewport.h"
 #include "SceneImporter.h"

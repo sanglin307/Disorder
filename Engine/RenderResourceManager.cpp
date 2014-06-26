@@ -41,7 +41,7 @@ namespace Disorder
 		data.Data = pixelData;
 		data.RowPitch = 4 * 4;
 		data.SlicePitch = 0;
-		RenderTexture2DPtr tex = CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, 4, 4, false, false, SV_ShaderResource, 1,&data);
+		RenderTexture2DPtr tex = CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, 4, 4, false, false, SV_ShaderResource, 1,&data,0);
 		DefaultWhiteTexture2D = CreateSurfaceView(SV_ShaderResource, tex, PF_R8G8B8A8_UNORM);
 
 		RegisterPropertyManager(ShaderPropertyManager::sManagerCamera);

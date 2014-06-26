@@ -172,12 +172,12 @@ float PCFShadowCubeMap(vec3 position)
 		if (lightDir.y < 0)
 		{
 			selectShadowMat = ShadowMapViewArray[3];
-			//lightDir.x = -lightDir.x;
+		//	lightDir.x = -lightDir.x;
 		}
 		else
 		{
 			selectShadowMat = ShadowMapViewArray[2];
-			//lightDir.z = -lightDir.z;
+		//	lightDir.z = -lightDir.z;
 		}
 	}
 	else
@@ -197,7 +197,13 @@ float PCFShadowCubeMap(vec3 position)
 	posShadowMap = ShadowMapProj * posShadowMap;
 
 	vec3 UVD = posShadowMap.xyz / posShadowMap.w;
+	//UVD.xyz = 0.5 * UVD.xyz + 0.5;
+	//vec3 texPos = vec3(UVD.x,UVD.y,0);
+	//lightDir = vec3(1,0,0);
 	float depth =  texture(ShadowMapTextureCube,lightDir).r;
+
+	//return depth;
+
 	if (UVD.z >= depth)
 	    return 1.0f;
 	else

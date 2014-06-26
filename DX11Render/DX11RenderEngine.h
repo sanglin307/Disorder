@@ -34,7 +34,7 @@ namespace Disorder
 		virtual void* Map(RenderBufferPtr const& buffer,BufferAccess bufferAccess);
 		virtual void UnMap(RenderBufferPtr const& buffer);
 		virtual void UpdateSubresource(RenderBufferPtr const& buffer,void* pSrcData,unsigned int srcDataSize);
- 
+		virtual void CopyTexture2D(RenderTexture2DPtr srcTexture, RenderTexture2DPtr dstTexture);
 		virtual void CreateViewport(void *hWnd);
 
 		ID3D11DevicePtr const & DX11RenderEngine::D3DDevice() const

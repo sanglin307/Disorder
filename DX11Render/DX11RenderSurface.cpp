@@ -32,7 +32,7 @@ namespace Disorder
 			SRVDesc.Format = DX11RenderEngine::GetPixelFormat(format);
 			RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(resource);
 			
-			if (tex->ArraySize == 6 && flag & SF_CubeMap)
+			if (tex->ArraySize == 6 && flag & SF_AsCubeMap)
 			{
 				SRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 				SRVDesc.TextureCube.MostDetailedMip = 0;

@@ -158,6 +158,9 @@
     <None Include="..\Resource\FX\GLSL\Skybox\PS.glfs">
       <Filter>GLSL\Skybox</Filter>
     </None>
+    <None Include="..\Resource\FX\HLSL\FXAA.hlsl">
+      <Filter>HLSL</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Geometry.h">
@@ -299,6 +302,12 @@
     <ClInclude Include="SHA1.h">
       <Filter>Mathematics</Filter>
     </ClInclude>
+    <ClInclude Include="..\Resource\FX\HLSL\Fxaa3_11.h">
+      <Filter>HLSL</Filter>
+    </ClInclude>
+    <ClInclude Include="PostProcess.h">
+      <Filter>RenderSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -427,6 +436,9 @@
     </ClCompile>
     <ClCompile Include="SHA1.cpp">
       <Filter>Mathematics</Filter>
+    </ClCompile>
+    <ClCompile Include="PostProcess.cpp">
+      <Filter>RenderSystem</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

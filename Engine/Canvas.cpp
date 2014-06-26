@@ -29,12 +29,14 @@ namespace Disorder
 		_lineElement.EndAddVertex();
 	}
 
-
-	void Canvas::Render(CameraPtr const& camera)
+	void Canvas::RenderLines(CameraPtr const& camera)
 	{
 		_lineElement.Render(camera);
+	}
+
+	void Canvas::RenderStrings(CameraPtr const& camera)
+	{
 		_stringElement.Render(camera);
-		
 	}
  
 	unsigned int Canvas::GetStringLength(std::string const& str, float scale)

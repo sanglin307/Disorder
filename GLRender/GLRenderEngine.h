@@ -64,7 +64,7 @@ namespace Disorder
 		virtual void* Map(RenderBufferPtr const& buffer, BufferAccess bufferAccess);
 		virtual void UnMap(RenderBufferPtr const& buffer);
 		virtual void UpdateSubresource(RenderBufferPtr const& buffer, void* pSrcData, unsigned int srcDataSize);
-
+		virtual void CopyTexture2D(RenderTexture2DPtr srcTexture, RenderTexture2DPtr dstTexture);
 		virtual void SaveSurfaceView(SurfaceViewPtr const& surface, std::string const& fileName);
 
 		static GLenum GetPixelFormat(PixelFormat format, GLenum &glFormat, GLenum &glType);

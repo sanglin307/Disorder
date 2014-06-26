@@ -497,16 +497,19 @@ namespace Disorder
 
 	void GLRenderEngine::CreateMainTarget()
 	{
-		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil,1, NULL);
+		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil,1, NULL,0);
 		SurfaceViewPtr DepthBufferView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, depthStencilTex, GConfig->pRenderConfig->DepthStencilFormat, 0);
  
-		RenderTexture2DPtr mainTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->ColorFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_RenderTarget ,1, NULL);
+		RenderTexture2DPtr mainTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->ColorFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_RenderTarget ,1, NULL,0);
 		SurfaceViewPtr mainTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, mainTex, GConfig->pRenderConfig->ColorFormat);
+		SurfaceViewPtr shaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, mainTex, GConfig->pRenderConfig->ColorFormat);
 
 		std::map<ESurfaceLocation, SurfaceViewPtr> viewMap;
 		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, DepthBufferView));
 		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, mainTargetView));
-		GEngine->RenderSurfaceCache->MainTarget = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
+		RenderSurfacePtr mainSurface = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
+
+		GEngine->RenderSurfaceCache->MainTarget = MainRenderTarget::Create(mainSurface, shaderView, mainTargetView, DepthBufferView);
 	}
 
  
@@ -818,12 +821,17 @@ namespace Disorder
 		GEngine->Stat.OnFrameBegin();
 	}
 
+	void GLRenderEngine::CopyTexture2D(RenderTexture2DPtr srcTexture, RenderTexture2DPtr dstTexture)
+	{
+		BOOST_ASSERT(0);
+	}
+
 	void GLRenderEngine::OnFrameEnd()
 	{
 		//blit
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glDrawBuffer(GL_BACK);
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLint)GEngine->RenderSurfaceCache->MainTarget->GetHandle());
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLint)GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface->GetHandle());
 		glReadBuffer(GL_COLOR_ATTACHMENT0);
 
 		GLint SizeX = GConfig->pRenderConfig->SizeX;
@@ -919,6 +927,9 @@ namespace Disorder
 		if (type == GL_SAMPLER_CUBE || type == GL_SAMPLER_CUBE_SHADOW)
 			return true;
 
+		if (type == GL_SAMPLER_2D_ARRAY || type == GL_SAMPLER_2D_ARRAY_SHADOW)
+			return true;
+
 		if (type == GL_SAMPLER_3D)
 			return true;
 
@@ -973,6 +984,8 @@ namespace Disorder
 				GLRenderTexture2DPtr res = boost::dynamic_pointer_cast<GLRenderTexture2D>(tex->Resource);
 				if (pDesc->Type == GL_SAMPLER_CUBE)
 					glBindTexture(GL_TEXTURE_CUBE_MAP, (GLuint)res->GetHandle());
+				else if (pDesc->Type == GL_SAMPLER_2D_ARRAY)
+					glBindTexture(GL_TEXTURE_2D_ARRAY, (GLuint)res->GetHandle());
 				else
 				    texBinding.push_back((GLuint)res->GetHandle());
 				if (res->Sampler)

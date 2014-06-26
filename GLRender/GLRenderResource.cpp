@@ -214,10 +214,10 @@ namespace Disorder
 		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat)/8 * spec.width;
 		data.SlicePitch = 0;
 
-		return Create(pixelFormat, spec.width, spec.height, false, bMultiSample, SV_ShaderResource,1, &data);
+		return Create(pixelFormat, spec.width, spec.height, false, bMultiSample, SV_ShaderResource,1, &data,0);
 	}
 
-	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image)
+	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image, unsigned int flag)
 	{
 		if (image.size() == 0)
 			return NULL;
@@ -238,13 +238,13 @@ namespace Disorder
 		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat) / 8 * spec.width;
 		data.SlicePitch = spec.dataSize;
 
-		GLRenderTexture2DPtr result = Create(pixelFormat, spec.width, spec.height, false, bMultiSample,SV_ShaderResource, image.size(), &data);
+		GLRenderTexture2DPtr result = Create(pixelFormat, spec.width, spec.height, false, bMultiSample,SV_ShaderResource, image.size(), &data,flag);
 		delete pData;
 
 		return result;
 	}
 
-	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData)
+	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
 	{
 		GLRenderTexture2D *pTexture = new GLRenderTexture2D(arraySize);
 
@@ -275,15 +275,24 @@ namespace Disorder
 				storageFormat = GL_DEPTH_COMPONENT16;
 		}
 
-		if (arraySize == 6)
+		if (arraySize == 6 && (flag & SF_AsCubeMap) )
+		{
 			pTexture->_texFormat = GL_TEXTURE_CUBE_MAP;
-		else
-			pTexture->_texFormat = GL_TEXTURE_2D;
-
-		// for layer texture rendering
-		if (arraySize > 1 && arraySize != 6 && (viewFlag & SV_DepthStencil || viewFlag & SV_RenderTarget))
+		}
+		else if (arraySize > 1)
 		{
 			pTexture->_texFormat = GL_TEXTURE_2D_ARRAY;
+		}
+		else if (arraySize == 1)
+		{
+			pTexture->_texFormat = GL_TEXTURE_2D;
+		}
+		else
+			BOOST_ASSERT(0);
+
+		// for layer texture rendering
+		if (pTexture->_texFormat == GL_TEXTURE_2D_ARRAY)
+		{
 			glBindTexture(pTexture->_texFormat, pTexture->_texHandle);
 			glTexStorage3D(pTexture->_texFormat, pTexture->MipLevel, storageFormat, width, height, arraySize);
 		}
@@ -292,18 +301,22 @@ namespace Disorder
 			glBindTexture(pTexture->_texFormat, pTexture->_texHandle);
 			
 		}
-		else
+		else if (pTexture->_texFormat == GL_TEXTURE_2D)
 		{
 			glBindTexture(pTexture->_texFormat, pTexture->_texHandle);
 			glTexStorage2D(pTexture->_texFormat, pTexture->MipLevel, storageFormat, width, height);
+		}
+		else
+		{
+			BOOST_ASSERT(0);
 		}
 		
 
 		if (pData && pData->Data)
 		{
-			if (arraySize == 1)
+			if (pTexture->_texFormat == GL_TEXTURE_2D)
 				glTexSubImage2D(pTexture->_texFormat, 0, 0, 0, width, height, glFormat, glType, pData->Data);
-			else if (arraySize == 6 && pTexture->_texFormat == GL_TEXTURE_CUBE_MAP)
+			else if (pTexture->_texFormat == GL_TEXTURE_CUBE_MAP)
 			{
 				glTexStorage2D(pTexture->_texFormat, pTexture->MipLevel, storageFormat, width, height);
 				glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
