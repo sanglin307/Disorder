@@ -117,6 +117,7 @@ namespace Disorder
 		static const std::string sShadowMapSize;
 		static const std::string sAmbientLowColor;
 		static const std::string sAmbientUpperColor;
+		static const std::string sLineRadius;
  
 		// ShadowMapGen
 		static const std::string sShadowMapView;
@@ -146,6 +147,9 @@ namespace Disorder
 
 		static const std::string sSkyboxTexture;
 		static const std::string sSkyboxSampler;
+
+		static const std::string sLineTexture;
+		static const std::string sLineSampler;
 
 		static const std::string sScreenAATexture;
 		static const std::string sScreenAASampler;

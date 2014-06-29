@@ -258,6 +258,263 @@ namespace Disorder
 
 	//////////////////////////////////////////////////////////////////////////
 	
+	void BatchVolumeLines::BuildBuffer(int maxLineNumber)
+	{
+		if (_vertexs)
+		{
+			BatchLineVertex* pBuffer = new BatchLineVertex[_savedVertexBufferSize];
+			memcpy(pBuffer, _vertexs, sizeof(BatchLineVertex)*_vertexNum);
+			delete[] _vertexs;
+			_vertexs = pBuffer;
+		}
+		else
+		   _vertexs = new BatchLineVertex[_savedVertexBufferSize];
+
+		_vertexNum = 0;
+
+		if (_positions)
+			delete[] _positions;
+		if (_otherPositions)
+			delete[] _otherPositions;
+		if (_colors)
+			delete[] _colors;
+
+		_positions = new float[maxLineNumber * 8 * 3];
+		_otherPositions = new float[maxLineNumber * 8 * 3];
+		_colors = new float[maxLineNumber * 8 * 3];
+
+		float* offsetDirUv = new float[maxLineNumber * 4 * 8];
+		for (int v = 0; v< maxLineNumber * 4 * 8; v += 4 * 8)
+		{
+			offsetDirUv[v] = 1.0f;		    offsetDirUv[v + 1] = 1.0f;		offsetDirUv[v + 2] = 1.0f;		offsetDirUv[v + 3] = 0.0f;
+			offsetDirUv[v + 4] = 1.0f;		offsetDirUv[v + 5] = -1.0f;		offsetDirUv[v + 6] = 1.0f;		offsetDirUv[v + 7] = 1.0f;
+			offsetDirUv[v + 8] = 0.0f;		offsetDirUv[v + 9] = 1.0f;		offsetDirUv[v + 10] = 0.5f;		offsetDirUv[v + 11] = 0.0f;
+			offsetDirUv[v + 12] = 0.0f;		offsetDirUv[v + 13] = -1.0f;		offsetDirUv[v + 14] = 0.5f;		offsetDirUv[v + 15] = 1.0f;
+			offsetDirUv[v + 16] = 0.0f;		offsetDirUv[v + 17] = -1.0f;		offsetDirUv[v + 18] = 0.5f;		offsetDirUv[v + 19] = 0.0f;
+			offsetDirUv[v + 20] = 0.0f;		offsetDirUv[v + 21] = 1.0f;		offsetDirUv[v + 22] = 0.5f;		offsetDirUv[v + 23] = 1.0f;
+			offsetDirUv[v + 24] = 1.0f;		offsetDirUv[v + 25] = -1.0f;		offsetDirUv[v + 26] = 0.0f;		offsetDirUv[v + 27] = 0.0f;
+			offsetDirUv[v + 28] = 1.0f;		offsetDirUv[v + 29] = 1.0f;		offsetDirUv[v + 30] = 0.0f;		offsetDirUv[v + 31] = 1.0f;
+		}
+
+		RenderBufferPtr positionBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 0);
+		RenderBufferPtr otherpositionBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 1);
+		RenderBufferPtr offsetBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Vertex, BU_StaticDraw, sizeof(float)* 4, maxLineNumber * 4 * 8 * sizeof(float), offsetDirUv, 2);
+		RenderBufferPtr colorBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 3);
+
+		int* trisStripElements = new int[maxLineNumber * 18];
+		int lineID = 0;
+		for (int t = 0; t<(maxLineNumber * 18); t += 18, lineID += 8)
+		{
+			//0
+			trisStripElements[t] = lineID;
+			trisStripElements[t + 1] = lineID + 1;
+			trisStripElements[t + 2] = lineID + 2;
+
+			//1
+			trisStripElements[t + 3] = lineID + 1;
+			trisStripElements[t + 4] = lineID + 3;
+			trisStripElements[t + 5] = lineID + 2;
+
+			//2
+			trisStripElements[t + 6] = lineID + 2;
+			trisStripElements[t + 7] = lineID + 3;
+			trisStripElements[t + 8] = lineID + 4;
+
+			//3
+			trisStripElements[t + 9] = lineID + 3;
+			trisStripElements[t + 10] = lineID + 5;
+			trisStripElements[t + 11] = lineID + 4;
+
+			// 4
+			trisStripElements[t + 12] = lineID + 4;
+			trisStripElements[t + 13] = lineID + 5;
+			trisStripElements[t + 14] = lineID + 7;
+
+			// 5
+			trisStripElements[t + 15] = lineID + 4;
+			trisStripElements[t + 16] = lineID + 7;
+			trisStripElements[t + 17] = lineID + 6;
+		}
+
+		RenderBufferPtr indexBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Index, BU_StaticDraw, sizeof(int), maxLineNumber * 18 * sizeof(int), trisStripElements);
+
+		_renderLayout->UnBindVertexBuffer();
+		_renderLayout->BindVertexBuffer(positionBuffer);
+		_renderLayout->BindVertexBuffer(otherpositionBuffer);
+		_renderLayout->BindVertexBuffer(offsetBuffer);
+		_renderLayout->BindVertexBuffer(colorBuffer);
+		_renderLayout->BindIndexBuffer(indexBuffer);
+		_renderLayout->FinishBufferBinding(_renderEffect);
+
+		delete[] offsetDirUv;
+		delete[] trisStripElements;
+	}
+
+	BatchVolumeLines::BatchVolumeLines(std::string const& name)
+		:Renderer(name)
+	{
+		RenderResourceManagerPtr resourceManager = GEngine->RenderResourceMgr;
+		_renderEffect = resourceManager->CreateRenderEffect();
+		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader, "VolumeLines", SM_4_0, "VS");
+		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader, "VolumeLines", SM_4_0, "PS");
+		_renderEffect->BindShader(vertexShader);
+		_renderEffect->BindShader(pixelShader);
+		_renderEffect->LinkShaders();
+
+		BlendDesc bDesc;
+		bDesc.BlendEnable = true;
+		bDesc.SrcBlend = BLEND_SRC_ALPHA;
+		bDesc.DestBlend = BLEND_INV_SRC_ALPHA;
+		bDesc.BlendOp = BLEND_OP_ADD;
+
+		BlendStatePtr blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc, 1);
+		_renderEffect->BindBlendState(blendState);
+
+		DepthStencilDesc dDesc;
+		dDesc.DepthEnable = false;
+		DepthStencilStatePtr depthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dDesc, 0);
+		_renderEffect->BindDepthStencilState(depthState);
+
+		ShaderPropertyManagerPtr globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		_sLineTextureProperty = globalProperty->CreateProperty(ShaderPropertyManager::sLineTexture, eSP_ShaderResource, 1);
+		_sLineSamplerProperty = globalProperty->CreateProperty(ShaderPropertyManager::sLineSampler, eSP_SampleState, 1);
+
+		SamplerDesc sdesc;
+		sdesc.Filter = SF_Min_Mag_Mip_Linear;
+		SamplerStatePtr samplerState = GEngine->RenderResourceMgr->CreateSamplerState(&sdesc);
+
+		ImagePtr lineImage = GImageManager->Load(GConfig->sResourceTexPath + "LineTexture.jpg");
+		RenderTexture2DPtr lineTexture = GEngine->RenderResourceMgr->CreateTexture2D(samplerState, PF_R8G8B8A8_TYPELESS, false, lineImage);
+		SurfaceViewPtr lineView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, lineTexture, PF_R8G8B8A8_UNORM);
+		_sLineTextureProperty->SetData(lineView);
+		_sLineSamplerProperty->SetData(samplerState);
+        
+		_renderLayout = resourceManager->CreateRenderLayout(_renderEffect, TT_TriangleList, false);
+
+		_vertexs = NULL;
+		_positions = NULL;
+		_otherPositions = NULL;
+		_colors = NULL;
+		_savedVertexBufferSize = 1024;
+
+		BuildBuffer(_savedVertexBufferSize / 2);
+	}
+
+	BatchVolumeLines::~BatchVolumeLines()
+	{
+		if (_vertexs)
+			delete[] _vertexs;
+
+		if (_positions)
+			delete[] _positions;
+
+		if (_otherPositions)
+			delete[] _otherPositions;
+
+		if (_colors)
+			delete[] _colors;
+
+		_vertexs = 0;
+		_vertexNum = 0;
+	}
+
+	BatchLineVertex* BatchVolumeLines::PrepareAddVertex()
+	{
+		if (_vertexNum + 2 >= _savedVertexBufferSize)
+		{
+			_savedVertexBufferSize *= 2;
+			BuildBuffer(_savedVertexBufferSize/2);
+		}
+
+		return &(_vertexs[_vertexNum]);
+	}
+
+	void BatchVolumeLines::EndAddVertex()
+	{
+		_vertexNum += 2;
+	}
+
+	void BatchVolumeLines::Render(CameraPtr const& camera)
+	{
+		BOOST_ASSERT(_vertexNum % 2 == 0);
+
+		if (_vertexNum == 0)
+			return;
+
+		for (unsigned int l = 0; l < _vertexNum/2; l++)
+		{
+			const int lA = l * 2;
+			const int lB = l * 2 + 1;
+			const int l24 = l * 24;
+			_positions[l24] = _vertexs[lA].position.x;		    _positions[l24 + 1] = _vertexs[lA].position.y;		_positions[l24 + 2] = _vertexs[lA].position.z;
+			_positions[l24 + 3] = _vertexs[lA].position.x;		_positions[l24 + 4] = _vertexs[lA].position.y;		_positions[l24 + 5] = _vertexs[lA].position.z;
+			_positions[l24 + 6] = _vertexs[lA].position.x;		_positions[l24 + 7] = _vertexs[lA].position.y;		_positions[l24 + 8] = _vertexs[lA].position.z;
+			_positions[l24 + 9] = _vertexs[lA].position.x;		_positions[l24 + 10] = _vertexs[lA].position.y;		_positions[l24 + 11] = _vertexs[lA].position.z;
+
+			_positions[l24 + 12] = _vertexs[lB].position.x;		_positions[l24 + 13] = _vertexs[lB].position.y;		_positions[l24 + 14] = _vertexs[lB].position.z;
+			_positions[l24 + 15] = _vertexs[lB].position.x;		_positions[l24 + 16] = _vertexs[lB].position.y;		_positions[l24 + 17] = _vertexs[lB].position.z;
+			_positions[l24 + 18] = _vertexs[lB].position.x;		_positions[l24 + 19] = _vertexs[lB].position.y;		_positions[l24 + 20] = _vertexs[lB].position.z;
+			_positions[l24 + 21] = _vertexs[lB].position.x;		_positions[l24 + 22] = _vertexs[lB].position.y;		_positions[l24 + 23] = _vertexs[lB].position.z;
+		}
+
+		for (unsigned int l = 0; l< _vertexNum / 2; ++l)
+		{
+			const int lA = l * 2;
+			const int lB = l * 2 + 1;
+			const int l24 = l * 24;
+			_otherPositions[l24] = _vertexs[lB].position.x;		    _otherPositions[l24 + 1] = _vertexs[lB].position.y;		_otherPositions[l24 + 2] = _vertexs[lB].position.z;
+			_otherPositions[l24 + 3] = _vertexs[lB].position.x;		_otherPositions[l24 + 4] = _vertexs[lB].position.y;		_otherPositions[l24 + 5] = _vertexs[lB].position.z;
+			_otherPositions[l24 + 6] = _vertexs[lB].position.x;		_otherPositions[l24 + 7] = _vertexs[lB].position.y;		_otherPositions[l24 + 8] = _vertexs[lB].position.z;
+			_otherPositions[l24 + 9] = _vertexs[lB].position.x;		_otherPositions[l24 + 10] = _vertexs[lB].position.y;	_otherPositions[l24 + 11] = _vertexs[lB].position.z;
+
+			_otherPositions[l24 + 12] = _vertexs[lA].position.x;	_otherPositions[l24 + 13] = _vertexs[lA].position.y;    _otherPositions[l24 + 14] = _vertexs[lA].position.z;
+			_otherPositions[l24 + 15] = _vertexs[lA].position.x;	_otherPositions[l24 + 16] = _vertexs[lA].position.y;    _otherPositions[l24 + 17] = _vertexs[lA].position.z;
+			_otherPositions[l24 + 18] = _vertexs[lA].position.x;	_otherPositions[l24 + 19] = _vertexs[lA].position.y;	_otherPositions[l24 + 20] = _vertexs[lA].position.z;
+			_otherPositions[l24 + 21] = _vertexs[lA].position.x;	_otherPositions[l24 + 22] = _vertexs[lA].position.y;	_otherPositions[l24 + 23] = _vertexs[lA].position.z;
+		}
+
+		for (unsigned int l = 0; l < _vertexNum / 2; l++)
+		{
+			const int lA = l * 2;
+			const int lB = l * 2 + 1;
+			const int l24 = l * 24;
+			_colors[l24] = _vertexs[lA].color.x;		    _colors[l24 + 1] = _vertexs[lA].color.y;		_colors[l24 + 2] = _vertexs[lA].color.z;
+			_colors[l24 + 3] = _vertexs[lA].color.x;		_colors[l24 + 4] = _vertexs[lA].color.y;		_colors[l24 + 5] = _vertexs[lA].color.z;
+			_colors[l24 + 6] = _vertexs[lA].color.x;		_colors[l24 + 7] = _vertexs[lA].color.y;		_colors[l24 + 8] = _vertexs[lA].color.z;
+			_colors[l24 + 9] = _vertexs[lA].color.x;		_colors[l24 + 10] = _vertexs[lA].color.y;		_colors[l24 + 11] = _vertexs[lA].color.z;
+
+			_colors[l24 + 12] = _vertexs[lB].color.x;		_colors[l24 + 13] = _vertexs[lB].color.y;		_colors[l24 + 14] = _vertexs[lB].color.z;
+			_colors[l24 + 15] = _vertexs[lB].color.x;		_colors[l24 + 16] = _vertexs[lB].color.y;		_colors[l24 + 17] = _vertexs[lB].color.z;
+			_colors[l24 + 18] = _vertexs[lB].color.x;		_colors[l24 + 19] = _vertexs[lB].color.y;		_colors[l24 + 20] = _vertexs[lB].color.z;
+			_colors[l24 + 21] = _vertexs[lB].color.x;		_colors[l24 + 22] = _vertexs[lB].color.y;		_colors[l24 + 23] = _vertexs[lB].color.z;
+		}
+
+		RenderEnginePtr renderEngine = GEngine->RenderEngine;
+		unsigned int bufferSize = _vertexNum / 2 * 8 * 3 * sizeof(float);
+		const RenderBufferPtr &positionBuffer = _renderLayout->GetVertexBuffers()[0];
+		void* vertexBuffer = renderEngine->Map(positionBuffer, BA_Write_Only);
+		memcpy(vertexBuffer, _positions, bufferSize);
+		renderEngine->UnMap(positionBuffer);
+
+		const RenderBufferPtr &otherPositionBuffer = _renderLayout->GetVertexBuffers()[1];
+		vertexBuffer = renderEngine->Map(otherPositionBuffer, BA_Write_Only);
+		memcpy(vertexBuffer, _otherPositions, bufferSize);
+		renderEngine->UnMap(otherPositionBuffer);
+
+		const RenderBufferPtr &colorBuffer = _renderLayout->GetVertexBuffers()[3];
+		vertexBuffer = renderEngine->Map(colorBuffer, BA_Write_Only);
+		memcpy(vertexBuffer, _colors, bufferSize);
+		renderEngine->UnMap(colorBuffer);
+ 
+		renderEngine->SetRenderLayout(_renderLayout);
+
+		renderEngine->SetEffect(_renderEffect);
+		renderEngine->DrawIndexed(_vertexNum/2 * 18, 0,0);
+		_vertexNum = 0;
+	}
+
+
+	//////////////////////////////////////////////////////////////////////////
 
 	GeometryRenderer::GeometryRenderer(std::string const& name)
 		:Renderer(name)

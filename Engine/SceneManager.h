@@ -93,7 +93,7 @@ namespace Disorder
 		ShaderPropertyPtr _sScreenWidthProperty;
 		ShaderPropertyPtr _sScreenHeightProperty;
 		ShaderPropertyPtr _sShadowMapSizeProperty;
-	 
+		ShaderPropertyPtr _sLineRadius;
 
 		ShaderPropertyManagerPtr _propertyManager;
 

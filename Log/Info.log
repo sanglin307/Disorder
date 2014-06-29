@@ -1,25 +1,29 @@
 FBX file format version for file Mangonel.FBX is 7,2,0
 Shader Object :Skybox:PS
 Shader Object :BatchLines:PS
-Shader Object :Skybox:VS
+Shader Object :ForwardLighting:SpotLightingPS
 Shader Object :BatchLines:VS
+Shader Object :ShadowMap:DepthVertexShader
 Shader Object :2DText:PS
 Shader Object :2DText:VS
+Shader Object :Skybox:VS
+Shader Object :ForwardLighting:BasePassPS
 Shader Object :FXAA:PS
-Shader Object :ForwardLighting:SpotLightingPS
+Shader Object :VolumeLines:VS
 Shader Object :FXAA:PrepareSurfacePS
 Shader Object :ForwardLighting:PointLightingPS
-Shader Object :ForwardLighting:BasePassPS
 Shader Object :ForwardLighting:DirectionLightingPS
 Shader Object :ForwardLighting:SceneVS
+Shader Object :VolumeLines:PS
 Shader Object :FXAA:VS
 Shader Object :ShadowMap:DepthCubeMapGS
 Shader Object :ShadowMap:DepthCubeMapVS
-Shader Object :ShadowMap:DepthVertexShader
 Shader Property Manager Name :Global
  ****** Shader Property :SkyboxSampler
  ****** Shader Property :SkyboxTexture
+ ****** Shader Property :LineTexture
  ****** Shader Property :ScreenAATexture
+ ****** Shader Property :LineSampler
  ****** Shader Property :MaterialProperty
  ****** Shader Property :TextSampler
  ****** Shader Property :SceneProperty
@@ -37,6 +41,7 @@ Shader Property Manager Name :Global
  ****** Shader Property :ShadowSampler
  ****** Shader Property :ShadowMapTexture2D
 Shader Property Manager Name :SceneProperty
+ ****** Shader Property :LineRadius
  ****** Shader Property :ShadowMapSize
  ****** Shader Property :ScreenHeight
  ****** Shader Property :ScreenWidth

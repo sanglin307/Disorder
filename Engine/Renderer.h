@@ -87,6 +87,32 @@ namespace Disorder
 		unsigned int _savedVertexBufferSize;
 	};
 
+	class BatchVolumeLines : public Renderer
+	{
+	public:
+		BatchVolumeLines(std::string const& name);
+		virtual void Render(CameraPtr const& camera);
+		~BatchVolumeLines();
+ 
+		BatchLineVertex* PrepareAddVertex();
+		void EndAddVertex();
+
+	private:
+
+		void BuildBuffer(int maxLineNumber);
+
+		BatchLineVertex* _vertexs;
+		unsigned int _vertexNum;
+		unsigned int _savedVertexBufferSize;
+
+		float *_positions;
+		float *_otherPositions;
+		float *_colors;
+
+		ShaderPropertyPtr _sLineTextureProperty;
+		ShaderPropertyPtr _sLineSamplerProperty;
+	};
+
 	class SimpleTile : public Renderer
 	{
 	public:

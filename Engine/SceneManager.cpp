@@ -16,7 +16,7 @@ namespace Disorder
 		_sScreenWidthProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sScreenWidth, eSP_Int, 1);
 		_sScreenHeightProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sScreenHeight, eSP_Int, 1);
 		_sShadowMapSizeProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sShadowMapSize, eSP_Int, 1);
-
+		_sLineRadius = _propertyManager->CreateProperty(ShaderPropertyManager::sLineRadius, eSP_Float, 1);
 		_skyBox = Skybox::Create();
 
 		EnableDebugDraw = true;
@@ -97,7 +97,7 @@ namespace Disorder
 		_sScreenWidthProperty->SetData(&GConfig->pRenderConfig->SizeX);
 		_sScreenHeightProperty->SetData(&GConfig->pRenderConfig->SizeY);
 		_sShadowMapSizeProperty->SetData(&GConfig->pRenderConfig->ShadowMapSize);
-
+		_sLineRadius->SetData(&GConfig->pSceneConfig->LineRadius);
 		_propertyManager->UpdateShaderProperty();
 	}
 

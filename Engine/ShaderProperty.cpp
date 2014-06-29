@@ -213,6 +213,7 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sScreenWidth = "ScreenWidth";
 	const std::string ShaderPropertyManager::sScreenHeight = "ScreenHeight";
 	const std::string ShaderPropertyManager::sShadowMapSize = "ShadowMapSize";
+	const std::string ShaderPropertyManager::sLineRadius = "LineRadius";
 	 
 	const std::string ShaderPropertyManager::sShadowMapView = "ShadowMapView";
 	const std::string ShaderPropertyManager::sShadowMapViewArray = "ShadowMapViewArray";
@@ -235,6 +236,9 @@ namespace Disorder
 
 	const std::string ShaderPropertyManager::sSkyboxTexture = "SkyboxTexture";
 	const std::string ShaderPropertyManager::sSkyboxSampler = "SkyboxSampler";
+
+	const std::string ShaderPropertyManager::sLineTexture = "LineTexture";
+	const std::string ShaderPropertyManager::sLineSampler = "LineSampler";
 
 	const std::string ShaderPropertyManager::sScreenAATexture = "ScreenAATexture";
 	const std::string ShaderPropertyManager::sScreenAASampler = "ScreenAASampler";

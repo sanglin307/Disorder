@@ -9,7 +9,7 @@ namespace Disorder
 	}
 
 	Canvas::Canvas(unsigned int width,unsigned int height)
-		:_width(width),_height(height),_stringElement("CanvasString"),_lineElement("BatchLines")
+		:_width(width), _height(height), _stringElement("CanvasString"), _lineElement("BatchLines"), _volumeLineElement("BatchVolumeLines")
 	{
 		_fontSize = 25;
 		_font = GFontManager->CreateFontFromTrueTypeFile("arial",_fontSize,96);
@@ -17,20 +17,35 @@ namespace Disorder
  
 	}
 
-	void Canvas::DrawLine(glm::vec3 const& beginPos, glm::vec4 const& beginColor, glm::vec3 const& endPos, glm::vec4 const& endColor)
+	void Canvas::DrawLine(glm::vec3 const& beginPos, glm::vec4 const& beginColor, glm::vec3 const& endPos, glm::vec4 const& endColor, bool bVolumeLines)
 	{
-		BatchLineVertex* pBuffer = _lineElement.PrepareAddVertex();
-		pBuffer[0].color = beginColor;
-		pBuffer[0].position = beginPos;
+		if (!bVolumeLines)
+		{
+			BatchLineVertex* pBuffer = _lineElement.PrepareAddVertex();
+			pBuffer[0].color = beginColor;
+			pBuffer[0].position = beginPos;
 
-		pBuffer[1].color = endColor;
-		pBuffer[1].position = endPos;
+			pBuffer[1].color = endColor;
+			pBuffer[1].position = endPos;
 
-		_lineElement.EndAddVertex();
+			_lineElement.EndAddVertex();
+		}
+		else
+		{
+			BatchLineVertex* pBuffer = _volumeLineElement.PrepareAddVertex();
+			pBuffer[0].color = beginColor;
+			pBuffer[0].position = beginPos;
+
+			pBuffer[1].color = endColor;
+			pBuffer[1].position = endPos;
+
+			_volumeLineElement.EndAddVertex();
+		}
 	}
 
 	void Canvas::RenderLines(CameraPtr const& camera)
 	{
+		_volumeLineElement.Render(camera);
 		_lineElement.Render(camera);
 	}
 

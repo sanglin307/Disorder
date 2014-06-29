@@ -35,6 +35,7 @@ namespace Disorder
 		bool HDR;
 		bool Gamma;
 		int ShadowMapSize;
+		
 		bool FXAA;
 
 		RenderConfig::RenderConfig()
@@ -55,16 +56,18 @@ namespace Disorder
 			Gamma = true;
 			FXAA = true;
 			ShadowMapSize = 1024;
+			
 		};
 	};
 
 	struct SceneConfig
 	{
 		std::string LevelName;
-
+		float LineRadius;
 		SceneConfig::SceneConfig()
 		{
 			LevelName = "";
+			LineRadius = 0.5f;
 		}
 	};
  

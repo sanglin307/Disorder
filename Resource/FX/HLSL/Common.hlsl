@@ -6,6 +6,7 @@ cbuffer SceneProperty
 	int    ScreenWidth;
 	int    ScreenHeight;
 	int    ShadowMapSize;
+	float    LineRadius;
 }
 
 cbuffer CameraTransforms
@@ -46,8 +47,7 @@ TextureCube<float>       ShadowMapTextureCube;
 
 SamplerState DiffuseSampler;
 Texture2D DiffuseTexture;
-
-
+ 
 cbuffer DirectionLightProperty
 {
 	float3 DirectionLightColor;

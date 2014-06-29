@@ -187,6 +187,7 @@ namespace Disorder
 		// base pass for ambient light and diffuse texture etc
 		BasePassRender(mainCamera, rendererList);
 		RenderLights(mainCamera, rendererList);
+ 
 
 		GEngine->GameCanvas->DrawString(5, 35, "Forward Lighting Mode");
 		GSceneManager->DebugDraw();

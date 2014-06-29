@@ -126,7 +126,7 @@ namespace Disorder
 		boost::property_tree::read_xml(sceneConfigFile, tree);
 
 		pSceneConfig->LevelName = tree.get("SceneConfig.LevelName", "");
-	 
+		pSceneConfig->LineRadius = tree.get("SceneConfig.LineRadius", 0.5f);
 		return true;
 	}
 

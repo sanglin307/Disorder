@@ -161,6 +161,9 @@
     <None Include="..\Resource\FX\HLSL\FXAA.hlsl">
       <Filter>HLSL</Filter>
     </None>
+    <None Include="..\Resource\FX\HLSL\VolumeLines.hlsl">
+      <Filter>HLSL</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Geometry.h">
