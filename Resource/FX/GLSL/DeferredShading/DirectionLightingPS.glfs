@@ -23,12 +23,10 @@ void main(void)
 	// Reconstruct the world position
 	vec3 position = CalculateWorldPos(In.Position, gbd.Depth);
 
-	// Calculate the ambient color
-	vec3 finalColor = CalculateAmbient(mat.Normal, mat.DiffuseColor);
-
 	// Calculate the directional light
-	finalColor += CalculateDirectionLight(position, mat);
+	vec3 finalColor = CalculateDirectionLight(position, mat);
 
-	// Return the final color
-	color =  vec4(finalColor, 1.0);
+	float shadowValue = PCFShadow(position);
+
+    color = vec4(finalColor * shadowValue,1.0f);
 }

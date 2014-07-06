@@ -1,0 +1,32 @@
+#version 330
+#extension GL_ARB_shading_language_include : require
+
+#include </common.gls>
+#include </deferredshading/common.gls>
+
+out vec4 color;
+
+in block
+{
+    vec2 Position;
+    vec2 UV;
+} In;
+
+void main(void)
+{
+    GBufferData gbd = UnpackGBuffer(In.UV);
+	
+	// Convert the data into the material structure/	
+	Material mat;
+	MaterialFromGBuffer(gbd, mat);
+
+	// Reconstruct the world position
+	vec3 position = CalculateWorldPos(In.Position, gbd.Depth);
+
+	vec3 finalColor = CalculatePointLight(position,mat);
+
+
+	float shadowValue = PCFShadowCubeMap(position);
+
+    color = vec4(finalColor * shadowValue,1.0f);
+}

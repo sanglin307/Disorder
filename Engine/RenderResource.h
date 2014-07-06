@@ -42,7 +42,15 @@ namespace Disorder
 	class RenderTexture : public RenderResource
 	{
 	public:
-		 
+		unsigned int Width;
+		unsigned int Height;
+		PixelFormat Format;
+		unsigned int ViewFlag;
+		unsigned int MipLevel;
+		unsigned int MultiSampleCount;
+		unsigned int MultiSampleQuality;
+		int ArraySize;
+		SamplerStatePtr Sampler;
 	};
 
 	class RenderTexture1D: public RenderTexture
@@ -52,15 +60,7 @@ namespace Disorder
 	class RenderTexture2D: public RenderTexture
 	{
 	public:
-		unsigned int Width;
-		unsigned int Height;
-		PixelFormat Format;
-		unsigned int ViewFlag;
-        unsigned int MipLevel;
-		unsigned int MultiSampleCount;
-		unsigned int MultiSampleQuality;
-		int ArraySize;
-		SamplerStatePtr Sampler;
+		
 	protected:
 
 		RenderTexture2D(){}

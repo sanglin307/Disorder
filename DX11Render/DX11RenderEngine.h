@@ -16,14 +16,14 @@ namespace Disorder
 		virtual void OnFrameBegin();
 		virtual void OnFrameEnd();
 
-		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
+		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex = -1);
 		
 
 		virtual void SetViewport(float width, float height, float minDepth, float maxDepth, float topX, float topY);
 
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
 	
-		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,bool useReadOnlyDepthStencil = false);
+		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget, int sliceIndex = -1, bool useReadOnlyDepthStencil = false);
 	 
 		virtual void SetPrimitiveTopology(TopologyType topologyType);
 
@@ -77,8 +77,8 @@ namespace Disorder
 		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState);
 		virtual void SetDepthStencilState(DepthStencilStatePtr const& depthStencilState);
 		
-		void ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color);
-		void ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
+		void ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color, int sliceIndex);
+		void ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex);
 
 	private:
 		DX11RenderEngine();

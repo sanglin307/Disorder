@@ -18,10 +18,9 @@ namespace Disorder
 			return _height;
 		}
 
-		void PrepareRenderDepth(const LightPtr& light);
-		void RenderObject(const CameraPtr& camera, const LightPtr& light, const GeometryRendererPtr object);
+		void RenderDepth(const CameraPtr& camera, std::vector<GeometryRendererPtr>& geometryList, const LightPtr& light);
 		void PrepareRenderLight(const LightPtr& light);
-	 
+
 	protected:
 		ShadowMap(unsigned int width,unsigned int height);
 
@@ -59,6 +58,8 @@ namespace Disorder
  
 		RenderEffectPtr _DepthGenEffect;
 		RenderEffectPtr _DepthCubeGenEffect;
+
+		bool _bUseGeometryShader;
 	};
 
 }

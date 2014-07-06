@@ -1,0 +1,20 @@
+
+#version 330
+#extension GL_ARB_shading_language_include : require
+
+#include </common.gls>
+
+layout (location = 0) in vec3 Position;
+layout (location = 3) in vec2 TextureUV;
+
+out block 
+{
+   noperspective vec2 UV;
+} Out;
+ 
+void main(void) 
+{
+   gl_Position = vec4(Position,1.f);
+   Out.UV = vec2(1.f - TextureUV.x,TextureUV.y);
+}
+ 

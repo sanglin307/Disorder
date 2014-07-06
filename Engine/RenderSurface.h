@@ -9,7 +9,8 @@ namespace Disorder
 	{
 		SF_ReadOnlyDepth = 0x1L,
 		SF_ReadOnlyStencil = 0x2L,
-		SF_AsCubeMap = 0x4L
+		SF_AsCubeMap = 0x4L,
+		SF_MultiSliceView = 0x8L,   // create multiple rendertarget or depth view for a texture array object.
 	};
 
 	enum ESurfaceViewType

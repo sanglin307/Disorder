@@ -48,10 +48,10 @@ namespace Disorder
  
 		virtual void CreateViewport(void *hWnd);
 
-		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil);
+		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex = -1);
 
  
-		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget, bool useReadOnlyDepthStencil = false);
+		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget, int sliceIndex = -1, bool useReadOnlyDepthStencil = false);
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
 		virtual void SetPrimitiveTopology(TopologyType topologyType);
 
@@ -132,6 +132,8 @@ namespace Disorder
 			GLuint ShaderProgram;
 
 			GLuint FrameBufferObject;
+			GLuint FrameSlice;
+
 			GLuint VertexArrayObject;
 			
 			GLuint VertexBufferObject;

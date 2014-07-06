@@ -585,7 +585,7 @@ namespace Disorder
 				LoadShaderIncludeForPath(fileiter->path());
 			}
 		}
-		else if (boost::filesystem::extension(p) == ".gls")
+		else if (boost::filesystem::extension(p) == ".gls" || boost::filesystem::extension(p) == ".h")
 		{
 			std::string path = p.string();
 			boost::to_lower(path);
@@ -823,7 +823,10 @@ namespace Disorder
 
 	void GLRenderEngine::CopyTexture2D(RenderTexture2DPtr srcTexture, RenderTexture2DPtr dstTexture)
 	{
-		BOOST_ASSERT(0);
+		GLRenderTexture2DPtr srcTex = boost::dynamic_pointer_cast<GLRenderTexture2D>(srcTexture);
+		GLRenderTexture2DPtr dstTex = boost::dynamic_pointer_cast<GLRenderTexture2D>(dstTexture);
+
+		glCopyImageSubData((GLuint)srcTex->GetHandle(), srcTex->GetGLFormat(), 0, 0, 0, 0, (GLuint)dstTex->GetHandle(), dstTex->GetGLFormat(), 0, 0, 0, 0, srcTex->Width, srcTex->Height, 1);
 	}
 
 	void GLRenderEngine::OnFrameEnd()
@@ -847,9 +850,9 @@ namespace Disorder
 	}
 
   
-	void GLRenderEngine::ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
+	void GLRenderEngine::ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex)
 	{
-		SetRenderTarget(renderSurface);
+		//SetRenderTarget(renderSurface,sliceIndex);
 
 		if (renderSurface == NULL) //default
 		{
@@ -895,7 +898,7 @@ namespace Disorder
 
  
 
-	void GLRenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget, bool useReadOnlyDepthStencil)
+	void GLRenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget, int sliceIndex,bool useReadOnlyDepthStencil)
 	{
 		if (renderTarget == NULL)
 		{
@@ -906,6 +909,28 @@ namespace Disorder
 
 		GLuint fbo = (GLuint)renderTarget->GetHandle();
 		_renderCache.CacheFrameBufferObject(fbo);
+
+		// for layer renderer
+		if (sliceIndex >= 0)
+		{
+			for (int index = SL_DepthStencil; index < SL_SurfaceLoactionMax; index++)
+			{
+				SurfaceViewPtr view = renderTarget->GetSurfaceView((ESurfaceLocation)index);
+				if (view != NULL && view->Resource->ArraySize > 1)
+				{
+					GLenum attachment = GL_DEPTH_ATTACHMENT;
+					if (index >= SL_RenderTarget1)
+						attachment = GL_COLOR_ATTACHMENT0 + index - SL_RenderTarget1;
+					glFramebufferTextureLayer(GL_FRAMEBUFFER, attachment, (GLuint)view->Resource->GetHandle(), 0, sliceIndex);
+					//glDrawBuffer(GL_NONE);
+					//glReadBuffer(GL_NONE);
+					//GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+					//BOOST_ASSERT(result == GL_FRAMEBUFFER_COMPLETE);
+				}
+				else
+					break;
+			}
+		}
 
 		GLRenderSurfacePtr GLSurface = boost::dynamic_pointer_cast<GLRenderSurface>(renderTarget);
 		std::vector<GLenum> bufferArray;
@@ -1117,12 +1142,8 @@ namespace Disorder
 
 	void GLRenderEngine::SaveSurfaceView(SurfaceViewPtr const& surface, std::string const& fileName)
 	{
-		int pixel = 64;
-		GLvoid* data = malloc(4 * pixel);
-		glReadPixels(500, 300, 8, 8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, data);
-
-		GLuint depth = (GLuint)data;
-		GLuint d = depth >> 8;
+		// use glGetTexLevelParameterfv to get texture information, and then download texture use glGetTexImage
+		BOOST_ASSERT(0);
 	}
 
 

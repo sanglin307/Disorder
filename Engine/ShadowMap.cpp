@@ -13,6 +13,7 @@ namespace Disorder
 	{
 		_width = width;
 		_height = height;
+		_bUseGeometryShader = true;
 
 		_propertyMgr = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerShadowMapGen);
 	
@@ -60,9 +61,12 @@ namespace Disorder
 		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, _depthView2D));
 		_depthSurface2D = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 
-		_shadowDataTexCube = GEngine->RenderResourceMgr->CreateTexture2D(_shadowSamplerState, PF_R32_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource, 6, NULL, SF_AsCubeMap);
-		_depthViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, _shadowDataTexCube, PF_D32_FLOAT);
-		_shaderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowDataTexCube, PF_R32_FLOAT, SF_AsCubeMap);
+		unsigned int viewFlag = SF_AsCubeMap;
+		if (!_bUseGeometryShader)
+			viewFlag |= SF_MultiSliceView;
+		_shadowDataTexCube = GEngine->RenderResourceMgr->CreateTexture2D(_shadowSamplerState, PF_R32_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource, 6, NULL, viewFlag);
+		_depthViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, _shadowDataTexCube, PF_D32_FLOAT, viewFlag);
+		_shaderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowDataTexCube, PF_R32_FLOAT, viewFlag);
 
 		//_shadowRenderTexCube = GEngine->RenderResourceMgr->CreateTexture2D(_shadowSamplerState, PF_R32_TYPELESS, width, height, false, false, SV_RenderTarget | SV_ShaderResource, 6, NULL, SF_AsCubeMap);
 		//_renderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, _shadowRenderTexCube, PF_R32_FLOAT);
@@ -94,9 +98,8 @@ namespace Disorder
 			_shadowTexture2D->SetData(GEngine->RenderResourceMgr->DefaultWhiteTexture2D);
 	}
 
-	void ShadowMap::PrepareRenderDepth(const LightPtr& light)
-	{
-		 
+	void ShadowMap::RenderDepth(const CameraPtr& camera, std::vector<GeometryRendererPtr>& geometryList, const LightPtr& light)
+	{	 
 		if (light->LightType == LT_Spot)
 		{
 			SpotLightPtr spot = boost::dynamic_pointer_cast<SpotLight>(light);
@@ -108,6 +111,17 @@ namespace Disorder
 			GEngine->RenderEngine->SetRenderTarget(_depthSurface2D);
 			GEngine->RenderEngine->ClearRenderSurface(_depthSurface2D, glm::vec4(0), true, 1.0f, false, 0);
 			GEngine->RenderEngine->SetViewport((float)_width, (float)_height, 0.f, 1.f, 0, 0);
+			for (size_t j = 0; j < geometryList.size(); j++)
+			{
+				if (!geometryList[j]->GetGeometry()->CastShadow)
+					continue;
+
+				if (!light->Touch(geometryList[j]))
+					continue;
+
+				geometryList[j]->UpdateShaderProperty();
+				geometryList[j]->RenderShadow(camera, _DepthGenEffect);
+			}
 		}
 		else if (light->LightType == LT_Directional)
 		{
@@ -120,33 +134,72 @@ namespace Disorder
 			GEngine->RenderEngine->SetRenderTarget(_depthSurface2D);
 			GEngine->RenderEngine->ClearRenderSurface(_depthSurface2D, glm::vec4(0), true, 1.0f, false, 0);
 			GEngine->RenderEngine->SetViewport((float)_width, (float)_height, 0.f, 1.f, 0, 0);
+
+			for (size_t j = 0; j < geometryList.size(); j++)
+			{
+				if (!geometryList[j]->GetGeometry()->CastShadow)
+					continue;
+
+				if (!light->Touch(geometryList[j]))
+					continue;
+
+				geometryList[j]->UpdateShaderProperty();
+				geometryList[j]->RenderShadow(camera, _DepthGenEffect);
+			}
 		}
 		else if ( light->LightType == LT_Point )
 		{
 			PointLightPtr pLight = boost::dynamic_pointer_cast<PointLight>(light);
-			_viewArrayMatrix->SetData(glm::value_ptr(pLight->ShadowViewMatrix[0]));
-			_projMatrix->SetData(glm::value_ptr(pLight->ShadowProjMatrix));
 
-			_propertyMgr->UpdateShaderProperty();
-			//prepared buffer
-			GEngine->RenderEngine->SetRenderTarget(_depthSurfaceCube);
-			GEngine->RenderEngine->ClearRenderSurface(_depthSurfaceCube, glm::vec4(0), true, 1.0f, false, 0);
-			GEngine->RenderEngine->SetViewport((float)_width, (float)_height, 0.f, 1.f, 0, 0);
+			if (_bUseGeometryShader)
+			{
+				_viewArrayMatrix->SetData(glm::value_ptr(pLight->ShadowViewMatrix[0]));
+				_projMatrix->SetData(glm::value_ptr(pLight->ShadowProjMatrix));
+
+				_propertyMgr->UpdateShaderProperty();
+				//prepared buffer
+				GEngine->RenderEngine->SetRenderTarget(_depthSurfaceCube);
+				GEngine->RenderEngine->ClearRenderSurface(_depthSurfaceCube, glm::vec4(0), true, 1.0f, false, 0);
+				GEngine->RenderEngine->SetViewport((float)_width, (float)_height, 0.f, 1.f, 0, 0);
+
+				for (size_t j = 0; j < geometryList.size(); j++)
+				{
+					if (!geometryList[j]->GetGeometry()->CastShadow)
+						continue;
+
+					if (!light->Touch(geometryList[j]))
+						continue;
+
+					geometryList[j]->UpdateShaderProperty();
+					geometryList[j]->RenderShadow(camera, _DepthCubeGenEffect);
+				}
+			}
+			else
+			{
+				GEngine->RenderEngine->SetViewport((float)_width, (float)_height, 0.f, 1.f, 0, 0);
+				_viewArrayMatrix->SetData(glm::value_ptr(pLight->ShadowViewMatrix[0]));
+				for (size_t slice = 0; slice < 6; slice++)
+				{
+					_viewMatrix->SetData(glm::value_ptr(pLight->ShadowViewMatrix[slice]));
+					_projMatrix->SetData(glm::value_ptr(pLight->ShadowProjMatrix));
+					_propertyMgr->UpdateShaderProperty();
+					//prepared buffer
+					GEngine->RenderEngine->SetRenderTarget(_depthSurfaceCube,slice);
+					GEngine->RenderEngine->ClearRenderSurface(_depthSurfaceCube, glm::vec4(0), true, 1.0f, false, 0,slice);
+					for (size_t j = 0; j < geometryList.size(); j++)
+					{
+						if (!geometryList[j]->GetGeometry()->CastShadow)
+							continue;
+
+						if (!light->Touch(geometryList[j]))
+							continue;
+
+						geometryList[j]->UpdateShaderProperty();
+						geometryList[j]->RenderShadow(camera, _DepthGenEffect);
+					}
+				}
+			}
 		}
 	}
  
-	void ShadowMap::RenderObject(const CameraPtr& camera, const LightPtr& light,const GeometryRendererPtr object)
-	{
-		if (light->LightType != LT_Point)
-		{
-			object->UpdateShaderProperty();
-			object->RenderShadow(camera, _DepthGenEffect);
-		}
-		else
-		{
-			object->UpdateShaderProperty();
-			object->RenderShadow(camera, _DepthCubeGenEffect);
-		}
-
-	}
 }

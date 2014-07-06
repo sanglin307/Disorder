@@ -40,10 +40,15 @@ namespace Disorder
 		static GLRenderTexture2DPtr Create(PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image, unsigned int flag);
 
 		virtual void * GetHandle();
+		const GLenum GetGLFormat() const
+		{
+			return _texFormat;
+		}
+
 	protected:
 		GLRenderTexture2D(int arraySize);
  
-		GLuint _texFormat;
+		GLenum _texFormat;
 		GLuint _texHandle;
 		 
 	};

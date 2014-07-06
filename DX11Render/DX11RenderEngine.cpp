@@ -845,7 +845,7 @@ namespace Disorder
 		_pImmediateContext->CopyResource((ID3D11Resource *)dstTexture->GetHandle(), (ID3D11Resource *)srcTexture->GetHandle());
 	}
 	 
-	void DX11RenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget,bool useReadOnlyDepthStencil)
+	void DX11RenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget, int sliceIndex,bool useReadOnlyDepthStencil)
 	{
 		std::vector<ID3D11RenderTargetView*> vRenderTarget;
 		ID3D11DepthStencilView* pDepthView = NULL;
@@ -860,15 +860,30 @@ namespace Disorder
 			if (i == SL_DepthStencil && pDepthView == NULL)
 			{
 				DX11SurfaceViewPtr dxDepthStencil = boost::dynamic_pointer_cast<DX11SurfaceView>(dxSurface->_surfacesViewArray[i]);
-				if (_featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil)
-					pDepthView = dxDepthStencil->ReadonlyDepthStencil.get();
+				if (sliceIndex < 0 || dxDepthStencil->DepthStencilHandleArray.size() == 0 )
+				{
+					if (_featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil)
+						pDepthView = dxDepthStencil->ReadonlyDepthStencil.get();
+					else
+						pDepthView = dxDepthStencil->DepthStencilHandle.get();
+				}
 				else
-					pDepthView = dxDepthStencil->DepthStencilHandle.get();
+				{
+					BOOST_ASSERT((size_t)sliceIndex < dxDepthStencil->DepthStencilHandleArray.size());
+					pDepthView = dxDepthStencil->DepthStencilHandleArray[sliceIndex].get();
+				}
 			}
 			else if (i >= SL_RenderTarget1 && i <= SL_RenderTarget8)
 			{
 				DX11SurfaceViewPtr dxRenderTarget = boost::dynamic_pointer_cast<DX11SurfaceView>(dxSurface->_surfacesViewArray[i]);
-				vRenderTarget.push_back((ID3D11RenderTargetView*)dxRenderTarget->RenderTargetHandle.get());
+				if (sliceIndex < 0 || dxRenderTarget->RenderTargetHandleArray.size() == 0)
+				{
+					vRenderTarget.push_back((ID3D11RenderTargetView*)dxRenderTarget->RenderTargetHandle.get());
+				}
+				else
+				{
+					vRenderTarget.push_back((ID3D11RenderTargetView*)dxRenderTarget->RenderTargetHandleArray[sliceIndex].get());
+				}
 			}
 		}
 	
@@ -876,14 +891,17 @@ namespace Disorder
 	 
 	}
 
-	void DX11RenderEngine::ClearRenderTarget(const SurfaceViewPtr& renderTarget,const glm::vec4& color )
+	void DX11RenderEngine::ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color, int sliceIndex)
 	{
 		DX11SurfaceViewPtr target = boost::dynamic_pointer_cast<DX11SurfaceView>(renderTarget);
-	    _pImmediateContext->ClearRenderTargetView((ID3D11RenderTargetView*)target->RenderTargetHandle.get(), glm::value_ptr(color));
+		if (sliceIndex < 0 || target->RenderTargetHandleArray.size() == 0)
+	        _pImmediateContext->ClearRenderTargetView((ID3D11RenderTargetView*)target->RenderTargetHandle.get(), glm::value_ptr(color));
+		else
+			_pImmediateContext->ClearRenderTargetView((ID3D11RenderTargetView*)target->RenderTargetHandleArray[sliceIndex].get(), glm::value_ptr(color));
 	}
 
 	 
-	void DX11RenderEngine::ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
+	void DX11RenderEngine::ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex)
 	{
 		DX11RenderSurfacePtr dxSurface = boost::dynamic_pointer_cast<DX11RenderSurface>(renderSurface);
 		for (size_t i = 0; i < SL_SurfaceLoactionMax; i++)
@@ -892,17 +910,17 @@ namespace Disorder
 			{
 				if (i == SL_DepthStencil)
 				{
-					ClearDepthStencil(dxSurface->_surfacesViewArray[i], bClearDepth, depth, bClearStencil, stencil);
+					ClearDepthStencil(dxSurface->_surfacesViewArray[i], bClearDepth, depth, bClearStencil, stencil,sliceIndex);
 				}
 				else
 				{
-					ClearRenderTarget(dxSurface->_surfacesViewArray[i], color);
+					ClearRenderTarget(dxSurface->_surfacesViewArray[i], color,sliceIndex);
 				}
 			}
 		}
 	}
 
-	void DX11RenderEngine::ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil)
+	void DX11RenderEngine::ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex)
 	{
 		unsigned int flag = 0;
 		if( bClearDepth )
@@ -912,7 +930,12 @@ namespace Disorder
 			flag |= D3D11_CLEAR_STENCIL;
 
 		DX11SurfaceViewPtr dxDepthStencil = boost::dynamic_pointer_cast<DX11SurfaceView>(depthBuffer); 
-		_pImmediateContext->ClearDepthStencilView((ID3D11DepthStencilView*)dxDepthStencil->DepthStencilHandle.get(), flag, depth, stencil);
+		if (sliceIndex < 0 || dxDepthStencil->DepthStencilHandleArray.size() == 0)
+		   _pImmediateContext->ClearDepthStencilView((ID3D11DepthStencilView*)dxDepthStencil->DepthStencilHandle.get(), flag, depth, stencil);
+		else
+		{
+			_pImmediateContext->ClearDepthStencilView((ID3D11DepthStencilView*)dxDepthStencil->DepthStencilHandleArray[sliceIndex].get(), flag, depth, stencil);
+		}
 			 
 	}
 

@@ -92,17 +92,7 @@ namespace Disorder
 
 			light->CalculateShadowMatrix();
 			// begin render depth
-			GEngine->RenderSurfaceCache->ShadowMapBuffer->PrepareRenderDepth(light);	
-			for (size_t j = 0; j < allGeometryList.size(); j++)
-			{
-				if (!allGeometryList[j]->GetGeometry()->CastShadow)
-					continue;
-
-				if (!light->Touch(allGeometryList[j]))
-					continue;
-
-				GEngine->RenderSurfaceCache->ShadowMapBuffer->RenderObject(camera,light, allGeometryList[j]);
-			}
+			GEngine->RenderSurfaceCache->ShadowMapBuffer->RenderDepth(camera,allGeometryList,light);	
 
 			// render object
 			GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
@@ -416,17 +406,7 @@ namespace Disorder
 
 			light->CalculateShadowMatrix();
 			// begin render depth
-			GEngine->RenderSurfaceCache->ShadowMapBuffer->PrepareRenderDepth(light);
-			for (size_t j = 0; j < allGeometryList.size(); j++)
-			{
-				if (!allGeometryList[j]->GetGeometry()->CastShadow)
-					continue;
-
-				if (!light->Touch(allGeometryList[j]))
-					continue;
-
-				GEngine->RenderSurfaceCache->ShadowMapBuffer->RenderObject(camera,light, allGeometryList[j]);
-			}
+			GEngine->RenderSurfaceCache->ShadowMapBuffer->RenderDepth(camera, allGeometryList, light);
 
 			// render object
 			GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);

@@ -1,0 +1,22 @@
+#version 330
+#extension GL_ARB_shading_language_include : require
+
+#include </common.gls>
+
+uniform sampler2D ScreenAATexture;
+
+in block
+{
+    noperspective vec2 UV;
+} In;
+
+out vec4 color;
+
+void main(void) 
+{
+	ivec2 screenPos = ivec2( In.UV.x * ScreenWidth, In.UV.y * ScreenHeight);
+
+	color.rgb = texelFetch(ScreenAATexture,screenPos,0).xyz;
+	color.a = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+}
+

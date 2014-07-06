@@ -27,12 +27,35 @@ namespace Disorder
 
 			 if (iter->first == SL_DepthStencil)
 			 {
-				 glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, (GLuint)iter->second->Resource->GetHandle(), 0);
+				 /*if (iter->second->Flag & SF_AsCubeMap)
+				 {
+					 GLuint handle = (GLuint)iter->second->Resource->GetHandle();
+					 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X, handle, 0);
+					 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, handle, 0);
+					 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, handle, 0);
+					 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, handle, 0);
+					 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, handle, 0);
+					 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, handle, 0);
+				 }
+				 else*/
+				    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, (GLuint)iter->second->Resource->GetHandle(), 0);
 			 }
 			 else if (iter->first >= SL_RenderTarget1 && iter->first <= SL_RenderTarget8)
 			 {
 				 GLenum loc = iter->first - SL_RenderTarget1 + GL_COLOR_ATTACHMENT0;
-				 glFramebufferTexture(GL_FRAMEBUFFER, loc, (GLuint)(GLuint)iter->second->Resource->GetHandle(), 0);
+
+				 /*if (iter->second->Flag & SF_AsCubeMap)
+				 {
+					 GLuint handle = (GLuint)iter->second->Resource->GetHandle();
+					 glFramebufferTexture2D(GL_FRAMEBUFFER, loc, GL_TEXTURE_CUBE_MAP_POSITIVE_X, handle, 0);
+					 glFramebufferTexture2D(GL_FRAMEBUFFER, loc, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, handle, 0);
+					 glFramebufferTexture2D(GL_FRAMEBUFFER, loc, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, handle, 0);
+					 glFramebufferTexture2D(GL_FRAMEBUFFER, loc, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, handle, 0);
+					 glFramebufferTexture2D(GL_FRAMEBUFFER, loc, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, handle, 0);
+					 glFramebufferTexture2D(GL_FRAMEBUFFER, loc, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, handle, 0);
+				 }
+				 else*/
+					 glFramebufferTexture(GL_FRAMEBUFFER, loc, (GLuint)iter->second->Resource->GetHandle(), 0);
 				 bHaveColorAttach = true;
 			 }
 

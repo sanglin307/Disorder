@@ -24,11 +24,11 @@ namespace Disorder
 
 		virtual void CreateViewport(void *hWnd) = 0;
 
-		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil) = 0;
+		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil,int sliceIndex = -1) = 0;
  
 		virtual void SetViewport(float width, float height, float minDepth, float maxDepth, float topX, float topY) = 0;
 
-		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,bool useReadOnlyDepthStencil = false) = 0;
+		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,int sliceIndex = -1,bool useReadOnlyDepthStencil = false) = 0;
 		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout) = 0;
 		virtual void SetPrimitiveTopology(TopologyType topologyType) = 0;
 

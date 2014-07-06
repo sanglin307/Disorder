@@ -27,7 +27,7 @@ SamplerState LineSampler;
 VS_OUTPUT VS(VS_INPUT input)
 {
 	VS_OUTPUT Output;
-	Output.Texcoord = float2(input.OffsetUV.z,1.f - input.OffsetUV.w);
+	Output.Texcoord = float2(input.OffsetUV.z,input.OffsetUV.w);
 
 	//compute vertices position in clip space
 	float4 vMVP = mul(CameraViewProj,float4(input.Position, 1.0));

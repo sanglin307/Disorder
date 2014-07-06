@@ -13,9 +13,13 @@ namespace Disorder
 		virtual void* GetHandle();
 
 		ID3D11DepthStencilViewPtr DepthStencilHandle;
+		std::vector<ID3D11DepthStencilViewPtr> DepthStencilHandleArray;
+
 		ID3D11DepthStencilViewPtr ReadonlyDepthStencil;
 		ID3D11ShaderResourceViewPtr ShaderResourceHandle;
 		ID3D11RenderTargetViewPtr RenderTargetHandle;
+		std::vector<ID3D11RenderTargetViewPtr> RenderTargetHandleArray;
+
 
 	private:
 		DX11SurfaceView(){};

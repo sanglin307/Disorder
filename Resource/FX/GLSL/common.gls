@@ -5,6 +5,7 @@ layout(std140) uniform SceneProperty
 	int    ShadowMapSize;
 	vec3 AmbientLowColor;
 	vec3 AmbientUpperColor;
+	float    LineRadius;
 
 };
 
@@ -42,7 +43,7 @@ layout(std140) uniform MaterialProperty
 
 uniform sampler2D DiffuseTexture;
 uniform sampler2D ShadowMapTexture2D;
-uniform samplerCube ShadowMapTextureCube;
+uniform sampler2DArray ShadowMapTextureCube;
 
 layout(std140) uniform DirectionLightProperty
 {
@@ -156,58 +157,45 @@ vec3 CalculateSpotLight(vec3 position, Material material)
 
 float PCFShadowCubeMap(vec3 position)
 {
-	mat4 selectShadowMat;
+	int selectTexture;
 	vec3 lightDir = normalize(position - PointLightPos);
 	vec3 dirValue = abs(lightDir);
 	if (dirValue.x > dirValue.y && dirValue.x > dirValue.z) // x is max component
 	{
-		//lightDir.z = -lightDir.z;   // right hand coordinate to left hand....
 		if (lightDir.x < 0)
-			selectShadowMat = ShadowMapViewArray[1];
+			selectTexture = 1;
 		else
-			selectShadowMat = ShadowMapViewArray[0];
+			selectTexture = 0;
 	}
 	else if (dirValue.y > dirValue.x && dirValue.y > dirValue.z) // y is max component
 	{
 		if (lightDir.y < 0)
 		{
-			selectShadowMat = ShadowMapViewArray[3];
-		//	lightDir.x = -lightDir.x;
+			selectTexture = 3;
 		}
 		else
 		{
-			selectShadowMat = ShadowMapViewArray[2];
-		//	lightDir.z = -lightDir.z;
+			selectTexture = 2;
 		}
 	}
 	else
 	{
-		//lightDir.x = -lightDir.x;
 		if (lightDir.z < 0)
 		{
-			selectShadowMat = ShadowMapViewArray[5];
+			selectTexture = 5;
 		}
 		else
 		{
-			selectShadowMat = ShadowMapViewArray[4];
+			selectTexture = 4;
 		}
 	}
 
-	vec4 posShadowMap = selectShadowMat * vec4(position, 1.0);
+	vec4 posShadowMap = ShadowMapViewArray[selectTexture] * vec4(position, 1.0);
 	posShadowMap = ShadowMapProj * posShadowMap;
 
 	vec3 UVD = posShadowMap.xyz / posShadowMap.w;
-	//UVD.xyz = 0.5 * UVD.xyz + 0.5;
-	//vec3 texPos = vec3(UVD.x,UVD.y,0);
-	//lightDir = vec3(1,0,0);
-	float depth =  texture(ShadowMapTextureCube,lightDir).r;
-
-	//return depth;
-
-	if (UVD.z >= depth)
-	    return 1.0f;
-	else
-	    return 0;
+	vec3 Pos = vec3(UVD.x,UVD.y,selectTexture);
+	return texture(ShadowMapTextureCube,Pos).r ; //< UVD.z ? 0.f : 1.0f;
 
 }
 

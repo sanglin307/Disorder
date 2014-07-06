@@ -64,18 +64,46 @@ namespace Disorder
 			RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(resource);
 			if (tex->ArraySize > 1)
 			{
-				if (tex->MultiSampleCount > 1)
+				if (flag & SF_MultiSliceView )
 				{
-					descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
-					descDSV.Texture2DMSArray.ArraySize = tex->ArraySize;
-					descDSV.Texture2DMSArray.FirstArraySlice = 0;
+					for (int index = 0; index<tex->ArraySize; index++)
+					{
+						if (tex->MultiSampleCount > 1)
+						{
+							descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
+							descDSV.Texture2DMSArray.ArraySize = 1;
+							descDSV.Texture2DMSArray.FirstArraySlice = index;
+						}
+						else
+						{
+							descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+							descDSV.Texture2DArray.ArraySize = 1;
+							descDSV.Texture2DArray.FirstArraySlice = index;
+							descDSV.Texture2DArray.MipSlice = 0;
+						}
+
+						HRESULT hr = renderEngine->D3DDevice()->CreateDepthStencilView((ID3D11Resource *)resource->GetHandle(), &descDSV, &pDepthStencilView);
+						BOOST_ASSERT(SUCCEEDED(hr));
+						pSurface->DepthStencilHandleArray.push_back(MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView));
+					}
+
+					return DX11SurfaceViewPtr(pSurface);
 				}
 				else
 				{
-					descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
-					descDSV.Texture2DArray.ArraySize = tex->ArraySize;
-					descDSV.Texture2DArray.FirstArraySlice = 0;
-					descDSV.Texture2DArray.MipSlice = 0;
+					if (tex->MultiSampleCount > 1)
+					{
+						descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
+						descDSV.Texture2DMSArray.ArraySize = tex->ArraySize;
+						descDSV.Texture2DMSArray.FirstArraySlice = 0;
+					}
+					else
+					{
+						descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+						descDSV.Texture2DArray.ArraySize = tex->ArraySize;
+						descDSV.Texture2DArray.FirstArraySlice = 0;
+						descDSV.Texture2DArray.MipSlice = 0;
+					}
 				}
 			}
 			else
@@ -119,20 +147,63 @@ namespace Disorder
 
 			if (tex->ArraySize > 1)
 			{
-				if (tex->MultiSampleCount > 1)
-					SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+				if (flag & SF_MultiSliceView)
+				{
+					for (int index = 0; index<tex->ArraySize; index++)
+					{
+						if (tex->MultiSampleCount > 1)
+						{
+							SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+							SRVDesc.Texture2DMSArray.ArraySize = 1;
+							SRVDesc.Texture2DMSArray.FirstArraySlice = index;
+						}
+						else
+						{
+							SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+							SRVDesc.Texture2DArray.ArraySize = 1;
+							SRVDesc.Texture2DArray.FirstArraySlice = index;
+							SRVDesc.Texture2DArray.MipSlice = 0;
+						}
+
+						HRESULT hr = renderEngine->D3DDevice()->CreateRenderTargetView((ID3D11Resource *)resource->GetHandle(), &SRVDesc, &pRenderTargetView);
+						BOOST_ASSERT(SUCCEEDED(hr));
+						pSurface->RenderTargetHandleArray.push_back(MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView));
+						
+					}
+
+					return DX11SurfaceViewPtr(pSurface);
+				}
 				else
-					SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+				{
+					if (tex->MultiSampleCount > 1)
+					{
+						SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+						SRVDesc.Texture2DMSArray.ArraySize = tex->ArraySize;
+						SRVDesc.Texture2DMSArray.FirstArraySlice = 0;
+					}
+					else
+					{
+						SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+						SRVDesc.Texture2DArray.ArraySize = tex->ArraySize;
+						SRVDesc.Texture2DArray.FirstArraySlice = 0;
+						SRVDesc.Texture2DArray.MipSlice = 0;
+					}
+				}
 			}
 			else
 			{
 				if (tex->MultiSampleCount > 1)
+				{
 					SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+				}
 				else
+				{
 					SRVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+					SRVDesc.Texture2D.MipSlice = 0;
+				}
 			}
 			
-			SRVDesc.Texture2D.MipSlice = 0;
+			
 			HRESULT hr = renderEngine->D3DDevice()->CreateRenderTargetView((ID3D11Resource *)resource->GetHandle(), &SRVDesc, &pRenderTargetView);
 			BOOST_ASSERT(SUCCEEDED(hr));
 			pSurface->RenderTargetHandle = MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView);

@@ -50,6 +50,12 @@
     <Filter Include="GLSL\Skybox">
       <UniqueIdentifier>{6138af05-5fe0-4ed0-81c7-0b6717d1adca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GLSL\FXAA">
+      <UniqueIdentifier>{9628df45-6c60-47f1-9ecd-9fae87c70777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLSL\VolumeLines">
+      <UniqueIdentifier>{e7e78a41-cf87-4ea9-b1ae-9c3dd975cd5a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="TodoList.txt" />
@@ -70,15 +76,6 @@
     </None>
     <None Include="..\Resource\FX\GLSL\BatchLines\VS.glvs">
       <Filter>GLSL\BatchLines</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\DeferredShading\BaseLightingPS.glfs">
-      <Filter>GLSL\DeferredShading</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\DeferredShading\FourLightingPS.glfs">
-      <Filter>GLSL\DeferredShading</Filter>
-    </None>
-    <None Include="..\Resource\FX\GLSL\DeferredShading\LightingVS.glvs">
-      <Filter>GLSL\DeferredShading</Filter>
     </None>
     <None Include="..\Resource\FX\GLSL\DeferredShading\ScenePS.glfs">
       <Filter>GLSL\DeferredShading</Filter>
@@ -163,6 +160,39 @@
     </None>
     <None Include="..\Resource\FX\HLSL\VolumeLines.hlsl">
       <Filter>HLSL</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\FXAA\VS.glvs">
+      <Filter>GLSL\FXAA</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\FXAA\PS.glfs">
+      <Filter>GLSL\FXAA</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\FXAA\PrepareSurfacePS.glfs">
+      <Filter>GLSL\FXAA</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\VolumeLines\VS.glvs">
+      <Filter>GLSL\VolumeLines</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\VolumeLines\PS.glfs">
+      <Filter>GLSL\VolumeLines</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\FXAA\Fxaa3_11.h">
+      <Filter>GLSL\FXAA</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\DeferredShading\BasePassPS.glfs">
+      <Filter>GLSL\DeferredShading</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\DeferredShading\DirectionLightingPS.glfs">
+      <Filter>GLSL\DeferredShading</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\DeferredShading\PointLightingPS.glfs">
+      <Filter>GLSL\DeferredShading</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\DeferredShading\SpotLightingPS.glfs">
+      <Filter>GLSL\DeferredShading</Filter>
+    </None>
+    <None Include="..\Resource\FX\GLSL\DeferredShading\LightingVS.glvs">
+      <Filter>GLSL\DeferredShading</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

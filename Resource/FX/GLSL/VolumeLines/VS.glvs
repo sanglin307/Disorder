@@ -1,0 +1,39 @@
+#version 330
+#extension GL_ARB_shading_language_include : require
+
+#include </common.gls>
+
+layout (location = 0) in vec3 Position;
+layout (location = 1) in vec3 PositionOther;
+layout (location = 2) in vec4 OffsetUV;
+layout (location = 3) in vec3 Color;
+
+out block 
+{
+  vec2 Texcoord;
+  vec3 Color;
+} Out;
+ 
+ void main(void)
+ { 
+	Out.Texcoord = OffsetUV.zw;
+
+	//compute vertices position in clip space
+	vec4 vMVP     = CameraViewProj * vec4(Position,1.0);
+	vec4 otherMVP = CameraViewProj * vec4(PositionOther,1.0);
+
+	//  line direction in screen space (perspective division required)
+	vec2 lineDirProj = LineRadius * normalize(vMVP.xy/vMVP.ww - otherMVP.xy/otherMVP.ww);
+
+	// small trick to avoid inversed line condition when points are not on the same side of Z plane
+	if( sign(otherMVP.w) != sign(vMVP.w) )
+		lineDirProj = -lineDirProj;
+
+	float invSrcRatio = ScreenWidth * 1.f / ScreenHeight;
+	// offset position in screen space along line direction and orthogonal direction
+	vMVP.xy += lineDirProj.xy					* OffsetUV.xx * vec2(1.0,invSrcRatio);
+	vMVP.xy += lineDirProj.yx*vec2(1.0,-1.0)	* OffsetUV.yy * vec2(1.0,invSrcRatio);
+
+	Out.Color = Color;
+	gl_Position = vMVP;
+ }
