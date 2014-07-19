@@ -1,7 +1,6 @@
 
 #version 330
 #extension GL_ARB_shading_language_include : require
-#extension GL_EXT_gpu_shader4 : enable
 
 #include </common.gls>
 
@@ -12,7 +11,7 @@ in block
 	vec2 UV0;
 }In;
 
-out vec4 Color;
+out vec4 color;
  
 void main(void)
 {
@@ -22,8 +21,10 @@ void main(void)
 	// Calculate the spot light color
 	vec3 finalColor = CalculateSpotLight(In.PositionWorld, material);
 
-	float shadowValue = PCFShadow(In.PositionWorld);
-
+	float shadowValue = 1.f;
+	if(SpotLightCastShadow)
+	   shadowValue = PCFShadow(In.PositionWorld);
+	
 	// Return the final color
-	Color = vec4(finalColor * shadowValue, 1.0);
+	color = vec4(finalColor * shadowValue, 1.0);
 }

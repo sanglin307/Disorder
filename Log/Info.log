@@ -1,0 +1,101 @@
+FBX file format version for file Mangonel.FBX is 7,2,0
+Shader Object :VolumeLines:main
+Shader Object :BatchLines:main
+Shader Object :FXAA:main
+Shader Object :Skybox:main
+Shader Object :2DText:main
+Shader Object :VolumeLines:main
+Shader Object :ShadowMap:main
+Shader Object :FXAA:main
+Shader Object :Skybox:main
+Shader Object :BatchLines:main
+Shader Object :ShadowMap:main
+Shader Object :DeferredShading:main
+Shader Object :SurfaceVisual:main
+Shader Object :SurfaceVisual:main
+Shader Object :DeferredShading:main
+Shader Object :2DText:main
+Shader Object :DeferredShading:main
+Shader Object :DeferredShading:main
+Shader Object :DeferredShading:main
+Shader Object :DeferredShading:main
+Shader Object :DeferredShading:main
+Shader Object :ShadowMap:main
+Shader Object :FXAA:main
+Shader Object :ShadowMap:main
+Shader Property Manager Name :Global
+ ****** Shader Property :DiffuseSampler
+ ****** Shader Property :SkyboxSampler
+ ****** Shader Property :LineTexture
+ ****** Shader Property :TextTexture
+ ****** Shader Property :ScreenAATexture
+ ****** Shader Property :SurfaceSampler
+ ****** Shader Property :GBufferColorSpecIntTexture
+ ****** Shader Property :SurfaceVisTex
+ ****** Shader Property :ShadowMapTextureCube
+ ****** Shader Property :GBufferSpecPowTexture
+ ****** Shader Property :SpotLightProperty
+ ****** Shader Property :GBufferNormalTexture
+ ****** Shader Property :DirectionLightProperty
+ ****** Shader Property :SceneProperty
+ ****** Shader Property :SkyboxTexture
+ ****** Shader Property :GBufferDepthTexture
+ ****** Shader Property :DiffuseTexture
+ ****** Shader Property :ShadowMapGen
+ ****** Shader Property :PointLightProperty
+ ****** Shader Property :ScreenAASampler
+ ****** Shader Property :ObjectTransform
+ ****** Shader Property :TextSampler
+ ****** Shader Property :LineSampler
+ ****** Shader Property :MaterialProperty
+ ****** Shader Property :CameraTransforms
+ ****** Shader Property :ShadowSampler
+ ****** Shader Property :ShadowMapTexture2D
+Shader Property Manager Name :SceneProperty
+ ****** Shader Property :ScreenWidth
+ ****** Shader Property :ScreenHeight
+ ****** Shader Property :ShadowMapSize
+ ****** Shader Property :LineRadius
+ ****** Shader Property :AmbientUpperColor
+ ****** Shader Property :AmbientLowColor
+Shader Property Manager Name :SpotLightProperty
+ ****** Shader Property :SpotLightRangeRcp
+ ****** Shader Property :SpotLightPos
+ ****** Shader Property :SpotLightIntensity
+ ****** Shader Property :SpotLightDir
+ ****** Shader Property :SpotLightCosOuterCone
+ ****** Shader Property :SpotLightColor
+ ****** Shader Property :SpotLightCosInnerCone
+ ****** Shader Property :SpotLightCastShadow
+Shader Property Manager Name :ShadowMapGen
+ ****** Shader Property :ShadowMapProj
+ ****** Shader Property :ShadowMapViewArray
+ ****** Shader Property :ShadowMapView
+Shader Property Manager Name :PointLightProperty
+ ****** Shader Property :PointLightRangeRcp
+ ****** Shader Property :PointLightPos
+ ****** Shader Property :PointLightIntensity
+ ****** Shader Property :PointLightColor
+ ****** Shader Property :PointLightCastShadow
+Shader Property Manager Name :DirectionLightProperty
+ ****** Shader Property :DirectionLightIntensity
+ ****** Shader Property :DirectionLightDir
+ ****** Shader Property :DirectionLightColor
+ ****** Shader Property :DirectionLightCastShadow
+Shader Property Manager Name :MaterialProperty
+ ****** Shader Property :Transparency
+ ****** Shader Property :SpecularExp
+ ****** Shader Property :SpecularColor
+ ****** Shader Property :EmissiveColor
+ ****** Shader Property :DiffuseColor
+Shader Property Manager Name :ObjectTransform
+ ****** Shader Property :WorldTransform
+ ****** Shader Property :WorldNormalTransform
+Shader Property Manager Name :CameraTransforms
+ ****** Shader Property :CameraViewProjInv
+ ****** Shader Property :CameraViewProj
+ ****** Shader Property :CameraViewInv
+ ****** Shader Property :CameraView
+ ****** Shader Property :CameraProjInv
+ ****** Shader Property :CameraProjection
+ ****** Shader Property :CameraPosition

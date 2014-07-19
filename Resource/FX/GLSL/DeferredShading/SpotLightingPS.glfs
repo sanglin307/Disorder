@@ -25,7 +25,9 @@ void main(void)
 
 	vec3 finalColor = CalculateSpotLight(position, mat);
 
-	float shadowValue = PCFShadow(position);
+	float shadowValue = 1.f;
+	if(SpotLightCastShadow)
+	   shadowValue = PCFShadow(position);
 
 	// Return the final color
 	color = vec4(finalColor * shadowValue, 1.0);

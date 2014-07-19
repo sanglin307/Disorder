@@ -123,6 +123,7 @@
     <None Include="..\Resource\FX\GLSL\FXAA\VS.glvs" />
     <None Include="..\Resource\FX\GLSL\ShadowMap\DepthCubeMapGS.glgs" />
     <None Include="..\Resource\FX\GLSL\ShadowMap\DepthCubeMapVS.glvs" />
+    <None Include="..\Resource\FX\GLSL\ShadowMap\DepthPixelShader.glfs" />
     <None Include="..\Resource\FX\GLSL\ShadowMap\DepthVertexShader.glvs" />
     <None Include="..\Resource\FX\GLSL\Skybox\PS.glfs" />
     <None Include="..\Resource\FX\GLSL\Skybox\VS.glvs" />

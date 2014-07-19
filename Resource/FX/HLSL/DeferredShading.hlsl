@@ -168,12 +168,15 @@ float4 DirectionLightingPS(LightVSOutput In) : SV_TARGET
 
 	// Reconstruct the world position
 	float3 position = CalculateWorldPos(In.ScreenPos, gbd.Depth);
- 
+
 	// Calculate the directional light
 	float3 finalColor = CalculateDirectionLight(position, mat);
 
 	// Return the final color
-	float shadowValue = PCFShadow(position);
+	float shadowValue = 1.f;
+
+	if (DirectionLightCastShadow)
+		shadowValue = PCFShadow(position);
 
 	return float4(finalColor * shadowValue, 1.0f);
 }
@@ -193,7 +196,9 @@ float4 SpotLightingPS(LightVSOutput In) : SV_TARGET
 	float3 finalColor = CalculateSpotLight(position, mat);
 
 		// Return the final color
-	float shadowValue = PCFShadow(position);
+	float shadowValue = 1.f;
+	if (SpotLightCastShadow)
+		shadowValue = PCFShadow(position);
 
 	return float4(finalColor * shadowValue, 1.0f);
 }
@@ -209,10 +214,12 @@ float4 PointLightingPS(LightVSOutput In) : SV_TARGET
 
 	// Reconstruct the world position
 	float3 position = CalculateWorldPos(In.ScreenPos, gbd.Depth);
- 
+
 	float3 finalColor = CalculatePointLight(position, mat);
 
-	float shadowValue = PCFShadowCubeMap(position);
+	float shadowValue = 1.f;
+	if (PointLightCastShadow)
+		shadowValue = PCFShadowCubeMap(position);
 
 	return float4(finalColor*shadowValue, 1.0f);
 }

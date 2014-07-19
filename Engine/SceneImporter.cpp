@@ -982,11 +982,6 @@ namespace Disorder
 						//Opacity is Transparency factor now
 						material->Transparency = (float)(lPhoneMaterial->TransparencyFactor.Get());
 
-						// Display the Shininess
-						material->SpecularExp = (float)lPhoneMaterial->Shininess.Get();
-						if (material->SpecularExp > 10)
-							material->SpecularExp = 10;
-
 						//textures
 						ProcessTextures(lPhoneMaterial, material);
 

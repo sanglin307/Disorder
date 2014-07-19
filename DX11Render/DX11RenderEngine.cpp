@@ -220,7 +220,7 @@ namespace Disorder
 		D3D11_MAP flag = D3D11_MAP_WRITE;
 		if( bufferAccess == BA_Read_Only )
 			flag = D3D11_MAP_READ;
-		else if( bufferAccess == BA_Write_Only)
+		else if (bufferAccess == BA_Write_Only)
 			flag = D3D11_MAP_WRITE_DISCARD;
 		else if( bufferAccess == BA_Read_Write)
 			flag = D3D11_MAP_READ_WRITE;

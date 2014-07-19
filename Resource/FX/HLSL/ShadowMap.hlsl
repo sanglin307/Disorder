@@ -28,6 +28,7 @@ float4 DepthVertexShader(VS_INPUT input) : SV_Position
 }
  
 
+
 float4 DepthCubeMapVS(VS_INPUT input) : SV_Position
 {
 	float4 position = float4(input.Position, 1.f);

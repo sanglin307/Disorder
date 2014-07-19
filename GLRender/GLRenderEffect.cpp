@@ -332,6 +332,30 @@ namespace Disorder
 			length = 4;
 			size = sizeof(GLint)* length;
 		}
+		else if (type == GL_BOOL)
+		{
+			propertyType = eSP_Bool;
+			length = 1;
+			size = sizeof(GLboolean)* length;
+		}
+		else if (type == GL_BOOL_VEC2)
+		{
+			propertyType = eSP_Bool;
+			length = 2;
+			size = sizeof(GLboolean)* length;
+		}
+		else if (type == GL_BOOL_VEC3)
+		{
+			propertyType = eSP_Bool;
+			length = 3;
+			size = sizeof(GLboolean)* length;
+		}
+		else if (type == GL_BOOL_VEC4)
+		{
+			propertyType = eSP_Bool;
+			length = 4;
+			size = sizeof(GLboolean)* length;
+		}
 		else if (GLRenderEngine::IsTextureSamplerResouce(type))
 		{
 			propertyType = eSP_ShaderResource;
@@ -580,20 +604,19 @@ namespace Disorder
 		if (!_uniformBlock)
 			return;
 
-		if (!_content)
-			_content = new BYTE[_uniformBlock->BlockSize];
-
-		BYTE* pDest = _content;
+		RenderBufferPtr renderbuffer = _uniformBlock->BufferParamRef->GetDataAsConstBuffer();
+		BYTE *constBuffer = (BYTE*)GEngine->RenderEngine->Map(renderbuffer, BA_Write_Only);
+		BYTE* pDest = constBuffer;
 		for (unsigned int j = 0; j<_uniformBlock->Members.size(); j++)
 		{
 			GLShaderResourceBinding* vaDesc = &(_uniformBlock->Members[j]);
-			pDest = _content + vaDesc->Offset;
+			pDest = constBuffer + vaDesc->Offset;
 			void *pSrc = vaDesc->ParamRef->GetData();
 			memcpy(pDest, pSrc, vaDesc->Size);
 		}
 
-		GEngine->RenderEngine->UpdateSubresource(_uniformBlock->BufferParamRef->GetDataAsConstBuffer(), _content, _uniformBlock->BlockSize);
-		 
+		GEngine->RenderEngine->UnMap(renderbuffer);
+
 	}
 
 	GLShaderPropertyManager::~GLShaderPropertyManager()

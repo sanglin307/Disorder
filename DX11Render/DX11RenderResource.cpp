@@ -221,13 +221,8 @@ namespace Disorder
 		}
 		else if(_bufferUsage == BU_DynamicDraw )
 		{		
-			if( _type == RBT_Constant )
-				usage = D3D11_USAGE_DEFAULT;
-			else
-			{
-				usage = D3D11_USAGE_DYNAMIC;
-				cpuAccessFlags |= D3D11_CPU_ACCESS_WRITE;
-			}
+			usage = D3D11_USAGE_DYNAMIC;
+			cpuAccessFlags |= D3D11_CPU_ACCESS_WRITE; 
 		}
 		else if(_bufferUsage == BU_StreamRead )
 		{

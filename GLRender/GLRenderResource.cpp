@@ -257,7 +257,6 @@ namespace Disorder
 		{ 
 	        unsigned int w = Math::LogTwo(width);
 			unsigned int h = Math::LogTwo(height);
-
 			pTexture->MipLevel = w > h ? h : w;
 		}
 		else
@@ -271,10 +270,7 @@ namespace Disorder
 		{
 			glFormat = GL_DEPTH_COMPONENT;
 			if (storageFormat == GL_R32F)
-			{
 				storageFormat = GL_DEPTH_COMPONENT32F;
-				//glType = GL_UNSIGNED_INT;
-			}
 			else if (storageFormat == GL_R16)
 				storageFormat = GL_DEPTH_COMPONENT16;
 		}
@@ -282,8 +278,6 @@ namespace Disorder
 		if (arraySize == 6 && (flag & SF_AsCubeMap) )
 		{
 			pTexture->_texFormat = GL_TEXTURE_CUBE_MAP;
-			if (pData == NULL || pData->Data == NULL)
-				pTexture->_texFormat = GL_TEXTURE_2D_ARRAY;
 		}
 		else if (arraySize > 1)
 		{

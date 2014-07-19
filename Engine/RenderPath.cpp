@@ -8,12 +8,14 @@ namespace Disorder
 		_DirectionLightIntensityProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightIntensity,eSP_Float,1);
 		_DirectionLightDirProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightDir,eSP_Float,3);
 		_DirectionLightColorProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightColor,eSP_Float,3);
+		_DirectionLightCastShadowProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightCastShadow, eSP_Bool,1);
 
 		_PointLightPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerPointLight);
 		_PointLightPosProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightPos,eSP_Float,3);
 		_PointLightColorProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightColor, eSP_Float, 3);
 		_PointLightRangeRcpProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightRangeRcp, eSP_Float, 1);
 		_PointLightIntensityProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightIntensity, eSP_Float, 1);
+		_PointLightCastShadowProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightCastShadow, eSP_Bool, 1);
 
 		_SpotLightPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerSpotLight);
 		_SpotLightPosProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightPos,eSP_Float,3);
@@ -22,7 +24,8 @@ namespace Disorder
 		_SpotLightIntensityProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightIntensity, eSP_Float, 1);
 		_SpotLightRangeRcpProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightRangeRcp, eSP_Float, 1);
 		_SpotLightCosOuterConeProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightCosOuterCone, eSP_Float, 1);
-		_SpotLightCosInnerConeRcpProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightCosInnerConeRcp, eSP_Float, 1);
+		_SpotLightCosInnerConeProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightCosInnerCone, eSP_Float, 1);
+		_SpotLightCastShadowProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightCastShadow, eSP_Bool, 1);
 
 
 	}
@@ -34,6 +37,7 @@ namespace Disorder
 		glm::vec3 dir = directionLight->GetDirection();
 		_DirectionLightDirProperty->SetData(glm::value_ptr(dir));
 		_DirectionLightColorProperty->SetData(glm::value_ptr(directionLight->Color));
+		_DirectionLightCastShadowProperty->SetData(&(directionLight->CastShadows));
 
 		_DirectionLightPropertyManager->UpdateShaderProperty();
 	}
@@ -46,6 +50,7 @@ namespace Disorder
 		float rangeRcp = 1.0f / pointLight->Range;
 		_PointLightRangeRcpProperty->SetData(&rangeRcp);
 		_PointLightIntensityProperty->SetData(&pointLight->Intensity);
+		_PointLightCastShadowProperty->SetData(&(pointLight->CastShadows));
 		_PointLightPropertyManager->UpdateShaderProperty();
 	}
 
@@ -55,7 +60,7 @@ namespace Disorder
 		glm::vec3 spotDir = spotLight->GetDirection();
 
 		float rangeRcp = 1.0f / spotLight->Range;
-		float innerRcp = 1.0f / Math::Cosf(spotLight->SpotInnerAngle);
+		float inner = Math::Cosf(spotLight->SpotInnerAngle);
 		float outerCone = Math::Cosf(spotLight->SpotOuterAngle);
 
 		_SpotLightPosProperty->SetData(glm::value_ptr(spotPos));
@@ -63,8 +68,9 @@ namespace Disorder
 		_SpotLightColorProperty->SetData(glm::value_ptr(spotLight->Color));
 		_SpotLightRangeRcpProperty->SetData(&rangeRcp);
 		_SpotLightCosOuterConeProperty->SetData(&outerCone);
-		_SpotLightCosInnerConeRcpProperty->SetData(&innerRcp);
+		_SpotLightCosInnerConeProperty->SetData(&inner);
 		_SpotLightIntensityProperty->SetData(&spotLight->Intensity);
+		_SpotLightCastShadowProperty->SetData(&(spotLight->CastShadows));
 		_SpotLightPropertyManager->UpdateShaderProperty();
 
 	}
@@ -82,23 +88,23 @@ namespace Disorder
 		std::vector<GeometryRendererPtr> allGeometryList;
 		GSceneManager->GetRendererList(allGeometryList);
 
-		for (size_t i = 0; i < lightList.size(); i++)
+		for (size_t iLight = 0; iLight < lightList.size(); iLight++)
 		{
-			LightPtr light = lightList[i];
+			LightPtr light = lightList[iLight];
 
 			// render shadow
-			if (!light->CastShadows)
-				continue;
+			if (light->CastShadows)
+			{
+				light->CalculateShadowMatrix();
+				// begin render depth
+				GEngine->RenderSurfaceCache->ShadowMapBuffer->RenderDepth(camera, allGeometryList, light);
 
-			light->CalculateShadowMatrix();
-			// begin render depth
-			GEngine->RenderSurfaceCache->ShadowMapBuffer->RenderDepth(camera,allGeometryList,light);	
+				// render object
+				GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
+				GEngine->RenderEngine->SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
+			}
 
-			// render object
-			GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
-			GEngine->RenderEngine->SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
-			GEngine->RenderSurfaceCache->ShadowMapBuffer->PrepareRenderLight(light);
-
+			GEngine->RenderSurfaceCache->ShadowMapBuffer->PrepareRenderLight(light); 
 			if (light->LightType == LT_Directional)
 			{
 				DirectionLightPtr dirLight = boost::dynamic_pointer_cast<DirectionLight>(light);
@@ -115,9 +121,9 @@ namespace Disorder
 				SetSpotLight(spotLight);
 			}
 
-			for (unsigned int i = 0; i < renderList.size(); i++)
+			for (unsigned int iObj = 0; iObj < renderList.size(); iObj++)
 			{
-				GeometryRendererPtr obj = renderList[i];
+				GeometryRendererPtr obj = renderList[iObj];
 				if (!light->Touch(obj))
 					continue;
 				obj->UpdateShaderProperty();
@@ -401,16 +407,18 @@ namespace Disorder
 			LightPtr light = lightList[i];
 
 			// render shadow
-			if (!light->CastShadows)
-				continue;
+			if (light->CastShadows)
+			{
+				light->CalculateShadowMatrix();
+				// begin render depth
+				GEngine->RenderSurfaceCache->ShadowMapBuffer->RenderDepth(camera, allGeometryList, light);
 
-			light->CalculateShadowMatrix();
-			// begin render depth
-			GEngine->RenderSurfaceCache->ShadowMapBuffer->RenderDepth(camera, allGeometryList, light);
+				// render object
+				GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
+				GEngine->RenderEngine->SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
+			}
+			
 
-			// render object
-			GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
-			GEngine->RenderEngine->SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
 			GEngine->RenderSurfaceCache->ShadowMapBuffer->PrepareRenderLight(light);
 
 			if (light->LightType == LT_Directional)
@@ -445,6 +453,7 @@ namespace Disorder
 		if( mainCamera == NULL )
 			return;
 
+		GSceneManager->UpdateBoundingBox();
 		GEngine->RenderEngine->OnFrameBegin();
 
 		GSceneManager->UpdateShaderProperty();
@@ -483,9 +492,8 @@ namespace Disorder
 		GSceneManager->DebugDraw();
 		GEngine->Stat.DrawStat();
 
-		GEngine->RenderSurfaceCache->GBuffer->DebugVisual();
-
 		GEngine->GameCanvas->RenderLines(mainCamera);
+ 
 
 		// postprocess not include the string renders.
 		if (GConfig->pRenderConfig->FXAA)
@@ -497,6 +505,8 @@ namespace Disorder
 		// the last ... render string.
 
 		GEngine->GameCanvas->RenderStrings(mainCamera);
+
+		GEngine->RenderSurfaceCache->GBuffer->DebugVisual();
 
 		GEngine->RenderEngine->SetEffect(NULL);
 		GEngine->RenderEngine->OnFrameEnd();

@@ -10,6 +10,8 @@ namespace Disorder
 	{
 		if( PropertyType == eSP_Int )
 			_data = new int[length];
+		else if (PropertyType == eSP_Bool)
+			_data = new bool[length];
 		else if(PropertyType == eSP_Float )
 			_data = new float[length];
 		else if(PropertyType == eSP_Double )
@@ -26,7 +28,7 @@ namespace Disorder
 
 	ShaderProperty::~ShaderProperty()
 	{
-		if( PropertyType == eSP_Int || PropertyType == eSP_Float || PropertyType == eSP_Double )
+		if( PropertyType == eSP_Int || PropertyType == eSP_Float || PropertyType == eSP_Double || PropertyType == eSP_Bool )
 			delete[] _data;
 		else if(PropertyType == eSP_ConstBuffer)
 			delete (RenderBufferPtr *)_data;
@@ -42,6 +44,9 @@ namespace Disorder
 	{
 		switch(PropertyType)
 		{
+		    case eSP_Bool:
+			   memset(_data, 0, sizeof(bool)*_length);
+			   break;
 			case eSP_Int:
 				memset(_data,0,sizeof(int)*_length);
 				break;
@@ -64,6 +69,12 @@ namespace Disorder
 	{
 		BOOST_ASSERT(PropertyType == eSP_Int);
 		memcpy(_data,data,sizeof(int)*_length);
+	}
+
+	void ShaderProperty::SetData(bool* data)
+	{
+		BOOST_ASSERT(PropertyType == eSP_Bool);
+		memcpy(_data, data, sizeof(bool)*_length);
 	}
 
 	void ShaderProperty::SetData(float* data)
@@ -190,6 +201,7 @@ namespace Disorder
     const std::string ShaderPropertyManager::sDirectionLightIntensity = "DirectionLightIntensity";
     const std::string ShaderPropertyManager::sDirectionLightDir = "DirectionLightDir";
     const std::string ShaderPropertyManager::sDirectionLightColor = "DirectionLightColor";
+	const std::string ShaderPropertyManager::sDirectionLightCastShadow = "DirectionLightCastShadow";
  
 	 
 	// point light
@@ -197,6 +209,7 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sPointLightColor = "PointLightColor";
 	const std::string ShaderPropertyManager::sPointLightIntensity = "PointLightIntensity";
 	const std::string ShaderPropertyManager::sPointLightRangeRcp = "PointLightRangeRcp";
+	const std::string ShaderPropertyManager::sPointLightCastShadow = "PointLightCastShadow";
 
 	// spot light
 	const std::string ShaderPropertyManager::sSpotLightPos = "SpotLightPos";
@@ -205,7 +218,8 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sSpotLightIntensity = "SpotLightIntensity";
 	const std::string ShaderPropertyManager::sSpotLightRangeRcp = "SpotLightRangeRcp";
 	const std::string ShaderPropertyManager::sSpotLightCosOuterCone = "SpotLightCosOuterCone";
-	const std::string ShaderPropertyManager::sSpotLightCosInnerConeRcp = "SpotLightCosInnerConeRcp";
+	const std::string ShaderPropertyManager::sSpotLightCosInnerCone = "SpotLightCosInnerCone";
+	const std::string ShaderPropertyManager::sSpotLightCastShadow = "SpotLightCastShadow";
 
 	// scene ambient
 	const std::string ShaderPropertyManager::sAmbientLowColor = "AmbientLowColor";
@@ -263,9 +277,7 @@ namespace Disorder
 
 	ShaderPropertyManager::~ShaderPropertyManager()
 	{
-		if (_content != 0)
-			delete[] _content;
-		_content = 0;
+		
 
 	}
 

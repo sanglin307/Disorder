@@ -26,12 +26,14 @@ namespace Disorder
 		ShaderPropertyPtr _DirectionLightIntensityProperty;
 		ShaderPropertyPtr _DirectionLightDirProperty;
 		ShaderPropertyPtr _DirectionLightColorProperty;
+		ShaderPropertyPtr _DirectionLightCastShadowProperty;
 
 		ShaderPropertyManagerPtr _PointLightPropertyManager;
 		ShaderPropertyPtr _PointLightPosProperty;
 		ShaderPropertyPtr _PointLightColorProperty;
 		ShaderPropertyPtr _PointLightIntensityProperty;
 		ShaderPropertyPtr _PointLightRangeRcpProperty;
+		ShaderPropertyPtr _PointLightCastShadowProperty;
 
 		ShaderPropertyManagerPtr _SpotLightPropertyManager;
 		ShaderPropertyPtr _SpotLightPosProperty;
@@ -40,7 +42,8 @@ namespace Disorder
 		ShaderPropertyPtr _SpotLightIntensityProperty;
 		ShaderPropertyPtr _SpotLightRangeRcpProperty;
 		ShaderPropertyPtr _SpotLightCosOuterConeProperty;
-		ShaderPropertyPtr _SpotLightCosInnerConeRcpProperty;
+		ShaderPropertyPtr _SpotLightCosInnerConeProperty;
+		ShaderPropertyPtr _SpotLightCastShadowProperty;
  
 	 
 		RenderPathType _type;

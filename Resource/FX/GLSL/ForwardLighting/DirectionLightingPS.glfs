@@ -23,9 +23,10 @@ void main(void)
 
 	vec3 finalColor = CalculateDirectionLight(In.PositionWorld,mat);
 
-	float shadowValue = PCFShadow(In.PositionWorld);
+	float shadowValue = 1.f;
+	if( DirectionLightCastShadow )
+	  shadowValue = PCFShadow(In.PositionWorld);
 
-	//Color = vec4(shadowValue,shadowValue,shadowValue,1.0);
     Color = vec4(finalColor * shadowValue,1.0f);
 }
 

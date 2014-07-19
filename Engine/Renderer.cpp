@@ -370,10 +370,10 @@ namespace Disorder
 		BlendStatePtr blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc, 1);
 		_renderEffect->BindBlendState(blendState);
 
-		DepthStencilDesc dDesc;
-		dDesc.DepthEnable = false;
-		DepthStencilStatePtr depthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dDesc, 0);
-		_renderEffect->BindDepthStencilState(depthState);
+		//DepthStencilDesc dDesc;
+		//dDesc.DepthEnable = false;
+		//DepthStencilStatePtr depthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dDesc, 0);
+		//_renderEffect->BindDepthStencilState(depthState);
 
 		ShaderPropertyManagerPtr globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 		_sLineTextureProperty = globalProperty->CreateProperty(ShaderPropertyManager::sLineTexture, eSP_ShaderResource, 1);
@@ -383,10 +383,10 @@ namespace Disorder
 		sdesc.Filter = SF_Min_Mag_Mip_Linear;
 		SamplerStatePtr samplerState = GEngine->RenderResourceMgr->CreateSamplerState(&sdesc);
 
-		ImagePtr lineImage = GImageManager->Load(GConfig->sResourceTexPath + "LineTexture.jpg");
-		RenderTexture2DPtr lineTexture = GEngine->RenderResourceMgr->CreateTexture2D(samplerState, PF_R8G8B8A8_TYPELESS, false, lineImage);
-		SurfaceViewPtr lineView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, lineTexture, PF_R8G8B8A8_UNORM);
-		_sLineTextureProperty->SetData(lineView);
+		//ImagePtr lineImage = GImageManager->Load(GConfig->sResourceTexPath + "LineTexture.jpg");
+		//RenderTexture2DPtr lineTexture = GEngine->RenderResourceMgr->CreateTexture2D(samplerState, PF_R8G8B8A8_TYPELESS, false, lineImage);
+		//SurfaceViewPtr lineView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, lineTexture, PF_R8G8B8A8_UNORM);
+		_sLineTextureProperty->SetData(GEngine->RenderResourceMgr->DefaultWhiteTexture2D);
 		_sLineSamplerProperty->SetData(samplerState);
         
 		_renderLayout = resourceManager->CreateRenderLayout(_renderEffect, TT_TriangleList, false);

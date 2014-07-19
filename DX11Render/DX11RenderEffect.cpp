@@ -294,7 +294,7 @@ namespace Disorder
 				constantBuffer.BufferParamRef = GlobalPropertyManager->GetProperty(constantBuffer.CBName);
 				if( constantBuffer.BufferParamRef == NULL )
 				{
-					RenderBufferPtr constBuffer = resourceManager->CreateBuffer(RBT_Constant,BU_DynamicDraw,bufferDesc.Size,bufferDesc.Size,NULL);
+					RenderBufferPtr constBuffer = resourceManager->CreateBuffer(RBT_Constant, BU_DynamicDraw, bufferDesc.Size, bufferDesc.Size, NULL);
 					constantBuffer.BufferParamRef = GlobalPropertyManager->CreateProperty(constantBuffer.CBName,eSP_ConstBuffer); 
 					constantBuffer.BufferParamRef->SetData(constBuffer);
 				}
@@ -307,13 +307,18 @@ namespace Disorder
 					D3D11_SHADER_VARIABLE_DESC var_desc;
 					pVariable->GetDesc( &var_desc );
 
-					constantBuffer.Variables.push_back( ShaderVariableDesc(var_desc) );
+					
 
 					// Get the variable type description and store it
 					ID3D11ShaderReflectionType* pType = pVariable->GetType();
 					D3D11_SHADER_TYPE_DESC type_desc;
 					pType->GetDesc( &type_desc );
 
+					// we must adjust var size according cpp data size.
+					if (type_desc.Type == D3D_SVT_BOOL)
+						var_desc.Size = sizeof(bool);
+
+					constantBuffer.Variables.push_back(ShaderVariableDesc(var_desc));
 					constantBuffer.Types.push_back( ShaderTypeDesc(type_desc) );
 
 					// Get references to the parameters for binding to these variables.
@@ -324,7 +329,9 @@ namespace Disorder
 					if( type_desc.Class == D3D_SVC_SCALAR)
 					{
 						length = 1;
-						if (type_desc.Type == D3D_SVT_INT)
+						if (type_desc.Type == D3D_SVT_BOOL)
+							shaderProperty = eSP_Bool;
+						else if (type_desc.Type == D3D_SVT_INT)
 					        shaderProperty = eSP_Int;
 						else if (type_desc.Type == D3D_SVT_FLOAT)
 							shaderProperty = eSP_Float;
@@ -334,8 +341,10 @@ namespace Disorder
 							BOOST_ASSERT(0);
 					}
 					else if ( type_desc.Class == D3D_SVC_VECTOR )
-					{		
-						if (type_desc.Type == D3D_SVT_INT)
+					{	
+						if (type_desc.Type == D3D_SVT_BOOL)
+							shaderProperty = eSP_Bool;
+						else if (type_desc.Type == D3D_SVT_INT)
 							shaderProperty = eSP_Int;
 						else if (type_desc.Type == D3D_SVT_FLOAT)
 							shaderProperty = eSP_Float;
@@ -349,7 +358,9 @@ namespace Disorder
 					else if ( ( type_desc.Class == D3D_SVC_MATRIX_ROWS ) ||
 								( type_desc.Class == D3D_SVC_MATRIX_COLUMNS ) )
 					{
-						if (type_desc.Type == D3D_SVT_INT)
+						if (type_desc.Type == D3D_SVT_BOOL)
+							shaderProperty = eSP_Bool;
+						else if (type_desc.Type == D3D_SVT_INT)
 							shaderProperty = eSP_Int;
 						else if (type_desc.Type == D3D_SVT_FLOAT)
 							shaderProperty = eSP_Float;
@@ -431,23 +442,23 @@ namespace Disorder
 		if( ConstantBuffer == NULL )
 			return;
 
-		if ( !_content )
-			_content = new BYTE[ConstantBuffer->CBSize];
-	 
-		BYTE* pDest = _content;
-		for(unsigned int j=0;j<ConstantBuffer->Parameters.size();j++)
+		RenderBufferPtr constBuffer = ConstantBuffer->BufferParamRef->GetDataAsConstBuffer();
+		BYTE *pContent = (BYTE*)(GEngine->RenderEngine->Map(constBuffer, BA_Write_Only));
+
+		BYTE* pDest = pContent;
+		for (unsigned int j = 0; j<ConstantBuffer->Parameters.size(); j++)
 		{
 			ShaderVariableDesc &vaDesc = ConstantBuffer->Variables[j];
 			ShaderTypeDesc &taDesc = ConstantBuffer->Types[j];
-			ShaderPropertyPtr &paDesc =  ConstantBuffer->Parameters[j];
-			pDest = _content + vaDesc.StartOffset;
-			
+			ShaderPropertyPtr &paDesc = ConstantBuffer->Parameters[j];
+			pDest = pContent + vaDesc.StartOffset;
+
 			void *pSrc = paDesc->GetData();
 			memcpy(pDest, pSrc, vaDesc.Size);
 		}
-				
-		GEngine->RenderEngine->UpdateSubresource(ConstantBuffer->BufferParamRef->GetDataAsConstBuffer(), _content, ConstantBuffer->CBSize);
-	 
+
+		GEngine->RenderEngine->UnMap(constBuffer);
+
 	}
 
 	DX11ShaderPropertyManager::DX11ShaderPropertyManager(const std::string& name)

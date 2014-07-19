@@ -118,11 +118,11 @@ namespace Disorder
 			glType = GL_FLOAT;
 			return GL_RGBA32F;
 		case PF_R32G32B32A32_UINT:
-			glFormat = GL_RGBA;
+			glFormat = GL_RGBA_INTEGER;
 			glType = GL_UNSIGNED_INT;
 			return GL_RGBA32UI;
 		case PF_R32G32B32A32_SINT:
-			glFormat = GL_RGBA;
+			glFormat = GL_RGBA_INTEGER;
 			glType = GL_INT;
 			return GL_RGBA32I;
 		case PF_R32G32B32_TYPELESS:
@@ -131,29 +131,32 @@ namespace Disorder
 			glType = GL_FLOAT;
 			return GL_RGB32F;
 		case PF_R32G32B32_UINT:
-			glFormat = GL_RGB;
+			glFormat = GL_RGB_INTEGER;
 			glType = GL_UNSIGNED_INT;
 			return GL_RGB16UI;
 		case PF_R32G32B32_SINT:
-			glFormat = GL_RGB;
+			glFormat = GL_RGB_INTEGER;
 			glType = GL_INT;
 			return GL_RGB16I;
-		case PF_R16G16B16A16_TYPELESS:
+		case PF_R16G16B16A16_UNORM:
 			glFormat = GL_RGBA;
 			glType = GL_UNSIGNED_SHORT;
 			return GL_RGBA16;
-		case PF_R16G16B16A16_FLOAT:
-		case PF_R16G16B16A16_UNORM:
 		case PF_R16G16B16A16_SNORM:
+			glFormat = GL_RGBA;
+			glType = GL_SHORT;
+			return GL_RGBA_SNORM;
+		case PF_R16G16B16A16_TYPELESS:
+		case PF_R16G16B16A16_FLOAT:
 			glFormat = GL_RGBA;
 			glType = GL_UNSIGNED_SHORT;
 			return GL_RGBA16F;
 		case PF_R16G16B16A16_UINT:
-			glFormat = GL_RGBA;
+			glFormat = GL_RGBA_INTEGER;
 			glType = GL_UNSIGNED_SHORT;
 			return GL_RGBA16UI;
 		case PF_R16G16B16A16_SINT:
-			glFormat = GL_RGBA;
+			glFormat = GL_RGBA_INTEGER;
 			glType = GL_SHORT;
 			return GL_RGBA16I;
 		case PF_R32G32_TYPELESS:
@@ -163,10 +166,10 @@ namespace Disorder
 			return GL_RG32F;
 		case PF_R32G32_UINT:
 			return GL_RG32UI;
-			glFormat = GL_RG;
+			glFormat = GL_RG_INTEGER;
 			glType = GL_UNSIGNED_INT;
 		case PF_R32G32_SINT:
-			glFormat = GL_RG;
+			glFormat = GL_RG_INTEGER;
 			glType = GL_INT;
 			return GL_RG32I;
 		case PF_R32G8X24_TYPELESS:
@@ -182,44 +185,53 @@ namespace Disorder
 			glType = GL_UNSIGNED_INT_10_10_10_2;
 			return GL_RGB10_A2;
 		case PF_R10G10B10A2_UINT:
-			glFormat = GL_RGBA;
+			glFormat = GL_RGBA_INTEGER;
 			glType = GL_UNSIGNED_INT_10_10_10_2;
 			return GL_RGB10_A2UI;
 		case PF_R11G11B10_FLOAT:
 			glFormat = GL_RGB;
-			glType = GL_FLOAT;
+			glType = GL_UNSIGNED_INT_10F_11F_11F_REV;
 			return GL_R11F_G11F_B10F;
 		case PF_R8G8B8A8_TYPELESS:
 		case PF_R8G8B8A8_UNORM:
-		case PF_R8G8B8A8_UNORM_SRGB:
-		case PF_R8G8B8A8_SNORM:
 			glFormat = GL_RGBA;
 			glType = GL_UNSIGNED_BYTE;
 			return GL_RGBA8;
-		case PF_R8G8B8A8_UINT:
+		case PF_R8G8B8A8_UNORM_SRGB:
 			glFormat = GL_RGBA;
+			glType = GL_UNSIGNED_BYTE;
+			return GL_SRGB8;
+		case PF_R8G8B8A8_SNORM:
+			glFormat = GL_RGBA;
+			glType = GL_BYTE;
+			return GL_RGBA8_SNORM;
+		case PF_R8G8B8A8_UINT:
+			glFormat = GL_RGBA_INTEGER;
 			glType = GL_UNSIGNED_BYTE;
 			return GL_RGBA8UI;
 		case PF_R8G8B8A8_SINT:
-			glFormat = GL_RGBA;
-			glType = GL_UNSIGNED_INT_8_8_8_8;
+			glFormat = GL_RGBA_INTEGER;
+			glType = GL_BYTE;
 			return GL_RGBA8I;
 		case PF_R16G16_TYPELESS:
-			glFormat = GL_RG;
-			glType = GL_UNSIGNED_INT_8_8_8_8;
-			return GL_RG16;
 		case PF_R16G16_FLOAT:
+			glFormat = GL_RG;
+			glType = GL_HALF_FLOAT;
+			return GL_RG16F;
 		case PF_R16G16_UNORM:
+			glFormat = GL_RG;
+			glType = GL_UNSIGNED_SHORT;
+			return GL_RGB16;
 		case PF_R16G16_SNORM:
 			glFormat = GL_RG;
-			glType = GL_UNSIGNED_SHORT;		
-			return GL_RGB16F;
+			glType = GL_SHORT;		
+			return GL_RG16_SNORM;
 		case PF_R16G16_UINT:
-			glFormat = GL_RG;
+			glFormat = GL_RG_INTEGER;
 			glType = GL_UNSIGNED_SHORT;
 			return GL_RG16UI;
 		case PF_R16G16_SINT:
-			glFormat = GL_RG;
+			glFormat = GL_RG_INTEGER;
 			glType = GL_SHORT;
 			return GL_RG16I;
 		case PF_D32_FLOAT:
@@ -232,11 +244,11 @@ namespace Disorder
 			glType = GL_FLOAT;
 			return GL_R32F;	
 		case PF_R32_UINT:
-			glFormat = GL_RED;
+			glFormat = GL_RED_INTEGER;
 			glType = GL_UNSIGNED_INT;
 			return GL_R32UI;
 		case PF_R32_SINT :
-			glFormat = GL_RED;
+			glFormat = GL_RED_INTEGER;
 			glType = GL_INT;
 			return GL_R32I;
 		case PF_R24G8_TYPELESS:		
@@ -252,7 +264,7 @@ namespace Disorder
 			glType = GL_UNSIGNED_BYTE;
 			return GL_RG8;
 		case PF_R8G8_UINT:
-			glFormat = GL_RG;
+			glFormat = GL_RG_INTEGER;
 			glType = GL_UNSIGNED_BYTE;
 			return GL_RG8UI;
 		case PF_R8G8_SNORM:
@@ -260,54 +272,54 @@ namespace Disorder
 			glType = GL_BYTE;
 			return GL_RG8_SNORM;
 		case PF_R8G8_SINT:
-			glFormat = GL_RG;
+			glFormat = GL_RG_INTEGER;
 			glType = GL_UNSIGNED_BYTE;
 			return GL_RG8I;
 		case PF_R16_TYPELESS:
-			glFormat = GL_R;
+		case PF_R16_FLOAT:
+			glFormat = GL_RED;
+			glType = GL_HALF_FLOAT;
+			return GL_R16F;
+		case PF_R16_UNORM:
+			glFormat = GL_RED;
 			glType = GL_UNSIGNED_SHORT;
 			return GL_R16;
-		case PF_R16_FLOAT:
-		case PF_R16_UNORM:
-			glFormat = GL_R;
-			glType = GL_UNSIGNED_SHORT;
-			return GL_R16F;
 		case PF_D16_UNORM:
 			glFormat = GL_DEPTH_COMPONENT;
 			glType = GL_UNSIGNED_SHORT;
 			return GL_DEPTH_COMPONENT16;
 		case PF_R16_UINT:
-			glFormat = GL_R;
+			glFormat = GL_RED_INTEGER;
 			glType = GL_UNSIGNED_SHORT;
 			return GL_R16UI;
 		case PF_R16_SNORM:
-			glFormat = GL_R;
+			glFormat = GL_RED;
 			glType = GL_UNSIGNED_SHORT;
 			return GL_R16_SNORM;
 		case PF_R16_SINT:
-			glFormat = GL_R;
+			glFormat = GL_RED_INTEGER;
 			glType = GL_SHORT;
 			return GL_R16I;
 		case PF_R8_TYPELESS:
-			glFormat = GL_R;
+		case PF_R8_UNORM:
+			glFormat = GL_RED;
 			glType = GL_UNSIGNED_BYTE;
 			return GL_R8;
-		case PF_R8_UNORM:
 		case PF_R8_UINT:
-			glFormat = GL_R;
+			glFormat = GL_RED_INTEGER;
 			glType = GL_UNSIGNED_BYTE;
 			return GL_R8UI;
 		case PF_R8_SNORM:
-			glFormat = GL_R;
+			glFormat = GL_RED;
 			glType = GL_BYTE;
 			return GL_R8_SNORM;
 		case PF_R8_SINT:
-			glFormat = GL_R;
+			glFormat = GL_RED_INTEGER;
 			glType = GL_BYTE;
 			return GL_R8I;
 		case PF_R9G9B9E5_SHAREDEXP:
-			glFormat = GL_R;
-			glType = GL_UNSIGNED_INT;
+			glFormat = GL_RGB;
+			glType = GL_UNSIGNED_INT_5_9_9_9_REV;
 			return GL_RGB9_E5;  
 		default:
 			BOOST_ASSERT(0);
@@ -796,7 +808,7 @@ namespace Disorder
 		glGetIntegerv(GL_MAJOR_VERSION, &_mainVersion);
 		glGetIntegerv(GL_MINOR_VERSION, &_subVersion);
 
-		_renderCache.Init();
+		//_renderCache.Init();
 
 		glViewport(0, 0, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY);
 	
@@ -818,6 +830,7 @@ namespace Disorder
 
 	void GLRenderEngine::OnFrameBegin()
 	{
+ 
 		GEngine->Stat.OnFrameBegin();
 	}
 
@@ -843,9 +856,9 @@ namespace Disorder
 
 		SwapBuffers(_hDC);
 
-		_renderCache.CacheFrameBufferObject(0);
-		_renderCache.CacheSingleDrawBuffer(GL_BACK);
-
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDrawBuffer(GL_BACK);
+	
 		GEngine->Stat.OnFrameEnd();
 	}
 
@@ -902,13 +915,13 @@ namespace Disorder
 	{
 		if (renderTarget == NULL)
 		{
-			_renderCache.CacheFrameBufferObject(0);
-			_renderCache.CacheSingleDrawBuffer(GL_BACK);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glDrawBuffer(GL_BACK);
 			return;
 		}
 
 		GLuint fbo = (GLuint)renderTarget->GetHandle();
-		_renderCache.CacheFrameBufferObject(fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 		// for layer renderer
 		if (sliceIndex >= 0)
@@ -921,7 +934,13 @@ namespace Disorder
 					GLenum attachment = GL_DEPTH_ATTACHMENT;
 					if (index >= SL_RenderTarget1)
 						attachment = GL_COLOR_ATTACHMENT0 + index - SL_RenderTarget1;
-					glFramebufferTextureLayer(GL_FRAMEBUFFER, attachment, (GLuint)view->Resource->GetHandle(), 0, sliceIndex);
+					if (view->Resource->ViewFlag & SF_AsCubeMap)
+					{
+						GLenum cubeFace = GL_TEXTURE_CUBE_MAP_POSITIVE_X + sliceIndex;
+						glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, cubeFace, (GLuint)view->Resource->GetHandle(), 0);
+					}
+					else
+					    glFramebufferTextureLayer(GL_FRAMEBUFFER, attachment, (GLuint)view->Resource->GetHandle(), 0, sliceIndex);
 					//glDrawBuffer(GL_NONE);
 					//glReadBuffer(GL_NONE);
 					//GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -937,9 +956,9 @@ namespace Disorder
 		GLSurface->GetGLDrawBuffers(bufferArray);
 		 
 		if (bufferArray.size() > 0)
-			_renderCache.CacheMultiDrawBuffers(bufferArray);
+			glDrawBuffers(bufferArray.size(),bufferArray.data());
 		else
-			_renderCache.CacheSingleDrawBuffer(GL_NONE);
+			glDrawBuffer(GL_NONE);
 	}
 
 	bool GLRenderEngine::IsTextureSamplerResouce(GLenum type)
@@ -964,30 +983,32 @@ namespace Disorder
 	void GLRenderEngine::SetRenderLayout(RenderLayoutPtr const& renderLayout)
 	{
 		TopologyType topology = renderLayout->GetTopology();
-		SetPrimitiveTopology(topology);
-
+		CachedTopology = topology;
+	
 		RenderBufferPtr indexBuffer = renderLayout->GetIndexBuffer();
 		GLuint vao = (GLuint)renderLayout->GetHandle();
 		if (indexBuffer)
 		{	
-			_renderCache.CacheVertexArrayObject(vao, indexBuffer->GetElementSize());
-			_renderCache.CacheIndexBufferObject((GLuint)indexBuffer->GetHandle(), indexBuffer->GetElementSize());
+			_indexElementSize = indexBuffer->GetElementSize();
+			glBindVertexArray(vao);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (GLuint)indexBuffer->GetHandle());
 		}
 		else
-			_renderCache.CacheVertexArrayObject(vao, 0); // don't use index draw
+			glBindVertexArray(vao); // don't use index draw
 	}
 
 	void GLRenderEngine::SetPrimitiveTopology(TopologyType topologyType)
 	{
 		CachedTopology = topologyType;
-		_renderCache.SetPrimitiveTopology(GetPlatformTopology(topologyType));
 	}
 
 	void GLRenderEngine::SetEffect(RenderEffectPtr const& effect)
 	{
 		if (effect == NULL)
 		{
-			_renderCache.CacheShaderProgram(0);
+			glUseProgram(0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D,0);
 			return;
 		}
 
@@ -997,9 +1018,9 @@ namespace Disorder
 
 		GLRenderEffectPtr effectGL = boost::dynamic_pointer_cast<GLRenderEffect>(effect);
 		GLShaderResourceBinding* pDesc = NULL;
-		std::vector<GLuint> texBinding;
 		std::vector<GLuint> samplerBinding;
  
+		int tex2DIndex = 0;
 		for (size_t i = 0; i < effectGL->EffectReflection->ResourceArray.size(); i++)
 		{
 			pDesc = &(effectGL->EffectReflection->ResourceArray[i]);
@@ -1007,12 +1028,24 @@ namespace Disorder
 			{
 				SurfaceViewPtr tex = pDesc->ParamRef->GetDataAsShaderResource();
 				GLRenderTexture2DPtr res = boost::dynamic_pointer_cast<GLRenderTexture2D>(tex->Resource);
+				
 				if (pDesc->Type == GL_SAMPLER_CUBE)
+				{
+					//glActiveTexture(GL_TEXTURE0);
 					glBindTexture(GL_TEXTURE_CUBE_MAP, (GLuint)res->GetHandle());
+				}
 				else if (pDesc->Type == GL_SAMPLER_2D_ARRAY)
+				{
+					//glActiveTexture(GL_TEXTURE0);
 					glBindTexture(GL_TEXTURE_2D_ARRAY, (GLuint)res->GetHandle());
+				}
 				else
-				    texBinding.push_back((GLuint)res->GetHandle());
+				{
+					glActiveTexture(GL_TEXTURE0 + tex2DIndex);
+					glBindTexture(GL_TEXTURE_2D, (GLuint)res->GetHandle());
+					tex2DIndex++;
+				}
+
 				if (res->Sampler)
 				    samplerBinding.push_back((GLuint)res->Sampler->GetHandle());
 				else
@@ -1023,14 +1056,14 @@ namespace Disorder
 				
 			}
 		}
-
-		if (texBinding.size() > 0)
+ 
+		if (samplerBinding.size() > 0)
 		{
-			_renderCache.CacheTexBinding(0, texBinding, samplerBinding);
+			glBindSamplers(0, samplerBinding.size(), samplerBinding.data());
 		}
 
 		GLuint program = (GLuint)effect->GetHandle();
-		_renderCache.CacheShaderProgram(program);
+		glUseProgram(program);
  
 	}
 
@@ -1038,33 +1071,33 @@ namespace Disorder
 	{
 		//GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT, or GL_UNSIGNED_INT
 		GLenum type;
-		if (_renderCache.GetIndexElementSize() == 1)
+		if (_indexElementSize == 1)
 			type = GL_UNSIGNED_BYTE;
-		else if (_renderCache.GetIndexElementSize() == 2)
+		else if (_indexElementSize == 2)
 			type = GL_UNSIGNED_SHORT;
-		else if (_renderCache.GetIndexElementSize() == 4)
+		else if (_indexElementSize == 4)
 			type = GL_UNSIGNED_INT;
 		else
 			return;
 
-		glDrawElementsBaseVertex(_renderCache.GetPrimitiveTopology(), indexCount, type, (const GLvoid*)startIndexLocation, baseVertexLocation);
+		glDrawElementsBaseVertex(GetPlatformTopology(CachedTopology), indexCount, type, (const GLvoid*)startIndexLocation, baseVertexLocation);
 		GEngine->Stat.DrawTriNumber += GetTriangleCountFromTopology(CachedTopology, indexCount);
 	}
 
 	void GLRenderEngine::Draw(unsigned int vertexCount, unsigned int startVertexLocation)
 	{
-		glDrawArrays(_renderCache.GetPrimitiveTopology(), startVertexLocation, vertexCount);
+		glDrawArrays(GetPlatformTopology(CachedTopology), startVertexLocation, vertexCount);
 		GEngine->Stat.DrawTriNumber += GetTriangleCountFromTopology(CachedTopology, vertexCount);
 	}
 
 	GLenum GLRenderEngine::GetBufferAccessFlag(BufferAccess ba)
 	{
 		if (ba == BA_Read_Only)
-			return GL_READ_ONLY;
+			return GL_MAP_READ_BIT;
 		else if (ba == BA_Write_Only)
-			return GL_WRITE_ONLY;
+			return GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT;
 		else if (ba == BA_Read_Write)
-			return GL_READ_WRITE;
+			return GL_MAP_READ_BIT | GL_MAP_WRITE_BIT;
 
 		return GL_NONE;
 	}
@@ -1074,21 +1107,21 @@ namespace Disorder
 		if (buffer->GetBufferType() == RBT_Vertex)
 		{
 			GLuint vbo = (GLuint)buffer->GetHandle();
-			_renderCache.CacheVertexBufferObject(vbo);
-			return glMapBuffer(GL_ARRAY_BUFFER, GetBufferAccessFlag(bufferAccess));
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
+			return glMapBufferRange(GL_ARRAY_BUFFER, 0, buffer->GetBufferSize(), GetBufferAccessFlag(bufferAccess));
 		}
 		else if (buffer->GetBufferType() == RBT_Index)
 		{
 			GLuint ibo = (GLuint)buffer->GetHandle();
-			_renderCache.CacheIndexBufferObject(ibo, buffer->GetElementSize());
-			return glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GetBufferAccessFlag(bufferAccess));
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+			return glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, buffer->GetBufferSize(), GetBufferAccessFlag(bufferAccess));
 		}
 		else if (buffer->GetBufferType() == RBT_Constant)
 		{
 			GLRenderBufferPtr GLbuffer = boost::dynamic_pointer_cast<GLRenderBuffer>(buffer);
 			GLuint ubo = (GLuint)GLbuffer->GetHandle();
-			_renderCache.CacheUniformBufferObject(ubo, GLbuffer->GetBindingPoint());
-			return glMapBuffer(GL_UNIFORM_BUFFER, GetBufferAccessFlag(bufferAccess));
+			glBindBufferBase(GL_UNIFORM_BUFFER, GLbuffer->GetBindingPoint(), ubo);
+			return glMapBufferRange(GL_UNIFORM_BUFFER, 0, buffer->GetBufferSize(), GetBufferAccessFlag(bufferAccess));
 		}
 
 		return NULL;
@@ -1098,20 +1131,20 @@ namespace Disorder
 		if (buffer->GetBufferType() == RBT_Vertex)
 		{
 			GLuint vbo = (GLuint)buffer->GetHandle();
-			_renderCache.CacheVertexBufferObject(vbo);
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
 			glUnmapBuffer(GL_ARRAY_BUFFER);
 		}
 		else if (buffer->GetBufferType() == RBT_Index)
 		{
 			GLuint ibo = (GLuint)buffer->GetHandle();
-			_renderCache.CacheIndexBufferObject(ibo, buffer->GetElementSize());
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 			glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 		}
 		else if (buffer->GetBufferType() == RBT_Constant)
 		{
 			GLRenderBufferPtr GLbuffer = boost::dynamic_pointer_cast<GLRenderBuffer>(buffer);
 			GLuint ubo = (GLuint)GLbuffer->GetHandle();
-			_renderCache.CacheUniformBufferObject(ubo, GLbuffer->GetBindingPoint());
+			glBindBufferBase(GL_UNIFORM_BUFFER, GLbuffer->GetBindingPoint(), ubo);
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 	}
@@ -1121,20 +1154,20 @@ namespace Disorder
 		if (buffer->GetBufferType() == RBT_Vertex)
 		{
 			GLuint vbo = (GLuint)buffer->GetHandle();
-			_renderCache.CacheVertexBufferObject(vbo);
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
 			glBufferSubData(GL_ARRAY_BUFFER,0,srcDataSize,pSrcData);
 		}
 		else if (buffer->GetBufferType() == RBT_Index)
 		{
 			GLuint ibo = (GLuint)buffer->GetHandle();
-			_renderCache.CacheIndexBufferObject(ibo,buffer->GetElementSize());
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 			glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, srcDataSize, pSrcData);
 		}
 		else if (buffer->GetBufferType() == RBT_Constant)
 		{
 			GLRenderBufferPtr GLbuffer = boost::dynamic_pointer_cast<GLRenderBuffer>(buffer);
 			GLuint ubo = (GLuint)GLbuffer->GetHandle();
-			_renderCache.CacheUniformBufferObject(ubo, GLbuffer->GetBindingPoint());
+			glBindBufferBase(GL_UNIFORM_BUFFER, GLbuffer->GetBindingPoint(), ubo);
 			glBufferSubData(GL_UNIFORM_BUFFER, 0, srcDataSize, pSrcData);
 		}
 		
@@ -1152,7 +1185,11 @@ namespace Disorder
 		if (CachedBlendState != blendState)
 		{
 			CachedBlendState = blendState;
-			_renderCache.CacheAlphaToCoverage(blendState->AlphaToCoverageEnable);
+			if ( blendState->AlphaToCoverageEnable )
+				glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+			else
+				glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+
 			bool bEnable = false;
 			for (int i = 0; i < 8; i++)
 			{
@@ -1163,12 +1200,12 @@ namespace Disorder
 
 			if (!bEnable)
 			{
-				_renderCache.CacheBlendEnable(false);
+				glDisable(GL_BLEND);
 				return;
 			}
 
-			_renderCache.CacheBlendEnable(true);
-			_renderCache.CacheBlendFactor(blendState->BlendFactor[0], blendState->BlendFactor[1], blendState->BlendFactor[2], blendState->BlendFactor[3]);
+			glEnable(GL_BLEND);
+			glBlendColor(blendState->BlendFactor[0], blendState->BlendFactor[1], blendState->BlendFactor[2], blendState->BlendFactor[3]);
 			if (blendState->IndependentBlendEnable)
 			{
 				for (int j = 0; j < 8; j++)
@@ -1176,15 +1213,15 @@ namespace Disorder
 					if (!blendState->Desc[j].BlendEnable)
 						continue;
 
-					_renderCache.CacheBlendEquation(j, GetGLBlendOp(blendState->Desc[j].BlendOp), GetGLBlendOp(blendState->Desc[j].BlendOpAlpha));
-					_renderCache.CacheBlendFunc(j, GetGLBlendFunc(blendState->Desc[j].SrcBlend), GetGLBlendFunc(blendState->Desc[j].DestBlend), 
+					glBlendEquationSeparatei(j, GetGLBlendOp(blendState->Desc[j].BlendOp), GetGLBlendOp(blendState->Desc[j].BlendOpAlpha));
+					glBlendFuncSeparatei(j, GetGLBlendFunc(blendState->Desc[j].SrcBlend), GetGLBlendFunc(blendState->Desc[j].DestBlend),
 						                       GetGLBlendFunc(blendState->Desc[j].SrcBlendAlpha), GetGLBlendFunc(blendState->Desc[j].DestBlendAlpha));
 				}
 			}
 			else
 			{
-				_renderCache.CacheBlendEquation(-1, GetGLBlendOp(blendState->Desc[0].BlendOp), GetGLBlendOp(blendState->Desc[0].BlendOpAlpha));
-				_renderCache.CacheBlendFunc(-1, GetGLBlendFunc(blendState->Desc[0].SrcBlend), GetGLBlendFunc(blendState->Desc[0].DestBlend),
+				glBlendEquationSeparate(GetGLBlendOp(blendState->Desc[0].BlendOp), GetGLBlendOp(blendState->Desc[0].BlendOpAlpha));
+				glBlendFuncSeparate(GetGLBlendFunc(blendState->Desc[0].SrcBlend), GetGLBlendFunc(blendState->Desc[0].DestBlend),
 					                        GetGLBlendFunc(blendState->Desc[0].SrcBlendAlpha), GetGLBlendFunc(blendState->Desc[0].DestBlendAlpha));
 			}
 		}
@@ -1196,22 +1233,42 @@ namespace Disorder
 		{
 			CachedRasterizeState = rasterizeState;
 			
-			_renderCache.CacheFillMode(GetGLFillMode(rasterizeState->Desc.FillMode));
+			glPolygonMode(GL_FRONT_AND_BACK, GetGLFillMode(rasterizeState->Desc.FillMode));
 			if (rasterizeState->Desc.CullMode == RCM_None)
-				_renderCache.CacheCullMode(false, GL_BACK);
+			{
+				glDisable(GL_CULL_FACE);
+			}
 			else
-				_renderCache.CacheCullMode(true, GetGLCullMode(rasterizeState->Desc.CullMode));
+			{
+				glEnable(GL_CULL_FACE);
+				glCullFace(GetGLCullMode(rasterizeState->Desc.CullMode));
+			}
 
 			if (rasterizeState->Desc.FrontCounterClockwise)
-				_renderCache.CacheFrontFace(GL_CCW);
+				glFrontFace(GL_CCW);
 			else
-				_renderCache.CacheFrontFace(GL_CW);
+				glFrontFace(GL_CW);
 
-			_renderCache.CachePolygonOffset(rasterizeState->Desc.DepthBias,rasterizeState->Desc.SlopeScaledDepthBias);
-			_renderCache.CacheAntialiasedLine(rasterizeState->Desc.AntialiasedLineEnable);
-			_renderCache.CacheDepthClip(rasterizeState->Desc.DepthClipEnable);
-			_renderCache.CacheMultiSample(rasterizeState->Desc.MultisampleEnable);
-			_renderCache.CacheScissor(rasterizeState->Desc.ScissorEnable);
+			glPolygonOffset(rasterizeState->Desc.SlopeScaledDepthBias, (GLfloat)rasterizeState->Desc.DepthBias);
+			if (rasterizeState->Desc.AntialiasedLineEnable)
+				glEnable(GL_LINE_SMOOTH);
+			else
+				glDisable(GL_LINE_SMOOTH);
+ 
+			if (rasterizeState->Desc.DepthClipEnable)
+				glEnable(GL_DEPTH_CLAMP);
+			else
+				glDisable(GL_DEPTH_CLAMP);
+
+			if (rasterizeState->Desc.MultisampleEnable)
+				glEnable(GL_MULTISAMPLE);
+			else
+				glDisable(GL_MULTISAMPLE);
+
+			if (rasterizeState->Desc.ScissorEnable)
+				glEnable(GL_SCISSOR_TEST);
+			else
+				glDisable(GL_SCISSOR_TEST);
 		}
 	}
 
@@ -1221,24 +1278,36 @@ namespace Disorder
 		{
 			CachedDepthStencilState = depthStencilState;
  
-			_renderCache.CacheDepthEnable(depthStencilState->Desc.DepthEnable);
 			if (depthStencilState->Desc.DepthEnable)
 			{
-				_renderCache.CacheDepthFunc(GLRenderEngine::GetGLComparisonFunc(depthStencilState->Desc.DepthFunc));
-				_renderCache.CacheDepthWrite(depthStencilState->Desc.DepthWrite);
+				glEnable(GL_DEPTH_TEST);
+				glDepthFunc(GLRenderEngine::GetGLComparisonFunc(depthStencilState->Desc.DepthFunc));
+				glDepthMask(depthStencilState->Desc.DepthWrite);
 			}
+			else
+				glDisable(GL_DEPTH_TEST);
 
-			_renderCache.CacheStencilEnable(depthStencilState->Desc.StencilEnable);
 			if (depthStencilState->Desc.StencilEnable)
 			{
-				_renderCache.CacheStencilFunc(GLRenderEngine::GetGLComparisonFunc(depthStencilState->Desc.FrontFaceStencilFunc), GLRenderEngine::GetGLComparisonFunc(depthStencilState->Desc.BackFaceStencilFunc),
-					depthStencilState->StencilRef, depthStencilState->Desc.StencilReadMask);
-				_renderCache.CacheStencilOpFront(GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.FrontFaceStencilFailOp), GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.FrontFaceStencilDepthFailOp),
+				glEnable(GL_STENCIL_TEST);
+
+				if ( depthStencilState->Desc.FrontFaceStencilFunc == depthStencilState->Desc.BackFaceStencilFunc )
+					glStencilFunc(GLRenderEngine::GetGLComparisonFunc(depthStencilState->Desc.FrontFaceStencilFunc), depthStencilState->StencilRef, depthStencilState->Desc.StencilReadMask);
+				else
+				{
+					glStencilFuncSeparate(GL_FRONT, GLRenderEngine::GetGLComparisonFunc(depthStencilState->Desc.FrontFaceStencilFunc), depthStencilState->StencilRef, depthStencilState->Desc.StencilReadMask);
+					glStencilFuncSeparate(GL_BACK, GLRenderEngine::GetGLComparisonFunc(depthStencilState->Desc.BackFaceStencilFunc), depthStencilState->StencilRef, depthStencilState->Desc.StencilReadMask);
+				}
+			 
+				glStencilOpSeparate(GL_FRONT, GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.FrontFaceStencilFailOp), GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.FrontFaceStencilDepthFailOp),
 					GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.FrontFaceStencilPassOp));
-				_renderCache.CacheStencilOpBack(GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.BackFaceStencilFailOp), GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.BackFaceStencilDepthFailOp),
+				glStencilOpSeparate(GL_BACK, GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.BackFaceStencilFailOp), GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.BackFaceStencilDepthFailOp),
 					GLRenderEngine::GetGLStencilOp(depthStencilState->Desc.BackFaceStencilPassOp));
-				_renderCache.CacheStencilWriteMask(depthStencilState->Desc.StencilWriteMask);
+				
+				glStencilMask(depthStencilState->Desc.StencilWriteMask);
 			}
+			else
+				glDisable(GL_STENCIL_TEST);
 		}
 	}
 
@@ -1276,7 +1345,7 @@ namespace Disorder
 		return GL_NONE;
 	}
 
-	void GLRenderEngine::GLEngineCache::Init()
+	/*void GLRenderEngine::GLEngineCache::Init()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, FrameBufferObject);
 		glUseProgram(ShaderProgram);
@@ -1355,9 +1424,9 @@ namespace Disorder
 		else
 			glDrawBuffer(SingleDrawBuffer);
 
-	}
+	}*/
 
-	void GLRenderEngine::GLEngineCache::CacheFrameBufferObject(GLuint fbo)
+	/*void GLRenderEngine::GLEngineCache::CacheFrameBufferObject(GLuint fbo)
 	{
 		if (FrameBufferObject != fbo)
 		{
@@ -1811,5 +1880,5 @@ namespace Disorder
 			glBindSamplers(TexBindingBegin, sArray.size(), sArray.data());
 			 
 		}
-	}
+	}*/
 }

@@ -23,8 +23,9 @@ void main(void)
 
 	vec3 finalColor = CalculatePointLight(In.PositionWorld,mat);
 
-
-	float shadowValue = PCFShadowCubeMap(In.PositionWorld);
+	float shadowValue = 1.f;
+	if(PointLightCastShadow)
+	  shadowValue = PCFShadowCubeMap(In.PositionWorld);
 
     Color = vec4(finalColor * shadowValue,1.0f);
 }

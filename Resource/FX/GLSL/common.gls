@@ -42,14 +42,15 @@ layout(std140) uniform MaterialProperty
 };
 
 uniform sampler2D DiffuseTexture;
-uniform sampler2D ShadowMapTexture2D;
-uniform sampler2DArray ShadowMapTextureCube;
+uniform sampler2DShadow ShadowMapTexture2D;
+uniform samplerCube ShadowMapTextureCube;
 
 layout(std140) uniform DirectionLightProperty
 {
 	vec3 DirectionLightColor;
 	vec3 DirectionLightDir;	
 	float DirectionLightIntensity;
+	bool  DirectionLightCastShadow;
 } ;
 
 layout(std140) uniform PointLightProperty
@@ -58,6 +59,7 @@ layout(std140) uniform PointLightProperty
 	vec3 PointLightColor;
 	float PointLightIntensity;
 	float PointLightRangeRcp;
+	bool  PointLightCastShadow;
 };
 
 layout(std140) uniform SpotLightProperty
@@ -68,7 +70,8 @@ layout(std140) uniform SpotLightProperty
    float SpotLightIntensity;
    float SpotLightRangeRcp;
    float SpotLightCosOuterCone;
-   float SpotLightCosInnerConeRcp;
+   float SpotLightCosInnerCone;
+   bool  SpotLightCastShadow;
 };
  
 struct Material
@@ -95,13 +98,13 @@ vec3 CalculateDirectionLight(vec3 position, Material material)
 {
    //diffuse
    vec3 lightColor = DirectionLightIntensity * DirectionLightColor.rgb;
-   float NDotL = max(dot(-DirectionLightDir, material.Normal),0);
+   float NDotL = clamp(dot(-DirectionLightDir, material.Normal),0.0,1.0);
    vec3 finalColor = lightColor * NDotL * material.DiffuseColor;
    
    //specular
    vec3 ToEye = normalize(CameraPosition - position);
    vec3 reflectVector = reflect(DirectionLightDir,material.Normal);
-   float NDotH = max(dot(reflectVector, ToEye),0);
+   float NDotH = clamp(dot(reflectVector, ToEye),0.0,1.0);
    finalColor += lightColor * clamp(pow(NDotH, material.SpecularExp),0.0,1.0) * material.SpecularColor;
    
    return finalColor;
@@ -116,14 +119,14 @@ vec3 CalculatePointLight(vec3 position, Material material)
 	float DistToLightNorm = 1.0 - clamp(length(ToLight) * PointLightRangeRcp,0.0,1.0);
 	float Attn = DistToLightNorm * DistToLightNorm;
 
+	ToLight = normalize(ToLight);
+
 	//diffuse
 	float diffuse = clamp(dot(ToLight, material.Normal),0.0,1.0);
     vec3 diffuseColor = PointLightColor * diffuse * material.DiffuseColor;
-   
-    //specular
-    vec3 reflectVector = reflect(-ToLight,material.Normal);
-	float specular = clamp(dot(reflectVector, ToEye),0.0,1.0);
-    vec3 specularColor = PointLightColor * clamp(pow(specular, material.SpecularExp),0.0,1.0) * material.SpecularColor;
+
+	vec3 H = normalize(ToEye + ToLight);
+	vec3 specularColor = PointLightColor * pow(max(0, dot(H, material.Normal)), material.SpecularExp) * material.SpecularColor;
 
 	return PointLightIntensity *Attn * (diffuseColor + specularColor);
 }
@@ -132,25 +135,26 @@ vec3 CalculateSpotLight(vec3 position, Material material)
 {
 	vec3 ToEye = normalize(CameraPosition.xyz - position);
 	vec3 ToLight = SpotLightPos - position;
+	float LightLength = length(ToLight);
+	ToLight = normalize(ToLight);
 
     // Cone attenuation
-	float cosAng = dot(-SpotLightDir, ToLight);
-	float conAtt = clamp((cosAng - SpotLightCosOuterCone) * SpotLightCosInnerConeRcp,0.0,1.0);
+	float cosAng = dot(SpotLightDir, -ToLight);
+	float conAtt = clamp(cosAng - SpotLightCosOuterCone,0.0,1.0);
+	
 	conAtt *= conAtt;
 
 	// range Attenuation
-	float DistToLightNorm = 1.0 - clamp(length(ToLight) * SpotLightRangeRcp,0.0,1.0);
+	float DistToLightNorm = 1.0 - clamp(LightLength * SpotLightRangeRcp,0.0,1.0);
 	float Attn = DistToLightNorm * DistToLightNorm;
 	Attn *= conAtt;
-   
-    //diffuse
+ 
+	//diffuse
 	float diffuse = clamp(dot(ToLight, material.Normal),0.0,1.0);
     vec3 diffuseColor = SpotLightColor * diffuse * material.DiffuseColor;
-   
-    //specular
-    vec3 reflectVector = reflect(-ToLight,material.Normal);
-	float specular = clamp(dot(reflectVector, ToEye),0.0,1.0);
-	vec3 specularColor = SpotLightColor * clamp(pow(specular, material.SpecularExp),0.0,1.0) * material.SpecularColor;
+
+	vec3 H = normalize(ToEye + ToLight);
+	vec3 specularColor = PointLightColor * pow(max(0, dot(H, material.Normal)), material.SpecularExp) * material.SpecularColor;
 
 	return SpotLightIntensity *Attn * (diffuseColor + specularColor);
 }
@@ -194,8 +198,13 @@ float PCFShadowCubeMap(vec3 position)
 	posShadowMap = ShadowMapProj * posShadowMap;
 
 	vec3 UVD = posShadowMap.xyz / posShadowMap.w;
-	vec3 Pos = vec3(UVD.x,UVD.y,selectTexture);
-	return texture(ShadowMapTextureCube,Pos).r ; //< UVD.z ? 0.f : 1.0f;
+	UVD.xyz = 0.5 * UVD.xyz + vec3(0.5,0.5,0.5);
+
+	return texture(ShadowMapTextureCube, lightDir).r < UVD.z ? 0.f : 1.0f;
+
+//	vec3 UVD = posShadowMap.xyz / posShadowMap.w;
+//	vec3 Pos = vec3(UVD.x,UVD.y,selectTexture);
+//	return texture(ShadowMapTextureCube,Pos).r ; //< UVD.z ? 0.f : 1.0f;
 
 }
 
@@ -209,35 +218,10 @@ float PCFShadowCubeMap(vec3 position)
 	vec3 UVD = posShadowMap.xyz / posShadowMap.w;
 
 	// Convert to shadow map UV values
-	UVD.xyz = 0.5 * UVD.xyz + 0.5;
-
-	//UVD.z -= 0.005f;
-	 
-	 return texture(ShadowMapTexture2D,UVD.xy).r < UVD.z ? 0.f : 1.0f;
-	 //float offset = 1.0f / 1024;
-	/* vec4 vshadow;
-	 vshadow.x = texture(ShadowMapTexture2D,UVD.xy).r < UVD.z ? 0.f : 1.0f;
-	 vshadow.y = texture(ShadowMapTexture2D,UVD.xy + vec2(offset, 0)).r < UVD.z ? 0.f : 1.0f;
-	 vshadow.z = texture(ShadowMapTexture2D,UVD.xy + vec2(0, offset)).r < UVD.z ? 0.f : 1.0f;
-	 vshadow.w = texture(ShadowMapTexture2D,UVD.xy + vec2(offset, offset)).r < UVD.z ? 0.f : 1.0f;
-
-	 return mix(vshadow.x, vshadow.y, 0.5);
-	 return mix(mix(vshadow.x, vshadow.y, 0.5),
-		                     mix(vshadow.z, vshadow.w, 0.5),
-		                     0.5);*/
+	UVD.xyz = 0.5 * UVD.xyz + vec3(0.5,0.5,0.5);
+	UVD.z -= 0.005;
  
-   // return texture(ShadowMapTexture2D, UVD);
-	/*float offset = 1.0f / ShadowMapSize;
-	// Compute the hardware PCF value
-	vec4 vshadow;
-	vshadow.x = texture(ShadowMapTexture2D, UVD);
-	vshadow.y = texture(ShadowMapTexture2D,UVD + vec3(offset, 0,0));
-	vshadow.z = texture(ShadowMapTexture2D,UVD + vec3(0, offset,0));
-	vshadow.w = texture(ShadowMapTexture2D,UVD + vec3(offset, offset,0));
-	
-	return mix(mix(vshadow.x, vshadow.y, 0.5),
-		                     mix(vshadow.z, vshadow.w, 0.5),
-		                     0.5);*/
+    return texture(ShadowMapTexture2D,UVD);	 
 }
 
 Material PrepareMaterial(vec3 normal, vec2 UV)

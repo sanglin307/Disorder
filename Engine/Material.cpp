@@ -24,7 +24,7 @@ namespace Disorder
 		DiffuseColor = glm::vec3(0.6f);
 		EmissiveColor = glm::vec3(0.f);
 		SpecularColor = glm::vec3(0.f);
-		SpecularExp = 1.0f;
+		SpecularExp = 8.0f;
 		Transparency = 0.0f;
 	}
 

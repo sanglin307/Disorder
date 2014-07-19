@@ -20,7 +20,7 @@ namespace Disorder
 		:Light(name)
 	{
 		LightType = LT_Directional;
-		CastShadows = false;
+		//CastShadows = false;
 	}
 
 	DirectionLightPtr DirectionLight::Create(std::string const& name)
@@ -206,10 +206,7 @@ namespace Disorder
 		if( bRange == false )
 			return false;
 
-		glm::vec3 renderDirect = renderPos - lightPos;
-		glm::vec3 Dir = GetDirection();
-		float angle = glm::angle(Dir, renderDirect);  
-		return angle < SpotOuterAngle;
+		return true;
 	}
 
 	bool SpotLight::Overlaps(const Frustrum& frustrum)

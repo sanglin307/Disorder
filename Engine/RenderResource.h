@@ -25,6 +25,11 @@ namespace Disorder
 			return _type;
 		}
 
+		unsigned int GetBufferSize() const
+		{
+			return _bufferSize;
+		}
+
 		virtual void Resize(unsigned int size) = 0;
 		virtual void * GetHandle(){ return 0;}
 

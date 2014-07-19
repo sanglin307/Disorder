@@ -30,7 +30,7 @@ namespace Disorder
 	   unsigned int shadowSize = GConfig->pRenderConfig->ShadowMapSize;
 	   GEngine->RenderSurfaceCache->ShadowMapBuffer = ShadowMap::Create(shadowSize, shadowSize);
 
-	   viewport->SetRenderPath(RPT_ForwardLighting);
+	   viewport->SetRenderPath(RPT_DeferredShading);
 	   SceneImporter->Init();
 
 	   GameCanvas = Canvas::Create(viewport->SizeX,viewport->SizeY);

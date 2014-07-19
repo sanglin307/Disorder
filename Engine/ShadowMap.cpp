@@ -29,14 +29,21 @@ namespace Disorder
 		_DepthGenEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ShadowMap", SM_4_0, "DepthVertexShader");
 		_DepthGenEffect->BindShader(vertexShader);
-		_DepthGenEffect->LinkShaders();
 
 		_DepthCubeGenEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
 		ShaderObjectPtr vertexShaderCube = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ShadowMap", SM_4_0, "DepthCubeMapVS");
 		ShaderObjectPtr geometryShader = GEngine->RenderResourceMgr->CreateShader(ST_GeometryShader, "ShadowMap", SM_4_0, "DepthCubeMapGS");
 		_DepthCubeGenEffect->BindShader(vertexShaderCube);
 		_DepthCubeGenEffect->BindShader(geometryShader);
+		if (GConfig->pRenderConfig->RenderEngine == RET_OpenGL)  // for openGL , must define a pixel shader when we need rasterization.
+		{
+			ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "ShadowMap", SM_4_0, "DepthPixelShader");
+			_DepthGenEffect->BindShader(pixelShader);
+			_DepthCubeGenEffect->BindShader(pixelShader);
+		}
+
 		_DepthCubeGenEffect->LinkShaders();
+		_DepthGenEffect->LinkShaders();
 
 		RasterizeDesc rDesc;
 		rDesc.DepthBias = 50;
@@ -78,6 +85,7 @@ namespace Disorder
 		_depthSurfaceCube = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 
 	
+		_shadowTexture2D->SetData(_shaderView2D);
 	
 
 	}
@@ -94,8 +102,6 @@ namespace Disorder
 			else
 			   _shadowTexture2D->SetData(_shaderView2D);
 		}
-		else
-			_shadowTexture2D->SetData(GEngine->RenderResourceMgr->DefaultWhiteTexture2D);
 	}
 
 	void ShadowMap::RenderDepth(const CameraPtr& camera, std::vector<GeometryRendererPtr>& geometryList, const LightPtr& light)
@@ -108,6 +114,7 @@ namespace Disorder
 			_propertyMgr->UpdateShaderProperty();
 
 			//prepared buffer
+			GEngine->RenderEngine->SetEffect(NULL);
 			GEngine->RenderEngine->SetRenderTarget(_depthSurface2D);
 			GEngine->RenderEngine->ClearRenderSurface(_depthSurface2D, glm::vec4(0), true, 1.0f, false, 0);
 			GEngine->RenderEngine->SetViewport((float)_width, (float)_height, 0.f, 1.f, 0, 0);
@@ -131,6 +138,7 @@ namespace Disorder
 			_propertyMgr->UpdateShaderProperty();
 
 			//prepared buffer
+			GEngine->RenderEngine->SetEffect(NULL);
 			GEngine->RenderEngine->SetRenderTarget(_depthSurface2D);
 			GEngine->RenderEngine->ClearRenderSurface(_depthSurface2D, glm::vec4(0), true, 1.0f, false, 0);
 			GEngine->RenderEngine->SetViewport((float)_width, (float)_height, 0.f, 1.f, 0, 0);

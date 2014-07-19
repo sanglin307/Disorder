@@ -194,6 +194,9 @@
     <None Include="..\Resource\FX\GLSL\DeferredShading\LightingVS.glvs">
       <Filter>GLSL\DeferredShading</Filter>
     </None>
+    <None Include="..\Resource\FX\GLSL\ShadowMap\DepthPixelShader.glfs">
+      <Filter>GLSL\ShadowMap</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Geometry.h">

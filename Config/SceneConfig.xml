@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <SceneConfig>
   <LevelName>Mangonel.FBX</LevelName>
-  <LineRadius>0.5</LineRadius>
+  <LineRadius>0.15</LineRadius>
 </SceneConfig>

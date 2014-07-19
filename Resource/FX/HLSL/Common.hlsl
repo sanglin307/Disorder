@@ -53,6 +53,7 @@ cbuffer DirectionLightProperty
 	float3 DirectionLightColor;
 	float3 DirectionLightDir;	
 	float  DirectionLightIntensity;
+	bool   DirectionLightCastShadow;
 } 
 
  
@@ -63,6 +64,7 @@ cbuffer PointLightProperty
 	float3 PointLightColor;
 	float PointLightIntensity;
 	float PointLightRangeRcp;
+	bool  PointLightCastShadow;
 }
 
 cbuffer SpotLightProperty
@@ -73,7 +75,8 @@ cbuffer SpotLightProperty
    float SpotLightIntensity;
    float SpotLightRangeRcp;
    float SpotLightCosOuterCone;
-   float SpotLightCosInnerConeRcp;
+   float SpotLightCosInnerCone;
+   bool  SpotLightCastShadow;
 }
  
 struct Material
@@ -100,7 +103,7 @@ float3 CalculateDirectionLight(float3 position, Material material)
 {
    //diffuse
    float3 lightColor = DirectionLightIntensity * DirectionLightColor.rgb;
-	   float NDotL = saturate(dot(-DirectionLightDir, material.Normal));
+   float NDotL = saturate(dot(-DirectionLightDir, material.Normal));
    float3 finalColor = lightColor * NDotL * material.DiffuseColor;
    
    //specular
@@ -198,14 +201,14 @@ float3 CalculatePointLight(float3 position, Material material)
 	float DistToLightNorm = 1.0 - saturate(length(ToLight) * PointLightRangeRcp);
 	float Attn = DistToLightNorm * DistToLightNorm;
 
+	ToLight = normalize(ToLight);
+
 	//diffuse
 	float diffuse = saturate(dot(ToLight, material.Normal));
-    float3 diffuseColor = PointLightColor * diffuse * material.DiffuseColor;
-   
-    //specular
-    float3 reflectVector = reflect(-ToLight,material.Normal);
-	float specular = saturate(dot(reflectVector, ToEye));
-    float3 specularColor = PointLightColor * saturate(pow(specular, material.SpecularExp)) * material.SpecularColor;
+	float3 diffuseColor = PointLightColor * diffuse * material.DiffuseColor;
+
+	float3 H = normalize(ToEye + ToLight);
+	float3 specularColor = PointLightColor * pow(max(0, dot(H, material.Normal)), material.SpecularExp) * material.SpecularColor;
 
 	return PointLightIntensity *Attn * (diffuseColor + specularColor);
 }
@@ -215,25 +218,25 @@ float3 CalculateSpotLight(float3 position, Material material)
 {
 	float3 ToEye = normalize(CameraPosition.xyz - position);
 	float3 ToLight = SpotLightPos - position;
+	float LightLength = length(ToLight);
+	ToLight = normalize(ToLight);
 
     // Cone attenuation
-	float cosAng = dot(-SpotLightDir, ToLight);
-	float conAtt = saturate((cosAng - SpotLightCosOuterCone) * SpotLightCosInnerConeRcp);
+	float cosAng = dot(SpotLightDir, -ToLight);
+	float conAtt = saturate(cosAng - SpotLightCosOuterCone);
+	
 	conAtt *= conAtt;
 
 	// range Attenuation
-	float DistToLightNorm = 1.0 - saturate(length(ToLight) * SpotLightRangeRcp);
+	float DistToLightNorm = 1.0 - saturate(LightLength * SpotLightRangeRcp);
 	float Attn = DistToLightNorm * DistToLightNorm;
 	Attn *= conAtt;
-   
-    //diffuse
+
 	float diffuse = saturate(dot(ToLight, material.Normal));
     float3 diffuseColor = SpotLightColor * diffuse * material.DiffuseColor;
-   
-    //specular
-    float3 reflectVector = reflect(-ToLight,material.Normal);
-	float specular = saturate(dot(reflectVector, ToEye));
-	float3 specularColor = SpotLightColor * saturate(pow(specular, material.SpecularExp)) * material.SpecularColor;
+
+	float3 H = normalize(ToEye + ToLight);
+	float3 specularColor = PointLightColor * pow(max(0, dot(H, material.Normal)), material.SpecularExp) * material.SpecularColor;
 
 	return SpotLightIntensity *Attn * (diffuseColor + specularColor);
 }

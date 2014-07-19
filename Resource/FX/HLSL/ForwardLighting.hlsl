@@ -64,9 +64,12 @@ float4 DirectionLightingPS( VS_OUTPUT input ) : SV_Target
 {
     Material mat = PrepareMaterial(input.NormalWorld,input.UV0);
 
-	float3 finalColor = CalculateDirectionLight(input.PositionWorld,mat);
+	float3 finalColor = CalculateDirectionLight(input.PositionWorld, mat);
 
-	float shadowValue = PCFShadow(input.PositionWorld);
+	float shadowValue = 1.f;
+	if (DirectionLightCastShadow )
+		shadowValue = PCFShadow(input.PositionWorld);
+
 	return float4(finalColor * shadowValue, 1.0f);
 }
 
@@ -78,7 +81,9 @@ float4 PointLightingPS( VS_OUTPUT In ) : SV_TARGET
 	// Calculate the spot light color
 	float3 finalColor = CalculatePointLight(In.PositionWorld, material);
 
-		float shadowValue = PCFShadowCubeMap(In.PositionWorld);
+	float shadowValue = 1.f;
+	if (PointLightCastShadow)
+		shadowValue = PCFShadowCubeMap(In.PositionWorld);
 	// Return the final color
 	return float4(finalColor * shadowValue, 1.0);
 }
@@ -91,7 +96,9 @@ float4 SpotLightingPS( VS_OUTPUT In ) : SV_TARGET
 	// Calculate the spot light color
 	float3 finalColor = CalculateSpotLight(In.PositionWorld, material);
 
-	float shadowValue = PCFShadow(In.PositionWorld);
+	float shadowValue = 1.f;
+	if (SpotLightCastShadow)
+		shadowValue = PCFShadow(In.PositionWorld);
 	// Return the final color
 	return float4(finalColor * shadowValue, 1.0);
 }
