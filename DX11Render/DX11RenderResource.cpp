@@ -49,10 +49,11 @@ namespace Disorder
 			BOOST_ASSERT(hr==S_OK);
 		}
 
+ 
 		D3DInterface = MakeComPtr<ID3D11Buffer>(pBuffer);
 	}
  
-	DX11RenderBufferPtr DX11RenderBuffer::Create(RenderBufferType type,BufferUsage bufferUsage,unsigned int elementSize,unsigned int size,void *pData)
+	DX11RenderBufferPtr DX11RenderBuffer::Create(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData)
 	{
 		DX11RenderBuffer *pBuffer = new DX11RenderBuffer;
 
@@ -79,12 +80,13 @@ namespace Disorder
 		}
 
 		pBuffer->DoCreateBuffer(pData);
+		pBuffer->D3DInterface->SetPrivateData(WKPDID_D3DDebugObjectName, bufferName.size(), bufferName.c_str());
 
 		return DX11RenderBufferPtr(pBuffer);
  
 	}
 
-	DX11RenderBufferPtr DX11RenderBuffer::Create(RenderBufferType type,GeometryPtr const& data,std::string const& sematic,BufferUsage bufferUsage,ShaderObjectPtr const& vertexShader)
+	DX11RenderBufferPtr DX11RenderBuffer::Create(const std::string& bufferName, RenderBufferType type, GeometryPtr const& data, std::string const& sematic, BufferUsage bufferUsage, ShaderObjectPtr const& vertexShader)
 	{
 		DX11RenderBuffer *pBuffer = new DX11RenderBuffer;
  
@@ -183,6 +185,7 @@ namespace Disorder
 
 	  
 		pBuffer->DoCreateBuffer(pData);
+		pBuffer->D3DInterface->SetPrivateData(WKPDID_D3DDebugObjectName, bufferName.size(), bufferName.c_str());
 
 		return DX11RenderBufferPtr(pBuffer);
 

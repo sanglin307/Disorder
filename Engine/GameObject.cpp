@@ -82,7 +82,36 @@ namespace Disorder
 	}
 
 	void GameObject::Tick(float deltaSeconds)
-	{	 
+	{	
+		//just a test
+		for (size_t i = 0; i < _vComponents.size(); i++)
+		{
+			if (_vComponents[i]->ComponentType == CT_Light)
+			{
+				LightPtr light = boost::dynamic_pointer_cast<Light>(_vComponents[i]);
+				if (light->LightType == LT_Point)
+				{
+					static glm::vec3 vDir(1.0, 0.0, 1.0);
+					glm::vec3 value(Math::UnitRandom(), Math::UnitRandom(), Math::UnitRandom());
+				
+					if (_wldPos.x < -20)
+						vDir.x = 1;
+					if (_wldPos.y < -3)
+						vDir.y = 0;
+					if (_wldPos.z < -20)
+						vDir.z = 1;
+
+					if (_wldPos.x > 20)
+						vDir.x = -1;
+					if (_wldPos.y > 20)
+						vDir.y = 0;
+					if (_wldPos.z > 20)
+						vDir.z = -1;
+
+					WorldTranslate(vDir * value * 0.2f);
+				}
+			}
+		}
 	}
 
 	GameObjectPtr GameObject::GetChild(std::string const& name)

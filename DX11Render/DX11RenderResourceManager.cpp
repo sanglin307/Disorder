@@ -76,23 +76,25 @@ namespace Disorder
 		return renderLayout;
 	}
  
-	void DX11RenderResourceManager::CreateBufferArray(GeometryPtr const& data,BufferUsage bufferUsage,RenderEffectPtr const& renderEffect,std::vector<RenderBufferPtr> & bufferArray )
+	void DX11RenderResourceManager::CreateBufferArray(const std::string& bufferName, GeometryPtr const& data, BufferUsage bufferUsage, RenderEffectPtr const& renderEffect, std::vector<RenderBufferPtr> & bufferArray)
 	{		 
 		DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(renderEffect->GetVertexShader());
 		//vertex buffer first
 		for(unsigned int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
 		{
-			RenderBufferPtr renderBuffer = DX11RenderBuffer::Create(RBT_Vertex,data,shader->ShaderReflect->InputSignatureParameters[i].SemanticName,bufferUsage,shader);
+			std::string name = bufferName + "_" + shader->ShaderReflect->InputSignatureParameters[i].SemanticName;
+			RenderBufferPtr renderBuffer = DX11RenderBuffer::Create(name,RBT_Vertex,data,shader->ShaderReflect->InputSignatureParameters[i].SemanticName,bufferUsage,shader);
 			bufferArray.push_back(renderBuffer);
 		}
 
-		RenderBufferPtr indexBuffer = DX11RenderBuffer::Create(RBT_Index,data,"",bufferUsage,shader);
+		std::string indexName = bufferName + "_IndexBuffer";
+		RenderBufferPtr indexBuffer = DX11RenderBuffer::Create(indexName,RBT_Index,data,"",bufferUsage,shader);
 		bufferArray.push_back(indexBuffer);
 	}
 
-	RenderBufferPtr DX11RenderResourceManager::CreateBuffer(RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint)
+	RenderBufferPtr DX11RenderResourceManager::CreateBuffer(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint)
 	{
-		RenderBufferPtr renderBuffer = DX11RenderBuffer::Create(type,bufferUsage,elementSize,size,pData);
+		RenderBufferPtr renderBuffer = DX11RenderBuffer::Create(bufferName,type,bufferUsage,elementSize,size,pData);
 	 
 		return renderBuffer;
 	}

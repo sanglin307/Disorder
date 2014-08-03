@@ -6,8 +6,8 @@ namespace Disorder
 	class DX11RenderBuffer : public RenderBuffer
 	{
 	public:
-		static DX11RenderBufferPtr Create(RenderBufferType type,GeometryPtr const& data,std::string const& sematic,BufferUsage bufferUsage,ShaderObjectPtr const& vertexShader);
-		static DX11RenderBufferPtr Create(RenderBufferType type,BufferUsage bufferUsage,unsigned int elementSize,unsigned int size,void *pData);
+		static DX11RenderBufferPtr Create(const std::string& bufferName, RenderBufferType type, GeometryPtr const& data, std::string const& sematic, BufferUsage bufferUsage, ShaderObjectPtr const& vertexShader);
+		static DX11RenderBufferPtr Create(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData);
 
 		virtual void * GetHandle();
 		virtual void Resize(unsigned int size);

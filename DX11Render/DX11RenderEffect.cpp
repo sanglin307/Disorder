@@ -294,7 +294,7 @@ namespace Disorder
 				constantBuffer.BufferParamRef = GlobalPropertyManager->GetProperty(constantBuffer.CBName);
 				if( constantBuffer.BufferParamRef == NULL )
 				{
-					RenderBufferPtr constBuffer = resourceManager->CreateBuffer(RBT_Constant, BU_DynamicDraw, bufferDesc.Size, bufferDesc.Size, NULL);
+					RenderBufferPtr constBuffer = resourceManager->CreateBuffer(constantBuffer.CBName,RBT_Constant, BU_DynamicDraw, bufferDesc.Size, bufferDesc.Size, NULL);
 					constantBuffer.BufferParamRef = GlobalPropertyManager->CreateProperty(constantBuffer.CBName,eSP_ConstBuffer); 
 					constantBuffer.BufferParamRef->SetData(constBuffer);
 				}
@@ -445,6 +445,7 @@ namespace Disorder
 		RenderBufferPtr constBuffer = ConstantBuffer->BufferParamRef->GetDataAsConstBuffer();
 		BYTE *pContent = (BYTE*)(GEngine->RenderEngine->Map(constBuffer, BA_Write_Only));
 
+		memset(pContent, 0, ConstantBuffer->CBSize);
 		BYTE* pDest = pContent;
 		for (unsigned int j = 0; j<ConstantBuffer->Parameters.size(); j++)
 		{

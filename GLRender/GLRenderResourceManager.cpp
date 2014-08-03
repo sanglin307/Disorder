@@ -30,13 +30,13 @@ namespace Disorder
 		return GLRenderEffect::Create();
 	}
  
-	RenderBufferPtr GLRenderResourceManager::CreateBuffer(RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint)
+	RenderBufferPtr GLRenderResourceManager::CreateBuffer(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint)
 	{
 		RenderBufferPtr renderBuffer = GLRenderBuffer::Create(type,bufferUsage,elementSize,size,pData,bindingPoint);	 
 		return renderBuffer;
 	}
 
-	void GLRenderResourceManager::CreateBufferArray(GeometryPtr const& data, BufferUsage bufferUsage, RenderEffectPtr const& renderEffect, std::vector<RenderBufferPtr> & bufferArray)
+	void GLRenderResourceManager::CreateBufferArray(const std::string& bufferName, GeometryPtr const& data, BufferUsage bufferUsage, RenderEffectPtr const& renderEffect, std::vector<RenderBufferPtr> & bufferArray)
 	{
 		GLRenderEffectPtr effect = boost::dynamic_pointer_cast<GLRenderEffect>(renderEffect);
 	 

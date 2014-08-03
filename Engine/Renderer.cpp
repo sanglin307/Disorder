@@ -130,11 +130,11 @@ namespace Disorder
 		_indexs = new unsigned short[_savedIndexBufferSize];
 		_indexNum = 0;
 
-		RenderBufferPtr vertexBuffer = resourceManager->CreateBuffer(RBT_Vertex,BU_DynamicDraw,sizeof(BatchTileVertex),sizeof(BatchTileVertex)*_savedVertexBufferSize,NULL);
+		RenderBufferPtr vertexBuffer = resourceManager->CreateBuffer("ScreenStringVertex",RBT_Vertex,BU_DynamicDraw,sizeof(BatchTileVertex),sizeof(BatchTileVertex)*_savedVertexBufferSize,NULL);
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 
 		//Index buffer
-		RenderBufferPtr indexBuffer = resourceManager->CreateBuffer(RBT_Index,BU_DynamicDraw,sizeof(WORD),sizeof(WORD)*_savedIndexBufferSize,NULL);
+		RenderBufferPtr indexBuffer = resourceManager->CreateBuffer("ScreenStringIndex",RBT_Index,BU_DynamicDraw,sizeof(WORD),sizeof(WORD)*_savedIndexBufferSize,NULL);
 		_renderLayout->BindIndexBuffer(indexBuffer);
 
 		_renderLayout->FinishBufferBinding(_renderEffect);
@@ -165,7 +165,7 @@ namespace Disorder
 	{
 		_renderEffect = renderEffect;
 		_renderLayout = GEngine->RenderResourceMgr->CreateRenderLayout(_renderEffect,TT_TriangleStrip,true);
-		RenderBufferPtr vertexBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Vertex,BU_StaticDraw,sizeof(TileTexVertex),sizeof(TileTexVertex)*4,(void*)positions);
+		RenderBufferPtr vertexBuffer = GEngine->RenderResourceMgr->CreateBuffer("SimpleTileVertex",RBT_Vertex,BU_StaticDraw,sizeof(TileTexVertex),sizeof(TileTexVertex)*4,(void*)positions);
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 		_renderLayout->FinishBufferBinding(_renderEffect);
 	}
@@ -198,7 +198,7 @@ namespace Disorder
 		_vertexs = new BatchLineVertex[_savedVertexBufferSize];
 		_vertexNum = 0;
 
-		RenderBufferPtr vertexBuffer = resourceManager->CreateBuffer(RBT_Vertex,BU_DynamicDraw,sizeof(BatchLineVertex),sizeof(BatchLineVertex)*_savedVertexBufferSize,NULL);
+		RenderBufferPtr vertexBuffer = resourceManager->CreateBuffer("BatchLineVertex",RBT_Vertex,BU_DynamicDraw,sizeof(BatchLineVertex),sizeof(BatchLineVertex)*_savedVertexBufferSize,NULL);
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 		_renderLayout->FinishBufferBinding(_renderEffect);
 
@@ -296,10 +296,10 @@ namespace Disorder
 			offsetDirUv[v + 28] = 1.0f;		offsetDirUv[v + 29] = 1.0f;		offsetDirUv[v + 30] = 0.0f;		offsetDirUv[v + 31] = 1.0f;
 		}
 
-		RenderBufferPtr positionBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 0);
-		RenderBufferPtr otherpositionBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 1);
-		RenderBufferPtr offsetBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Vertex, BU_StaticDraw, sizeof(float)* 4, maxLineNumber * 4 * 8 * sizeof(float), offsetDirUv, 2);
-		RenderBufferPtr colorBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 3);
+		RenderBufferPtr positionBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLinePos",RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 0);
+		RenderBufferPtr otherpositionBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLineOtPos",RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 1);
+		RenderBufferPtr offsetBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLineOff",RBT_Vertex, BU_StaticDraw, sizeof(float)* 4, maxLineNumber * 4 * 8 * sizeof(float), offsetDirUv, 2);
+		RenderBufferPtr colorBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLineColor",RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 3);
 
 		int* trisStripElements = new int[maxLineNumber * 18];
 		int lineID = 0;
@@ -336,7 +336,7 @@ namespace Disorder
 			trisStripElements[t + 17] = lineID + 6;
 		}
 
-		RenderBufferPtr indexBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Index, BU_StaticDraw, sizeof(int), maxLineNumber * 18 * sizeof(int), trisStripElements);
+		RenderBufferPtr indexBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLineIndex",RBT_Index, BU_StaticDraw, sizeof(int), maxLineNumber * 18 * sizeof(int), trisStripElements);
 
 		_renderLayout->UnBindVertexBuffer();
 		_renderLayout->BindVertexBuffer(positionBuffer);
@@ -568,7 +568,7 @@ namespace Disorder
 		_renderLayout = GEngine->RenderResourceMgr->CreateRenderLayout(effect,TT_TriangleList,false);
  
 		std::vector<RenderBufferPtr> bufferArray;
-		GEngine->RenderResourceMgr->CreateBufferArray(_geometryObject,BU_StaticDraw,effect,bufferArray);
+		GEngine->RenderResourceMgr->CreateBufferArray(_geometryObject->Name,_geometryObject, BU_StaticDraw, effect, bufferArray);
 		for(unsigned int index = 0;index<bufferArray.size();index++)
 		{
 			if( bufferArray[index]->GetBufferType() == RBT_Vertex )

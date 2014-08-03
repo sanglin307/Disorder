@@ -57,7 +57,7 @@ namespace Disorder
 		};
 
 		_renderLayout = GEngine->RenderResourceMgr->CreateRenderLayout(_renderEffect, TT_TriangleList,true);
-		RenderBufferPtr vertexBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Vertex, BU_StaticDraw, sizeof(glm::vec3), sizeof(glm::vec3)*36, positions);
+		RenderBufferPtr vertexBuffer = GEngine->RenderResourceMgr->CreateBuffer("SkyBoxVertex",RBT_Vertex, BU_StaticDraw, sizeof(glm::vec3), sizeof(glm::vec3)*36, positions);
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 
 		_renderLayout->FinishBufferBinding(_renderEffect);

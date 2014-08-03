@@ -20,7 +20,7 @@ namespace Disorder
 		:Light(name)
 	{
 		LightType = LT_Directional;
-		//CastShadows = false;
+		CastShadows = false;
 	}
 
 	DirectionLightPtr DirectionLight::Create(std::string const& name)

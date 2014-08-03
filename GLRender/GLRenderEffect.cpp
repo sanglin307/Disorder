@@ -446,7 +446,7 @@ namespace Disorder
 				desc.BlockBinding = propertyManager->BindingPoint;
 				if (desc.BufferParamRef == NULL)
 				{
-					RenderBufferPtr constBuffer = GEngine->RenderResourceMgr->CreateBuffer(RBT_Constant, BU_DynamicDraw, desc.BlockSize, desc.BlockSize, NULL, desc.BlockBinding);
+					RenderBufferPtr constBuffer = GEngine->RenderResourceMgr->CreateBuffer(name,RBT_Constant, BU_DynamicDraw, desc.BlockSize, desc.BlockSize, NULL, desc.BlockBinding);
 					desc.BufferParamRef = GlobalPropertyManager->CreateProperty(name, eSP_ConstBuffer);
 					desc.BufferParamRef->SetData(constBuffer);					
 				}
@@ -606,6 +606,7 @@ namespace Disorder
 
 		RenderBufferPtr renderbuffer = _uniformBlock->BufferParamRef->GetDataAsConstBuffer();
 		BYTE *constBuffer = (BYTE*)GEngine->RenderEngine->Map(renderbuffer, BA_Write_Only);
+		memset(constBuffer, 0, _uniformBlock->BlockSize);
 		BYTE* pDest = constBuffer;
 		for (unsigned int j = 0; j<_uniformBlock->Members.size(); j++)
 		{
