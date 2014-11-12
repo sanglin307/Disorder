@@ -21,7 +21,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -44,7 +44,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Bin\$(Configuration)\</OutDir>
     <IncludePath>..\Engine;$(BOOST_ROOT);..\..\External\freetype-2.4.10\include;$(FBXSDK)\include;..\..\External\openEXR\lib\include;..\..\External\glew-1.10.0\include;..\..\External\lpng1610;..\..\External\zlib;..\..\External\glm-0.9.5;$(DXSDK_DIR)\Include;..\..\External\jpeg-9a;$(IncludePath)</IncludePath>
-    <LibraryPath>$(DXSDK_DIR)\Lib\x86;..\..\External\ois-v1-3\lib;..\..\External\freetype-2.4.10\objs\win32\vc2010;$(FBXSDK)\lib\vs2010\x86\debug;$(BOOST_ROOT)\stage\lib;..\..\External\glew-1.10.0\lib\Release\Win32;..\..\External\lpng1610\projects\vstudio\Debug Library;..\..\External\zlib\install\lib;..\..\External\jpeg-9a\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(DXSDK_DIR)\Lib\x86;..\..\External\ois-v1-3\lib;..\..\External\freetype-2.4.10\objs\win32\vc2010;$(FBXSDK)\lib\vs2013\x86\debug;$(BOOST_ROOT)\stage\lib;..\..\External\glew-1.10.0\lib\Release\Win32;..\..\External\lpng1610\projects\vstudio\Debug Library;..\..\External\zlib\install\lib;..\..\External\jpeg-9a\Release;$(LibraryPath)</LibraryPath>
     <LibraryWPath />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

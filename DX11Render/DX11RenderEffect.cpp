@@ -165,7 +165,7 @@ namespace Disorder
 			std::ostringstream stream;
 			stream << "the shader file :"<< fileName << "  entry point: ("<< entryPoint << ")   cannot be compiled.";
 			MessageBoxA( NULL,stream.str().c_str(), "Error", MB_OK );
-			return ShaderObjectPtr();
+			return false;
 		}
 
 		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
