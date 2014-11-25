@@ -5,36 +5,34 @@ namespace Disorder
 {
 	class DX11RenderResourceManager : public RenderResourceManager
 	{
-		typedef boost::unordered_map<std::wstring, ID3D11InputLayoutPtr> RenderLayoutMap;
+		typedef boost::unordered_map<std::wstring, ID3D11InputLayout*> RenderLayoutMap;
 
 	public :
-		virtual RenderLayoutPtr CreateRenderLayout(RenderEffectPtr const& renderEffect,TopologyType topologyType,bool soloBuffer);
-		virtual ShaderObjectPtr CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel,std::string const& entryPoint);
-		virtual RenderBufferPtr CreateBuffer(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint = 0);
+		virtual RenderLayout* CreateRenderLayout(RenderEffect* renderEffect,TopologyType topologyType,bool soloBuffer);
+		virtual ShaderObject* CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel,std::string const& entryPoint);
+		virtual RenderBuffer* CreateBuffer(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint = 0);
 
-		virtual void CreateBufferArray(const std::string& bufferName, GeometryPtr const& data, BufferUsage bufferUsage, RenderEffectPtr const& renderEffect, std::vector<RenderBufferPtr> & bufferArray);
+		virtual void CreateBufferArray(const std::string& bufferName, Geometry* data, BufferUsage bufferUsage, RenderEffect* renderEffect, std::vector<RenderBuffer*> & bufferArray);
 		
-		virtual RenderTexture2DPtr CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag);
-		virtual RenderTexture2DPtr CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample,ImagePtr image);
-		virtual RenderTexture2DPtr CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image, unsigned int flag);
+		virtual RenderTexture2D* CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag);
+		virtual RenderTexture2D* CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample, Image* image);
+		virtual RenderTexture2D* CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<Image*>& image, unsigned int flag);
 
-		virtual RenderEffectPtr CreateRenderEffect();
-		virtual SurfaceViewPtr CreateSurfaceView(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat Format, unsigned int Flag = 0);
-		virtual RenderSurfacePtr CreateRenderSurface(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap);
+		virtual RenderEffect* CreateRenderEffect();
+		virtual SurfaceView* CreateSurfaceView(ESurfaceViewType type, RenderTexture* resource, PixelFormat Format, unsigned int Flag = 0);
+		virtual RenderSurface* CreateRenderSurface(const std::map<ESurfaceLocation, SurfaceView*>& viewMap);
 
-		virtual SamplerStatePtr CreateSamplerState(SamplerDesc* pSamplerDesc);
-		virtual RasterizeStatePtr CreateRasterizeState(RasterizeDesc *pDesc);
-		virtual DepthStencilStatePtr CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef);
-		virtual BlendStatePtr CreateBlendState(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable = false,bool IndependentBlendEnable = false);
+		virtual SamplerState* CreateSamplerState(SamplerDesc* pSamplerDesc);
+		virtual RasterizeState* CreateRasterizeState(RasterizeDesc *pDesc);
+		virtual DepthStencilState* CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef);
+		virtual BlendState* CreateBlendState(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable = false,bool IndependentBlendEnable = false);
 
 		virtual void RegisterPropertyManager(std::string const& name);
-		static DX11RenderResourceManagerPtr Create();
-
-		void UpdateRenderLayout(const std::wstring& hashKey, ID3D11InputLayoutPtr layout);
-		ID3D11InputLayoutPtr GetRenderLayout(const std::wstring& hashKey);
+	 
+		void UpdateRenderLayout(const std::wstring& hashKey, ID3D11InputLayout* layout);
+		ID3D11InputLayout* GetRenderLayout(const std::wstring& hashKey);
 
 	private:
-		DX11RenderResourceManager(){}
 		RenderLayoutMap _renderLayoutMap;
 	
 	};

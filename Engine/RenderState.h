@@ -142,8 +142,7 @@ namespace Disorder
 	{
 	public:
 		SamplerDesc Desc;
-	protected:
-		SamplerState(){}
+
 	};
 
 

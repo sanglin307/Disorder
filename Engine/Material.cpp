@@ -16,7 +16,7 @@ namespace Disorder
 		_SpecularExpProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sSpecularExp,eSP_Float,1);
 		_TransparencyFactorProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sTransparency,eSP_Float,1);
 
-		ShaderPropertyManagerPtr globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderPropertyManager* globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 		_DiffuseTexProperty = globalProperty->CreateProperty(ShaderPropertyManager::sDiffuseTexture, eSP_ShaderResource, 1);
 		_DiffuseSampler = globalProperty->CreateProperty(ShaderPropertyManager::sDiffuseSampler, eSP_SampleState, 1);
  
@@ -27,13 +27,7 @@ namespace Disorder
 		SpecularExp = 8.0f;
 		Transparency = 0.0f;
 	}
-
-	SurfaceMaterialPtr SurfaceMaterial::Create(std::string const& name)
-	{
-		SurfaceMaterial *pMaterial = new SurfaceMaterial(name);
-		return SurfaceMaterialPtr(pMaterial);
-	}
-
+ 
 	void SurfaceMaterial::UpdateShaderProperty()
 	{	
 		BOOST_ASSERT(SpecularExp <= 10.0f);  // because defer shading have the 8bit precision, so ...
@@ -64,7 +58,7 @@ namespace Disorder
 		if (TextureChannelMap.size() == 0)
 			return;
 
-		std::map<std::string, RenderTexture2DPtr>::const_iterator iter = TextureChannelMap.cbegin();
+		std::map<std::string, RenderTexture2D*>::const_iterator iter = TextureChannelMap.cbegin();
 		while (iter != TextureChannelMap.end())
 		{
 			std::string key = iter->first;

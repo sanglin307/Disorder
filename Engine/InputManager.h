@@ -52,17 +52,12 @@ namespace Disorder
 	class InputEventHandler : public OIS::KeyListener, public OIS::MouseListener
 	{
 	public:
-		static InputEventHandlerPtr Create();
-
 		bool keyPressed( const OIS::KeyEvent &arg );
         bool keyReleased( const OIS::KeyEvent &arg );
 	    bool mouseMoved( const OIS::MouseEvent &arg );
 	    bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );	 
 	    bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id ); 
-
-	private:
 		InputEventHandler();
-
 	};
 
 	class InputManager
@@ -76,16 +71,15 @@ namespace Disorder
 		int  GetMousePosX();
 		int GetMousePosY();
 		int GetMousePosWheel();
-		static InputManagerPtr Create(unsigned int hWnd);
-
-	private:
 		InputManager(unsigned int hWnd);
+	private:
+		
 
 		OIS::InputManager*  _oisInputManager;
 		OIS::Keyboard*      _oisKeyboard;
 		OIS::Mouse*         _oisMouse;
 
-		InputEventHandlerPtr  _eventHandler;
+		InputEventHandler*  _eventHandler;
 
 	};
 }

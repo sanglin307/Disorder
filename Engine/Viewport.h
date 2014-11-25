@@ -13,12 +13,13 @@ namespace Disorder
 
 	 protected:
 		 bool _bActive;
-		 RenderPathPtr _renderPath;
+		 RenderPath* _renderPath;
 
 	 public:
 
 		 Viewport(int sizeX,int sizeY);
-		 
+		 ~Viewport();
+
 		 virtual void Render();
 
 		 virtual inline void Active(bool bActive)
@@ -38,7 +39,7 @@ namespace Disorder
 
 		 void SetRenderPath(RenderPathType type);
 		 void ToggleRenderPath();
-		 RenderPathPtr GetRenderPath();
+		 RenderPath* GetRenderPath() const;
 	 };
 
 	

@@ -21,41 +21,37 @@ namespace Disorder
 		 float Transparency;
 
 		 // input texture related
-		 SamplerStatePtr DiffuseSampler;
-		 SurfaceViewPtr DiffuseTexture;
+		 SamplerState* DiffuseSampler;
+		 SurfaceView* DiffuseTexture;
 		 
 
-		 std::map<std::string, RenderTexture2DPtr> TextureChannelMap;
+		 std::map<std::string, RenderTexture2D*> TextureChannelMap;
 
 		void UpdateShaderProperty();
 	
 		void UpdateTextureResource();  // create texture resource view according to TextureCannelMap
 
-        const ShaderPropertyManagerPtr& GetShaderPropertyManager() const
+        const ShaderPropertyManager* GetShaderPropertyManager() const
         {
              return _propertyManager;
         }
 
-		static SurfaceMaterialPtr Create(std::string const& name);
-
+		SurfaceMaterial(std::string const& name);
     protected:
 
-		SurfaceMaterial(std::string const& name);
-        ShaderPropertyManagerPtr _propertyManager;
+		
+        ShaderPropertyManager* _propertyManager;
 
 		// tex data
-		ShaderPropertyPtr _DiffuseTexProperty;
-		ShaderPropertyPtr _DiffuseSampler;
-
-
-		
+		ShaderProperty* _DiffuseTexProperty;
+		ShaderProperty* _DiffuseSampler;
 
 		// non-tex data
-		ShaderPropertyPtr  _DiffuseColorProperty;
-        ShaderPropertyPtr  _EmissiveColorProperty;
-		ShaderPropertyPtr  _SpecularColorProperty;
-		ShaderPropertyPtr  _SpecularExpProperty;
-        ShaderPropertyPtr  _TransparencyFactorProperty;
+		ShaderProperty*  _DiffuseColorProperty;
+		ShaderProperty*  _EmissiveColorProperty;
+		ShaderProperty*  _SpecularColorProperty;
+		ShaderProperty*  _SpecularExpProperty;
+		ShaderProperty*  _TransparencyFactorProperty;
 
 
 	};

@@ -10,36 +10,36 @@ namespace Disorder
  
 //////////////////////////////////////////////////////////////////////////
 
-	void BatchScreenString::SetTexture(SurfaceViewPtr const& texture)
+	void BatchScreenString::SetTexture(SurfaceView* texture)
 	{
 		_texture = texture;
  
-	    ShaderPropertyManagerPtr globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
-		ShaderPropertyPtr texProperty = globalProperty->CreateProperty(ShaderPropertyManager::sTextTexture,eSP_ShaderResource,1);
+	    ShaderPropertyManager* globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderProperty* texProperty = globalProperty->CreateProperty(ShaderPropertyManager::sTextTexture,eSP_ShaderResource,1);
 	    texProperty->SetData(_texture);
 	 
-		ShaderPropertyPtr Sampler = globalProperty->CreateProperty(ShaderPropertyManager::sTextSampler,eSP_SampleState,1);
-		RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(texture->Resource);
+		ShaderProperty* Sampler = globalProperty->CreateProperty(ShaderPropertyManager::sTextSampler,eSP_SampleState,1);
+		RenderTexture2D* tex = (RenderTexture2D*)texture->Resource;
 		Sampler->SetData(tex->Sampler);
  
 	}
 
-	void BatchScreenString::Render(CameraPtr const& camera)
+	void BatchScreenString::Render(Camera* camera)
 	{
 		BOOST_ASSERT(_vertexNum%4==0);
 
 		if( _vertexNum == 0 )
 			return;
  
-		RenderEnginePtr renderEngine = GEngine->RenderEngine;
+		RenderEngine* renderEngine = GEngine->RenderEngine;
  
-		const RenderBufferPtr & vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
+		RenderBuffer* vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
 		void* vertexBuffer = renderEngine->Map(vertexRenderBuffer,BA_Write_Only);
 		unsigned int length = _vertexNum*sizeof(BatchTileVertex);
 		memcpy(vertexBuffer,_vertexs,length);
 		renderEngine->UnMap(vertexRenderBuffer);
 
-		const RenderBufferPtr & indexRenderBuffer = _renderLayout->GetIndexBuffer();
+		RenderBuffer* indexRenderBuffer = _renderLayout->GetIndexBuffer();
 		void* indexBuffer = renderEngine->Map(indexRenderBuffer,BA_Write_Only);
 		memcpy(indexBuffer,_indexs,_indexNum*sizeof(unsigned short));
 		renderEngine->UnMap(indexRenderBuffer);
@@ -63,7 +63,7 @@ namespace Disorder
 			delete []_vertexs;
 			_vertexs = pBuffer;
 
-			const RenderBufferPtr & vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
+			RenderBuffer* vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
 			vertexRenderBuffer->Resize(sizeof(BatchTileVertex) * _savedVertexBufferSize);
 		}
 
@@ -75,7 +75,7 @@ namespace Disorder
 			delete[] _indexs;
 			_indexs = pBuffer;
 
-			const RenderBufferPtr & indexRenderBuffer = _renderLayout->GetIndexBuffer();
+			RenderBuffer* indexRenderBuffer = _renderLayout->GetIndexBuffer();
 			indexRenderBuffer->Resize(sizeof(WORD) * _savedIndexBufferSize);
 		}
 
@@ -97,10 +97,10 @@ namespace Disorder
 	BatchScreenString::BatchScreenString(std::string const& name)
 		:Renderer(name)
 	{
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderResourceMgr;
+		RenderResourceManager* resourceManager  = GEngine->RenderResourceMgr;
 		_renderEffect = resourceManager->CreateRenderEffect(); 
-		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"2DText",SM_4_0,"VS");
-		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"2DText",SM_4_0,"PS");
+		ShaderObject* vertexShader = resourceManager->CreateShader(ST_VertexShader,"2DText",SM_4_0,"VS");
+		ShaderObject* pixelShader = resourceManager->CreateShader(ST_PixelShader,"2DText",SM_4_0,"PS");
 	    
 		_renderEffect->BindShader(vertexShader);
 		_renderEffect->BindShader(pixelShader);
@@ -112,12 +112,12 @@ namespace Disorder
 		blendDesc.DestBlend = BLEND_INV_SRC_ALPHA;
 		blendDesc.BlendOp = BLEND_OP_ADD;
 		 
-		BlendStatePtr blendState = resourceManager->CreateBlendState(&blendDesc,1);
+		BlendState* blendState = resourceManager->CreateBlendState(&blendDesc,1);
 		_renderEffect->BindBlendState(blendState);
 
 		RasterizeDesc rDesc;
 		rDesc.FrontCounterClockwise = false;
-		RasterizeStatePtr rState = resourceManager->CreateRasterizeState(&rDesc);
+		RasterizeState* rState = resourceManager->CreateRasterizeState(&rDesc);
 		_renderEffect->BindRasterizeState(rState);
 
 		_renderLayout = resourceManager->CreateRenderLayout(_renderEffect,TT_TriangleList,true);
@@ -130,11 +130,11 @@ namespace Disorder
 		_indexs = new unsigned short[_savedIndexBufferSize];
 		_indexNum = 0;
 
-		RenderBufferPtr vertexBuffer = resourceManager->CreateBuffer("ScreenStringVertex",RBT_Vertex,BU_DynamicDraw,sizeof(BatchTileVertex),sizeof(BatchTileVertex)*_savedVertexBufferSize,NULL);
+		RenderBuffer* vertexBuffer = resourceManager->CreateBuffer("ScreenStringVertex",RBT_Vertex,BU_DynamicDraw,sizeof(BatchTileVertex),sizeof(BatchTileVertex)*_savedVertexBufferSize,NULL);
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 
 		//Index buffer
-		RenderBufferPtr indexBuffer = resourceManager->CreateBuffer("ScreenStringIndex",RBT_Index,BU_DynamicDraw,sizeof(WORD),sizeof(WORD)*_savedIndexBufferSize,NULL);
+		RenderBuffer* indexBuffer = resourceManager->CreateBuffer("ScreenStringIndex",RBT_Index,BU_DynamicDraw,sizeof(WORD),sizeof(WORD)*_savedIndexBufferSize,NULL);
 		_renderLayout->BindIndexBuffer(indexBuffer);
 
 		_renderLayout->FinishBufferBinding(_renderEffect);
@@ -160,21 +160,21 @@ namespace Disorder
 	{
 	}
 
-	SimpleTile::SimpleTile(std::string const& name,const TileTexVertex* positions,const RenderEffectPtr& renderEffect)
+	SimpleTile::SimpleTile(std::string const& name,const TileTexVertex* positions,RenderEffect* renderEffect)
 		:Renderer(name)
 	{
 		_renderEffect = renderEffect;
 		_renderLayout = GEngine->RenderResourceMgr->CreateRenderLayout(_renderEffect,TT_TriangleStrip,true);
-		RenderBufferPtr vertexBuffer = GEngine->RenderResourceMgr->CreateBuffer("SimpleTileVertex",RBT_Vertex,BU_StaticDraw,sizeof(TileTexVertex),sizeof(TileTexVertex)*4,(void*)positions);
+		RenderBuffer* vertexBuffer = GEngine->RenderResourceMgr->CreateBuffer("SimpleTileVertex",RBT_Vertex,BU_StaticDraw,sizeof(TileTexVertex),sizeof(TileTexVertex)*4,(void*)positions);
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 		_renderLayout->FinishBufferBinding(_renderEffect);
 	}
 
 	 
 
-	void SimpleTile::Render(CameraPtr const& camera)
+	void SimpleTile::Render(Camera* camera)
 	{
-		RenderEnginePtr renderEngine = GEngine->RenderEngine;
+		RenderEngine* renderEngine = GEngine->RenderEngine;
 		renderEngine->SetRenderLayout(_renderLayout);
 		renderEngine->SetEffect(_renderEffect);
 		renderEngine->Draw(4,0);
@@ -184,10 +184,10 @@ namespace Disorder
 	BatchLines::BatchLines(std::string const& name)
 		:Renderer(name)
 	{
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderResourceMgr;
+		RenderResourceManager* resourceManager  = GEngine->RenderResourceMgr;
 		_renderEffect =  resourceManager->CreateRenderEffect();
-		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader,"BatchLines",SM_4_0,"VS");
-		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader,"BatchLines",SM_4_0,"PS");
+		ShaderObject* vertexShader = resourceManager->CreateShader(ST_VertexShader,"BatchLines",SM_4_0,"VS");
+		ShaderObject* pixelShader = resourceManager->CreateShader(ST_PixelShader,"BatchLines",SM_4_0,"PS");
 		_renderEffect->BindShader(vertexShader);
 		_renderEffect->BindShader(pixelShader);
 		_renderEffect->LinkShaders();
@@ -198,7 +198,7 @@ namespace Disorder
 		_vertexs = new BatchLineVertex[_savedVertexBufferSize];
 		_vertexNum = 0;
 
-		RenderBufferPtr vertexBuffer = resourceManager->CreateBuffer("BatchLineVertex",RBT_Vertex,BU_DynamicDraw,sizeof(BatchLineVertex),sizeof(BatchLineVertex)*_savedVertexBufferSize,NULL);
+		RenderBuffer* vertexBuffer = resourceManager->CreateBuffer("BatchLineVertex",RBT_Vertex,BU_DynamicDraw,sizeof(BatchLineVertex),sizeof(BatchLineVertex)*_savedVertexBufferSize,NULL);
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 		_renderLayout->FinishBufferBinding(_renderEffect);
 
@@ -223,7 +223,7 @@ namespace Disorder
 			delete[] _vertexs;
 			_vertexs = pBuffer;
 
-			const RenderBufferPtr & vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
+			RenderBuffer* vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
 			vertexRenderBuffer->Resize(sizeof(BatchLineVertex) * _savedVertexBufferSize);
 		}
  
@@ -235,23 +235,20 @@ namespace Disorder
 		_vertexNum += 2;
 	}
  
-	void BatchLines::Render(CameraPtr const& camera)
+	void BatchLines::Render(Camera* camera)
 	{
 		BOOST_ASSERT(_vertexNum%2==0);
 
 		if( _vertexNum == 0 )
 			return;
  
-		RenderEnginePtr renderEngine = GEngine->RenderEngine;
-		const RenderBufferPtr & vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
-		void* vertexBuffer = renderEngine->Map(vertexRenderBuffer,BA_Write_Only);
+		RenderBuffer* vertexRenderBuffer = _renderLayout->GetVertexBuffers()[0];
+		void* vertexBuffer = GEngine->RenderEngine->Map(vertexRenderBuffer, BA_Write_Only);
 		memcpy(vertexBuffer,_vertexs,_vertexNum*sizeof(BatchLineVertex));
-		renderEngine->UnMap(vertexRenderBuffer);
-
-		renderEngine->SetRenderLayout(_renderLayout);
-	
-		renderEngine->SetEffect(_renderEffect);
-		renderEngine->Draw(_vertexNum,0);
+		GEngine->RenderEngine->UnMap(vertexRenderBuffer);
+		GEngine->RenderEngine->SetRenderLayout(_renderLayout);
+		GEngine->RenderEngine->SetEffect(_renderEffect);
+		GEngine->RenderEngine->Draw(_vertexNum, 0);
 		_vertexNum = 0;
 	}
 
@@ -296,10 +293,10 @@ namespace Disorder
 			offsetDirUv[v + 28] = 1.0f;		offsetDirUv[v + 29] = 1.0f;		offsetDirUv[v + 30] = 0.0f;		offsetDirUv[v + 31] = 1.0f;
 		}
 
-		RenderBufferPtr positionBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLinePos",RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 0);
-		RenderBufferPtr otherpositionBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLineOtPos",RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 1);
-		RenderBufferPtr offsetBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLineOff",RBT_Vertex, BU_StaticDraw, sizeof(float)* 4, maxLineNumber * 4 * 8 * sizeof(float), offsetDirUv, 2);
-		RenderBufferPtr colorBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLineColor",RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 3);
+		RenderBuffer* positionBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLinePos",RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 0);
+		RenderBuffer* otherpositionBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLineOtPos", RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 1);
+		RenderBuffer* offsetBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLineOff", RBT_Vertex, BU_StaticDraw, sizeof(float)* 4, maxLineNumber * 4 * 8 * sizeof(float), offsetDirUv, 2);
+		RenderBuffer* colorBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLineColor", RBT_Vertex, BU_DynamicDraw, sizeof(float)* 3, maxLineNumber * 8 * 3 * sizeof(float), NULL, 3);
 
 		int* trisStripElements = new int[maxLineNumber * 18];
 		int lineID = 0;
@@ -336,7 +333,7 @@ namespace Disorder
 			trisStripElements[t + 17] = lineID + 6;
 		}
 
-		RenderBufferPtr indexBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLineIndex",RBT_Index, BU_StaticDraw, sizeof(int), maxLineNumber * 18 * sizeof(int), trisStripElements);
+		RenderBuffer* indexBuffer = GEngine->RenderResourceMgr->CreateBuffer("BatchVolumeLineIndex",RBT_Index, BU_StaticDraw, sizeof(int), maxLineNumber * 18 * sizeof(int), trisStripElements);
 
 		_renderLayout->UnBindVertexBuffer();
 		_renderLayout->BindVertexBuffer(positionBuffer);
@@ -353,10 +350,10 @@ namespace Disorder
 	BatchVolumeLines::BatchVolumeLines(std::string const& name)
 		:Renderer(name)
 	{
-		RenderResourceManagerPtr resourceManager = GEngine->RenderResourceMgr;
+		RenderResourceManager* resourceManager = GEngine->RenderResourceMgr;
 		_renderEffect = resourceManager->CreateRenderEffect();
-		ShaderObjectPtr vertexShader = resourceManager->CreateShader(ST_VertexShader, "VolumeLines", SM_4_0, "VS");
-		ShaderObjectPtr pixelShader = resourceManager->CreateShader(ST_PixelShader, "VolumeLines", SM_4_0, "PS");
+		ShaderObject* vertexShader = resourceManager->CreateShader(ST_VertexShader, "VolumeLines", SM_4_0, "VS");
+		ShaderObject* pixelShader = resourceManager->CreateShader(ST_PixelShader, "VolumeLines", SM_4_0, "PS");
 		_renderEffect->BindShader(vertexShader);
 		_renderEffect->BindShader(pixelShader);
 		_renderEffect->LinkShaders();
@@ -367,7 +364,7 @@ namespace Disorder
 		bDesc.DestBlend = BLEND_INV_SRC_ALPHA;
 		bDesc.BlendOp = BLEND_OP_ADD;
 
-		BlendStatePtr blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc, 1);
+		BlendState* blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc, 1);
 		_renderEffect->BindBlendState(blendState);
 
 		//DepthStencilDesc dDesc;
@@ -375,13 +372,13 @@ namespace Disorder
 		//DepthStencilStatePtr depthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dDesc, 0);
 		//_renderEffect->BindDepthStencilState(depthState);
 
-		ShaderPropertyManagerPtr globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderPropertyManager* globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 		_sLineTextureProperty = globalProperty->CreateProperty(ShaderPropertyManager::sLineTexture, eSP_ShaderResource, 1);
 		_sLineSamplerProperty = globalProperty->CreateProperty(ShaderPropertyManager::sLineSampler, eSP_SampleState, 1);
 
 		SamplerDesc sdesc;
 		sdesc.Filter = SF_Min_Mag_Mip_Linear;
-		SamplerStatePtr samplerState = GEngine->RenderResourceMgr->CreateSamplerState(&sdesc);
+		SamplerState* samplerState = GEngine->RenderResourceMgr->CreateSamplerState(&sdesc);
 
 		//ImagePtr lineImage = GImageManager->Load(GConfig->sResourceTexPath + "LineTexture.jpg");
 		//RenderTexture2DPtr lineTexture = GEngine->RenderResourceMgr->CreateTexture2D(samplerState, PF_R8G8B8A8_TYPELESS, false, lineImage);
@@ -434,7 +431,7 @@ namespace Disorder
 		_vertexNum += 2;
 	}
 
-	void BatchVolumeLines::Render(CameraPtr const& camera)
+	void BatchVolumeLines::Render(Camera* camera)
 	{
 		BOOST_ASSERT(_vertexNum % 2 == 0);
 
@@ -489,27 +486,27 @@ namespace Disorder
 			_colors[l24 + 21] = _vertexs[lB].color.x;		_colors[l24 + 22] = _vertexs[lB].color.y;		_colors[l24 + 23] = _vertexs[lB].color.z;
 		}
 
-		RenderEnginePtr renderEngine = GEngine->RenderEngine;
+		 
 		unsigned int bufferSize = _vertexNum / 2 * 8 * 3 * sizeof(float);
-		const RenderBufferPtr &positionBuffer = _renderLayout->GetVertexBuffers()[0];
-		void* vertexBuffer = renderEngine->Map(positionBuffer, BA_Write_Only);
+		RenderBuffer* positionBuffer = _renderLayout->GetVertexBuffers()[0];
+		void* vertexBuffer = GEngine->RenderEngine->Map(positionBuffer, BA_Write_Only);
 		memcpy(vertexBuffer, _positions, bufferSize);
-		renderEngine->UnMap(positionBuffer);
+		GEngine->RenderEngine->UnMap(positionBuffer);
 
-		const RenderBufferPtr &otherPositionBuffer = _renderLayout->GetVertexBuffers()[1];
-		vertexBuffer = renderEngine->Map(otherPositionBuffer, BA_Write_Only);
+		RenderBuffer* otherPositionBuffer = _renderLayout->GetVertexBuffers()[1];
+		vertexBuffer = GEngine->RenderEngine->Map(otherPositionBuffer, BA_Write_Only);
 		memcpy(vertexBuffer, _otherPositions, bufferSize);
-		renderEngine->UnMap(otherPositionBuffer);
+		GEngine->RenderEngine->UnMap(otherPositionBuffer);
 
-		const RenderBufferPtr &colorBuffer = _renderLayout->GetVertexBuffers()[3];
-		vertexBuffer = renderEngine->Map(colorBuffer, BA_Write_Only);
+		RenderBuffer* colorBuffer = _renderLayout->GetVertexBuffers()[3];
+		vertexBuffer = GEngine->RenderEngine->Map(colorBuffer, BA_Write_Only);
 		memcpy(vertexBuffer, _colors, bufferSize);
-		renderEngine->UnMap(colorBuffer);
+		GEngine->RenderEngine->UnMap(colorBuffer);
  
-		renderEngine->SetRenderLayout(_renderLayout);
+		GEngine->RenderEngine->SetRenderLayout(_renderLayout);
 
-		renderEngine->SetEffect(_renderEffect);
-		renderEngine->DrawIndexed(_vertexNum/2 * 18, 0,0);
+		GEngine->RenderEngine->SetEffect(_renderEffect);
+		GEngine->RenderEngine->DrawIndexed(_vertexNum / 2 * 18, 0, 0);
 		_vertexNum = 0;
 	}
 
@@ -526,13 +523,7 @@ namespace Disorder
 		return frustrum.Overlaps(_boxBounds);
 	}
  
-	GeometryRendererPtr GeometryRenderer::Create(std::string const& name)
-	{
-		GeometryRenderer *pRender = new GeometryRenderer(name);
-		return GeometryRendererPtr(pRender);
-	}
-
-	void GeometryRenderer::SetGeometry(GeometryPtr const& geometry,SurfaceMaterialPtr const& mat)
+	void GeometryRenderer::SetGeometry(Geometry* geometry,SurfaceMaterial* mat)
 	{
 		_geometryObject = geometry;
 		_material = mat;
@@ -541,7 +532,7 @@ namespace Disorder
 
 	void GeometryRenderer::UpdateBoundingBox()
 	{
-		GameObjectPtr go = GetBase();
+		GameObject* go = GetBase();
 		if (go == NULL)
 			return;
 
@@ -557,7 +548,7 @@ namespace Disorder
 		_boxBounds = BoxBounds(corners.data(), corners.size());
 	}
 
-	void GeometryRenderer::BuildRenderLayout(RenderEffectPtr const& effect,bool releaseOld)
+	void GeometryRenderer::BuildRenderLayout(RenderEffect* effect,bool releaseOld)
 	{
 		if( _geometryObject == NULL )
 			return;
@@ -567,7 +558,7 @@ namespace Disorder
 
 		_renderLayout = GEngine->RenderResourceMgr->CreateRenderLayout(effect,TT_TriangleList,false);
  
-		std::vector<RenderBufferPtr> bufferArray;
+		std::vector<RenderBuffer*> bufferArray;
 		GEngine->RenderResourceMgr->CreateBufferArray(_geometryObject->Name,_geometryObject, BU_StaticDraw, effect, bufferArray);
 		for(unsigned int index = 0;index<bufferArray.size();index++)
 		{
@@ -589,7 +580,7 @@ namespace Disorder
 		 }
 	 }
 
-	 void GeometryRenderer::DrawBoundingBox(CameraPtr const& camera)
+	 void GeometryRenderer::DrawBoundingBox(Camera* camera)
 	 {
 
 		/* glm::vec4 boxVec1( _geometryObject->BoundingBox.Origin.x - _geometryObject->BoundingBox.BoxExtent.x,
@@ -675,15 +666,15 @@ namespace Disorder
 	
 	 void GeometryRenderer::DebugDraw()
 	 {
-		  CameraPtr camera = GSceneManager->GetDefaultCamera();
+		  Camera* camera = GSceneManager->GetDefaultCamera();
 		  DrawAxis(camera);
 		  DrawBoundingBox(camera);
 	 }
 
-	  void GeometryRenderer::DrawAxis(CameraPtr const& camera)
+	  void GeometryRenderer::DrawAxis(Camera* camera)
 	  {
 		 // draw local axis for debug
-		 GameObjectPtr go = GetBase();
+		 GameObject* go = GetBase();
 		 glm::vec3 original(0, 0, 0);
 
 		 float AxisLength = _geometryObject->BoundingBox.GetSphere().Radius*1.5f;
@@ -727,23 +718,21 @@ namespace Disorder
 	  }
 
 	 
-	void GeometryRenderer::Render(CameraPtr const& camera)
+	void GeometryRenderer::Render(Camera* camera)
 	{
 		BOOST_ASSERT(_renderLayout != NULL);
  
 		if( _renderEffect == NULL )
 			return;
  
-		GameObjectPtr gameObject = _baseObject.lock();
-		RenderEnginePtr renderEngine = GEngine->RenderEngine;
-		renderEngine->SetRenderLayout(_renderLayout);
- 
-		renderEngine->SetEffect(_renderEffect);
-		renderEngine->DrawIndexed(_geometryObject->Indices.size(),0,0);
+	
+		GEngine->RenderEngine->SetRenderLayout(_renderLayout);
+		GEngine->RenderEngine->SetEffect(_renderEffect);
+		GEngine->RenderEngine->DrawIndexed(_geometryObject->Indices.size(), 0, 0);
 		 
 	}
 
-	void GeometryRenderer::RenderShadow(CameraPtr const& camera, RenderEffectPtr shadowEffect)
+	void GeometryRenderer::RenderShadow(Camera* camera, RenderEffect* shadowEffect)
 	{
 		if (_shadowLayout == NULL)
 		{
@@ -755,13 +744,10 @@ namespace Disorder
 
 		if (_renderEffect == NULL)
 			return;
-
-		GameObjectPtr gameObject = _baseObject.lock();
-		RenderEnginePtr renderEngine = GEngine->RenderEngine;
-
-		renderEngine->SetRenderLayout(_shadowLayout);
-		renderEngine->SetEffect(shadowEffect);
-		renderEngine->DrawIndexed(_geometryObject->Indices.size(), 0, 0);
+ 
+		GEngine->RenderEngine->SetRenderLayout(_shadowLayout);
+		GEngine->RenderEngine->SetEffect(shadowEffect);
+		GEngine->RenderEngine->DrawIndexed(_geometryObject->Indices.size(), 0, 0);
 	}
 
 

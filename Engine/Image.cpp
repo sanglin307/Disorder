@@ -3,9 +3,19 @@
 
 namespace Disorder
 {
-	InitialiseSingleton(ImageManager);
+	ImageManager *GImageManager = NULL;
 
-	ImagePtr ImageManager::Load(std::string const& fileName, SamplerDesc* desc, bool reloadIfExist)
+	ImageManager::~ImageManager()
+	{
+		std::map<std::string, Image*>::iterator iter = _mapImages.begin();
+		while (iter != _mapImages.end())
+		{
+			delete iter->second;
+		}
+		_mapImages.clear();
+	}
+
+	Image* ImageManager::Load(std::string const& fileName, SamplerDesc* desc, bool reloadIfExist)
 	{
 		if (!reloadIfExist)
 		{
@@ -21,12 +31,12 @@ namespace Disorder
 		boost::to_lower(suffix);
 		if (suffix == "png")
 		{
-			ImagePtr img = LoadPng(fileName);
+			Image* img = LoadPng(fileName);
 			if (img != NULL)
 			{
 				if (desc != NULL)
 				{
-					SamplerStatePtr sampler = GEngine->RenderResourceMgr->CreateSamplerState(desc);
+					SamplerState* sampler = GEngine->RenderResourceMgr->CreateSamplerState(desc);
 					img->SetResource(GEngine->RenderResourceMgr->CreateTexture2D(sampler, img->GetSpec().format, false, img));
 				}
 				else
@@ -37,12 +47,12 @@ namespace Disorder
 		}
 		else if (suffix == "jpg")
 		{
-			ImagePtr img = LoadJpg(fileName);
+			Image* img = LoadJpg(fileName);
 			if (img != NULL)
 			{
 				if (desc != NULL)
 				{
-					SamplerStatePtr sampler = GEngine->RenderResourceMgr->CreateSamplerState(desc);
+					SamplerState* sampler = GEngine->RenderResourceMgr->CreateSamplerState(desc);
 					img->SetResource(GEngine->RenderResourceMgr->CreateTexture2D(sampler, img->GetSpec().format, false, img));
 				}
 				else
@@ -55,25 +65,19 @@ namespace Disorder
 		return NULL;
 	}
 
-	ImagePtr ImageManager::Load(std::string const& fileName,bool reloadIfExist)
+	Image* ImageManager::Load(std::string const& fileName,bool reloadIfExist)
 	{
 		return Load(fileName, NULL, reloadIfExist);
 	}
 
-	void ImageManager::Add(std::string const& imageName,ImagePtr const& image)
+	void ImageManager::Add(std::string const& imageName, Image* image)
 	{
 		_mapImages[imageName] = image;
 	}
-
-	ImageManagerPtr ImageManager::Create()
+ 
+	Image* ImageManager::Find(std::string const& imageName)
 	{
-		ImageManager *pManager = new ImageManager;
-		return ImageManagerPtr(pManager);
-	}
-
-	ImagePtr ImageManager::Find(std::string const& imageName)
-	{
-		std::map<std::string,ImagePtr>::iterator iter = _mapImages.find(imageName);
+		std::map<std::string,Image*>::iterator iter = _mapImages.find(imageName);
 		if( iter != _mapImages.end() )
 			return iter->second;
 
@@ -89,7 +93,7 @@ namespace Disorder
 		return false;
 	}
 
-	ImagePtr ImageManager::LoadPng(std::string const& fileName)
+	Image* ImageManager::LoadPng(std::string const& fileName)
 	{
 		// only support png now.
 		png_image image;
@@ -107,7 +111,7 @@ namespace Disorder
 
 			if (buffer != NULL && png_image_finish_read(&image, NULL, buffer, 0, NULL))
 			{
-				ImagePtr imagePtr = Image::Create(eIT_PNG, image.width, image.height, PF_R8G8B8A8_TYPELESS, buffer, size);
+				Image* imagePtr = Image::Create(eIT_PNG, image.width, image.height, PF_R8G8B8A8_TYPELESS, buffer, size);
 				_mapImages[fileName] = imagePtr;
 				free(buffer);
 				return imagePtr;
@@ -147,7 +151,7 @@ namespace Disorder
 
 	}
 
-	ImagePtr ImageManager::LoadJpg(std::string const& fileName)
+	Image* ImageManager::LoadJpg(std::string const& fileName)
 	{
 		struct jpeg_decompress_struct cinfo;
 		struct jpeg_error_mgr jerr;
@@ -221,7 +225,7 @@ namespace Disorder
 			pDest += row_stride;
 		}
 
-		ImagePtr imagePtr = NULL;
+		Image* imagePtr = NULL;
 		PixelFormat pixelFormat;
 		if (cinfo.out_color_space == JCS_RGB && cinfo.output_components == 3 && cinfo.block_size == 8)
 		{
@@ -256,7 +260,7 @@ namespace Disorder
 		return imagePtr;
 	}
 
-	bool ImageManager::SavePng(std::string const& fileName, ImagePtr const& image)
+	bool ImageManager::SavePng(std::string const& fileName, const Image* image)
 	{
 		if (image == NULL)
 			return false;
@@ -272,7 +276,7 @@ namespace Disorder
 		return png_image_write_to_file(&pngSpec, fileName.c_str(), 0, image->GetImageData(), 0, NULL) > 0;
 	}
 
-	bool ImageManager::SaveJpg(std::string const& fileName, ImagePtr const& image)
+	bool ImageManager::SaveJpg(std::string const& fileName, const Image* image)
 	{ 
 		struct jpeg_compress_struct cinfo;
 		struct jpeg_error_mgr jerr;
@@ -364,7 +368,7 @@ namespace Disorder
 		return true;
 	}
 
-	bool ImageManager::Save(std::string const& fileName,ImagePtr const& image)
+	bool ImageManager::Save(std::string const& fileName,const Image* image)
 	{
 		if (image->GetSpec().type == eIT_PNG)
 			return SavePng(fileName, image);
@@ -384,7 +388,7 @@ namespace Disorder
 		_pPixelRawData = NULL;
 	}
  
-	ImagePtr Image::Create(EImageType type,int width, int height, PixelFormat format, BYTE* pData, unsigned int dataSize)
+	Image* Image::Create(EImageType type,int width, int height, PixelFormat format, BYTE* pData, unsigned int dataSize)
 	{
 		ImageSpec spec;
 		spec.type = type;
@@ -395,7 +399,7 @@ namespace Disorder
 
 		Image *pImage = new Image(spec,pData,dataSize);
 		 
-		return ImagePtr(pImage);
+		return pImage;
 	}
  
  

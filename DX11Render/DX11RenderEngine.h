@@ -7,42 +7,40 @@ namespace Disorder
 	class DX11RenderEngine : public RenderEngine
 	{
 	public:
-		
-		static DX11RenderEnginePtr Create();
-
+		DX11RenderEngine();
 		virtual void Init();
 		virtual void Exit();
 		
 		virtual void OnFrameBegin();
 		virtual void OnFrameEnd();
 
-		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex = -1);
+		virtual void ClearRenderSurface(RenderSurface* renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex = -1);
 		
 
 		virtual void SetViewport(float width, float height, float minDepth, float maxDepth, float topX, float topY);
 
-		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
+		virtual void SetRenderLayout(RenderLayout* renderLayout);
 	
-		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget, int sliceIndex = -1, bool useReadOnlyDepthStencil = false);
+		virtual void SetRenderTarget(RenderSurface* renderTarget, int sliceIndex = -1, bool useReadOnlyDepthStencil = false);
 	 
 		virtual void SetPrimitiveTopology(TopologyType topologyType);
 
-		virtual void SetEffect(RenderEffectPtr const& technique);
+		virtual void SetEffect(RenderEffect* technique);
 		virtual void DrawIndexed(unsigned int indexCount,unsigned int startIndexLocation,int baseVertexLocation);
 		virtual void Draw(unsigned int vertexCount,unsigned int startVertexLocation);
 
-		virtual void* Map(RenderBufferPtr const& buffer,BufferAccess bufferAccess);
-		virtual void UnMap(RenderBufferPtr const& buffer);
-		virtual void UpdateSubresource(RenderBufferPtr const& buffer,void* pSrcData,unsigned int srcDataSize);
-		virtual void CopyTexture2D(RenderTexture2DPtr srcTexture, RenderTexture2DPtr dstTexture);
+		virtual void* Map(RenderBuffer* buffer,BufferAccess bufferAccess);
+		virtual void UnMap(RenderBuffer* buffer);
+		virtual void UpdateSubresource(RenderBuffer* buffer,void* pSrcData,unsigned int srcDataSize);
+		virtual void CopyTexture2D(RenderTexture2D* srcTexture, RenderTexture2D* dstTexture);
 		virtual void CreateViewport(void *hWnd);
 
-		ID3D11DevicePtr const & DX11RenderEngine::D3DDevice() const
+		ID3D11Device* DX11RenderEngine::D3DDevice() const
 		{
 			return _pd3dDevice;
 		};
 
-		ID3D11DeviceContextPtr const & DX11RenderEngine::D3DImmediateContext() const
+		ID3D11DeviceContext* DX11RenderEngine::D3DImmediateContext() const
 		{
 			return _pImmediateContext;
 		};
@@ -52,7 +50,7 @@ namespace Disorder
 			return _featureLevel;
 		}
 
-		virtual void SaveSurfaceView(SurfaceViewPtr const& surface, std::string const& fileName);
+		virtual void SaveSurfaceView(SurfaceView* surface, std::string const& fileName);
 
 		// pixel format related things.
 		static DXGI_FORMAT GetPixelFormat(PixelFormat format);
@@ -73,25 +71,23 @@ namespace Disorder
 		void EnumAdapters();
 		void CreateDevice();
 
-		virtual void SetBlendState(BlendStatePtr const& blendState);
-		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState);
-		virtual void SetDepthStencilState(DepthStencilStatePtr const& depthStencilState);
+		virtual void SetBlendState(BlendState* blendState);
+		virtual void SetRasterizeState(RasterizeState* rasterizeState);
+		virtual void SetDepthStencilState(DepthStencilState* depthStencilState);
 		
-		void ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color, int sliceIndex);
-		void ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex);
+		void ClearRenderTarget(SurfaceView* renderTarget, const glm::vec4& color, int sliceIndex);
+		void ClearDepthStencil(SurfaceView* depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex);
 
 	private:
-		DX11RenderEngine();
-
 		D3D_DRIVER_TYPE                         _driverType;
 		D3D_FEATURE_LEVEL                       _featureLevel;
 
-		IDXGIFactoryPtr                         _pDXGIFactory;
-		std::vector<IDXGIAdapterPtr>            _vDXGIAdapter;
+		IDXGIFactory*                         _pDXGIFactory;
+		std::vector<IDXGIAdapter*>            _vDXGIAdapter;
 
-		ID3D11DevicePtr                         _pd3dDevice;
-		ID3D11DeviceContextPtr                  _pImmediateContext;
-		IDXGISwapChainPtr                       _pSwapChain;
+		ID3D11Device*                         _pd3dDevice;
+		ID3D11DeviceContext*                  _pImmediateContext;
+		IDXGISwapChain*                       _pSwapChain;
  
 	 
 

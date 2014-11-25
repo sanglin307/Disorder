@@ -5,28 +5,21 @@
 
 namespace Disorder
 {
-	InitialiseSingleton(Config);
+	Config *GConfig = NULL;
 
-	std::string Config::sRootPath = "";
-	std::string Config::sConfigPath = "";
-	std::string Config::sLogPath = "";
-	std::string Config::sResourceFBXPath = "";
-    std::string Config::sResourceFXPath = "";
-    std::string Config::sResourceTexPath = "";
-	std::string Config::sResourceFontPath = "";
-
-
-	ConfigPtr Config::Create()
+	Config::Config(const std::string& rRootPath)
 	{
-		Config *pConfig = new Config;
-		return ConfigPtr(pConfig);
-	}
-
-	Config::Config()
-	{
+		RootPath = rRootPath;
+		ConfigPath = RootPath + "/Config/";
+		LogPath = RootPath + "/Log/";
+		ResourceFBXPath = RootPath + "/Resource/Fbx/";
+		ResourceFXPath = RootPath + "/Resource/FX/";
+		ResourceTexPath = RootPath + "/Resource/Texture/";
+		ResourceFontPath = RootPath + "/Resource/Font/";
 		pRenderConfig = new RenderConfig;
 		pCameraConfig = new CameraConfig;
 		pSceneConfig = new SceneConfig;
+		Load();
 	}
 
 	Config::~Config()
@@ -34,19 +27,19 @@ namespace Disorder
 		if(pRenderConfig)
 		{
 			delete pRenderConfig;
-			pRenderConfig = 0;
+			pRenderConfig = NULL;
 		}
 
 		if( pCameraConfig )
 		{
 			delete pCameraConfig;
-			pCameraConfig = 0;
+			pCameraConfig = NULL;
 		}
 
 		if (pSceneConfig)
 		{
 			delete pSceneConfig;
-			pSceneConfig = 0;
+			pSceneConfig = NULL;
 		}
 	}
 
@@ -74,7 +67,7 @@ namespace Disorder
 	{
 		BOOST_ASSERT(pRenderConfig);
 
-		std::string renderConfigFile = GConfig->sConfigPath + "RenderConfig.xml";
+		std::string renderConfigFile = GConfig->ConfigPath + "RenderConfig.xml";
 		boost::property_tree::ptree tree;
 		boost::property_tree::read_xml(renderConfigFile,tree);
 		
@@ -103,7 +96,7 @@ namespace Disorder
 	{
 		BOOST_ASSERT(pCameraConfig);
 
-		std::string cameraConfigFile = GConfig->sConfigPath + "CameraConfig.xml";
+		std::string cameraConfigFile = GConfig->ConfigPath + "CameraConfig.xml";
 		boost::property_tree::ptree tree;
 		boost::property_tree::read_xml(cameraConfigFile,tree);
 
@@ -121,7 +114,7 @@ namespace Disorder
 	{
 		BOOST_ASSERT(pSceneConfig);
 
-		std::string sceneConfigFile = GConfig->sConfigPath + "SceneConfig.xml";
+		std::string sceneConfigFile = GConfig->ConfigPath + "SceneConfig.xml";
 		boost::property_tree::ptree tree;
 		boost::property_tree::read_xml(sceneConfigFile, tree);
 
@@ -151,7 +144,7 @@ namespace Disorder
 		tree.put("RenderConfig.SyncInterval", pRenderConfig->SyncInterval);
 		tree.put("RenderConfig.MultiSampleCount", pRenderConfig->MultiSampleCount);
 
-		std::string renderConfigFile = GConfig->sConfigPath + "RenderConfig.xml";
+		std::string renderConfigFile = GConfig->ConfigPath + "RenderConfig.xml";
 		boost::property_tree::write_xml(renderConfigFile,tree);
 
 		return true;
@@ -169,7 +162,7 @@ namespace Disorder
 		tree.put("CameraConfig.FreeMode.MoveSpeed",pCameraConfig->mFreeMode.MoveSpeed);
 		tree.put("CameraConfig.FreeMode.RotateSpeed",pCameraConfig->mFreeMode.RotateSpeed);
 
-		std::string cameraConfigFile = GConfig->sConfigPath + "CameraConfig.xml";
+		std::string cameraConfigFile = GConfig->ConfigPath + "CameraConfig.xml";
 		boost::property_tree::write_xml(cameraConfigFile,tree);
 
 		return true;
@@ -182,7 +175,7 @@ namespace Disorder
 		boost::property_tree::ptree tree;
 		tree.put("SceneConfig.LevelName", pSceneConfig->LevelName);
 	 
-		std::string sceneConfigFile = GConfig->sConfigPath + "SceneConfig.xml";
+		std::string sceneConfigFile = GConfig->ConfigPath + "SceneConfig.xml";
 		boost::property_tree::write_xml(sceneConfigFile, tree);
 
 		return true;

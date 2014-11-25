@@ -5,16 +5,13 @@ namespace Disorder
 {
 	void* DX11RenderBuffer::GetHandle()
 	{
-		if( D3DInterface != NULL )
-			return D3DInterface.get();
-
-		return 0;
+		return D3DInterface;
 	}
 
 	void DX11RenderBuffer::Resize(unsigned int size)
 	{
 		// release old and create new one
-		D3DInterface.reset();
+		D3DInterface->Release();
 
 		_bufferSize = size;
 		DoCreateBuffer(NULL);
@@ -28,9 +25,8 @@ namespace Disorder
 		bd.BindFlags = _bindFlags;
 		GetD3DFlags(pData,bd.Usage,bd.CPUAccessFlags,bd.MiscFlags);
 
-		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
-		BOOST_ASSERT(renderEngine);
-
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine; 
+		 
 		ID3D11Buffer *pBuffer = NULL;
 
 		if( pData != NULL )
@@ -50,78 +46,69 @@ namespace Disorder
 		}
 
  
-		D3DInterface = MakeComPtr<ID3D11Buffer>(pBuffer);
+		D3DInterface = pBuffer;
 	}
  
-	DX11RenderBufferPtr DX11RenderBuffer::Create(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData)
-	{
-		DX11RenderBuffer *pBuffer = new DX11RenderBuffer;
+	DX11RenderBuffer::DX11RenderBuffer(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData)
+	{ 
+		_type = type;
+		_bufferUsage = bufferUsage;
+		_elementSize = elementSize;
+	    _bufferSize = size;
 
-		pBuffer->_type = type;
-		pBuffer->_bufferUsage = bufferUsage;
-		pBuffer->_elementSize = elementSize;
-		pBuffer->_bufferSize = size;
-
-		if( pBuffer->_type == RBT_Vertex )
+		if( _type == RBT_Vertex )
 		{		
-			pBuffer->_bindFlags = D3D11_BIND_VERTEX_BUFFER;
+			_bindFlags = D3D11_BIND_VERTEX_BUFFER;
 		}
-		else if( pBuffer->_type == RBT_Index )
+		else if( _type == RBT_Index )
 		{
-			pBuffer->_bindFlags = D3D11_BIND_INDEX_BUFFER;
+			_bindFlags = D3D11_BIND_INDEX_BUFFER;
 		}
-		else if( pBuffer->_type == RBT_Constant )
+		else if( _type == RBT_Constant )
 		{
-			pBuffer->_bindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			_bindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		}
 		else
 		{
 			BOOST_ASSERT(0);
 		}
 
-		pBuffer->DoCreateBuffer(pData);
-		pBuffer->D3DInterface->SetPrivateData(WKPDID_D3DDebugObjectName, bufferName.size(), bufferName.c_str());
-
-		return DX11RenderBufferPtr(pBuffer);
- 
+		DoCreateBuffer(pData);
+		D3DInterface->SetPrivateData(WKPDID_D3DDebugObjectName, bufferName.size(), bufferName.c_str());
 	}
 
-	DX11RenderBufferPtr DX11RenderBuffer::Create(const std::string& bufferName, RenderBufferType type, GeometryPtr const& data, std::string const& sematic, BufferUsage bufferUsage, ShaderObjectPtr const& vertexShader)
+	DX11RenderBuffer::DX11RenderBuffer(const std::string& bufferName, RenderBufferType type, Geometry* data, std::string const& sematic, BufferUsage bufferUsage, ShaderObject* vertexShader)
 	{
-		DX11RenderBuffer *pBuffer = new DX11RenderBuffer;
- 
-		pBuffer->_bufferUsage = bufferUsage;
-		pBuffer->_elementSize = 0;
-		pBuffer->_bufferSize = 0;
-		pBuffer->_type = type;
+		_bufferUsage = bufferUsage;
+		_elementSize = 0;
+		_bufferSize = 0;
+		_type = type;
 		
 		void *pData = NULL;
 		std::vector<float> vData;
   
 		if( type == RBT_Vertex )
 		{
-			pBuffer->_bindFlags = D3D11_BIND_VERTEX_BUFFER;
+			_bindFlags = D3D11_BIND_VERTEX_BUFFER;
 
-			DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
+			DX11ShaderObject* shader = (DX11ShaderObject*)vertexShader;
 			for(unsigned int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
 			{
 				if(shader->ShaderReflect->InputSignatureParameters[i].SemanticName.compare(sematic) == 0 )
 				{
-					pBuffer->_elementSize = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
+					_elementSize = shader->ShaderReflect->InputSignatureParameters[i].GetElementSize();
 					break;
 				}		 
 			}
 
-			if( pBuffer->_elementSize == 0 )
+			if( _elementSize == 0 )
 			{
 				BOOST_ASSERT(0);
-				delete pBuffer;
-				return NULL;
 			}
 
 			if(sematic.compare(DX11RenderLayout::POSITION) == 0 )
 			{
-				pBuffer->_bufferSize = pBuffer->_elementSize*data->Positions.size();
+				_bufferSize = _elementSize*data->Positions.size();
 				for(unsigned int index=0;index<data->Positions.size();++index)
 				{
 					glm::vec3& vec = data->ControllPositions[data->Positions[index]];
@@ -132,7 +119,7 @@ namespace Disorder
 			}
 			else if(sematic.compare(DX11RenderLayout::COLOR) == 0 )
 			{
-				pBuffer->_bufferSize = pBuffer->_elementSize*data->Colors.size();
+				_bufferSize = _elementSize*data->Colors.size();
 				for(unsigned int index=0;index<data->Colors.size();++index)
 				{
 					glm::vec4& vec = data->Colors[index];
@@ -144,7 +131,7 @@ namespace Disorder
 			}
 			else if(sematic.compare(DX11RenderLayout::NORMAL) == 0 )
 			{
-				pBuffer->_bufferSize = pBuffer->_elementSize*data->Normals.size();
+				_bufferSize = _elementSize*data->Normals.size();
 				for(unsigned int index=0;index<data->Normals.size();++index)
 				{
 					glm::vec3& vec = data->Normals[index];
@@ -155,7 +142,7 @@ namespace Disorder
 			}
 			else if(sematic.compare(DX11RenderLayout::TEXCOORD) == 0 )
 			{
-				pBuffer->_bufferSize = pBuffer->_elementSize*data->Texcoords.size();
+				_bufferSize = _elementSize*data->Texcoords.size();
 				for(unsigned int index=0;index<data->Texcoords.size();++index)
 				{
 					glm::vec2& vec = data->Texcoords[index];
@@ -170,25 +157,21 @@ namespace Disorder
 
 			  pData = vData.data();
 	    }
-		else if( pBuffer->_type == RBT_Index )
+		else if( _type == RBT_Index )
 		{
-			pBuffer->_bindFlags = D3D11_BIND_INDEX_BUFFER;
+			_bindFlags = D3D11_BIND_INDEX_BUFFER;
 			if( data->Indices.size() > 0 )
 			{
-				pBuffer->_elementSize = sizeof(unsigned int);
-				pBuffer->_bufferSize = sizeof(unsigned int) * data->Indices.size();
+				_elementSize = sizeof(unsigned int);
+				_bufferSize = sizeof(unsigned int) * data->Indices.size();
 				pData = data->Indices.data();
 			}
 		}
 
-		BOOST_ASSERT(pBuffer->_bufferSize > 0 );
+		BOOST_ASSERT(_bufferSize > 0 );
 
-	  
-		pBuffer->DoCreateBuffer(pData);
-		pBuffer->D3DInterface->SetPrivateData(WKPDID_D3DDebugObjectName, bufferName.size(), bufferName.c_str());
-
-		return DX11RenderBufferPtr(pBuffer);
-
+		DoCreateBuffer(pData);
+		D3DInterface->SetPrivateData(WKPDID_D3DDebugObjectName, bufferName.size(), bufferName.c_str());
 	}
  
   
@@ -247,11 +230,19 @@ namespace Disorder
 
 	}
 
-	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image, unsigned int flag)
+	DX11RenderTexture2D::DX11RenderTexture2D(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
+	{
+		InternalCreate(pixelFormat, width, height, bMipmap, bMultiSample, viewFlag, arraySize, pData, flag);
+	}
+
+	DX11RenderTexture2D::DX11RenderTexture2D(PixelFormat pixelFormat, bool bMultiSample, const std::vector<Image*>& image, unsigned int flag)
 	{
 		if (image.size() == 0)
-			return NULL;
-
+		{
+			BOOST_ASSERT(0);
+			return;
+		}
+		 
 		const ImageSpec &spec = image[0]->GetSpec();
 		BYTE* pData = new BYTE[spec.dataSize*image.size()];
 		BYTE* pDest = pData;
@@ -269,41 +260,37 @@ namespace Disorder
 
 		}
 
-		DX11RenderTexture2DPtr result = Create(pixelFormat, spec.width, spec.height, false, bMultiSample, SV_ShaderResource, image.size(), vBufferInitData.data(),flag);
+		InternalCreate(pixelFormat, spec.width, spec.height, false, bMultiSample, SV_ShaderResource, image.size(), vBufferInitData.data(), flag);
 		delete pData;
-
-		return result;
 	}
 
-	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, bool bMultiSample,ImagePtr const& image)
+	DX11RenderTexture2D::DX11RenderTexture2D(PixelFormat pixelFormat, bool bMultiSample,Image* image)
 	{
 		const ImageSpec &spec = image->GetSpec();
 		BufferInitData data;
 		data.Data = image->GetImageData();
 		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat)/8 * spec.width;
 		data.SlicePitch = 0;
-		return Create(pixelFormat,spec.width,spec.height,false,bMultiSample,SV_ShaderResource,1,&data,0);
+		InternalCreate(pixelFormat, spec.width, spec.height, false, bMultiSample, SV_ShaderResource, 1, &data, 0);
 	}
 
-	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
+	void DX11RenderTexture2D::InternalCreate(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
 	{
-		DX11RenderTexture2D* pTexture = new DX11RenderTexture2D;
-
-		pTexture->Format = pixelFormat;
-		pTexture->Width = width;
-		pTexture->Height = height;
-		pTexture->ViewFlag = viewFlag;
-		pTexture->ArraySize = arraySize;
+		Format = pixelFormat;
+		Width = width;
+	    Height = height;
+		ViewFlag = viewFlag;
+		ArraySize = arraySize;
 
 		if (bMultiSample && !pData)
 		{
-			pTexture->MultiSampleCount = GConfig->pRenderConfig->MultiSampleCount;
-			pTexture->MultiSampleQuality = GConfig->pRenderConfig->MultiSampleQuality;
+			MultiSampleCount = GConfig->pRenderConfig->MultiSampleCount;
+			MultiSampleQuality = GConfig->pRenderConfig->MultiSampleQuality;
 		}
 		else
 		{
-			pTexture->MultiSampleCount = 1;
-			pTexture->MultiSampleQuality = 0;
+			MultiSampleCount = 1;
+			MultiSampleQuality = 0;
 		}
 
 		D3D11_TEXTURE2D_DESC desc;
@@ -313,16 +300,16 @@ namespace Disorder
 		
 		if( bMipmap )
 		{
-			desc.MipLevels = pTexture->MipLevel = 0;
+			desc.MipLevels = MipLevel = 0;
 			desc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
 		}
 		else 
 		{
-			desc.MipLevels = pTexture->MipLevel = 1;
+			desc.MipLevels = MipLevel = 1;
 		}
  
-		desc.SampleDesc.Count = pTexture->MultiSampleCount;
-		desc.SampleDesc.Quality = pTexture->MultiSampleQuality;
+		desc.SampleDesc.Count = MultiSampleCount;
+		desc.SampleDesc.Quality = MultiSampleQuality;
 		desc.ArraySize = arraySize;
 		desc.Format = DX11RenderEngine::GetPixelFormat(pixelFormat);
 		desc.Usage = D3D11_USAGE_DEFAULT;
@@ -341,7 +328,7 @@ namespace Disorder
 		if (arraySize == 6 && (flag & SF_AsCubeMap))
 			desc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
 
-		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine; 
 
 		ID3D11Texture2D* pTex2D = NULL;
 		if( pData != NULL )
@@ -367,33 +354,28 @@ namespace Disorder
 			BOOST_ASSERT(hr==S_OK);
 		}
 
-		pTexture->D3DInterface = MakeComPtr<ID3D11Texture2D>(pTex2D);
- 
-		return DX11RenderTexture2DPtr(pTexture);
-
+		D3DInterface = pTex2D;
 	}
 	 
 	
 
 	void * DX11RenderTexture2D::GetHandle()
 	{
-		return D3DInterface.get();
+		return D3DInterface;
 	}
 
-	DX11RenderTexture2DPtr DX11RenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, unsigned int viewFlag, bool bmipmap, unsigned int multiSampleCount, unsigned int multiSampleQuality, ID3D11Texture2DPtr DXInterface)
+	DX11RenderTexture2D::DX11RenderTexture2D(PixelFormat pixelFormat, unsigned int width, unsigned int height, unsigned int viewFlag, bool bmipmap, unsigned int multiSampleCount, unsigned int multiSampleQuality, ID3D11Texture2D* DXInterface)
 	{
-		DX11RenderTexture2D *pTex = new DX11RenderTexture2D;
-		pTex->Width = width;
-		pTex->Height = height;
-		pTex->Format = pixelFormat;
-		pTex->D3DInterface = DXInterface;
-		pTex->Sampler = NULL;
-		pTex->ViewFlag = viewFlag;
-		pTex->MipLevel = bmipmap ? 0 : 1;
-		pTex->MultiSampleCount = multiSampleCount;
-		pTex->MultiSampleQuality = multiSampleQuality;
-		pTex->ArraySize = 1;
-		return DX11RenderTexture2DPtr(pTex);
+		Width = width;
+		Height = height;
+		Format = pixelFormat;
+		D3DInterface = DXInterface;
+		Sampler = NULL;
+		ViewFlag = viewFlag;
+		MipLevel = bmipmap ? 0 : 1;
+		MultiSampleCount = multiSampleCount;
+		MultiSampleQuality = multiSampleQuality;
+		ArraySize = 1;
 	}
 	 
  

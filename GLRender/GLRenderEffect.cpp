@@ -28,11 +28,6 @@ namespace Disorder
 		}
 	}
 
-	GLShaderObjectPtr GLShaderObject::Create(std::string const& effectName, std::string const& entryPoint, ShaderType shaderType, ShaderModel shaderMode)
-	{
-		GLShaderObject *pObject = new GLShaderObject(effectName, entryPoint, shaderType, shaderMode);
-		return GLShaderObjectPtr(pObject);
-	}
 
 	int GLShaderObject::GetOpenGLShaderType(ShaderType sType)
 	{
@@ -81,7 +76,7 @@ namespace Disorder
 	bool GLShaderObject::LoadShaderFromFile(std::string const& fileName, std::string const& entryPoint, ShaderType shaderType)
 	{
 		PrepareShaderPathInclude();
-		FileObjectPtr file = GEngine->FileManager->OpenTextFile(fileName, eF_Read);
+		FileObject* file = GEngine->FileManager->OpenTextFile(fileName, eF_Read);
 		std::string shaderContent = file->ReadText();
 
 		_GLHandle = glCreateShader(GLShaderObject::GetOpenGLShaderType(shaderType));
@@ -118,12 +113,7 @@ namespace Disorder
 		glDeleteShader(_GLHandle);		 
 	}
 
-	GLProgramReflectionPtr GLProgramReflection::Create()
-	{
-		GLProgramReflection *Reflection = new GLProgramReflection;
-		return GLProgramReflectionPtr(Reflection);
-	}
-
+	 
 	void GLRenderEffect::LinkShaders()
 	{
 		glLinkProgram(_GLHandle);
@@ -369,7 +359,7 @@ namespace Disorder
 		}
 	}
 
-	void GLRenderEffect::BindShader(ShaderObjectPtr const& shaderObject)
+	void GLRenderEffect::BindShader(ShaderObject* shaderObject)
 	{
 		if( shaderObject->GetType() == ST_VertexShader )
 			_vertexShader = shaderObject;
@@ -386,7 +376,7 @@ namespace Disorder
 
 	void GLRenderEffect::Reflection()
 	{
-		EffectReflection = GLProgramReflection::Create();
+		EffectReflection = new GLProgramReflection;
 
 		glUseProgram(_GLHandle);
 		// input
@@ -423,7 +413,7 @@ namespace Disorder
 		}
  
 		// uniform block
-		ShaderPropertyManagerPtr GlobalPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderPropertyManager* GlobalPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 
 		GLint uniformBlockNumber;
 		glGetProgramInterfaceiv(_GLHandle, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &uniformBlockNumber);
@@ -439,14 +429,14 @@ namespace Disorder
 				desc.BlockIndex = glGetUniformBlockIndex(_GLHandle, name);
 				glGetActiveUniformBlockiv(_GLHandle, desc.BlockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &desc.BlockSize);
 				//glGetActiveUniformBlockiv(_GLHandle, desc.BlockIndex, GL_UNIFORM_BLOCK_BINDING, &desc.BlockBinding);
-				GLShaderPropertyManagerPtr propertyManager = boost::dynamic_pointer_cast<GLShaderPropertyManager>(GEngine->RenderResourceMgr->GetPropertyManager(name));
+				GLShaderPropertyManager* propertyManager = (GLShaderPropertyManager*)GEngine->RenderResourceMgr->GetPropertyManager(name);
 				BOOST_ASSERT(propertyManager->Name != ShaderPropertyManager::sManagerGlobal);  // don't registe uniform block name ,please registe it in ShaderPropertyManager
 
 				desc.BufferParamRef = GlobalPropertyManager->GetProperty(name);
 				desc.BlockBinding = propertyManager->BindingPoint;
 				if (desc.BufferParamRef == NULL)
 				{
-					RenderBufferPtr constBuffer = GEngine->RenderResourceMgr->CreateBuffer(name,RBT_Constant, BU_DynamicDraw, desc.BlockSize, desc.BlockSize, NULL, desc.BlockBinding);
+					RenderBuffer* constBuffer = GEngine->RenderResourceMgr->CreateBuffer(name,RBT_Constant, BU_DynamicDraw, desc.BlockSize, desc.BlockSize, NULL, desc.BlockBinding);
 					desc.BufferParamRef = GlobalPropertyManager->CreateProperty(name, eSP_ConstBuffer);
 					desc.BufferParamRef->SetData(constBuffer);					
 				}
@@ -495,7 +485,7 @@ namespace Disorder
 				
 
 				GLShaderUniformBlock *pBlock = NULL;
-				ShaderPropertyManagerPtr manager = NULL;
+				ShaderPropertyManager* manager = NULL;
 				if (desc.BlockIndex >= 0)
 				{
 					for (size_t k = 0; k < EffectReflection->UniformBlockArray.size(); k++)
@@ -560,19 +550,14 @@ namespace Disorder
 
 		for (size_t i = 0; i < EffectReflection->UniformBlockArray.size(); i++)
 		{
-			ShaderPropertyManagerPtr mgr = GEngine->RenderResourceMgr->GetPropertyManager(EffectReflection->UniformBlockArray[i].Name);
-			GLShaderPropertyManagerPtr glMgr = boost::dynamic_pointer_cast<GLShaderPropertyManager>(mgr);
+			ShaderPropertyManager* mgr = GEngine->RenderResourceMgr->GetPropertyManager(EffectReflection->UniformBlockArray[i].Name);
+			GLShaderPropertyManager* glMgr = (GLShaderPropertyManager*)(mgr);
 			BOOST_ASSERT(glMgr->Validate(&(EffectReflection->UniformBlockArray[i])));
 		}
 
 		glUseProgram(0);
 	}
-
-	GLRenderEffectPtr GLRenderEffect::Create()
-	{
-		GLRenderEffect *pEffect = new GLRenderEffect;
-		return GLRenderEffectPtr(pEffect);
-	}
+ 
 
 	GLRenderEffect::GLRenderEffect()
 		:EffectReflection(NULL)
@@ -585,13 +570,7 @@ namespace Disorder
 	{
 		glDeleteProgram(_GLHandle);
 	}
-
-	GLShaderPropertyManagerPtr GLShaderPropertyManager::Create(const std::string& name)
-	{
-		GLShaderPropertyManager *pManager = new GLShaderPropertyManager(name);
-		return GLShaderPropertyManagerPtr(pManager);
-	}
-
+ 
 	GLShaderPropertyManager::GLShaderPropertyManager(const std::string& name)
 		:ShaderPropertyManager(name)
 	{
@@ -604,7 +583,7 @@ namespace Disorder
 		if (!_uniformBlock)
 			return;
 
-		RenderBufferPtr renderbuffer = _uniformBlock->BufferParamRef->GetDataAsConstBuffer();
+		RenderBuffer* renderbuffer = _uniformBlock->BufferParamRef->GetDataAsConstBuffer();
 		BYTE *constBuffer = (BYTE*)GEngine->RenderEngine->Map(renderbuffer, BA_Write_Only);
 		memset(constBuffer, 0, _uniformBlock->BlockSize);
 		BYTE* pDest = constBuffer;

@@ -7,39 +7,30 @@ namespace Disorder
 	{
 	public:
 		~GLSamplerState();
-		static GLSamplerStatePtr Create(SamplerDesc* pSamplerDesc);
+		GLSamplerState(SamplerDesc* pSamplerDesc);
 		virtual void* GetHandle();
 
 
 	protected:
-		GLSamplerState();
 		GLuint _stateHandle;
 	};
 
 	class GLRasterizeState : public RasterizeState
 	{
 	public:
-		static GLRasterizeStatePtr Create(RasterizeDesc* pDesc);
-	protected:
-		GLRasterizeState(){}
+		GLRasterizeState(RasterizeDesc* pDesc);
 	};
 
 	class GLDepthStencilState : public DepthStencilState
 	{
 	public:
-		static GLDepthStencilStatePtr Create(DepthStencilDesc *pDepthStencilDesc, unsigned int stencilRef);
-	protected:
-		GLDepthStencilState(){}
+	    GLDepthStencilState(DepthStencilDesc *pDepthStencilDesc, unsigned int stencilRef);
 	};
 
 	class GLBlendState : public BlendState
 	{
 	public:
-		static GLBlendStatePtr Create(BlendDesc *pBlendDescArray, int BlendArraySize, bool AlphaToCoverageEnable = false, bool IndependentBlendEnable = false);
-	protected:
-		GLBlendState()
-		{
-		}
+		GLBlendState(BlendDesc *pBlendDescArray, int BlendArraySize, bool AlphaToCoverageEnable = false, bool IndependentBlendEnable = false);
 	};
 
 }

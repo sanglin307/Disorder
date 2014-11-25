@@ -6,6 +6,16 @@ namespace Disorder
 		:SizeX(sizeX),SizeY(sizeY)
 	{	
 		_bActive = true;
+		_renderPath = NULL;
+	}
+
+	Viewport::~Viewport()
+	{
+		if (_renderPath != NULL)
+		{
+			delete _renderPath;
+			_renderPath = NULL;
+		}
 	}
 
 	void Viewport::Render()
@@ -22,10 +32,16 @@ namespace Disorder
 			type = RPT_ForwardLighting;
 		}
 
+		if (_renderPath != NULL)
+		{
+			delete _renderPath;
+			_renderPath = NULL;
+		}
+
 		if( type == RPT_ForwardLighting )
-			_renderPath = ForwardRenderPath::Create();
+			_renderPath = new ForwardRenderPath;
 		else if(type == RPT_DeferredShading )
-			_renderPath = DeferredShading::Create();
+			_renderPath = new DeferredShading;
 		else
 			BOOST_ASSERT(0);
 	}
@@ -38,7 +54,7 @@ namespace Disorder
 			 SetRenderPath(RPT_ForwardLighting);
 	 }
 
-    RenderPathPtr Viewport::GetRenderPath()
+    RenderPath* Viewport::GetRenderPath() const
 	{
 		return _renderPath;
 	}

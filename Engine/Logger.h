@@ -15,10 +15,9 @@ namespace Disorder
 
 
 
-	class Logger : public Singleton<Logger>
+	class Logger 
 	{
 		friend class LoggerRunner;
-		friend class Singleton<Logger>;
 	public:
 
 		struct LogObj
@@ -35,19 +34,14 @@ namespace Disorder
 		void Warning(std::string const& warning);
 		void Info(std::string const& info);
  
-	
-
 	private:
-		static LoggerPtr Create();
-		Logger(){};
-
 		void Flush();
 
 		boost::thread _thread;
 
-		FileObjectPtr _errorFile;
-		FileObjectPtr _warningFile;
-		FileObjectPtr _infoFile;
+		FileObject* _errorFile;
+		FileObject* _warningFile;
+		FileObject* _infoFile;
 
 		boost::mutex _errorMutex;
 		boost::mutex _warningMutex;
@@ -60,7 +54,7 @@ namespace Disorder
 
 	};
 
-	#define GLogger Logger::GetSingleton()
+	extern Logger* GLogger;
 }
 
 

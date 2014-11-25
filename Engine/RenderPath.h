@@ -16,39 +16,39 @@ namespace Disorder
 		}
 
 	protected:
-
 		RenderPath();
-		void SetDirectionLight(const DirectionLightPtr& directionLight);
-		void SetPointLight(const PointLightPtr& pointLight);
-		void SetSpotLight(const SpotLightPtr& spotLight);
+		
+		void SetDirectionLight(DirectionLight* directionLight);
+		void SetPointLight(PointLight* pointLight);
+		void SetSpotLight(SpotLight* spotLight);
 
-		ShaderPropertyManagerPtr _DirectionLightPropertyManager;
-		ShaderPropertyPtr _DirectionLightIntensityProperty;
-		ShaderPropertyPtr _DirectionLightDirProperty;
-		ShaderPropertyPtr _DirectionLightColorProperty;
-		ShaderPropertyPtr _DirectionLightCastShadowProperty;
+		ShaderPropertyManager* _DirectionLightPropertyManager;
+		ShaderProperty* _DirectionLightIntensityProperty;
+		ShaderProperty* _DirectionLightDirProperty;
+		ShaderProperty* _DirectionLightColorProperty;
+		ShaderProperty* _DirectionLightCastShadowProperty;
 
-		ShaderPropertyManagerPtr _PointLightPropertyManager;
-		ShaderPropertyPtr _PointLightPosProperty;
-		ShaderPropertyPtr _PointLightColorProperty;
-		ShaderPropertyPtr _PointLightIntensityProperty;
-		ShaderPropertyPtr _PointLightRangeRcpProperty;
-		ShaderPropertyPtr _PointLightCastShadowProperty;
+		ShaderPropertyManager* _PointLightPropertyManager;
+		ShaderProperty* _PointLightPosProperty;
+		ShaderProperty* _PointLightColorProperty;
+		ShaderProperty* _PointLightIntensityProperty;
+		ShaderProperty* _PointLightRangeRcpProperty;
+		ShaderProperty* _PointLightCastShadowProperty;
 
-		ShaderPropertyManagerPtr _SpotLightPropertyManager;
-		ShaderPropertyPtr _SpotLightPosProperty;
-		ShaderPropertyPtr _SpotLightDirProperty;
-		ShaderPropertyPtr _SpotLightColorProperty;
-		ShaderPropertyPtr _SpotLightIntensityProperty;
-		ShaderPropertyPtr _SpotLightRangeRcpProperty;
-		ShaderPropertyPtr _SpotLightCosOuterConeProperty;
-		ShaderPropertyPtr _SpotLightCosInnerConeProperty;
-		ShaderPropertyPtr _SpotLightCastShadowProperty;
+		ShaderPropertyManager* _SpotLightPropertyManager;
+		ShaderProperty* _SpotLightPosProperty;
+		ShaderProperty* _SpotLightDirProperty;
+		ShaderProperty* _SpotLightColorProperty;
+		ShaderProperty* _SpotLightIntensityProperty;
+		ShaderProperty* _SpotLightRangeRcpProperty;
+		ShaderProperty* _SpotLightCosOuterConeProperty;
+		ShaderProperty* _SpotLightCosInnerConeProperty;
+		ShaderProperty* _SpotLightCastShadowProperty;
  
 	 
 		RenderPathType _type;
 
-		FXAAPtr _aaRender;
+		FXAA* _aaRender;
 
 	};
 
@@ -56,17 +56,14 @@ namespace Disorder
 	{
 	public:
 		virtual void Render();
-		static ForwardRenderPathPtr Create();
-
-	protected:
 		ForwardRenderPath();
- 
-		void BasePassRender(const CameraPtr& camera, const std::vector<GeometryRendererPtr>& renderList);
-		void RenderLights(const CameraPtr& camera, const std::vector<GeometryRendererPtr>& renderList);
-		RenderEffectPtr _BasePassEffect;
-		RenderEffectPtr _DirectionLightEffect;
-		RenderEffectPtr _PointLightEffect;
-		RenderEffectPtr _SpotLightEffect;
+	protected:
+		void BasePassRender(Camera* camera, const std::vector<GeometryRenderer*>& renderList);
+		void RenderLights(Camera* camera, const std::vector<GeometryRenderer*>& renderList);
+		RenderEffect* _BasePassEffect;
+		RenderEffect* _DirectionLightEffect;
+		RenderEffect* _PointLightEffect;
+		RenderEffect* _SpotLightEffect;
 	};
 
 	class DeferredShading : public RenderPath
@@ -74,19 +71,18 @@ namespace Disorder
 	public:
 	 
 		virtual void Render();
-		static DeferredShadingPtr Create();
-	protected:
 		DeferredShading();
-		void RenderScene(const CameraPtr& mainCamera, const std::vector<GeometryRendererPtr>& rendererList);
-		void RenderLights(const CameraPtr& camera, const std::vector<GeometryRendererPtr>& renderList);
+	protected:
+		void RenderScene(Camera* mainCamera, const std::vector<GeometryRenderer*>& rendererList);
+		void RenderLights(Camera* camera, const std::vector<GeometryRenderer*>& renderList);
 
-		RenderEffectPtr _RenderSceneEffect;
+		RenderEffect* _RenderSceneEffect;
 
 		SimpleTile _LightingTile;
-		RenderEffectPtr _BasePassEffect;
-		RenderEffectPtr _DirectionLightEffect;
-		RenderEffectPtr _PointLightEffect;
-		RenderEffectPtr _SpotLightEffect;
+		RenderEffect* _BasePassEffect;
+		RenderEffect* _DirectionLightEffect;
+		RenderEffect* _PointLightEffect;
+		RenderEffect* _SpotLightEffect;
 	};
 
 }

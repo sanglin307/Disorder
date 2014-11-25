@@ -22,18 +22,16 @@ namespace Disorder
 		TopologyType PrimitiveType;
 
 		void CalculateBounding();
-
-		static GeometryPtr Create(std::string const& name);
-
+		Geometry(std::string const& name);
 	private:
-		Geometry();
+		
 	};
 
 	class GeometryGenerator
 	{
 	public :
 
-		static GeometryPtr CreateCube(float length);
+		static Geometry* CreateCube(float length);
 	};
 }
 

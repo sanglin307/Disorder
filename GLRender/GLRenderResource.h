@@ -7,9 +7,8 @@ namespace Disorder
 	{
 	public:
 		~GLRenderBuffer();
-
-		static GLRenderBufferPtr Create(RenderBufferType type,GeometryPtr const& data,GLint location,BufferUsage bufferUsage,RenderEffectPtr const& effect);
-		static GLRenderBufferPtr Create(RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint);
+		GLRenderBuffer(RenderBufferType type,Geometry* data,GLint location,BufferUsage bufferUsage,RenderEffect* effect);
+		GLRenderBuffer(RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint);
 
 		virtual void * GetHandle();
 		virtual void Resize(unsigned int size);
@@ -20,7 +19,7 @@ namespace Disorder
 		}
 
 	private:
-		GLRenderBuffer();
+		
 		void DoCreateBuffer(void *pData);
 
 		GLenum GetGLBufferUsage(BufferUsage bufferUsage);
@@ -35,9 +34,11 @@ namespace Disorder
 	public:
 		~GLRenderTexture2D();
 
-		static GLRenderTexture2DPtr Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag);
-		static GLRenderTexture2DPtr Create(PixelFormat pixelFormat, bool bMultiSample,ImagePtr const& image);
-		static GLRenderTexture2DPtr Create(PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image, unsigned int flag);
+		GLRenderTexture2D(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag);
+		GLRenderTexture2D(PixelFormat pixelFormat, bool bMultiSample,Image* image);
+		GLRenderTexture2D(PixelFormat pixelFormat, bool bMultiSample, const std::vector<Image*>& image, unsigned int flag);
+		GLRenderTexture2D(int arraySize);
+		void InnerCreator(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag);
 
 		virtual void * GetHandle();
 		const GLenum GetGLFormat() const
@@ -46,8 +47,6 @@ namespace Disorder
 		}
 
 	protected:
-		GLRenderTexture2D(int arraySize);
- 
 		GLenum _texFormat;
 		GLuint _texHandle;
 		 

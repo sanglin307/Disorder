@@ -2,18 +2,17 @@
 
 namespace Disorder
 {
-	GLRenderBufferPtr GLRenderBuffer::Create(RenderBufferType type,GeometryPtr const& data,GLint location,BufferUsage bufferUsage,RenderEffectPtr const& effect)
+	GLRenderBuffer::GLRenderBuffer(RenderBufferType type,Geometry* data,GLint location,BufferUsage bufferUsage,RenderEffect* effect)
 	{
-		GLRenderEffectPtr glEffect = boost::dynamic_pointer_cast<GLRenderEffect>(effect);
+		GLRenderEffect* glEffect = (GLRenderEffect*)effect;
 		
 		int elementSize = 0;
 		int bufferSize = 0;
 
 		void *pData = NULL;
 		std::vector<float> vData;
-		GLRenderBuffer *pBuffer = new GLRenderBuffer;
-		pBuffer->_type = type;
-		pBuffer->_bufferUsage = bufferUsage;
+		_type = type;
+		_bufferUsage = bufferUsage;
 		
 
 		if( type == RBT_Vertex )
@@ -30,14 +29,13 @@ namespace Disorder
 			if( elementSize == 0 )
 			{
 				BOOST_ASSERT(0);
-				delete pBuffer;
-				return NULL;
+				return;
 			}
  
-			pBuffer->_elementSize = elementSize;
+			_elementSize = elementSize;
 			if( location == GLRenderLayout::Location_Position )
 			{
-				pBuffer->_bufferSize = pBuffer->_elementSize*data->Positions.size();
+				_bufferSize = _elementSize*data->Positions.size();
 				for(unsigned int index=0;index<data->Positions.size();++index)
 				{
 					glm::vec3& vec = data->ControllPositions[data->Positions[index]];
@@ -48,7 +46,7 @@ namespace Disorder
 			}
 			else if(location == GLRenderLayout::Location_Color )
 			{
-				pBuffer->_bufferSize = pBuffer->_elementSize*data->Colors.size();
+				_bufferSize = _elementSize*data->Colors.size();
 				for(unsigned int index=0;index<data->Colors.size();++index)
 				{
 					glm::vec4& vec = data->Colors[index];
@@ -60,7 +58,7 @@ namespace Disorder
 			}
 			else if(location == GLRenderLayout::Location_Normal )
 			{
-				pBuffer->_bufferSize = pBuffer->_elementSize*data->Normals.size();
+				_bufferSize = _elementSize*data->Normals.size();
 				for(unsigned int index=0;index<data->Normals.size();++index)
 				{
 					glm::vec3& vec = data->Normals[index];
@@ -71,7 +69,7 @@ namespace Disorder
 			}
 			else if(location == GLRenderLayout::Location_Tex0 )
 			{
-				pBuffer->_bufferSize = pBuffer->_elementSize*data->Texcoords.size();
+				_bufferSize = _elementSize*data->Texcoords.size();
 				for(unsigned int index=0;index<data->Texcoords.size();++index)
 				{
 					glm::vec2& vec = data->Texcoords[index];
@@ -90,27 +88,25 @@ namespace Disorder
 		{
 			if( data->Indices.size() > 0 )
 			{
-				pBuffer->_elementSize = sizeof(unsigned int);
-				pBuffer->_bufferSize = sizeof(unsigned int) * data->Indices.size();
+				_elementSize = sizeof(unsigned int);
+				_bufferSize = sizeof(unsigned int) * data->Indices.size();
 				pData = data->Indices.data();
 			}
 			else
 			{
 				BOOST_ASSERT(0);
-				delete pBuffer;
-				return NULL;
+				return;
+	
 			}
 		}
 		else
 		{
 			BOOST_ASSERT(0);
-			delete pBuffer;
-			return NULL;
+			return;
 		}
 
-		pBuffer->DoCreateBuffer(pData);
+	    DoCreateBuffer(pData);
 
-		return GLRenderBufferPtr(pBuffer);
 	}
 
 	void * GLRenderBuffer::GetHandle()
@@ -132,6 +128,7 @@ namespace Disorder
 
 	void GLRenderBuffer::DoCreateBuffer(void *pData)
 	{
+		glGenBuffers(1, &_bufferHandle);
 		if( _type == RBT_Vertex )
 		{
 			glBindBuffer(GL_ARRAY_BUFFER,_bufferHandle);
@@ -178,25 +175,17 @@ namespace Disorder
 
 	}
 
-	GLRenderBufferPtr GLRenderBuffer::Create(RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint)
+	GLRenderBuffer::GLRenderBuffer(RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint)
 	{
-		GLRenderBuffer *pBuffer = new GLRenderBuffer;
-		pBuffer->_type = type;
-		pBuffer->_bufferUsage = bufferUsage;
-		pBuffer->_elementSize = elementSize;
-		pBuffer->_bufferSize = size;
-		pBuffer->_bindingPoint = bindingPoint;
+		_type = type;
+		_bufferUsage = bufferUsage;
+		_elementSize = elementSize;
+		_bufferSize = size;
+		_bindingPoint = bindingPoint;
 
-		pBuffer->DoCreateBuffer(pData);
-		 
-
-		return GLRenderBufferPtr(pBuffer);
+		DoCreateBuffer(pData);
 	}
 
-	GLRenderBuffer::GLRenderBuffer()
-	{
-		glGenBuffers(1,&_bufferHandle);
-	}
 
 	GLRenderBuffer::~GLRenderBuffer()
 	{
@@ -205,8 +194,12 @@ namespace Disorder
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////
+	GLRenderTexture2D::GLRenderTexture2D(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
+	{
+		InnerCreator(pixelFormat, width, height, bMipmap, bMultiSample, viewFlag, arraySize, pData, flag);
+	}
 
-	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat, bool bMultiSample,ImagePtr const& image)
+	GLRenderTexture2D::GLRenderTexture2D(PixelFormat pixelFormat, bool bMultiSample,Image* image)
 	{
 		const ImageSpec &spec = image->GetSpec();
 		BufferInitData data;
@@ -214,13 +207,13 @@ namespace Disorder
 		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat)/8 * spec.width;
 		data.SlicePitch = 0;
 
-		return Create(pixelFormat, spec.width, spec.height, false, bMultiSample, SV_ShaderResource,1, &data,0);
+		InnerCreator(pixelFormat, spec.width, spec.height, false, bMultiSample, SV_ShaderResource,1, &data,0);
 	}
 
-	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image, unsigned int flag)
+	GLRenderTexture2D::GLRenderTexture2D(PixelFormat pixelFormat, bool bMultiSample, const std::vector<Image*>& image, unsigned int flag)
 	{
 		if (image.size() == 0)
-			return NULL;
+			return;
 
 		const ImageSpec &spec = image[0]->GetSpec();
 		BYTE* pData = new BYTE[spec.dataSize*image.size()];
@@ -238,29 +231,25 @@ namespace Disorder
 		data.RowPitch = RenderEngine::ComputePixelSizeBits(pixelFormat) / 8 * spec.width;
 		data.SlicePitch = spec.dataSize;
 
-		GLRenderTexture2DPtr result = Create(pixelFormat, spec.width, spec.height, false, bMultiSample,SV_ShaderResource, image.size(), &data,flag);
+		InnerCreator(pixelFormat, spec.width, spec.height, false, bMultiSample, SV_ShaderResource, image.size(), &data, flag);
 		delete pData;
-
-		return result;
 	}
 
-	GLRenderTexture2DPtr GLRenderTexture2D::Create(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
+	void GLRenderTexture2D::InnerCreator(PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
 	{
-		GLRenderTexture2D *pTexture = new GLRenderTexture2D(arraySize);
-
-		pTexture->Format = pixelFormat;
-		pTexture->Height = height;
-		pTexture->Width = width;
-		pTexture->ArraySize = arraySize;
+		Format = pixelFormat;
+		Height = height;
+		Width = width;
+		ArraySize = arraySize;
 
 		if (bMipmap)
 		{ 
 	        unsigned int w = Math::LogTwo(width);
 			unsigned int h = Math::LogTwo(height);
-			pTexture->MipLevel = w > h ? h : w;
+			MipLevel = w > h ? h : w;
 		}
 		else
-			pTexture->MipLevel = 1;
+		    MipLevel = 1;
      
 		// format 
 		GLenum glFormat = 0;
@@ -277,19 +266,19 @@ namespace Disorder
 
 		if (arraySize == 6 && (flag & SF_AsCubeMap) )
 		{
-			pTexture->_texFormat = GL_TEXTURE_CUBE_MAP;
+			_texFormat = GL_TEXTURE_CUBE_MAP;
 		}
 		else if (arraySize > 1)
 		{
-			pTexture->_texFormat = GL_TEXTURE_2D_ARRAY;
+			_texFormat = GL_TEXTURE_2D_ARRAY;
 			if (bMultiSample)
-				pTexture->_texFormat = GL_TEXTURE_2D_MULTISAMPLE_ARRAY;
+				_texFormat = GL_TEXTURE_2D_MULTISAMPLE_ARRAY;
 		}
 		else if (arraySize == 1)
 		{
-			pTexture->_texFormat = GL_TEXTURE_2D;
+			_texFormat = GL_TEXTURE_2D;
 			if (bMultiSample)
-				pTexture->_texFormat = GL_TEXTURE_2D_MULTISAMPLE;
+				_texFormat = GL_TEXTURE_2D_MULTISAMPLE;
 		}
 		else
 			BOOST_ASSERT(0);
@@ -300,20 +289,20 @@ namespace Disorder
 
 		// texture create.
 		// for layer texture rendering
-		if (pTexture->_texFormat == GL_TEXTURE_2D_ARRAY)
+		if (_texFormat == GL_TEXTURE_2D_ARRAY)
 		{
-			glBindTexture(pTexture->_texFormat, pTexture->_texHandle);			 
+			glBindTexture(_texFormat, _texHandle);			 
 			if (bMultiSample)
-				glTexStorage3DMultisample(pTexture->_texFormat, GConfig->pRenderConfig->MultiSampleCount, storageFormat, width, height, arraySize, false);
+				glTexStorage3DMultisample(_texFormat, GConfig->pRenderConfig->MultiSampleCount, storageFormat, width, height, arraySize, false);
 			else
-				glTexStorage3D(pTexture->_texFormat, pTexture->MipLevel, storageFormat, width, height, arraySize);
+				glTexStorage3D(_texFormat, MipLevel, storageFormat, width, height, arraySize);
 			
 		}
-		else if (pTexture->_texFormat == GL_TEXTURE_CUBE_MAP)
+		else if (_texFormat == GL_TEXTURE_CUBE_MAP)
 		{
-			glBindTexture(pTexture->_texFormat, pTexture->_texHandle);
+			glBindTexture(_texFormat, _texHandle);
 			 
-			glTexStorage2D(pTexture->_texFormat, pTexture->MipLevel, storageFormat, width, height);
+			glTexStorage2D(_texFormat, MipLevel, storageFormat, width, height);
 			glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 			if (pTextureData)
 			{
@@ -324,17 +313,17 @@ namespace Disorder
 				}
 			}
 		}
-		else if (pTexture->_texFormat == GL_TEXTURE_2D)
+		else if (_texFormat == GL_TEXTURE_2D)
 		{
-			glBindTexture(pTexture->_texFormat, pTexture->_texHandle);
+			glBindTexture(_texFormat, _texHandle);
 			 
 			if (bMultiSample)
-				glTexStorage2DMultisample(pTexture->_texFormat, GConfig->pRenderConfig->MultiSampleCount, storageFormat, width, height, false);
+				glTexStorage2DMultisample(_texFormat, GConfig->pRenderConfig->MultiSampleCount, storageFormat, width, height, false);
 			else
-				glTexStorage2D(pTexture->_texFormat, pTexture->MipLevel, storageFormat, width, height);
+				glTexStorage2D(_texFormat,MipLevel, storageFormat, width, height);
 
 			if (pTextureData != NULL)
-				glTexSubImage2D(pTexture->_texFormat, 0, 0, 0, width, height, glFormat, glType, pTextureData);
+				glTexSubImage2D(_texFormat, 0, 0, 0, width, height, glFormat, glType, pTextureData);
 		}
 		else
 		{
@@ -343,10 +332,8 @@ namespace Disorder
 		
  
 		if (bMipmap)
-			glGenerateMipmap(pTexture->_texFormat);
+			glGenerateMipmap(_texFormat);
 		
-
-		return GLRenderTexture2DPtr(pTexture);
 	}
 
 	GLRenderTexture2D::GLRenderTexture2D(int arraySize)

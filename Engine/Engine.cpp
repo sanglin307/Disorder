@@ -3,15 +3,34 @@
 
 namespace Disorder
 {
-   InitialiseSingleton(Engine);
+   Engine *GEngine = NULL;
 
    Engine::Engine()
    {
-	   FileManager = FileSystem::Create();
+	   FileManager = new FileSystem;
+	   SurfaceCache = new RenderSurfaceCache;
+	   SceneImporter = new FbxSceneImporter;
    }
 
    Engine::~Engine()
    {
+	   if (FileManager != NULL)
+	   {
+		   delete FileManager;
+		   FileManager = NULL;
+	   }
+
+	   if (SurfaceCache != NULL)
+	   {
+		   delete SurfaceCache;
+		   SurfaceCache = NULL;
+	   }
+
+	   if (SceneImporter != NULL)
+	   {
+		   delete SceneImporter;
+		   SceneImporter = NULL;
+	   }
    }
 
    void Engine::Init()
@@ -19,22 +38,22 @@ namespace Disorder
 	   //Client Init
 	   GLogger->Init();
 	   RenderEngine->Init();
-	   GameClient->Init();
+	   GClient->Init();
 
-	   ViewportPtr const& viewport = GameClient->GetViewport(0);
+	   Viewport* viewport = GClient->GetViewport(0);
 	   RenderEngine->CreateViewport(viewport->GetWindow());	 
 
 	   RenderResourceMgr->Init();
 	 //  GFontManager->LoadFontImageData();
 	   // shadowMap
 	   unsigned int shadowSize = GConfig->pRenderConfig->ShadowMapSize;
-	   GEngine->RenderSurfaceCache->ShadowMapBuffer = ShadowMap::Create(shadowSize, shadowSize);
+	   GEngine->SurfaceCache->ShadowMapBuffer = new ShadowMap(shadowSize, shadowSize);
 
 	   viewport->SetRenderPath(RPT_DeferredShading);
 	   SceneImporter->Init();
 
-	   GameCanvas = Canvas::Create(viewport->SizeX,viewport->SizeY);
-	   GameConsole = Console::Create();
+	   GameCanvas = new Canvas(viewport->SizeX,viewport->SizeY);
+	   GameConsole = new Console();
 	   GSceneManager->Init();
  
 	   GWorld->Init();
@@ -45,7 +64,7 @@ namespace Disorder
    {
 	 
 	   //Client first
-	   GameClient->Tick(deltaSeconds);
+	   GClient->Tick(deltaSeconds);
  
 	   //GWorld
 	   GWorld->Tick(deltaSeconds);
@@ -56,7 +75,7 @@ namespace Disorder
 	   Stat.Tick(deltaSeconds);
 
 	   //Draw Evertything~
-	   GameClient->GetViewport(0)->Render();
+	   GClient->GetViewport(0)->Render();
 
 	   Stat.FrameCounter++;
 
@@ -68,7 +87,7 @@ namespace Disorder
 	 
 	   GWorld->Exit();
 	   GSceneManager->Exit();
-	   GameClient->Exit();
+	   GClient->Exit();
 	   SceneImporter->Exit();
 	   RenderEngine->Exit();
 	   GLogger->Exit();
@@ -79,20 +98,12 @@ namespace Disorder
    {
 	   if (!_bDrawEnable)
 			return;
- 
-		CanvasPtr canvas = GEngine->GameCanvas;
 
 		std::stringstream strstream;
 		strstream << "Drawed triangle num:" << _lastFrameDrawTriNumber;
 		std::string drawstr = strstream.str();
-		unsigned int length = canvas->GetStringLength(drawstr);
-		canvas->DrawString(GConfig->pRenderConfig->SizeX - 5 - length, 10, drawstr);
-   }
-
-   EnginePtr Engine::Create()
-   {
-	   Engine *pEngine = new Engine;
-	   return EnginePtr(pEngine);
+		unsigned int length = GEngine->GameCanvas->GetStringLength(drawstr);
+		GEngine->GameCanvas->DrawString(GConfig->pRenderConfig->SizeX - 5 - length, 10, drawstr);
    }
 
    void EngineStat::Tick(float deltaSeconds)
@@ -103,7 +114,6 @@ namespace Disorder
 	   timeDelta += deltaSeconds;
 	   frameCount ++;
 
-	   CanvasPtr canvas = GEngine->GameCanvas;
 	   float x = 10.f;
 	   float y = 10.f;
 	  
@@ -117,7 +127,7 @@ namespace Disorder
 
 	    std::stringstream strstream;
 		strstream << "Fps:" << fps << "  Frame Delta:"<< deltaSeconds;
-		canvas->DrawString(5,10,strstream.str());
+		GEngine->GameCanvas->DrawString(5, 10, strstream.str());
 		strstream.clear();
 
    }

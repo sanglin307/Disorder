@@ -17,18 +17,17 @@ namespace Disorder
 		void AddKeyboardEvent(KeyboardInputEvent const& keyEvent);
 		void AddMouseEvent(MouseInputEvent const& mouseEvent);
 
-		void AddInputListener(InputListenerPtr listener);
-		void ReleaseInputListener(InputListenerPtr listener);
+		void AddInputListener(InputListener* listener);
+		void ReleaseInputListener(InputListener* listener);
 		void ReleaseAllInputListener();
- 
 
-		inline ViewportPtr const& GetViewport(unsigned int Index)
+		inline Viewport* const& GetViewport(unsigned int Index)
 		{
-			BOOST_ASSERT(Index >= 0 && Index <_Viewports.size());
-			return _Viewports[Index];
+			BOOST_ASSERT(Index >= 0 && Index <_viewports.size());
+			return _viewports[Index];
 		}
 
-		inline InputManagerPtr const& GetInputManager() const
+		inline InputManager *GetInputManager() const
 		{
 			return _inputManager;
 		}
@@ -37,15 +36,15 @@ namespace Disorder
 		virtual void CreateViewport(int x,int y,int sizeX,int sizeY,void* hWnd);
 
 	protected:
-	    static std::vector<ViewportPtr> _Viewports;
-	    InputManagerPtr _inputManager;
+	    std::vector<Viewport *> _viewports;
+	    InputManager* _inputManager;
 		std::list<KeyboardInputEvent> _keyboardEvents;
 		std::list<MouseInputEvent>  _mouseEvents;
-		std::list<InputListenerPtr> _inputListenerList;
+		std::list<InputListener*> _inputListenerList;
 
 	};
 
-	
+	extern Client* GClient;
 }
  
 

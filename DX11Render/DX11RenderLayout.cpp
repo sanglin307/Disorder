@@ -9,22 +9,15 @@ namespace Disorder
 
 	void* DX11RenderLayout::GetHandle()
 	{
-		if( D3DInterface != NULL )
-			return D3DInterface.get();
-
-		return 0;
-
+		return D3DInterface;
 	}
 
-	DX11RenderLayoutPtr DX11RenderLayout::Create(RenderEffectPtr const& renderEffect,TopologyType topologyType,bool soloBuffer)
+	DX11RenderLayout::DX11RenderLayout(RenderEffect* renderEffect,TopologyType topologyType,bool soloBuffer)
 	{
-		ShaderObjectPtr vertexShader = renderEffect->GetVertexShader();
-		DX11ShaderReflectionPtr shaderReflection = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader)->ShaderReflect;
+		ShaderObject* vertexShader = renderEffect->GetVertexShader();
+		DX11ShaderReflection* shaderReflection = ((DX11ShaderObject*)vertexShader)->ShaderReflect;
 		BOOST_ASSERT(shaderReflection != NULL );
- 
-		DX11RenderLayout *pLayout = new DX11RenderLayout;
-
-		pLayout->_topologyType = topologyType;
+		_topologyType = topologyType;
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> vElementDes;
 
@@ -35,7 +28,7 @@ namespace Disorder
 			D3D11_INPUT_ELEMENT_DESC desc;
 			desc.SemanticName = shaderReflection->InputSignatureParameters[index].SemanticName.c_str();
 			desc.SemanticIndex = shaderReflection->InputSignatureParameters[index].SemanticIndex;
-			desc.Format =  pLayout->GetInputFormat(shaderReflection->InputSignatureParameters[index].ComponentType,shaderReflection->InputSignatureParameters[index].Mask);
+			desc.Format =  GetInputFormat(shaderReflection->InputSignatureParameters[index].ComponentType,shaderReflection->InputSignatureParameters[index].Mask);
 			if( soloBuffer )
 			{
 			   desc.InputSlot = 0;
@@ -60,15 +53,15 @@ namespace Disorder
 		//cached layout interface
 		std::wstring hashKey;
 		Math::HashBuffer(vElementDes.data(), sizeof(D3D11_INPUT_ELEMENT_DESC)* vElementDes.size(), hashKey);
-		DX11RenderResourceManagerPtr mgr = boost::dynamic_pointer_cast<DX11RenderResourceManager>(GEngine->RenderResourceMgr);
-		ID3D11InputLayoutPtr cacheLayout = mgr->GetRenderLayout(hashKey);
+		DX11RenderResourceManager* mgr = (DX11RenderResourceManager*)GEngine->RenderResourceMgr;
+		ID3D11InputLayout* cacheLayout = mgr->GetRenderLayout(hashKey);
 		if (cacheLayout != NULL)
 		{
-			pLayout->D3DInterface = cacheLayout;
-			return DX11RenderLayoutPtr(pLayout);
+			D3DInterface = cacheLayout;
+			return;
 		}
 
-		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine; 
  
 		// Create the input layout
 		ID3D11InputLayout* pInputLayout = NULL;
@@ -78,18 +71,13 @@ namespace Disorder
 		
 		if( hr != S_OK )
 		{
-			delete pLayout;
-			return NULL;
+			return;
 		}
 
 		
 
-		pLayout->D3DInterface = MakeComPtr<ID3D11InputLayout>(pInputLayout);
-		mgr->UpdateRenderLayout(hashKey, pLayout->D3DInterface);
-
-		return DX11RenderLayoutPtr(pLayout);
-	 
-
+		D3DInterface = pInputLayout;
+		mgr->UpdateRenderLayout(hashKey, D3DInterface);
 	}
 
 	DXGI_FORMAT DX11RenderLayout::GetInputFormat(D3D_REGISTER_COMPONENT_TYPE component,BYTE mask)

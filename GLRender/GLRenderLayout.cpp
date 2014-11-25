@@ -59,9 +59,9 @@ namespace Disorder
 		return 0;
 	}
 
-	void GLRenderLayout::FinishBufferBinding(RenderEffectPtr const& renderEffect)
+	void GLRenderLayout::FinishBufferBinding(RenderEffect* renderEffect)
 	{
-		GLRenderEffectPtr glEffect = boost::dynamic_pointer_cast<GLRenderEffect>(renderEffect);
+		GLRenderEffect* glEffect = (GLRenderEffect*)renderEffect;
 		BOOST_ASSERT(glEffect->EffectReflection->InputArray.size() > 0 );
 		BOOST_ASSERT(_VAOHandle > 0 );
  
@@ -108,11 +108,9 @@ namespace Disorder
 		glBindVertexArray(0);
 	}
 
-	GLRenderLayoutPtr GLRenderLayout::Create(RenderEffectPtr const& renderEffect,TopologyType topologyType,bool soloBuffer)
+	GLRenderLayout::GLRenderLayout(RenderEffect* renderEffect,TopologyType topologyType,bool soloBuffer)
 	{
-		GLRenderLayout *pLayout = new GLRenderLayout;
-		pLayout->_topologyType = topologyType;
-		glGenVertexArrays(1, &(pLayout->_VAOHandle)); 
-		return GLRenderLayoutPtr(pLayout);
+		_topologyType = topologyType;
+		glGenVertexArrays(1, &_VAOHandle); 
 	}
 }

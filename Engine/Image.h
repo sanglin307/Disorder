@@ -39,17 +39,17 @@ namespace Disorder
 			return _pPixelRawData;
 		}
 
-		void SetResource(RenderTexture2DPtr resource)
+		void SetResource(RenderTexture2D* resource)
 		{
 			_resource = resource;
 		}
 
-		const RenderTexture2DPtr GetResource() const
+		RenderTexture2D* GetResource() const
 		{
 			return _resource;
 		}
  
-		static ImagePtr Create(EImageType type,int width, int height, PixelFormat format, BYTE* pData, unsigned int dataSize);
+		static Image* Create(EImageType type,int width, int height, PixelFormat format, BYTE* pData, unsigned int dataSize);
 	 
 		~Image();
 
@@ -63,38 +63,34 @@ namespace Disorder
 	
 		ImageSpec _imageSpec;
 		BYTE* _pPixelRawData; 
-		RenderTexture2DPtr _resource;
+		RenderTexture2D* _resource;
 	};
 
-
-	class ImageManager : public Singleton<ImageManager>
+	class ImageManager  
 	{
-		friend class Singleton<ImageManager>;
 	public:
-		ImagePtr Load(std::string const& fileName, bool reloadIfExist = false);
-		ImagePtr Load(std::string const& fileName, SamplerDesc* desc, bool reloadIfExist = false);
-		bool Save(std::string const& fileName,ImagePtr const& image);
-		void Add(std::string const& imageName,ImagePtr const& image);
-		ImagePtr Find(std::string const& imageName);
+		Image* Load(std::string const& fileName, bool reloadIfExist = false);
+		Image* Load(std::string const& fileName, SamplerDesc* desc, bool reloadIfExist = false);
+		bool Save(std::string const& fileName,const Image* image);
+		void Add(std::string const& imageName,Image* image);
+		Image* Find(std::string const& imageName);
 
 		bool IsSupported(std::string& suffix);
-		
+		~ImageManager();
 	private:
-		ImageManager(){};
-		static ImageManagerPtr Create();
-		std::map<std::string,ImagePtr> _mapImages;
+		std::map<std::string,Image*> _mapImages;
 
-		ImagePtr LoadPng(std::string const& fileName);
-		ImagePtr LoadJpg(std::string const& fileName);
+		Image* LoadPng(std::string const& fileName);
+		Image* LoadJpg(std::string const& fileName);
 
-		bool SavePng(std::string const& fileName, ImagePtr const& image);
-		bool SaveJpg(std::string const& fileName, ImagePtr const& image);
+		bool SavePng(std::string const& fileName, const Image* image);
+		bool SaveJpg(std::string const& fileName, const Image* image);
 
 		void Convert_R8G8B8_R8G8B8A8(BYTE *pSrc,unsigned int srcLength, BYTE *pDst,unsigned int dstLength);
 
 	};
 
-	#define GImageManager ImageManager::GetSingleton()
+	extern ImageManager* GImageManager;
 }
 
 

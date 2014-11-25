@@ -10,26 +10,16 @@ namespace Disorder
 		}
 	}
 
-	SurfaceViewPtr RenderSurface::GetSurfaceView(ESurfaceLocation location)
+	SurfaceView* RenderSurface::GetSurfaceView(ESurfaceLocation location)
 	{
 		return _surfacesViewArray[location];
 	}
-
-	MainRenderTargetPtr MainRenderTarget::Create(const RenderSurfacePtr renderTargetBuffer, const SurfaceViewPtr renderTargetShaderView, const SurfaceViewPtr renderTargetView, const SurfaceViewPtr depthBufferView)
-	{
-		MainRenderTarget *pTarget = new MainRenderTarget(renderTargetBuffer, renderTargetShaderView, renderTargetView, depthBufferView);
-		return MainRenderTargetPtr(pTarget);
-	}
-
-	RenderGBufferPtr RenderGBuffer::Create(unsigned int width, unsigned int height)
-	{
-		RenderGBuffer *pBuffer = new RenderGBuffer(width, height);
-		return RenderGBufferPtr(pBuffer);
-	}
+ 
+ 
 
 	RenderGBuffer::RenderGBuffer(unsigned int width, unsigned int height)
 	{
-		ShaderPropertyManagerPtr propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderPropertyManager* propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 		_GBufferDepthTexture = propertyManager->CreateProperty(ShaderPropertyManager::sGBufferDepthTexture,eSP_ShaderResource);
 		_GBufferColorSpecIntTexture = propertyManager->CreateProperty(ShaderPropertyManager::sGBufferColorSpecIntTexture,eSP_ShaderResource);
 		_GBufferNormalTexture = propertyManager->CreateProperty(ShaderPropertyManager::sGBufferNormalTexture,eSP_ShaderResource);
@@ -38,41 +28,41 @@ namespace Disorder
 		_SurfaceSampler = propertyManager->CreateProperty(ShaderPropertyManager::sSurfaceSampler,eSP_SampleState);
  
 		SamplerDesc sDesc;
-		SamplerStatePtr pointState = GEngine->RenderResourceMgr->CreateSamplerState(&sDesc);
+		SamplerState* pointState = GEngine->RenderResourceMgr->CreateSamplerState(&sDesc);
 		_SurfaceSampler->SetData(pointState);
  
-		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R24G8_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource,1, NULL,0);
+		RenderTexture2D* depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R24G8_TYPELESS, width, height, false, false, SV_DepthStencil | SV_ShaderResource,1, NULL,0);
 		DepthBufferView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, depthStencilTex, PF_D24_UNORM_S8_UINT, SF_ReadOnlyDepth | SF_ReadOnlyStencil);
 		DepthShaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, depthStencilTex, PF_R24_UNORM_X8_TYPELESS);
 
-		RenderTexture2DPtr basicColorTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, width, height, false, false, SV_RenderTarget | SV_ShaderResource,1, NULL,0);
+		RenderTexture2D* basicColorTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, width, height, false, false, SV_RenderTarget | SV_ShaderResource,1, NULL,0);
 		BasicColorShaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, basicColorTex, PF_R8G8B8A8_UNORM);
 		BasicColorTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, basicColorTex, PF_R8G8B8A8_UNORM);
 
-		RenderTexture2DPtr normalTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R11G11B10_FLOAT, width, height, false, false, SV_RenderTarget | SV_ShaderResource, 1,NULL,0);
+		RenderTexture2D* normalTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R11G11B10_FLOAT, width, height, false, false, SV_RenderTarget | SV_ShaderResource, 1,NULL,0);
 		NormalDataShaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, normalTex, PF_R11G11B10_FLOAT);
 		NormalDataTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, normalTex, PF_R11G11B10_FLOAT);
 
-		RenderTexture2DPtr specularTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, width, height, false, false, SV_RenderTarget | SV_ShaderResource, 1,NULL,0);
+		RenderTexture2D* specularTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, width, height, false, false, SV_RenderTarget | SV_ShaderResource, 1,NULL,0);
 		SpecularDataShaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, specularTex, PF_R8G8B8A8_UNORM);
 		SpecularDataTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, specularTex, PF_R8G8B8A8_UNORM);
 
 		
-		std::map<ESurfaceLocation, SurfaceViewPtr> viewMap;
-		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, DepthBufferView));
-		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, BasicColorTargetView));
-		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget2, NormalDataTargetView));
-		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget3, SpecularDataTargetView));
+		std::map<ESurfaceLocation, SurfaceView*> viewMap;
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_DepthStencil, DepthBufferView));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_RenderTarget1, BasicColorTargetView));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_RenderTarget2, NormalDataTargetView));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_RenderTarget3, SpecularDataTargetView));
 		RenderTargetBuffer = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 
 		viewMap.clear();
-		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, DepthBufferView));
-		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, GEngine->RenderSurfaceCache->MainTarget->RenderTargetView));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_DepthStencil, DepthBufferView));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_RenderTarget1, GEngine->RenderSurfaceCache->MainTarget->RenderTargetView));
 		MainTargetGDepth = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 
 		_GBufferVisualEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "SurfaceVisual", SM_4_0, "VS");
-		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "SurfaceVisual", SM_4_0, "PS");
+		ShaderObject* vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "SurfaceVisual", SM_4_0, "VS");
+		ShaderObject* pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "SurfaceVisual", SM_4_0, "PS");
 		_GBufferVisualEffect->BindShader(vertexShader);
 		_GBufferVisualEffect->BindShader(pixelShader);
 		_GBufferVisualEffect->LinkShaders();
@@ -80,7 +70,7 @@ namespace Disorder
  
 		DepthStencilDesc depthDesc;
 		depthDesc.DepthEnable = false;
-		DepthStencilStatePtr _DepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&depthDesc, 0);
+		DepthStencilState* _DepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&depthDesc, 0);
 		_GBufferVisualEffect->BindDepthStencilState(_DepthWriteState);
 
 		TileTexVertex vertex[4];
@@ -133,7 +123,7 @@ namespace Disorder
 		if (!GSceneManager->EnableDebugDraw)
 			return;
 
-		CameraPtr mainCamera = GSceneManager->GetDefaultCamera();
+		Camera* mainCamera = GSceneManager->GetDefaultCamera();
 
 		//_GBufferVisTex->SetData(DepthStencilBuffer);
 		//_DepthVisTile.Render(mainCamera);
@@ -145,12 +135,7 @@ namespace Disorder
 		_SpecPowVisTile.Render(mainCamera);
 	}
 	
-
-	RenderSurfaceCachePtr RenderSurfaceCache::Create()
-	{
-		RenderSurfaceCache *pCache = new RenderSurfaceCache;
-		return RenderSurfaceCachePtr(pCache);
-	}
+ 
 
 	RenderSurfaceCache::~RenderSurfaceCache()
 	{

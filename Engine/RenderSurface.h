@@ -1,7 +1,7 @@
 #ifndef _DISORDER_RENDERSURFACE_H_
 #define _DISORDER_RENDERSURFACE_H_
 
-#include "Renderer.h"
+ 
 
 namespace Disorder
 {
@@ -27,7 +27,7 @@ namespace Disorder
 		virtual void* GetHandle(){ return 0; }
 
 		ESurfaceViewType Type;
-		RenderTexturePtr Resource;
+		RenderTexture* Resource;
 		PixelFormat Format;
 		unsigned int Flag;
 		
@@ -50,93 +50,82 @@ namespace Disorder
 	class RenderSurface : public RenderResource
 	{
 	public:
-		SurfaceViewPtr GetSurfaceView(ESurfaceLocation location);
-
-	protected:
+		SurfaceView* GetSurfaceView(ESurfaceLocation location);
 		RenderSurface();
-		std::vector<SurfaceViewPtr> _surfacesViewArray;
+	protected:	
+		std::vector<SurfaceView*> _surfacesViewArray;
 	};
  
 	class MainRenderTarget
 	{
 	public:
-
-		static MainRenderTargetPtr Create(const RenderSurfacePtr renderTargetBuffer, const SurfaceViewPtr renderTargetShaderView, const SurfaceViewPtr renderTargetView, const SurfaceViewPtr depthBufferView);
-
-		RenderSurfacePtr RenderTargetSurface;
-		SurfaceViewPtr RenderTargetShaderView;
-		SurfaceViewPtr RenderTargetView;
-		SurfaceViewPtr DepthBufferView;
-
-	protected:
-
-		MainRenderTarget(const RenderSurfacePtr renderTargetBuffer, const SurfaceViewPtr renderTargetShaderView, const SurfaceViewPtr renderTargetView, const SurfaceViewPtr depthBufferView)
-			:RenderTargetSurface(renderTargetBuffer), RenderTargetShaderView(renderTargetShaderView), RenderTargetView(renderTargetView), DepthBufferView(depthBufferView)
+ 
+		MainRenderTarget(RenderSurface* renderTargetBuffer, SurfaceView* renderTargetShaderView, SurfaceView* renderTargetView,SurfaceView* depthBufferView)
 		{
+			RenderTargetSurface = renderTargetBuffer;
+			RenderTargetShaderView = renderTargetShaderView;
+			RenderTargetView = renderTargetView;
+			DepthBufferView = depthBufferView;
 		}
 
-		
+		RenderSurface* RenderTargetSurface;
+		SurfaceView* RenderTargetShaderView;
+		SurfaceView* RenderTargetView;
+		SurfaceView* DepthBufferView;
 
+ 
 	};
 
 	class RenderGBuffer
 	{
 	public:
 	 
-		RenderSurfacePtr RenderTargetBuffer;
-		RenderSurfacePtr MainTargetGDepth;
+		RenderSurface* RenderTargetBuffer;
+		RenderSurface* MainTargetGDepth;
 
-		SurfaceViewPtr DepthShaderView;
-		SurfaceViewPtr DepthBufferView;
+		SurfaceView* DepthShaderView;
+		SurfaceView* DepthBufferView;
 		
-		SurfaceViewPtr BasicColorShaderView;
-		SurfaceViewPtr BasicColorTargetView;
+		SurfaceView* BasicColorShaderView;
+		SurfaceView* BasicColorTargetView;
 
-		SurfaceViewPtr NormalDataShaderView;
-		SurfaceViewPtr NormalDataTargetView;
+		SurfaceView* NormalDataShaderView;
+		SurfaceView* NormalDataTargetView;
 
-		SurfaceViewPtr SpecularDataShaderView;
-		SurfaceViewPtr SpecularDataTargetView;
+		SurfaceView* SpecularDataShaderView;
+		SurfaceView* SpecularDataTargetView;
 
 		virtual void UpdateShaderProperty();
 
 		virtual void DebugVisual();
 
-		static RenderGBufferPtr Create(unsigned int width, unsigned int height);
-
-	protected:
 		RenderGBuffer(unsigned int width, unsigned int height);
 
-		ShaderPropertyPtr _GBufferDepthTexture;
-		ShaderPropertyPtr _GBufferColorSpecIntTexture;
-		ShaderPropertyPtr _GBufferNormalTexture;
-		ShaderPropertyPtr _GBufferSpecPowTexture;
+	protected:
+		
+		ShaderProperty* _GBufferDepthTexture;
+		ShaderProperty* _GBufferColorSpecIntTexture;
+		ShaderProperty* _GBufferNormalTexture;
+		ShaderProperty* _GBufferSpecPowTexture;
 
-		ShaderPropertyPtr _SurfaceVisTex;
-		ShaderPropertyPtr _SurfaceSampler;
+		ShaderProperty* _SurfaceVisTex;
+		ShaderProperty* _SurfaceSampler;
 
-		RenderEffectPtr _GBufferVisualEffect;
+		RenderEffect* _GBufferVisualEffect;
 
 		SimpleTile _DepthVisTile;
 		SimpleTile _ColorVisTile;
 		SimpleTile _NormalVisTile;
 		SimpleTile _SpecPowVisTile;
-
-
 	};
 
 	class RenderSurfaceCache
 	{
 	public:
 		~RenderSurfaceCache();
-		MainRenderTargetPtr MainTarget;
-		RenderGBufferPtr GBuffer;
-		ShadowMapPtr ShadowMapBuffer;
-		
-		static RenderSurfaceCachePtr Create();
- 
-	private:
-		RenderSurfaceCache(){}
+		MainRenderTarget* MainTarget;
+		RenderGBuffer* GBuffer;
+		ShadowMap* ShadowMapBuffer;
 	};
  
 }

@@ -2,12 +2,14 @@
 
 namespace Disorder
 {
-	RasterizeStatePtr RenderResourceManager::DefaultRasterizeState = NULL;
-	BlendStatePtr RenderResourceManager::DefaultBlentState = NULL;
-	DepthStencilStatePtr RenderResourceManager::DefaultDepthStencilState = NULL;
+	RenderResourceManager* GRenderResourceMgr = NULL;
 
-	SurfaceViewPtr RenderResourceManager::DefaultWhiteTexture2D = NULL;
-	SamplerStatePtr RenderResourceManager::DefaultSamplerState = NULL;
+	RasterizeState* RenderResourceManager::DefaultRasterizeState = NULL;
+	BlendState* RenderResourceManager::DefaultBlentState = NULL;
+	DepthStencilState* RenderResourceManager::DefaultDepthStencilState = NULL;
+
+	SurfaceView* RenderResourceManager::DefaultWhiteTexture2D = NULL;
+	SamplerState* RenderResourceManager::DefaultSamplerState = NULL;
 
 	void RenderResourceManager::Exit()
 	{
@@ -41,7 +43,7 @@ namespace Disorder
 		data.Data = pixelData;
 		data.RowPitch = 4 * 4;
 		data.SlicePitch = 0;
-		RenderTexture2DPtr tex = CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, 4, 4, false, false, SV_ShaderResource, 1,&data,0);
+		RenderTexture2D* tex = CreateTexture2D(NULL, PF_R8G8B8A8_UNORM, 4, 4, false, false, SV_ShaderResource, 1,&data,0);
 		DefaultWhiteTexture2D = CreateSurfaceView(SV_ShaderResource, tex, PF_R8G8B8A8_UNORM);
 
 		RegisterPropertyManager(ShaderPropertyManager::sManagerCamera);
@@ -55,7 +57,7 @@ namespace Disorder
 		RegisterPropertyManager(ShaderPropertyManager::sManagerGlobal);
 	}
  
-	ShaderPropertyManagerPtr RenderResourceManager::GetPropertyManager(std::string const& name)
+	ShaderPropertyManager* RenderResourceManager::GetPropertyManager(std::string const& name)
 	{
 		if( _propertyManagerMap.find(name) != _propertyManagerMap.end() )
 			return _propertyManagerMap.at(name);

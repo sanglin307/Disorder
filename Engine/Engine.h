@@ -52,10 +52,8 @@ namespace Disorder
 	};
 
 
-	class Engine : public Singleton<Engine>
+	class Engine 
 	{
-		friend class Singleton<Engine>;
-
 	public:
 		void Init();
 		void Exit();
@@ -63,29 +61,19 @@ namespace Disorder
 		int GetMaxTickRate(float delta) { return 0;}
 		void Tick(float deltaSeconds);
 
+		Engine();
 		~Engine();
 
 	public :
- 
-		ClientPtr GameClient;
-		CanvasPtr GameCanvas;
-		ConsolePtr GameConsole;
-		RenderEnginePtr RenderEngine;
-		SceneImporterPtr SceneImporter;
-		RenderResourceManagerPtr RenderResourceMgr;
-		RenderSurfaceCachePtr RenderSurfaceCache;
-
+		Canvas* GameCanvas;
+		Console* GameConsole;
+		SceneImporter* SceneImporter;
+		RenderSurfaceCache* SurfaceCache;
 	    EngineStat Stat;
-
-		FileSystemPtr FileManager;
-
-	private:
-		static EnginePtr Create();
-	    Engine();
-
+		FileSystem* FileManager;
 	};
 
-#define GEngine Engine::GetSingleton()
+	extern Engine *GEngine;
 
 }
 

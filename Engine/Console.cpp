@@ -2,9 +2,11 @@
 
 namespace Disorder
 {
+	Console* GConsole = NULL;
 
 	Console::Console()
 	{
+		GClient->AddInputListener(this);
 	}
 
 	bool Console::KeyboardEvent(OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds)
@@ -17,13 +19,13 @@ namespace Disorder
 
 		if( state == IS_Release && key == OIS::KC_R ) // RenderPath
 		{
-			GEngine->GameClient->GetViewport(0)->ToggleRenderPath();
+			GClient->GetViewport(0)->ToggleRenderPath();
 			return true;
 		}
 
 		if( state == IS_Release && key == OIS::KC_C ) // Camera update strategy
 		{
-			CameraPtr mainCamera = GSceneManager->GetDefaultCamera();
+			Camera* mainCamera = GSceneManager->GetDefaultCamera();
 			if( mainCamera )
 			{
 				mainCamera->ToggleUpdateStratety();
@@ -42,32 +44,4 @@ namespace Disorder
 	{
 		return false;
 	}
-
-	ConsolePtr Console::Create()
-	{
-		Console *pConsole = new Console;
-		ConsolePtr console(pConsole);
-		GEngine->GameClient->AddInputListener(console);
-		return console;
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

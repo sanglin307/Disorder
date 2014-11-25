@@ -2,7 +2,7 @@
 
 namespace Disorder
 {
-	FileObjectPtr FileObject::Create(std::string const& fileName, FileAccessFlag access, bool binaryFile, bool append)
+	FileObject::FileObject(std::string const& fileName, FileAccessFlag access, bool binaryFile, bool append)
 	{
 		std::string flag;
 		if (append)
@@ -48,16 +48,12 @@ namespace Disorder
 		if (fopen_s(&fp, fileName.c_str(), flag.c_str()))
 		{
 			BOOST_ASSERT(0);
-			return NULL;
 		}
 
-		FileObject *pObject = new FileObject();
-		pObject->FileName = fileName;
-		pObject->_handler = fp;
-		pObject->AccessFlag = access;
-		pObject->BinaryFile = binaryFile;
-
-		return FileObjectPtr(pObject);
+		FileName = fileName;
+		_handler = fp;
+		AccessFlag = access;
+		BinaryFile = binaryFile;
 	}
 
 	FileObject::~FileObject()
@@ -108,23 +104,18 @@ namespace Disorder
 		fflush(_handler);
 	}
 
-	FileObjectPtr FileSystem::OpenTextFile(std::string const& fileName, FileAccessFlag access, bool append)
+	FileObject* FileSystem::OpenTextFile(std::string const& fileName, FileAccessFlag access, bool append)
 	{
-		return FileObject::Create(fileName,access,false,append);
+		return new FileObject(fileName,access,false,append);
 	 
 	}
 
-	FileObjectPtr FileSystem::OpenBinaryFile(std::string const& fileName, FileAccessFlag access, bool append)
+	FileObject* FileSystem::OpenBinaryFile(std::string const& fileName, FileAccessFlag access, bool append)
 	{
-		return FileObject::Create(fileName, access, true, append);
+		return new FileObject(fileName, access, true, append);
 		 
 	}
 
-	FileSystemPtr FileSystem::Create()
-	{
-		FileSystem *pSystem = new FileSystem;
-		return FileSystemPtr(pSystem);
-	}
-
+	 
 	
 }

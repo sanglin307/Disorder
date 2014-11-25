@@ -2,20 +2,14 @@
 
 namespace Disorder
 {
-	InitialiseSingleton(MainLoop);
+	MainLoop *GMainLoop = NULL;
  
 	void MainLoop::Init()
 	{
 		GameTime::Init();
 		GEngine->Init();
 	}
-
-	MainLoopPtr MainLoop::Create()
-	{
-		MainLoop *pLoop = new MainLoop;
-		return MainLoopPtr(pLoop);
-	}
-
+ 
 	void MainLoop::CalculateTimeDelta()
 	{
 		static double lastTime = GameTime::Seconds() -0.001; 

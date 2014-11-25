@@ -3,27 +3,23 @@
 
 namespace Disorder
 {
-	GLSurfaceViewPtr GLSurfaceView::Create(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat Format, unsigned int Flag)
+	GLSurfaceView::GLSurfaceView(ESurfaceViewType type, RenderTexture* resource, PixelFormat Format, unsigned int Flag)
 	{
-		GLSurfaceView *pView = new GLSurfaceView;
-		pView->Flag = Flag;
-		pView->Format = Format;
-		pView->Resource = resource;
-		pView->Type = type;
-
-		return GLSurfaceViewPtr(pView);
+		Flag = Flag;
+		Format = Format;
+		Resource = resource;
+		Type = type;
 	}
 
-	GLRenderSurfacePtr GLRenderSurface::Create(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap)
+	GLRenderSurface::GLRenderSurface(const std::map<ESurfaceLocation, SurfaceView*>& viewMap)
 	 {
-		 GLRenderSurface *pSurface = new GLRenderSurface;
-
-		 glBindFramebuffer(GL_FRAMEBUFFER, pSurface->_frameBuffer);
-		 std::map<ESurfaceLocation, SurfaceViewPtr>::const_iterator iter = viewMap.cbegin();
+		 glGenFramebuffers(1, &_frameBuffer);
+		 glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
+		 std::map<ESurfaceLocation, SurfaceView*>::const_iterator iter = viewMap.cbegin();
 		 bool bHaveColorAttach = false;
 		 while (iter != viewMap.cend())
 		 {
-			 pSurface->_surfacesViewArray[iter->first] = iter->second;
+			 _surfacesViewArray[iter->first] = iter->second;
 
 			 if (iter->first == SL_DepthStencil)
 			 {
@@ -70,8 +66,6 @@ namespace Disorder
  
 		 GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		 BOOST_ASSERT(result == GL_FRAMEBUFFER_COMPLETE);
-
-		 return GLRenderSurfacePtr(pSurface);
 	 }
 
 	void GLRenderSurface::GetGLDrawBuffers(std::vector<GLenum>& buffers)
@@ -89,12 +83,6 @@ namespace Disorder
 	 void* GLRenderSurface::GetHandle()
 	 {
 		 return (void*)_frameBuffer;
-	 }
-
-	 GLRenderSurface::GLRenderSurface()
-	 {
-		 glGenFramebuffers(1, &_frameBuffer);
-		 
 	 }
 
 	 GLRenderSurface::~GLRenderSurface()

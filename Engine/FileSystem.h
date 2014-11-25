@@ -18,37 +18,25 @@ namespace Disorder
 		FileAccessFlag AccessFlag;
 		bool BinaryFile;
 
-		static FileObjectPtr Create(std::string const& fileName, FileAccessFlag access, bool binaryFile = false,bool append = false);
-
+		FileObject(std::string const& fileName, FileAccessFlag access, bool binaryFile = false, bool append = false);
 		void Write(std::string const& content);
 		std::string ReadText();
 		void Flush();
 		void Close();
 
 		~FileObject();
-
 	private:
-
 		FILE *_handler;
-		FileObject(){}
+	
 		
 	};
 
 	class FileSystem
 	{
 	public:
-		FileObjectPtr OpenTextFile(std::string const& fileName, FileAccessFlag access, bool append = false);
-		FileObjectPtr OpenBinaryFile(std::string const& fileName, FileAccessFlag access, bool append = false);
-
-	
-		static FileSystemPtr Create();
-
-	protected:
-		FileSystem(){}
+		FileObject* OpenTextFile(std::string const& fileName, FileAccessFlag access, bool append = false);
+		FileObject* OpenBinaryFile(std::string const& fileName, FileAccessFlag access, bool append = false);
 	};
-
-
-	
 }
 
 #endif

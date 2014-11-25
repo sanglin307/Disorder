@@ -51,25 +51,23 @@ namespace Disorder
 	{
 	public:
 		virtual bool KeyboardEvent(Camera *pCamera,OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds);
-		virtual bool MouseEvent(Camera *pCamera,MouseInputEvent const& mouseEvent,float deltaSeconds);
+		virtual bool MouseEvent(Camera *pCamera, MouseInputEvent const& mouseEvent, float deltaSeconds);
 		virtual bool Update(Camera *pCamera, float deltaSeconds);
-		 
-		static CameraFirstPersonUpdatePtr Create();
-	protected:
-		CameraFirstPersonUpdate(){};
 
 	};
 
 	class CameraSphereTargetUpdate : public CameraUpdateStrategy
 	{
 	public:
-		virtual bool KeyboardEvent(Camera *pCamera,OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds);
-		virtual bool MouseEvent(Camera *pCamera,MouseInputEvent const& mouseEvent,float deltaSeconds);
+		virtual bool KeyboardEvent(Camera *pCamera, OIS::KeyCode key, unsigned int text, InputState state, float deltaSeconds);
+		virtual bool MouseEvent(Camera *pCamera, MouseInputEvent const& mouseEvent, float deltaSeconds);
 		virtual bool Update(Camera *pCamera, float deltaSeconds);
 		 
-		static CameraSphereTargetUpdatePtr Create(float fRadius,const glm::vec3& target);
+		CameraSphereTargetUpdate(float radius, const glm::vec3& target)
+			:_radius(radius), _target(target), _zoomPos(-1)
+		{};
 		
-		virtual void SetTarget(Camera *pCamera,const glm::vec3& target);
+		virtual void SetTarget(Camera *pCamera, const glm::vec3& target);
 		
 		const glm::vec3& GetTarget() const
 		{
@@ -77,10 +75,6 @@ namespace Disorder
 		}
 
 	protected:
-		CameraSphereTargetUpdate(float radius,const glm::vec3& target)
-			:_radius(radius),_target(target),_zoomPos(-1)
-		{};
-
 		float _radius;
 		glm::vec3 _target;
 		int _zoomPos;
@@ -134,15 +128,12 @@ namespace Disorder
 		void DebugDraw();
 
 		void UpdateShaderProperty();
-
-		static CameraPtr Create(std::string const& name);
+		Camera(std::string const& name);
+		~Camera();
 
 		void UpdateViewProjMatrix(const glm::mat4& viewMat, const glm::mat4& projMat);
-
+		
 	private:
-
-		Camera(std::string const& name);
-
 		void LookAt_(const glm::vec3& eyePos,const glm::vec3& lookAt,const glm::vec3& upVec);
 
 		void Update(float delta);
@@ -165,16 +156,16 @@ namespace Disorder
 		bool _InvalidProjMatrix;
 
 		ECameraUpdateStrategy _updateMode;
-		CameraUpdateStrategyPtr _updateStrategy;
+		CameraUpdateStrategy* _updateStrategy;
 
-		ShaderPropertyManagerPtr _propertyManager;
-		ShaderPropertyPtr _viewMatrixProperty;
-		ShaderPropertyPtr _projMatrixProperty;
-		ShaderPropertyPtr _viewProjMatrixProperty;
-		ShaderPropertyPtr _viewInvProperty;
-		ShaderPropertyPtr _projInvProperty;
-		ShaderPropertyPtr _viewProjInvProperty;
-		ShaderPropertyPtr _positionProperty;
+		ShaderPropertyManager* _propertyManager;
+		ShaderProperty* _viewMatrixProperty;
+		ShaderProperty* _projMatrixProperty;
+		ShaderProperty* _viewProjMatrixProperty;
+		ShaderProperty* _viewInvProperty;
+		ShaderProperty* _projInvProperty;
+		ShaderProperty* _viewProjInvProperty;
+		ShaderProperty* _positionProperty;
 
 	};
 }

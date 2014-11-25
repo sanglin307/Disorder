@@ -2,7 +2,7 @@
 
 namespace Disorder
 {
-	std::vector<ViewportPtr> Client::_Viewports;
+	Client* GClient;
 
 	Client::Client()
 	{
@@ -28,7 +28,12 @@ namespace Disorder
 
 	void Client::Exit()
 	{
-		_Viewports.empty();
+		for (size_t i = 0; i < _viewports.size(); i++)
+		{
+			delete _viewports[i];
+		}
+		_viewports.empty();
+
 		_inputManager = NULL;
 		_keyboardEvents.empty();
 		_mouseEvents.empty();
@@ -52,7 +57,7 @@ namespace Disorder
 		_mouseEvents.push_back(mouseEvent);
 	}
 
-	void Client::AddInputListener(InputListenerPtr listener)
+	void Client::AddInputListener(InputListener* listener)
 	{
 		if( _inputListenerList.empty() )
 		{
@@ -60,7 +65,7 @@ namespace Disorder
 			return;
 		}
 
-		std::list<InputListenerPtr>::iterator iter = _inputListenerList.begin();
+		std::list<InputListener*>::iterator iter = _inputListenerList.begin();
 		while( iter != _inputListenerList.end() )
 		{
 			if( *iter == listener )
@@ -74,7 +79,7 @@ namespace Disorder
 		
 	}
 		
-	void Client::ReleaseInputListener(InputListenerPtr listener)
+	void Client::ReleaseInputListener(InputListener* listener)
 	{
 		if( _inputListenerList.empty() )
 			return;

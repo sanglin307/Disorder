@@ -152,7 +152,6 @@
     <ClInclude Include="Client.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Common.h" />
-    <ClInclude Include="ComPtr.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="Engine.h" />
@@ -188,7 +187,6 @@
     <ClInclude Include="SHA1.h" />
     <ClInclude Include="ShaderProperty.h" />
     <ClInclude Include="ShadowMap.h" />
-    <ClInclude Include="Singleton.h" />
     <ClInclude Include="GameTime.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="VertexFormat.h" />

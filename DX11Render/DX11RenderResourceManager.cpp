@@ -2,66 +2,60 @@
 
 namespace Disorder
 {
- 
-	DX11RenderResourceManagerPtr DX11RenderResourceManager::Create()
-	{
-		DX11RenderResourceManager *pManager = new DX11RenderResourceManager;
-		return DX11RenderResourceManagerPtr(pManager);
-	}
 
-    ShaderObjectPtr DX11RenderResourceManager::CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel,std::string const& entryPoint)
+    ShaderObject* DX11RenderResourceManager::CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel,std::string const& entryPoint)
 	{
 		std::string shaderKey = fileName + entryPoint;
 		if( _shaderMap.find(shaderKey) != _shaderMap.end() )
 			return _shaderMap.at(shaderKey);
  
-		std::string strFilePath = GConfig->sResourceFXPath + "HLSL\\" + fileName + ".hlsl";
+		std::string strFilePath = GConfig->ResourceFXPath + "HLSL\\" + fileName + ".hlsl";
 
-		DX11ShaderObjectPtr shaderObject = DX11ShaderObject::Create(fileName,entryPoint,type,shaderModel); 
+		DX11ShaderObject* shaderObject = new DX11ShaderObject(fileName,entryPoint,type,shaderModel); 
 	    shaderObject->LoadShaderFromFile(strFilePath,entryPoint,type);
 	 
-		_shaderMap.insert(std::pair<std::string,ShaderObjectPtr>(shaderKey,shaderObject));
+		_shaderMap.insert(std::pair<std::string,ShaderObject*>(shaderKey,shaderObject));
 
 		return shaderObject;
 		 
 	}
 
-	DepthStencilStatePtr DX11RenderResourceManager::CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef)
+	DepthStencilState* DX11RenderResourceManager::CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef)
 	{
 		std::wstring hashKey;
 		Math::HashBuffer(pDepthStencilDesc, sizeof(DepthStencilDesc), hashKey);
 		if (_depthStencilMap.find(hashKey) != _depthStencilMap.end())
 			return _depthStencilMap.at(hashKey);
 
-		DepthStencilStatePtr state = DX11DepthStencilState::Create(pDepthStencilDesc,stencilRef);
+		DepthStencilState* state = new DX11DepthStencilState(pDepthStencilDesc,stencilRef);
 
-		_depthStencilMap.insert(std::pair<std::wstring, DepthStencilStatePtr>(hashKey, state));
+		_depthStencilMap.insert(std::pair<std::wstring, DepthStencilState*>(hashKey, state));
 
 		return state;
 	}
 
-	RasterizeStatePtr DX11RenderResourceManager::CreateRasterizeState(RasterizeDesc *pDesc)
+	RasterizeState* DX11RenderResourceManager::CreateRasterizeState(RasterizeDesc *pDesc)
 	{
 		std::wstring hashKey;
 		Math::HashBuffer(pDesc, sizeof(RasterizeDesc), hashKey);
 		if (_rasterizeStateMap.find(hashKey) != _rasterizeStateMap.end())
 			return _rasterizeStateMap.at(hashKey);
 
-		RasterizeStatePtr state = DX11RasterizeState::Create(pDesc);
+		RasterizeState* state = new DX11RasterizeState(pDesc);
 
-		_rasterizeStateMap.insert(std::pair<std::wstring, RasterizeStatePtr>(hashKey, state));
+		_rasterizeStateMap.insert(std::pair<std::wstring, RasterizeState*>(hashKey, state));
 		return state;
 	}
 
-	void DX11RenderResourceManager::UpdateRenderLayout(const std::wstring& hashKey, ID3D11InputLayoutPtr layout)
+	void DX11RenderResourceManager::UpdateRenderLayout(const std::wstring& hashKey, ID3D11InputLayout* layout)
 	{
 		if (_renderLayoutMap.find(hashKey) != _renderLayoutMap.end())
 			return;
 
-		_renderLayoutMap.insert(std::pair<std::wstring, ID3D11InputLayoutPtr>(hashKey, layout));
+		_renderLayoutMap.insert(std::pair<std::wstring, ID3D11InputLayout*>(hashKey, layout));
 	}
 
-	ID3D11InputLayoutPtr DX11RenderResourceManager::GetRenderLayout(const std::wstring& hashKey)
+	ID3D11InputLayout* DX11RenderResourceManager::GetRenderLayout(const std::wstring& hashKey)
 	{
 		if (_renderLayoutMap.find(hashKey) != _renderLayoutMap.end())
 			return _renderLayoutMap.at(hashKey);
@@ -69,96 +63,96 @@ namespace Disorder
 		return NULL;
 	}
 
-	RenderLayoutPtr DX11RenderResourceManager::CreateRenderLayout(RenderEffectPtr const& renderEffect,TopologyType topologyType,bool soloBuffer)
+	RenderLayout* DX11RenderResourceManager::CreateRenderLayout(RenderEffect* renderEffect,TopologyType topologyType,bool soloBuffer)
 	{
 
-		RenderLayoutPtr renderLayout = DX11RenderLayout::Create(renderEffect,topologyType,soloBuffer);
+		RenderLayout* renderLayout = new DX11RenderLayout(renderEffect,topologyType,soloBuffer);
 		return renderLayout;
 	}
  
-	void DX11RenderResourceManager::CreateBufferArray(const std::string& bufferName, GeometryPtr const& data, BufferUsage bufferUsage, RenderEffectPtr const& renderEffect, std::vector<RenderBufferPtr> & bufferArray)
+	void DX11RenderResourceManager::CreateBufferArray(const std::string& bufferName, Geometry* data, BufferUsage bufferUsage, RenderEffect* renderEffect, std::vector<RenderBuffer*> & bufferArray)
 	{		 
-		DX11ShaderObjectPtr shader = boost::dynamic_pointer_cast<DX11ShaderObject>(renderEffect->GetVertexShader());
+		DX11ShaderObject* shader = (DX11ShaderObject*)renderEffect->GetVertexShader();
 		//vertex buffer first
 		for(unsigned int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
 		{
 			std::string name = bufferName + "_" + shader->ShaderReflect->InputSignatureParameters[i].SemanticName;
-			RenderBufferPtr renderBuffer = DX11RenderBuffer::Create(name,RBT_Vertex,data,shader->ShaderReflect->InputSignatureParameters[i].SemanticName,bufferUsage,shader);
+			RenderBuffer* renderBuffer = new DX11RenderBuffer(name,RBT_Vertex,data,shader->ShaderReflect->InputSignatureParameters[i].SemanticName,bufferUsage,shader);
 			bufferArray.push_back(renderBuffer);
 		}
 
 		std::string indexName = bufferName + "_IndexBuffer";
-		RenderBufferPtr indexBuffer = DX11RenderBuffer::Create(indexName,RBT_Index,data,"",bufferUsage,shader);
+		RenderBuffer* indexBuffer = new DX11RenderBuffer(indexName,RBT_Index,data,"",bufferUsage,shader);
 		bufferArray.push_back(indexBuffer);
 	}
 
-	RenderBufferPtr DX11RenderResourceManager::CreateBuffer(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint)
+	RenderBuffer* DX11RenderResourceManager::CreateBuffer(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint)
 	{
-		RenderBufferPtr renderBuffer = DX11RenderBuffer::Create(bufferName,type,bufferUsage,elementSize,size,pData);
+		RenderBuffer* renderBuffer = new DX11RenderBuffer(bufferName,type,bufferUsage,elementSize,size,pData);
 	 
 		return renderBuffer;
 	}
  
-	RenderSurfacePtr DX11RenderResourceManager::CreateRenderSurface(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap)
+	RenderSurface* DX11RenderResourceManager::CreateRenderSurface(const std::map<ESurfaceLocation, SurfaceView*>& viewMap)
 	{
-		return DX11RenderSurface::Create(viewMap);
+		return new DX11RenderSurface(viewMap);
 	}
 
-	SurfaceViewPtr DX11RenderResourceManager::CreateSurfaceView(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat format, unsigned int flag)
+	SurfaceView* DX11RenderResourceManager::CreateSurfaceView(ESurfaceViewType type, RenderTexture* resource, PixelFormat format, unsigned int flag)
 	{
-		DX11SurfaceViewPtr view = DX11SurfaceView::Create(type, resource, format, flag);
+		DX11SurfaceView* view = new DX11SurfaceView(type, resource, format, flag);
 		return view;
 	}
  
 
-	RenderTexture2DPtr DX11RenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample,ImagePtr image)
+	RenderTexture2D* DX11RenderResourceManager::CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample,Image* image)
 	{
-		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat,bMultiSample,image);
+		RenderTexture2D* texture = new DX11RenderTexture2D(pixelFormat, bMultiSample, image);
 		texture->Sampler = sampler;
 		return texture;
 	}
 
-	RenderTexture2DPtr DX11RenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image, unsigned int flag)
+	RenderTexture2D* DX11RenderResourceManager::CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<Image*>& image, unsigned int flag)
 	{
-		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat, bMultiSample, image,flag);
+		RenderTexture2D* texture = new DX11RenderTexture2D(pixelFormat, bMultiSample, image, flag);
 		texture->Sampler = sampler;
 		return texture;
 	}
 
-	RenderTexture2DPtr DX11RenderResourceManager::CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
+	RenderTexture2D* DX11RenderResourceManager::CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
 	{
-		RenderTexture2DPtr texture = DX11RenderTexture2D::Create(pixelFormat,width,height,bMipmap,bMultiSample,viewFlag,arraySize,pData,flag);
+		RenderTexture2D* texture = new DX11RenderTexture2D(pixelFormat, width, height, bMipmap, bMultiSample, viewFlag, arraySize, pData, flag);
 		texture->Sampler = sampler;
 		return texture;
 
 	}
 
-	SamplerStatePtr DX11RenderResourceManager::CreateSamplerState(SamplerDesc* pSamplerDesc)
+	SamplerState* DX11RenderResourceManager::CreateSamplerState(SamplerDesc* pSamplerDesc)
 	{
 		std::wstring hashKey;
 		Math::HashBuffer(pSamplerDesc, sizeof(SamplerDesc), hashKey);
 		if (_samplerStateMap.find(hashKey) != _samplerStateMap.end())
 			return _samplerStateMap.at(hashKey);
 
-		SamplerStatePtr sampler = DX11SamplerState::Create(pSamplerDesc);
+		SamplerState* sampler = new DX11SamplerState(pSamplerDesc);
 
-		_samplerStateMap.insert(std::pair<std::wstring, SamplerStatePtr>(hashKey, sampler));
+		_samplerStateMap.insert(std::pair<std::wstring, SamplerState*>(hashKey, sampler));
 
 		return sampler;
 	}
 
 	 
 
-	BlendStatePtr DX11RenderResourceManager::CreateBlendState(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable,bool IndependentBlendEnable)
+	BlendState* DX11RenderResourceManager::CreateBlendState(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable,bool IndependentBlendEnable)
 	{
 		std::wstring hashKey;
 		Math::HashBuffer(pBlendDescArray, sizeof(BlendDesc)*BlendArraySize, hashKey);
 		if (_blendStateMap.find(hashKey) != _blendStateMap.end())
 			return _blendStateMap.at(hashKey);
 
-		DX11BlendStatePtr blendState = DX11BlendState::Create(pBlendDescArray,BlendArraySize,AlphaToCoverageEnable,IndependentBlendEnable);
+		DX11BlendState* blendState = new DX11BlendState(pBlendDescArray,BlendArraySize,AlphaToCoverageEnable,IndependentBlendEnable);
 		
-		_blendStateMap.insert(std::pair<std::wstring, BlendStatePtr>(hashKey, blendState));
+		_blendStateMap.insert(std::pair<std::wstring, BlendState*>(hashKey, blendState));
 
 		return blendState;
 	}
@@ -168,12 +162,12 @@ namespace Disorder
 		if( _propertyManagerMap.find(name) != _propertyManagerMap.end() )
 			return;
 
-		ShaderPropertyManagerPtr manger = DX11ShaderPropertyManager::Create(name);
-		_propertyManagerMap.insert(std::pair<std::string,ShaderPropertyManagerPtr>(name,manger));
+		ShaderPropertyManager* manger = new DX11ShaderPropertyManager(name);
+		_propertyManagerMap.insert(std::pair<std::string,ShaderPropertyManager*>(name,manger));
 	}
 
-	RenderEffectPtr DX11RenderResourceManager::CreateRenderEffect()
+	RenderEffect* DX11RenderResourceManager::CreateRenderEffect()
 	{
-		return RenderEffect::Create();
+		return new RenderEffect;
 	}
 }

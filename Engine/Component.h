@@ -21,14 +21,14 @@ namespace Disorder
 		Component(std::string const& name,EComponentType componentType);
 
 		virtual ~Component(){};
-	   inline void SetBase(GameObjectPtr const& base)
+	   inline void SetBase(GameObject* base)
 	   {
 		   _baseObject = base;
 	   }
 
-	   GameObjectPtr GetBase()
+	   GameObject* GetBase()
 	   {
-		   return _baseObject.lock();
+		   return _baseObject;
 	   }
 
 	   std::string Name;
@@ -38,7 +38,7 @@ namespace Disorder
 		glm::vec3 _vPos;
 		glm::vec3 _vScale;
 		glm::quat _vRot;
-		boost::weak_ptr<GameObject> _baseObject;
+		GameObject* _baseObject;
 
 		// offset transform to gameobject , when using instance, set it to identity
 	

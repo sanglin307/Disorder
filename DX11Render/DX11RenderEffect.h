@@ -61,8 +61,8 @@ namespace Disorder
          UINT                    CBuFlags;         // Buffer description flags
 		std::vector<ShaderVariableDesc>	        Variables;
 		std::vector<ShaderTypeDesc>		        Types;
-		std::vector<ShaderPropertyPtr>		    Parameters;
-		ShaderPropertyPtr					    BufferParamRef;
+		std::vector<ShaderProperty*>		    Parameters;
+		ShaderProperty*					    BufferParamRef;
 	};
 
 	struct ShaderInputBindDesc
@@ -101,7 +101,7 @@ namespace Disorder
 		D3D11_RESOURCE_RETURN_TYPE ReturnType;
 		D3D_SRV_DIMENSION Dimension;
 		UINT NumSamples;
-		ShaderPropertyPtr ParamRef;
+		ShaderProperty* ParamRef;
 	};
 
 	struct ShaderSignatureDesc
@@ -144,11 +144,6 @@ namespace Disorder
 		std::vector<ShaderSignatureDesc>		        OutputSignatureParameters;
 		std::vector<ConstantBufferDesc>				    ConstantBuffers;
 		std::vector<ShaderInputBindDesc>				ResourceBindings;
-
-		static DX11ShaderReflectionPtr Create(); 
-
-	private:
-		DX11ShaderReflection(){}
 	};
 
 	class DX11ShaderInclude : public ID3DInclude
@@ -168,8 +163,8 @@ namespace Disorder
 			}
 			else
 			{
-				std::string strFilePath = GConfig->sResourceFXPath + "HLSL\\" + std::string(pFileName);
-				FileObjectPtr fileptr = GEngine->FileManager->OpenTextFile(strFilePath, eF_Read);
+				std::string strFilePath = GConfig->ResourceFXPath + "HLSL\\" + std::string(pFileName);
+				FileObject* fileptr = GEngine->FileManager->OpenTextFile(strFilePath, eF_Read);
 		        std::string shaderContent = fileptr->ReadText();
 				ShaderObject::sMapIncludeFiles.insert(std::pair<std::string,std::string>(pFileName,shaderContent));
 				length = shaderContent.length();
@@ -204,26 +199,19 @@ namespace Disorder
 		virtual void* GetHandle();
 		virtual void* GetDataInterface();
 		
-		static DX11ShaderObjectPtr Create(std::string const& effectName,std::string const& entryPoint,ShaderType shaderType,ShaderModel shaderMode);
-
+	 
 	public:
-		DX11ShaderReflectionPtr  ShaderReflect;
-		ID3D11VertexShaderPtr VertexShaderInterface;
-		ID3D11PixelShaderPtr  PixelShaderInterface;
-		ID3D11GeometryShaderPtr GeometryShaderInterface;
-		ID3DBlobPtr DataInterface;
+		DX11ShaderReflection*  ShaderReflect;
+		ID3D11VertexShader* VertexShaderInterface;
+		ID3D11PixelShader*  PixelShaderInterface;
+		ID3D11GeometryShader* GeometryShaderInterface;
+		ID3DBlob* DataInterface;
 
 		std::vector<ID3D11Buffer*> CachedConstBuffer;
 		std::vector<ID3D11SamplerState*> CachedSamplerState;
 		std::vector<ID3D11ShaderResourceView*> CachedShaderResourceView;
 
-	private:
-
-		bool _bCacheRefresh;
-
-		HRESULT CompileShaderFromFile(std::string const& fileName, std::string const& entryPoint, std::string const& shaderModel, ID3DBlob** ppBlobOut);
-
-		explicit DX11ShaderObject(std::string const& fileName,std::string const& entryPoint,ShaderType shaderType,ShaderModel shaderModel)
+		explicit DX11ShaderObject(std::string const& fileName, std::string const& entryPoint, ShaderType shaderType, ShaderModel shaderModel)
 		{
 			_fileName = fileName;
 			_entryPoint = entryPoint;
@@ -233,6 +221,13 @@ namespace Disorder
 			_bCacheRefresh = true;
 		}
 
+	private:
+
+		bool _bCacheRefresh;
+
+		HRESULT CompileShaderFromFile(std::string const& fileName, std::string const& entryPoint, std::string const& shaderModel, ID3DBlob** ppBlobOut);
+
+		
 		inline std::string GetShaderModelDes(ShaderType type)
 		{
 			if( _shaderModel == SM_4_0 )
@@ -257,11 +252,8 @@ namespace Disorder
 		~DX11ShaderPropertyManager();
 		virtual void UpdateShaderProperty();
 		bool Validate(ConstantBufferDesc *pConstBuffer);
-		static DX11ShaderPropertyManagerPtr Create(const std::string& name);
-
+		 
 		ConstantBufferDesc* ConstantBuffer;
-
-	protected:
 		DX11ShaderPropertyManager(const std::string& name);
 		
 

@@ -7,8 +7,6 @@ namespace Disorder
 	class Font : public RenderResource
 	{
 		typedef std::pair<UINT, UINT> CodePointRange;
-		
-
 	public:
 
 		struct GlyphInfo 
@@ -27,12 +25,12 @@ namespace Disorder
  
 		void LoadFontFromTrueTypeFile(std::string const& fontName);
 
-		void CreateRenderResource(const ImagePtr& image);
+		void CreateRenderResource(Image* image);
 
 		void SaveFontLayout(const std::string& fontName);
 		void LoadFontLayout(const std::string& fontName);
 
-		SurfaceViewPtr const& GetGlyphTexture() const
+		SurfaceView* GetGlyphTexture() const
 		{
 			return _glyphsTexture;
 		}
@@ -98,12 +96,9 @@ namespace Disorder
 
         }
 
-		static FontPtr Create(unsigned int fontSize,unsigned int fontRevolution);
-
+		Font(unsigned int fontSize, unsigned int fontRevolution);
 	protected:
-
-		Font(unsigned int fontSize,unsigned int fontRevolution);
-
+ 
 		unsigned int _fontSize; // in pixel.
 		unsigned int _fontRevolution;
 		/// Max distance to baseline of this (truetype) font
@@ -115,7 +110,7 @@ namespace Disorder
 
 		bool _antialiasColor;
 
-		SurfaceViewPtr _glyphsTexture;
+		SurfaceView* _glyphsTexture;
 
 		std::vector<CodePointRange> _codePointRangeList;
 

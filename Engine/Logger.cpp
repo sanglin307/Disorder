@@ -3,13 +3,13 @@
 
 namespace Disorder
 {
-	InitialiseSingleton(Logger);
+	Logger* GLogger = NULL;
 
 	void Logger::Init()
 	{
-		_errorFile = GEngine->FileManager->OpenTextFile(GConfig->sLogPath + "Error.log",eF_Write);
-		_warningFile = GEngine->FileManager->OpenTextFile(GConfig->sLogPath + "Warning.log", eF_Write);
-		_infoFile = GEngine->FileManager->OpenTextFile(GConfig->sLogPath + "Info.log", eF_Write);
+		_errorFile = GEngine->FileManager->OpenTextFile(GConfig->LogPath + "Error.log",eF_Write);
+		_warningFile = GEngine->FileManager->OpenTextFile(GConfig->LogPath + "Warning.log", eF_Write);
+		_infoFile = GEngine->FileManager->OpenTextFile(GConfig->LogPath + "Info.log", eF_Write);
 
 		_thread =  boost::thread(LoggerRunner());
 	}
@@ -27,13 +27,7 @@ namespace Disorder
 		_infoCache.push_back(log);
 
 	}
-
-	LoggerPtr Logger::Create()
-	{
-		Logger *logger = new Logger;
-		return LoggerPtr(logger);
-	}
-
+ 
 	void Logger::Warning(std::string const& warning)
 	{
 		boost::mutex::scoped_lock lock(_warningMutex);

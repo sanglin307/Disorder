@@ -1,10 +1,9 @@
 #ifndef _DISORDER_RENDERTECHNIQUE_H_
 #define _DISORDER_RENDERTECHNIQUE_H_
-
+ 
 
 namespace Disorder
 {
-
 	class ShaderObject
 	{
 	public:
@@ -45,22 +44,22 @@ namespace Disorder
 	class RenderEffect
 	{
 	public: 
-		inline ShaderObjectPtr const& GetVertexShader() const
+		inline ShaderObject* GetVertexShader() const
 		{
 			return _vertexShader;
 		}
 
-		inline ShaderObjectPtr const& GetPixelShader() const
+		inline ShaderObject* GetPixelShader() const
 		{
 			return _pixelShader;
 		}
 
-		inline ShaderObjectPtr const& GetGeometryShader() const
+		inline ShaderObject* GetGeometryShader() const
 		{
 			return _geometryShader;
 		}
 
-		virtual void BindShader(ShaderObjectPtr const& shaderObject)
+		virtual void BindShader(ShaderObject * shaderObject)
 		{
 			if( shaderObject->GetType() == ST_VertexShader )
 				_vertexShader = shaderObject;
@@ -77,61 +76,61 @@ namespace Disorder
 		{
 		}
 
-		void BindRasterizeState(RasterizeStatePtr const& rasterizeState)
+		void BindRasterizeState(RasterizeState *rasterizeState)
 		{
 			_rasterizeState = rasterizeState;
 		}
 
-		void BindBlendState(BlendStatePtr const& blendState)
+		void BindBlendState(BlendState *blendState)
 		{
 			_blendState = blendState;
 		}
 
-		void BindDepthStencilState(DepthStencilStatePtr const& depthStencilState)
+		void BindDepthStencilState(DepthStencilState *depthStencilState)
 		{
 			_depthStencilState = depthStencilState;
 		}
 
-		BlendStatePtr const& GetBlendState()
+		BlendState* GetBlendState() const
 		{
 			return _blendState;
 		}
 
-		RasterizeStatePtr const& GetRasterizeState()
+		RasterizeState *GetRasterizeState() const
 		{
 			return _rasterizeState;
 		}
 
-		DepthStencilStatePtr const& GetDepthStencilState()
+		DepthStencilState* GetDepthStencilState() const
 		{
 			return _depthStencilState;
 		}
  
 		virtual void UpdateShaderParameter();
-
-		static RenderEffectPtr Create(); 
-
+ 
 		virtual void* GetHandle()
 		{
 			return 0;
 		}
 
-	protected:
-		// shader slot!
-		ShaderObjectPtr _vertexShader;
-		ShaderObjectPtr _pixelShader;
-		ShaderObjectPtr _geometryShader;
-
-		RasterizeStatePtr _rasterizeState;
-		BlendStatePtr _blendState;
-		DepthStencilStatePtr _depthStencilState;
- 
 		RenderEffect()
 		{
 			_rasterizeState = RenderResourceManager::DefaultRasterizeState;
 			_blendState = RenderResourceManager::DefaultBlentState;
 			_depthStencilState = RenderResourceManager::DefaultDepthStencilState;
 		}
+
+	protected:
+		// shader slot!
+		ShaderObject* _vertexShader;
+		ShaderObject* _pixelShader;
+		ShaderObject* _geometryShader;
+
+		RasterizeState* _rasterizeState;
+		BlendState* _blendState;
+		DepthStencilState* _depthStencilState;
+ 
+	
 	};
 
 

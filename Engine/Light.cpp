@@ -23,13 +23,8 @@ namespace Disorder
 		CastShadows = false;
 	}
 
-	DirectionLightPtr DirectionLight::Create(std::string const& name)
-	{
-		DirectionLight *pLight = new DirectionLight(name);
-		return DirectionLightPtr(pLight);
-	}
-
-	bool DirectionLight::Touch(GeometryRendererPtr renderObject)
+ 
+	bool DirectionLight::Touch(GeometryRenderer* renderObject)
 	{
 		return true;
 	}
@@ -71,13 +66,13 @@ namespace Disorder
 
 	glm::vec3 DirectionLight::GetDirection()
 	{
-		GameObjectPtr go = GetBase();
+		GameObject* go = GetBase();
 		return go->GetWorldRotation() * DirectionLight::DefaultDirection;
 	}
 
 	void DirectionLight::DebugDraw()
 	{
-		GameObjectPtr go = GetBase();
+		GameObject* go = GetBase();
 		glm::vec3 beginPos = go->GetWorldPosition();
 		glm::vec3 endPos = beginPos + GetDirection() * 2.f;
 			
@@ -95,20 +90,13 @@ namespace Disorder
 
 	glm::vec3 PointLight::GetPosition()
 	{
-		GameObjectPtr lightGo = GetBase();
+		GameObject* lightGo = GetBase();
 		return lightGo->GetWorldPosition();
 	}
-
-	PointLightPtr PointLight::Create(std::string const& name)
+	bool PointLight::Touch(GeometryRenderer* renderObject)
 	{
-		PointLight *pLight = new PointLight(name);
-		return PointLightPtr(pLight);
-	}
-
-	bool PointLight::Touch(GeometryRendererPtr renderObject)
-	{
-		GameObjectPtr lightGo = GetBase();
-		GameObjectPtr renderGo = renderObject->GetBase(); 
+		GameObject* lightGo = GetBase();
+		GameObject* renderGo = renderObject->GetBase(); 
 		float objRadius = renderObject->GetGeometry()->BoundingBox.SphereRadius;
 		return (Range + objRadius) * (Range + objRadius) > glm::distance2(lightGo->GetWorldPosition(), renderGo->GetWorldPosition());
 	}
@@ -119,14 +107,14 @@ namespace Disorder
 
 	bool PointLight::Overlaps(const Frustrum& frustrum)
 	{
-		GameObjectPtr lightGo = GetBase();
+		GameObject* lightGo = GetBase();
 		SphereBounds bound(lightGo->GetWorldPosition(),Range);
 		return frustrum.Overlaps(bound);
 	}
 
 	void PointLight::CalculateShadowMatrix()
 	{
-		GameObjectPtr lightGo = GetBase();
+		GameObject* lightGo = GetBase();
 		glm::vec3 lightPos = lightGo->GetWorldPosition();
 	
 		// +X
@@ -174,19 +162,13 @@ namespace Disorder
 
 	glm::vec3 SpotLight::GetPosition()
 	{
-		GameObjectPtr lightGo = GetBase();
+		GameObject* lightGo = GetBase();
 		return lightGo->GetWorldPosition();
-	}
-
-	SpotLightPtr SpotLight::Create(std::string const& name)
-	{
-		SpotLight *pLight = new SpotLight(name);
-		return SpotLightPtr(pLight);
 	}
 
 	glm::vec3 SpotLight::GetDirection()
 	{
-		GameObjectPtr go = GetBase();
+		GameObject* go = GetBase();
 		return go->GetWorldRotation() * DirectionLight::DefaultDirection;
 	}
 
@@ -194,10 +176,10 @@ namespace Disorder
 	{
 	}
 
-	bool SpotLight::Touch(GeometryRendererPtr renderObject)
+	bool SpotLight::Touch(GeometryRenderer* renderObject)
 	{
-		GameObjectPtr lightGo = GetBase();
-		GameObjectPtr renderGo = renderObject->GetBase();
+		GameObject* lightGo = GetBase();
+		GameObject* renderGo = renderObject->GetBase();
 		 
 		glm::vec3 renderPos = renderGo->GetWorldPosition();
 		glm::vec3 lightPos = lightGo->GetWorldPosition();
@@ -212,7 +194,7 @@ namespace Disorder
 	bool SpotLight::Overlaps(const Frustrum& frustrum)
 	{
 		//rough calculate
-		GameObjectPtr lightGo = GetBase();
+		GameObject* lightGo = GetBase();
 		float BoundsRadius = Math::Sqrtf(1.25f * Range * Range - Range * Range * SpotOuterAngle);
 		SphereBounds bound(lightGo->GetWorldPosition() + .5f * GetDirection() * Range, BoundsRadius);
 
@@ -221,7 +203,7 @@ namespace Disorder
 
 	void SpotLight::CalculateShadowMatrix()
 	{
-		GameObjectPtr lightGo = GetBase();
+		GameObject* lightGo = GetBase();
 		glm::vec3 lightPos = lightGo->GetWorldPosition();
 		glm::vec3 Dir = GetDirection();
 

@@ -3,13 +3,7 @@
 
 namespace Disorder
 {
-
-	DX11RenderEnginePtr DX11RenderEngine::Create()
-	{
-		DX11RenderEngine *pEngine = new DX11RenderEngine;
-		return DX11RenderEnginePtr(pEngine);
-	}
-
+ 
 	DXGI_FORMAT DX11RenderEngine::GetPixelFormat(PixelFormat format)
 	{
 		return (DXGI_FORMAT)format;
@@ -70,7 +64,7 @@ namespace Disorder
 		 UINT i =0;
 		 while(_pDXGIFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND) 
 		 { 
-			 _vDXGIAdapter.push_back(MakeComPtr<IDXGIAdapter>(pAdapter));
+			 _vDXGIAdapter.push_back(pAdapter);
 			 i++;
 		 } 
 	 }
@@ -93,16 +87,11 @@ namespace Disorder
 		 };
  
 		 UINT numFeatureLevels = ARRAYSIZE( FeatureLevels );
-		 ID3D11Device*         pd3dDevice;
-		 ID3D11DeviceContext*  pImmediateContext;
- 
-		 HRESULT Hr = D3D11CreateDevice( _vDXGIAdapter[0].get(), DriverType, NULL, DeviceCreationFlags, FeatureLevels, numFeatureLevels, D3D11_SDK_VERSION, &pd3dDevice, &_featureLevel, &pImmediateContext );
-		 BOOST_ASSERT( SUCCEEDED(Hr) );
-
- 
-		 _pd3dDevice = MakeComPtr<ID3D11Device>(pd3dDevice);
-		 _pImmediateContext = MakeComPtr<ID3D11DeviceContext>(pImmediateContext);
 		 
+ 
+		 HRESULT Hr = D3D11CreateDevice(_vDXGIAdapter[0], DriverType, NULL, DeviceCreationFlags, FeatureLevels, numFeatureLevels, D3D11_SDK_VERSION, &_pd3dDevice, &_featureLevel, &_pImmediateContext);
+		 BOOST_ASSERT( SUCCEEDED(Hr) );
+ 
 	 }
 
 	 void DX11RenderEngine::CreateViewport(void *hWnd)
@@ -140,11 +129,9 @@ namespace Disorder
 		sd.SampleDesc.Quality = GConfig->pRenderConfig->MultiSampleQuality;
 		sd.Windowed = !GConfig->pRenderConfig->FullScreen;
  
-		IDXGISwapChain*  pSwapChain;
-		hr = _pDXGIFactory->CreateSwapChain(_pd3dDevice.get(),&sd,&pSwapChain);
+		hr = _pDXGIFactory->CreateSwapChain(_pd3dDevice, &sd, &_pSwapChain);
 		BOOST_ASSERT(SUCCEEDED(hr));
-		_pSwapChain = MakeComPtr<IDXGISwapChain>(pSwapChain);
-
+		 
 		hr = _pDXGIFactory->MakeWindowAssociation((HWND)hWnd,DXGI_MWA_NO_WINDOW_CHANGES);
 		BOOST_ASSERT(SUCCEEDED(hr));
 
@@ -152,22 +139,22 @@ namespace Disorder
 		ID3D11Texture2D* pBackBuffer = NULL;
 		hr = _pSwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), ( LPVOID* )&pBackBuffer );
 		BOOST_ASSERT(SUCCEEDED(hr));
-		DX11RenderTexture2DPtr BackBufferTex = DX11RenderTexture2D::Create(GConfig->pRenderConfig->ColorFormat, sd.BufferDesc.Width, sd.BufferDesc.Height, SV_RenderTarget | SV_ShaderResource, false, 
-			GConfig->pRenderConfig->MultiSampleCount, GConfig->pRenderConfig->MultiSampleQuality,MakeComPtr<ID3D11Texture2D>(pBackBuffer));
+		DX11RenderTexture2D* BackBufferTex = new DX11RenderTexture2D(GConfig->pRenderConfig->ColorFormat, sd.BufferDesc.Width, sd.BufferDesc.Height, SV_RenderTarget | SV_ShaderResource, false, 
+			GConfig->pRenderConfig->MultiSampleCount, GConfig->pRenderConfig->MultiSampleQuality,pBackBuffer);
  
-		SurfaceViewPtr rtView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, BackBufferTex,GConfig->pRenderConfig->ColorFormat);
-		SurfaceViewPtr srView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, BackBufferTex, GConfig->pRenderConfig->ColorFormat);
+		SurfaceView* rtView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, BackBufferTex,GConfig->pRenderConfig->ColorFormat);
+		SurfaceView* srView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, BackBufferTex, GConfig->pRenderConfig->ColorFormat);
 
-		RenderTexture2DPtr DepthBufferTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil,1, NULL,0);
+		RenderTexture2D* DepthBufferTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil,1, NULL,0);
 
-		SurfaceViewPtr dsView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, DepthBufferTex, GConfig->pRenderConfig->DepthStencilFormat);
+		SurfaceView* dsView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, DepthBufferTex, GConfig->pRenderConfig->DepthStencilFormat);
 
-		std::map<ESurfaceLocation, SurfaceViewPtr> viewMap;
-		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, rtView));
-		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, dsView));
-		RenderSurfacePtr mainSurface = DX11RenderSurface::Create(viewMap);
+		std::map<ESurfaceLocation, SurfaceView*> viewMap;
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_RenderTarget1, rtView));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_DepthStencil, dsView));
+		RenderSurface* mainSurface = new DX11RenderSurface(viewMap);
  
-		GEngine->RenderSurfaceCache->MainTarget = MainRenderTarget::Create(mainSurface, srView, rtView, dsView);
+		GEngine->SurfaceCache->MainTarget = new MainRenderTarget(mainSurface, srView, rtView, dsView);
 
 		// Setup the viewport
 		SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
@@ -192,11 +179,9 @@ namespace Disorder
 		_driverType = D3D_DRIVER_TYPE_NULL;
 		_featureLevel = D3D_FEATURE_LEVEL_11_0;
 
-		IDXGIFactory * pFactory;
-		HRESULT hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)(&pFactory));
+		HRESULT hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)(&_pDXGIFactory));
 		BOOST_ASSERT(SUCCEEDED(hr));
-
-		_pDXGIFactory = MakeComPtr<IDXGIFactory>(pFactory);
+ 
 
 		EnumAdapters();
 
@@ -210,12 +195,12 @@ namespace Disorder
 			 _pImmediateContext->ClearState();
 		 }
 
-		 _pImmediateContext.reset();
-		 _pSwapChain.reset();
-		 _pd3dDevice.reset();
+		 _pImmediateContext->Release();
+		 _pSwapChain->Release();
+		 _pd3dDevice->Release();
 	}
 
-   	void* DX11RenderEngine::Map(RenderBufferPtr const& buffer,BufferAccess bufferAccess)
+   	void* DX11RenderEngine::Map(RenderBuffer* buffer,BufferAccess bufferAccess)
 	{
 		D3D11_MAP flag = D3D11_MAP_WRITE;
 		if( bufferAccess == BA_Read_Only )
@@ -231,12 +216,12 @@ namespace Disorder
 		return pMappedResource.pData;
 	}
 	
-	void DX11RenderEngine::UnMap(RenderBufferPtr const& buffer)
+	void DX11RenderEngine::UnMap(RenderBuffer* buffer)
 	{
 		_pImmediateContext->Unmap((ID3D11Buffer*)(buffer->GetHandle()),D3D11CalcSubresource(0, 0, 1));
 	}
 
-	void DX11RenderEngine::SetBlendState(BlendStatePtr const& blendState)
+	void DX11RenderEngine::SetBlendState(BlendState* blendState)
 	{ 
 
 		if (CachedBlendState != blendState || CachedBlendState->BlendFactor[0] != CachedBlendFactor[0] || CachedBlendState->BlendFactor[1] != CachedBlendFactor[1] || 
@@ -257,7 +242,7 @@ namespace Disorder
 		}
 	}
 
-    void DX11RenderEngine::SetRasterizeState(RasterizeStatePtr const& rasterizeState)
+    void DX11RenderEngine::SetRasterizeState(RasterizeState* rasterizeState)
 	{
 		if( CachedRasterizeState != rasterizeState )
 		{
@@ -581,9 +566,9 @@ namespace Disorder
 		_pImmediateContext->IASetPrimitiveTopology(DX11RenderEngine::GetPlatformTopology(topologyType));
 	}
 
-	void DX11RenderEngine::SetRenderLayout( RenderLayoutPtr const& renderLayout)
+	void DX11RenderEngine::SetRenderLayout( RenderLayout* renderLayout)
 	{
-		DX11RenderLayoutPtr dxRenderLayout = boost::dynamic_pointer_cast<DX11RenderLayout>(renderLayout);
+		DX11RenderLayout* dxRenderLayout = (DX11RenderLayout*)renderLayout;
 
 		SetPrimitiveTopology(renderLayout->GetTopology());
 		//set layout
@@ -592,7 +577,7 @@ namespace Disorder
 		//set vertex buffer		 
 		_pImmediateContext->IASetVertexBuffers(0,dxRenderLayout->VertexArray.size(),&(dxRenderLayout->VertexArray[0]),&(dxRenderLayout->VertexArrayElementSize[0]),&(dxRenderLayout->VertexArrayOffset[0]));
  
-		RenderBufferPtr indexBuffer = renderLayout->GetIndexBuffer();
+		RenderBuffer* indexBuffer = renderLayout->GetIndexBuffer();
 		if(indexBuffer != NULL )
 		{
 			ID3D11Buffer *pBuffer = (ID3D11Buffer *)(indexBuffer->GetHandle());
@@ -606,7 +591,7 @@ namespace Disorder
  
 	}
 
-	void DX11RenderEngine::UpdateSubresource(RenderBufferPtr const& buffer,void* pSrcData,unsigned int srcDataSize)
+	void DX11RenderEngine::UpdateSubresource(RenderBuffer* buffer,void* pSrcData,unsigned int srcDataSize)
 	{
 		ID3D11Buffer *pBuffer = (ID3D11Buffer *)(buffer->GetHandle());
 		_pImmediateContext->UpdateSubresource(pBuffer, 0, NULL, pSrcData, srcDataSize, 0);
@@ -626,7 +611,7 @@ namespace Disorder
 		GEngine->Stat.DrawTriNumber += GetTriangleCountFromTopology(CachedTopology, vertexCount);
 	}
  
-	void DX11RenderEngine::SetEffect(RenderEffectPtr const& effect)
+	void DX11RenderEngine::SetEffect(RenderEffect* effect)
 	{
 		if( effect == NULL ) // clean up
 		{			 
@@ -654,13 +639,13 @@ namespace Disorder
 
 			effect->UpdateShaderParameter();
 
-			ShaderObjectPtr vertexShader = effect->GetVertexShader();
+			ShaderObject* vertexShader = effect->GetVertexShader();
 			if( vertexShader != NULL )
 			{
 				ID3D11VertexShader *pShader = (ID3D11VertexShader *)(vertexShader->GetHandle());
 				_pImmediateContext->VSSetShader(pShader, NULL,0);
 
-				DX11ShaderObjectPtr dxVertexShader = boost::dynamic_pointer_cast<DX11ShaderObject>(vertexShader);
+				DX11ShaderObject* dxVertexShader = (DX11ShaderObject*)vertexShader;
 				std::size_t cbsize = dxVertexShader->CachedConstBuffer.size();
 				if( cbsize > 0 )
 				{
@@ -698,13 +683,13 @@ namespace Disorder
 
 			}
 
-			ShaderObjectPtr geometryShader = effect->GetGeometryShader();
+			ShaderObject* geometryShader = effect->GetGeometryShader();
 			if (geometryShader != NULL)
 			{
 				ID3D11GeometryShader *pShader = (ID3D11GeometryShader *)(geometryShader->GetHandle());
 				_pImmediateContext->GSSetShader(pShader, NULL, 0);
 
-				DX11ShaderObjectPtr dxGeometryShader = boost::dynamic_pointer_cast<DX11ShaderObject>(geometryShader);
+				DX11ShaderObject* dxGeometryShader = (DX11ShaderObject*)geometryShader;
 				std::size_t cbsize = dxGeometryShader->CachedConstBuffer.size();
 				if (cbsize > 0)
 				{
@@ -746,13 +731,13 @@ namespace Disorder
 				_pImmediateContext->GSSetShader(NULL, NULL, 0);
 			}
 
-			ShaderObjectPtr pixelShader = effect->GetPixelShader();
+			ShaderObject* pixelShader = effect->GetPixelShader();
 			if( pixelShader != NULL )
 			{
 				ID3D11PixelShader *pShader = (ID3D11PixelShader *)(pixelShader->GetHandle());
 				_pImmediateContext->PSSetShader(pShader,NULL,0);
 
-				DX11ShaderObjectPtr dxPixelShader = boost::dynamic_pointer_cast<DX11ShaderObject>(pixelShader);
+				DX11ShaderObject* dxPixelShader = (DX11ShaderObject*)pixelShader;
 
 				std::size_t csize = dxPixelShader->CachedConstBuffer.size();
 				if( csize > 0 )
@@ -794,7 +779,7 @@ namespace Disorder
 		}
 	}
 
-	void DX11RenderEngine::SetDepthStencilState(DepthStencilStatePtr const& depthStencilState)
+	void DX11RenderEngine::SetDepthStencilState(DepthStencilState* depthStencilState)
 	{
 		if( CachedDepthStencilState != depthStencilState || depthStencilState->StencilRef != CachedStencilRef )
 		{
@@ -806,11 +791,11 @@ namespace Disorder
 		}
 	}
  
-	void DX11RenderEngine::SaveSurfaceView(SurfaceViewPtr const& surface, std::string const& fileName)
+	void DX11RenderEngine::SaveSurfaceView(SurfaceView* surface, std::string const& fileName)
 	{
 		//create stage texture
 		D3D11_TEXTURE2D_DESC desc;
-		RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(surface->Resource);
+		RenderTexture2D* tex = (RenderTexture2D*)surface->Resource;
 		ID3D11Texture2D *pTex = (ID3D11Texture2D*)tex->GetHandle();
 		pTex->GetDesc(&desc);
 		desc.Usage = D3D11_USAGE_STAGING;
@@ -828,7 +813,7 @@ namespace Disorder
 		_pImmediateContext->Map(pStageTex2D,D3D11CalcSubresource(0, 0, 1),D3D11_MAP_READ,0,&MappedResource);
 		
 		int dataSize = desc.Width * desc.Height * RenderEngine::ComputePixelSizeBits(tex->Format) / 8;
-		ImagePtr image = Image::Create(eIT_PNG,desc.Width,desc.Height,tex->Format,(BYTE*)MappedResource.pData,dataSize);
+		Image* image = Image::Create(eIT_PNG,desc.Width,desc.Height,tex->Format,(BYTE*)MappedResource.pData,dataSize);
 		GImageManager->Save(fileName,image);
 
 		_pImmediateContext->Unmap(pStageTex2D,D3D11CalcSubresource(0, 0, 1));
@@ -836,7 +821,7 @@ namespace Disorder
 		
 	}
 
-	void DX11RenderEngine::CopyTexture2D(RenderTexture2DPtr srcTexture, RenderTexture2DPtr dstTexture)
+	void DX11RenderEngine::CopyTexture2D(RenderTexture2D* srcTexture, RenderTexture2D* dstTexture)
 	{
 		BOOST_ASSERT(srcTexture->Height == dstTexture->Height);
 		BOOST_ASSERT(srcTexture->Width == dstTexture->Width);
@@ -845,12 +830,12 @@ namespace Disorder
 		_pImmediateContext->CopyResource((ID3D11Resource *)dstTexture->GetHandle(), (ID3D11Resource *)srcTexture->GetHandle());
 	}
 	 
-	void DX11RenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget, int sliceIndex,bool useReadOnlyDepthStencil)
+	void DX11RenderEngine::SetRenderTarget(RenderSurface* renderTarget, int sliceIndex,bool useReadOnlyDepthStencil)
 	{
 		std::vector<ID3D11RenderTargetView*> vRenderTarget;
 		ID3D11DepthStencilView* pDepthView = NULL;
 		
-		DX11RenderSurfacePtr dxSurface = boost::dynamic_pointer_cast<DX11RenderSurface>(renderTarget);
+		DX11RenderSurface* dxSurface = (DX11RenderSurface*)renderTarget;
 
 		for (size_t i = 0; i < SL_SurfaceLoactionMax; i++)
 		{
@@ -859,30 +844,30 @@ namespace Disorder
 
 			if (i == SL_DepthStencil && pDepthView == NULL)
 			{
-				DX11SurfaceViewPtr dxDepthStencil = boost::dynamic_pointer_cast<DX11SurfaceView>(dxSurface->_surfacesViewArray[i]);
+				DX11SurfaceView* dxDepthStencil = (DX11SurfaceView*)dxSurface->_surfacesViewArray[i];
 				if (sliceIndex < 0 || dxDepthStencil->DepthStencilHandleArray.size() == 0 )
 				{
 					if (_featureLevel >= D3D_FEATURE_LEVEL_11_0 && useReadOnlyDepthStencil)
-						pDepthView = dxDepthStencil->ReadonlyDepthStencil.get();
+						pDepthView = dxDepthStencil->ReadonlyDepthStencil;
 					else
-						pDepthView = dxDepthStencil->DepthStencilHandle.get();
+						pDepthView = dxDepthStencil->DepthStencilHandle;
 				}
 				else
 				{
 					BOOST_ASSERT((size_t)sliceIndex < dxDepthStencil->DepthStencilHandleArray.size());
-					pDepthView = dxDepthStencil->DepthStencilHandleArray[sliceIndex].get();
+					pDepthView = dxDepthStencil->DepthStencilHandleArray[sliceIndex];
 				}
 			}
 			else if (i >= SL_RenderTarget1 && i <= SL_RenderTarget8)
 			{
-				DX11SurfaceViewPtr dxRenderTarget = boost::dynamic_pointer_cast<DX11SurfaceView>(dxSurface->_surfacesViewArray[i]);
+				DX11SurfaceView* dxRenderTarget = (DX11SurfaceView*)dxSurface->_surfacesViewArray[i];
 				if (sliceIndex < 0 || dxRenderTarget->RenderTargetHandleArray.size() == 0)
 				{
-					vRenderTarget.push_back((ID3D11RenderTargetView*)dxRenderTarget->RenderTargetHandle.get());
+					vRenderTarget.push_back(dxRenderTarget->RenderTargetHandle);
 				}
 				else
 				{
-					vRenderTarget.push_back((ID3D11RenderTargetView*)dxRenderTarget->RenderTargetHandleArray[sliceIndex].get());
+					vRenderTarget.push_back(dxRenderTarget->RenderTargetHandleArray[sliceIndex]);
 				}
 			}
 		}
@@ -891,19 +876,19 @@ namespace Disorder
 	 
 	}
 
-	void DX11RenderEngine::ClearRenderTarget(const SurfaceViewPtr& renderTarget, const glm::vec4& color, int sliceIndex)
+	void DX11RenderEngine::ClearRenderTarget(SurfaceView* renderTarget, const glm::vec4& color, int sliceIndex)
 	{
-		DX11SurfaceViewPtr target = boost::dynamic_pointer_cast<DX11SurfaceView>(renderTarget);
+		DX11SurfaceView* target = (DX11SurfaceView*)renderTarget;
 		if (sliceIndex < 0 || target->RenderTargetHandleArray.size() == 0)
-	        _pImmediateContext->ClearRenderTargetView((ID3D11RenderTargetView*)target->RenderTargetHandle.get(), glm::value_ptr(color));
+	        _pImmediateContext->ClearRenderTargetView(target->RenderTargetHandle, glm::value_ptr(color));
 		else
-			_pImmediateContext->ClearRenderTargetView((ID3D11RenderTargetView*)target->RenderTargetHandleArray[sliceIndex].get(), glm::value_ptr(color));
+			_pImmediateContext->ClearRenderTargetView(target->RenderTargetHandleArray[sliceIndex], glm::value_ptr(color));
 	}
 
 	 
-	void DX11RenderEngine::ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex)
+	void DX11RenderEngine::ClearRenderSurface(RenderSurface* renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex)
 	{
-		DX11RenderSurfacePtr dxSurface = boost::dynamic_pointer_cast<DX11RenderSurface>(renderSurface);
+		DX11RenderSurface* dxSurface = (DX11RenderSurface*)renderSurface;
 		for (size_t i = 0; i < SL_SurfaceLoactionMax; i++)
 		{
 			if (dxSurface->_surfacesViewArray[i] != NULL)
@@ -920,7 +905,7 @@ namespace Disorder
 		}
 	}
 
-	void DX11RenderEngine::ClearDepthStencil(const SurfaceViewPtr& depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex)
+	void DX11RenderEngine::ClearDepthStencil(SurfaceView* depthBuffer, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex)
 	{
 		unsigned int flag = 0;
 		if( bClearDepth )
@@ -929,12 +914,12 @@ namespace Disorder
 		if( bClearStencil )
 			flag |= D3D11_CLEAR_STENCIL;
 
-		DX11SurfaceViewPtr dxDepthStencil = boost::dynamic_pointer_cast<DX11SurfaceView>(depthBuffer); 
+		DX11SurfaceView* dxDepthStencil = (DX11SurfaceView*)depthBuffer; 
 		if (sliceIndex < 0 || dxDepthStencil->DepthStencilHandleArray.size() == 0)
-		   _pImmediateContext->ClearDepthStencilView((ID3D11DepthStencilView*)dxDepthStencil->DepthStencilHandle.get(), flag, depth, stencil);
+		   _pImmediateContext->ClearDepthStencilView(dxDepthStencil->DepthStencilHandle, flag, depth, stencil);
 		else
 		{
-			_pImmediateContext->ClearDepthStencilView((ID3D11DepthStencilView*)dxDepthStencil->DepthStencilHandleArray[sliceIndex].get(), flag, depth, stencil);
+			_pImmediateContext->ClearDepthStencilView(dxDepthStencil->DepthStencilHandleArray[sliceIndex], flag, depth, stencil);
 		}
 			 
 	}

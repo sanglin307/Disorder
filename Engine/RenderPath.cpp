@@ -30,7 +30,7 @@ namespace Disorder
 
 	}
 
-	void RenderPath::SetDirectionLight(const DirectionLightPtr& directionLight)
+	void RenderPath::SetDirectionLight(DirectionLight* directionLight)
 	{
 		_DirectionLightPropertyManager->ClearShaderPropertyValue();
 		_DirectionLightIntensityProperty->SetData(&(directionLight->Intensity));
@@ -42,7 +42,7 @@ namespace Disorder
 		_DirectionLightPropertyManager->UpdateShaderProperty();
 	}
 
-	void RenderPath::SetPointLight(const PointLightPtr& pointLight)
+	void RenderPath::SetPointLight(PointLight* pointLight)
 	{
 		glm::vec3 pos = pointLight->GetPosition();
 		_PointLightPosProperty->SetData(glm::value_ptr(pos));
@@ -54,7 +54,7 @@ namespace Disorder
 		_PointLightPropertyManager->UpdateShaderProperty();
 	}
 
-	void RenderPath::SetSpotLight(const SpotLightPtr& spotLight)
+	void RenderPath::SetSpotLight(SpotLight* spotLight)
 	{
 		glm::vec3 spotPos = spotLight->GetPosition();
 		glm::vec3 spotDir = spotLight->GetDirection();
@@ -79,18 +79,18 @@ namespace Disorder
 
 	//////////////////////////////////////////////////////////////////////////////////////////
  
-	void ForwardRenderPath::RenderLights(const CameraPtr& camera, const std::vector<GeometryRendererPtr>& renderList)
+	void ForwardRenderPath::RenderLights(Camera* camera, const std::vector<GeometryRenderer*>& renderList)
 	{
-		const std::vector<LightPtr>& lightList = GSceneManager->GetLightsList();
+		const std::vector<Light*>& lightList = GSceneManager->GetLightsList();
 		if (lightList.size() == 0)
 			return;
  
-		std::vector<GeometryRendererPtr> allGeometryList;
+		std::vector<GeometryRenderer*> allGeometryList;
 		GSceneManager->GetRendererList(allGeometryList);
 
 		for (size_t iLight = 0; iLight < lightList.size(); iLight++)
 		{
-			LightPtr light = lightList[iLight];
+			Light* light = lightList[iLight];
 
 			// render shadow
 			if (light->CastShadows)
@@ -107,23 +107,23 @@ namespace Disorder
 			GEngine->RenderSurfaceCache->ShadowMapBuffer->PrepareRenderLight(light); 
 			if (light->LightType == LT_Directional)
 			{
-				DirectionLightPtr dirLight = boost::dynamic_pointer_cast<DirectionLight>(light);
+				DirectionLight* dirLight = (DirectionLight*)light;
 				SetDirectionLight(dirLight);
 			}
 			else if (light->LightType == LT_Point)
 			{
-				PointLightPtr pointLight = boost::dynamic_pointer_cast<PointLight>(light);
+				PointLight* pointLight = (PointLight*)light;
 				SetPointLight(pointLight);
 			}
 			else if (light->LightType == LT_Spot)
 			{
-				SpotLightPtr spotLight = boost::dynamic_pointer_cast<SpotLight>(light);
+				SpotLight* spotLight = (SpotLight*)light;
 				SetSpotLight(spotLight);
 			}
 
 			for (unsigned int iObj = 0; iObj < renderList.size(); iObj++)
 			{
-				GeometryRendererPtr obj = renderList[iObj];
+				GeometryRenderer* obj = renderList[iObj];
 				if (!light->Touch(obj))
 					continue;
 				obj->UpdateShaderProperty();
@@ -141,14 +141,14 @@ namespace Disorder
  
 	}
 
-	void ForwardRenderPath::BasePassRender(const CameraPtr& camera, const std::vector<GeometryRendererPtr>& renderList)
+	void ForwardRenderPath::BasePassRender(Camera* camera, const std::vector<GeometryRenderer*>& renderList)
 	{
 		if (renderList.size() == 0)
 			return;
 
 		for (unsigned int i = 0; i< renderList.size(); i++)
 		{
-			GeometryRendererPtr obj = renderList[i];
+			GeometryRenderer* obj = renderList[i];
 			obj->BuildRenderLayout(_BasePassEffect, false);
 			obj->UpdateShaderProperty();
  
@@ -159,7 +159,7 @@ namespace Disorder
 
 	void ForwardRenderPath::Render()
 	{
-		CameraPtr mainCamera = GSceneManager->GetDefaultCamera();
+		Camera* mainCamera = GSceneManager->GetDefaultCamera();
 
 		if( mainCamera == NULL )
 			return;
@@ -177,7 +177,7 @@ namespace Disorder
 		// skybox
 		GSceneManager->GetSkybox()->Render();
 
-		std::vector<GeometryRendererPtr> rendererList;
+		std::vector<GeometryRenderer*> rendererList;
 		GSceneManager->GetRendererList(mainCamera,rendererList);
 
 		// base pass for ambient light and diffuse texture etc
@@ -203,43 +203,36 @@ namespace Disorder
 		GEngine->RenderEngine->OnFrameEnd();
 	}
  
-
-	ForwardRenderPathPtr ForwardRenderPath::Create()
-	{
-		ForwardRenderPath *pPath = new ForwardRenderPath;
-		return ForwardRenderPathPtr(pPath);
-	}
-
 	ForwardRenderPath::ForwardRenderPath()
 	{
 		_type = RPT_ForwardLighting;
 
 	 
 		_BasePassEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ForwardLighting", SM_4_0, "SceneVS");
-		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "ForwardLighting", SM_4_0, "BasePassPS");
+		ShaderObject* vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ForwardLighting", SM_4_0, "SceneVS");
+		ShaderObject* pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "ForwardLighting", SM_4_0, "BasePassPS");
 		 
 		_BasePassEffect->BindShader(vertexShader);
 		_BasePassEffect->BindShader(pixelShader);
 		_BasePassEffect->LinkShaders();
 
 		_DirectionLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr dvertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"SceneVS");
-		ShaderObjectPtr dpixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"DirectionLightingPS");
+		ShaderObject* dvertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"SceneVS");
+		ShaderObject* dpixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"DirectionLightingPS");
 		_DirectionLightEffect->BindShader(dvertexShader);
 		_DirectionLightEffect->BindShader(dpixelShader);
 		_DirectionLightEffect->LinkShaders();
  
 		_PointLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr pVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"SceneVS");
-		ShaderObjectPtr pPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"PointLightingPS");
+		ShaderObject* pVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"SceneVS");
+		ShaderObject* pPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"PointLightingPS");
 		_PointLightEffect->BindShader(pVertexShader);
 		_PointLightEffect->BindShader(pPixelShader);
 		_PointLightEffect->LinkShaders();
 
 		_SpotLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr sVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ForwardLighting", SM_4_0, "SceneVS");
-		ShaderObjectPtr sPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "ForwardLighting", SM_4_0, "SpotLightingPS");
+		ShaderObject* sVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ForwardLighting", SM_4_0, "SceneVS");
+		ShaderObject* sPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "ForwardLighting", SM_4_0, "SpotLightingPS");
 		_SpotLightEffect->BindShader(sVertexShader);
 		_SpotLightEffect->BindShader(sPixelShader);
 		_SpotLightEffect->LinkShaders();
@@ -252,7 +245,7 @@ namespace Disorder
 		bDesc.BlendOpAlpha = BLEND_OP_ADD;
 		bDesc.SrcBlendAlpha = BLEND_ONE;
 		bDesc.DestBlendAlpha = BLEND_ONE;
-		BlendStatePtr blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc,1);
+		BlendState* blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc,1);
 		_DirectionLightEffect->BindBlendState(blendState);
 		_PointLightEffect->BindBlendState(blendState);
 		_SpotLightEffect->BindBlendState(blendState);
@@ -260,31 +253,26 @@ namespace Disorder
 		DepthStencilDesc dsDesc;
 		dsDesc.DepthFunc = CF_Less_Equal;
 		dsDesc.DepthWrite = false;
-		DepthStencilStatePtr noDepthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dsDesc,0);
+		DepthStencilState* noDepthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dsDesc,0);
 		_DirectionLightEffect->BindDepthStencilState(noDepthState);
 		_PointLightEffect->BindDepthStencilState(noDepthState);
 		_SpotLightEffect->BindDepthStencilState(noDepthState);
  
-		_aaRender = FXAA::Create();
+		_aaRender = new FXAA;
  
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////
-
-	DeferredShadingPtr DeferredShading::Create()
-	{
-		DeferredShading *pShading = new DeferredShading;
-		return DeferredShadingPtr(pShading);
-	}
+ 
 
 	DeferredShading::DeferredShading()
 	{
 		_type = RPT_DeferredShading;
 
 	 
-		_RenderSceneEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"SceneVS");
-		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"ScenePS");
+		_RenderSceneEffect = new RenderEffect;
+		ShaderObject* vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"SceneVS");
+		ShaderObject* pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"ScenePS");
 		_RenderSceneEffect->BindShader(vertexShader);
 		_RenderSceneEffect->BindShader(pixelShader);
 		_RenderSceneEffect->LinkShaders();
@@ -298,7 +286,7 @@ namespace Disorder
 		depthDesc.BackFaceStencilFailOp = depthDesc.FrontFaceStencilFailOp = STENCIL_OP_REPLACE;
 		depthDesc.BackFaceStencilPassOp = depthDesc.FrontFaceStencilPassOp = STENCIL_OP_REPLACE;
 		depthDesc.BackFaceStencilFunc = depthDesc.BackFaceStencilFunc = CF_Always;
-		DepthStencilStatePtr _DepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&depthDesc,0);
+		DepthStencilState* _DepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&depthDesc,0);
 		_RenderSceneEffect->BindDepthStencilState(_DepthWriteState);
 
 		_BasePassEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
@@ -308,23 +296,23 @@ namespace Disorder
 		 _BasePassEffect->BindShader(pixelShader);
 		 _BasePassEffect->LinkShaders();
 
-		 _DirectionLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		 vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "DeferredShading", SM_4_0, "LightingVS");
-		 pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "DeferredShading", SM_4_0, "DirectionLightingPS");
+		 _DirectionLightEffect = GRenderResourceMgr->CreateRenderEffect();
+		 vertexShader = GRenderResourceMgr->CreateShader(ST_VertexShader, "DeferredShading", SM_4_0, "LightingVS");
+		 pixelShader = GRenderResourceMgr->CreateShader(ST_PixelShader, "DeferredShading", SM_4_0, "DirectionLightingPS");
 		 _DirectionLightEffect->BindShader(vertexShader);
 		 _DirectionLightEffect->BindShader(pixelShader);
 		 _DirectionLightEffect->LinkShaders();
 
-		 _PointLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		 vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "DeferredShading", SM_4_0, "LightingVS");
-		 pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "DeferredShading", SM_4_0, "PointLightingPS");
+		 _PointLightEffect = GRenderResourceMgr->CreateRenderEffect();
+		 vertexShader = GRenderResourceMgr->CreateShader(ST_VertexShader, "DeferredShading", SM_4_0, "LightingVS");
+		 pixelShader = GRenderResourceMgr->CreateShader(ST_PixelShader, "DeferredShading", SM_4_0, "PointLightingPS");
 		 _PointLightEffect->BindShader(vertexShader);
 		 _PointLightEffect->BindShader(pixelShader);
 		 _PointLightEffect->LinkShaders();
 
-		 _SpotLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		 vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "DeferredShading", SM_4_0, "LightingVS");
-		 pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "DeferredShading", SM_4_0, "SpotLightingPS");
+		 _SpotLightEffect = GRenderResourceMgr->CreateRenderEffect();
+		 vertexShader = GRenderResourceMgr->CreateShader(ST_VertexShader, "DeferredShading", SM_4_0, "LightingVS");
+		 pixelShader = GRenderResourceMgr->CreateShader(ST_PixelShader, "DeferredShading", SM_4_0, "SpotLightingPS");
 		 _SpotLightEffect->BindShader(vertexShader);
 		 _SpotLightEffect->BindShader(pixelShader);
 		 _SpotLightEffect->LinkShaders();
@@ -339,7 +327,7 @@ namespace Disorder
 		nodepthWriteDesc.BackFaceStencilFailOp = nodepthWriteDesc.FrontFaceStencilFailOp = STENCIL_OP_KEEP;
 		nodepthWriteDesc.BackFaceStencilPassOp = nodepthWriteDesc.FrontFaceStencilPassOp = STENCIL_OP_KEEP;
 		nodepthWriteDesc.BackFaceStencilFunc = nodepthWriteDesc.BackFaceStencilFunc = CF_Equal;
-		DepthStencilStatePtr _noDepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&nodepthWriteDesc, 0);
+		DepthStencilState* _noDepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&nodepthWriteDesc, 0);
 		_BasePassEffect->BindDepthStencilState(_noDepthWriteState);
  
 		BlendDesc bBaseDesc;
@@ -350,7 +338,7 @@ namespace Disorder
 		bBaseDesc.BlendOpAlpha = BLEND_OP_ADD;
 		bBaseDesc.SrcBlendAlpha = BLEND_ONE;
 		bBaseDesc.DestBlendAlpha = BLEND_ONE;
-		BlendStatePtr blendStateBase = GEngine->RenderResourceMgr->CreateBlendState(&bBaseDesc, 1);
+		BlendState* blendStateBase = GEngine->RenderResourceMgr->CreateBlendState(&bBaseDesc, 1);
 		_BasePassEffect->BindBlendState(blendStateBase);
 
 		BlendDesc bDesc;
@@ -361,7 +349,7 @@ namespace Disorder
 		bDesc.BlendOpAlpha = BLEND_OP_ADD;
 		bDesc.SrcBlendAlpha = BLEND_ONE;
 		bDesc.DestBlendAlpha = BLEND_ONE;
-		BlendStatePtr blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc,1);
+		BlendState* blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc,1);
 		
 		_DirectionLightEffect->BindBlendState(blendState);
 		_PointLightEffect->BindBlendState(blendState);
@@ -369,7 +357,7 @@ namespace Disorder
  
 		DepthStencilDesc dsDesc;
 		dsDesc.DepthFunc = CF_Less_Equal;
-		DepthStencilStatePtr noDepthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dsDesc,0);
+		DepthStencilState* noDepthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dsDesc,0);
 		_DirectionLightEffect->BindDepthStencilState(noDepthState);
 		_PointLightEffect->BindDepthStencilState(noDepthState);
 		_SpotLightEffect->BindDepthStencilState(noDepthState);
@@ -388,23 +376,23 @@ namespace Disorder
 	
 		_LightingTile = SimpleTile("DeferLightingTile", vertex, _BasePassEffect);
  
-		GEngine->RenderSurfaceCache->GBuffer = RenderGBuffer::Create(GConfig->pRenderConfig->SizeX,GConfig->pRenderConfig->SizeY);
+		GEngine->RenderSurfaceCache->GBuffer = new RenderGBuffer(GConfig->pRenderConfig->SizeX,GConfig->pRenderConfig->SizeY);
 
-		_aaRender = FXAA::Create();
+		_aaRender = new FXAA;
 	}
 
-	void DeferredShading::RenderLights(const CameraPtr& camera, const std::vector<GeometryRendererPtr>& renderList)
+	void DeferredShading::RenderLights(Camera* camera, const std::vector<GeometryRenderer*>& renderList)
 	{
-		const std::vector<LightPtr>& lightList = GSceneManager->GetLightsList();
+		const std::vector<Light*>& lightList = GSceneManager->GetLightsList();
 		if (lightList.size() == 0)
 			return;
 
-		std::vector<GeometryRendererPtr> allGeometryList;
+		std::vector<GeometryRenderer*> allGeometryList;
 		GSceneManager->GetRendererList(allGeometryList);
 
 		for (size_t i = 0; i < lightList.size(); i++)
 		{
-			LightPtr light = lightList[i];
+			Light* light = lightList[i];
 
 			// render shadow
 			if (light->CastShadows)
@@ -423,21 +411,21 @@ namespace Disorder
 
 			if (light->LightType == LT_Directional)
 			{
-				DirectionLightPtr dirLight = boost::dynamic_pointer_cast<DirectionLight>(light);
+				DirectionLight* dirLight = (DirectionLight*)light;
 				SetDirectionLight(dirLight);
 				_LightingTile.SetRenderEffect(_DirectionLightEffect);
 				_LightingTile.Render(camera);
 			}
 			else if (light->LightType == LT_Point)
 			{
-				PointLightPtr pointLight = boost::dynamic_pointer_cast<PointLight>(light);
+				PointLight* pointLight = (PointLight*)light;
 				SetPointLight(pointLight);
 				_LightingTile.SetRenderEffect(_PointLightEffect);
 				_LightingTile.Render(camera);
 			}
 			else if (light->LightType == LT_Spot)
 			{
-				SpotLightPtr spotLight = boost::dynamic_pointer_cast<SpotLight>(light);
+				SpotLight* spotLight =  (SpotLight*)light;
 				SetSpotLight(spotLight);
 				_LightingTile.SetRenderEffect(_SpotLightEffect);
 				_LightingTile.Render(camera);
@@ -448,7 +436,7 @@ namespace Disorder
 
 	void DeferredShading::Render()
 	{
-		CameraPtr mainCamera = GSceneManager->GetDefaultCamera();
+		Camera* mainCamera = GSceneManager->GetDefaultCamera();
 
 		if( mainCamera == NULL )
 			return;
@@ -465,11 +453,11 @@ namespace Disorder
 		GSceneManager->GetSkybox()->Render();
 
 		// draw to GBuffer
-		RenderSurfacePtr renderTargetPtr = GEngine->RenderSurfaceCache->GBuffer->RenderTargetBuffer;
+		RenderSurface* renderTargetPtr = GEngine->RenderSurfaceCache->GBuffer->RenderTargetBuffer;
 		GEngine->RenderEngine->SetRenderTarget(renderTargetPtr);
 		GEngine->RenderEngine->ClearRenderSurface(renderTargetPtr, glm::vec4(0.f),true, 1.f, true, 0);
  
-		std::vector<GeometryRendererPtr> rendererList;
+		std::vector<GeometryRenderer*> rendererList;
 		GSceneManager->GetRendererList(mainCamera, rendererList);
 		
 		RenderScene(mainCamera,rendererList);
@@ -512,11 +500,11 @@ namespace Disorder
 		GEngine->RenderEngine->OnFrameEnd();
 	}
 
-	void DeferredShading::RenderScene(const CameraPtr& mainCamera,const std::vector<GeometryRendererPtr>& rendererList)
+	void DeferredShading::RenderScene(Camera* mainCamera,const std::vector<GeometryRenderer*>& rendererList)
 	{	
 		for(size_t i=0;i< rendererList.size(); i++ )
 		{
-			GeometryRendererPtr obj = rendererList[i];
+			GeometryRenderer* obj = rendererList[i];
 			obj->BuildRenderLayout(_RenderSceneEffect,false);
 			obj->UpdateShaderProperty();
 			obj->SetRenderEffect(_RenderSceneEffect);

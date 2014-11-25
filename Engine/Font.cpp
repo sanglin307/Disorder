@@ -2,12 +2,7 @@
 
 namespace Disorder
 {
-	FontPtr Font::Create(unsigned int fontSize,unsigned int fontRevolution)
-	{
-		Font *pFont = new Font(fontSize,fontRevolution);
-		return FontPtr(pFont);
-	}
-
+ 
 	Font::Font(unsigned int fontWidSize,unsigned int fontRevolution)
 		:_fontSize(fontWidSize), _fontRevolution(fontRevolution), _fontMaxBearingY(0)
 		,_characterSpacer(5),_antialiasColor(false)
@@ -33,12 +28,12 @@ namespace Disorder
 
 	}
 
-	void Font::CreateRenderResource(const ImagePtr& image)
+	void Font::CreateRenderResource(Image* image)
 	{
 		SamplerDesc desc;
 		desc.Filter = SF_Min_Mag_Linear_Mip_Point;
-		SamplerStatePtr sampler = GEngine->RenderResourceMgr->CreateSamplerState(&desc);
-		RenderTexture2DPtr fontTexture = GEngine->RenderResourceMgr->CreateTexture2D(sampler, image->GetSpec().format, false, image);
+		SamplerState* sampler = GEngine->RenderResourceMgr->CreateSamplerState(&desc);
+		RenderTexture2D* fontTexture = GEngine->RenderResourceMgr->CreateTexture2D(sampler, image->GetSpec().format, false, image);
 		_glyphsTexture = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, fontTexture, image->GetSpec().format);
 	}
 
@@ -48,7 +43,7 @@ namespace Disorder
 		FT_Error error = FT_Init_FreeType( &ft_library );
 		BOOST_ASSERT(!error);
 
-		std::string strFilePath = GConfig->sResourceFontPath + "ttf\\" + fontName + ".ttf";
+		std::string strFilePath = GConfig->ResourceFontPath + "ttf\\" + fontName + ".ttf";
 		FT_Face face;
 	    error = FT_New_Face( ft_library,strFilePath.c_str(),0,&face );
 		BOOST_ASSERT(!error);
@@ -194,9 +189,9 @@ namespace Disorder
 
 		// save it to image 
 		PixelFormat pixelFormat = PF_R8G8_UNORM;
-		ImagePtr fontImage = Image::Create(eIT_PNG, finalWidth, finalHeight, pixelFormat, imageData, data_size);
+		Image* fontImage = Image::Create(eIT_PNG, finalWidth, finalHeight, pixelFormat, imageData, data_size);
 		GImageManager->Add(fontName,fontImage);
-		std::string strImageFileName = GConfig->sResourceFontPath + "png\\" + fontName + ".png";
+		std::string strImageFileName = GConfig->ResourceFontPath + "png\\" + fontName + ".png";
 		GImageManager->Save(strImageFileName,fontImage);
 
 		delete imageData;

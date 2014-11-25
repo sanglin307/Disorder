@@ -8,19 +8,17 @@ namespace Disorder
 	{
 	public:
 		void Render();
-		static SkyboxPtr Create();
-	private:
 		Skybox();
+	private:
+		RenderTexture2D* _skyTexture;
+		SurfaceView* _skyCubeView;
+		SamplerState* _skyCubeSampler;
 
-		RenderTexture2DPtr _skyTexture;
-		SurfaceViewPtr _skyCubeView;
-		SamplerStatePtr _skyCubeSampler;
+		RenderEffect* _renderEffect;
+		RenderLayout* _renderLayout;
 
-		RenderEffectPtr _renderEffect;
-		RenderLayoutPtr _renderLayout;
-
-		ShaderPropertyPtr _skyTextureProperty;
-		ShaderPropertyPtr _skySamplerProperty;
+		ShaderProperty* _skyTextureProperty;
+		ShaderProperty* _skySamplerProperty;
 	};
 }
 

@@ -9,7 +9,7 @@ namespace Disorder
 	{
 	public:
  
-        virtual void BindVertexBuffer(RenderBufferPtr const& renderBuffer)
+        virtual void BindVertexBuffer(RenderBuffer* renderBuffer)
         {
 			_vertexBuffers.push_back(renderBuffer);
         }
@@ -19,17 +19,17 @@ namespace Disorder
 			_vertexBuffers.clear();
 		}
 
-         void BindIndexBuffer(RenderBufferPtr const& renderBuffer)
+         void BindIndexBuffer(RenderBuffer* renderBuffer)
         {
              _indexBuffer = renderBuffer; 
         }
 
-		std::vector<RenderBufferPtr> const& GetVertexBuffers()
+		std::vector<RenderBuffer*> const& GetVertexBuffers() const
 		{
 			return _vertexBuffers;
 		}
 
-		RenderBufferPtr const& GetIndexBuffer()
+		RenderBuffer* GetIndexBuffer() const
 		{
 			return _indexBuffer;
 		}
@@ -41,13 +41,13 @@ namespace Disorder
  
 		virtual void * GetHandle(){ return 0;}
 
-		virtual void FinishBufferBinding(RenderEffectPtr const& renderEffect){};
+		virtual void FinishBufferBinding(RenderEffect* renderEffect){};
 
 	protected:
 		RenderLayout(){}
 
-		std::vector<RenderBufferPtr> _vertexBuffers;
-        RenderBufferPtr _indexBuffer;
+		std::vector<RenderBuffer*> _vertexBuffers;
+        RenderBuffer* _indexBuffer;
         TopologyType _topologyType;
 	};
 }

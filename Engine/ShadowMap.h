@@ -1,12 +1,12 @@
 #ifndef _DISORDER_SHADOWMAP_H_
 #define _DISORDER_SHADOWMAP_H_
-
+ 
 namespace Disorder
 {
 	class ShadowMap
 	{
 	public:
-		static ShadowMapPtr Create(unsigned int width,unsigned int height);
+		ShadowMap(unsigned int width, unsigned int height);
 
 		const unsigned int GetWidth() const
 		{
@@ -18,46 +18,46 @@ namespace Disorder
 			return _height;
 		}
 
-		void RenderDepth(const CameraPtr& camera, std::vector<GeometryRendererPtr>& geometryList, const LightPtr& light);
-		void PrepareRenderLight(const LightPtr& light);
+		void RenderDepth(Camera* camera, const std::vector<GeometryRenderer*>& geometryList, Light* light);
+		void PrepareRenderLight(const Light* light);
 
 	protected:
-		ShadowMap(unsigned int width,unsigned int height);
+		
 
-		ShaderPropertyManagerPtr _propertyMgr;
+		ShaderPropertyManager* _propertyMgr;
 
-		ShaderPropertyPtr _viewMatrix;
-		ShaderPropertyPtr _viewArrayMatrix;
-		ShaderPropertyPtr _projMatrix;
+		ShaderProperty* _viewMatrix;
+		ShaderProperty* _viewArrayMatrix;
+		ShaderProperty* _projMatrix;
 
-		ShaderPropertyPtr _shadowSampler;
-		ShaderPropertyPtr _shadowTexture2D;
-		ShaderPropertyPtr _shadowTextureCube;
+		ShaderProperty* _shadowSampler;
+		ShaderProperty* _shadowTexture2D;
+		ShaderProperty* _shadowTextureCube;
  
 		// 2D texture used to direction light and spot light
-		RenderTexture2DPtr _shadowDataTex2D;
-		SurfaceViewPtr _depthView2D;
-		SurfaceViewPtr _shaderView2D;
-		RenderSurfacePtr _depthSurface2D;
+		RenderTexture2D* _shadowDataTex2D;
+		SurfaceView* _depthView2D;
+		SurfaceView* _shaderView2D;
+		RenderSurface* _depthSurface2D;
 
 		// cube texture used to point light
-		RenderTexture2DPtr _shadowDataTexCube;
-		SurfaceViewPtr _depthViewCube;
-		SurfaceViewPtr _shaderViewCube;
+		RenderTexture2D* _shadowDataTexCube;
+		SurfaceView* _depthViewCube;
+		SurfaceView* _shaderViewCube;
 
-		RenderTexture2DPtr _shadowRenderTexCube;
-		SurfaceViewPtr _renderViewCube;
-		SurfaceViewPtr _shaderRenderViewCube;
+		RenderTexture2D* _shadowRenderTexCube;
+		SurfaceView* _renderViewCube;
+		SurfaceView* _shaderRenderViewCube;
 
-		RenderSurfacePtr _depthSurfaceCube;
+		RenderSurface* _depthSurfaceCube;
 
-		SamplerStatePtr _shadowSamplerState;
+		SamplerState* _shadowSamplerState;
 	 
 		unsigned int _width;
 		unsigned int _height;
  
-		RenderEffectPtr _DepthGenEffect;
-		RenderEffectPtr _DepthCubeGenEffect;
+		RenderEffect* _DepthGenEffect;
+		RenderEffect* _DepthCubeGenEffect;
 
 		bool _bUseGeometryShader;
 	};

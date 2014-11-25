@@ -1,36 +1,27 @@
 #ifndef _DISORDER_FONTMANAGER_H_
 #define _DISORDER_FONTMANAGER_H_
-
  
-
 namespace Disorder
 {
-	class FontManager : public Singleton<FontManager>
+	class FontManager
 	{
-		friend class Singleton<FontManager>;
-
-		typedef boost::unordered_map<std::string,FontPtr> FontMap;
+		typedef boost::unordered_map<std::string,Font*> FontMap;
 
 	public:
-	
+		FontManager();
 		~FontManager();
 
-		FontPtr CreateFontFromTrueTypeFile(std::string const& fontName,unsigned int fontSize,unsigned int fontResolution);
+		Font* CreateFontFromTrueTypeFile(std::string const& fontName,unsigned int fontSize,unsigned int fontResolution);
 
 		void LoadFontImageData();
 
 	protected:
-		static FontManagerPtr Create();
-
-		FontManager();
+		
 		FontMap _fontMap;
-
-
-
-
+ 
 	};
 
-	#define GFontManager FontManager::GetSingleton()
+	extern FontManager* GFontManager;
 }
 
 

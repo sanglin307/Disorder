@@ -3,13 +3,7 @@
 
 namespace Disorder
 {
-
-	FbxSceneImporterPtr FbxSceneImporter::Create()
-	{
-		FbxSceneImporter *pImport = new FbxSceneImporter();
-		return FbxSceneImporterPtr(pImport);
-	}
-
+ 
 	void FbxSceneImporter::Init()
 	{
 		 //The first thing to do is to create the FBX Manager which is the object allocator for almost all the classes in the SDK
@@ -37,9 +31,9 @@ namespace Disorder
  
 	
 
-	LevelPtr FbxSceneImporter::Import(std::string const& fileName)
+	Level* FbxSceneImporter::Import(std::string const& fileName)
 	{
-		std::string fbxFile = GConfig->sResourceFBXPath + fileName;
+		std::string fbxFile = GConfig->ResourceFBXPath + fileName;
 		int lFileMajor, lFileMinor, lFileRevision;
 		int lSDKMajor,  lSDKMinor,  lSDKRevision;	 
 		bool lStatus = false;
@@ -101,7 +95,7 @@ namespace Disorder
 			return NULL;
 		}
  
-		LevelPtr level = Level::Create(_cachedCurrentScene);
+		Level* level = new Level(_cachedCurrentScene);
 
 		PreProcessGlobalSetting(lscene, level);
 
@@ -125,7 +119,7 @@ namespace Disorder
 		return level;
 	}
 
-	void FbxSceneImporter::PreProcessGlobalSetting(FbxScene* lscene,LevelPtr const& level)
+	void FbxSceneImporter::PreProcessGlobalSetting(FbxScene* lscene,Level* level)
 	{
 		FbxGlobalSettings &rGlobalSetting =  lscene->GetGlobalSettings();
  
@@ -151,7 +145,7 @@ namespace Disorder
  
 	}
 
-	void FbxSceneImporter::PostProcessGlobalSetting(FbxScene* lscene,LevelPtr const& level)
+	void FbxSceneImporter::PostProcessGlobalSetting(FbxScene* lscene,Level* level)
 	{
 		FbxGlobalSettings &rGlobalSetting =  lscene->GetGlobalSettings();
 
@@ -159,7 +153,7 @@ namespace Disorder
 		if( !defaultCamera.IsEmpty())
 		{
 			std::string strCamera = defaultCamera.Buffer();
-			CameraPtr cameraPtr = GSceneManager->GetCamera(strCamera);
+			Camera* cameraPtr = GSceneManager->GetCamera(strCamera);
 			if(cameraPtr != NULL )
 			{
 				GSceneManager->SetDefaultCamera(cameraPtr);
@@ -171,7 +165,7 @@ namespace Disorder
 	}
 	 
 
-    void FbxSceneImporter::ProcessHierarchy(FbxScene* lscene,LevelPtr const& level)
+    void FbxSceneImporter::ProcessHierarchy(FbxScene* lscene,Level* level)
 	{
 		FbxNode* lNode = lscene->GetRootNode();
 
@@ -180,7 +174,7 @@ namespace Disorder
 			for(int i = 0; i < lNode->GetChildCount(); i++)
 			{
 				FbxNode* pNode = lNode->GetChild(i);
-				GameObjectPtr gameObject = ProcessTranform(pNode);
+				GameObject* gameObject = ProcessTranform(pNode);
 				ProcessContent(pNode,gameObject);
 				level->AddGameObject(gameObject);
 
@@ -194,9 +188,9 @@ namespace Disorder
 		}
 	}
 
-	void FbxSceneImporter::ProcessHierarchy(FbxNode* pNode,GameObjectPtr const& gameObject)
+	void FbxSceneImporter::ProcessHierarchy(FbxNode* pNode,GameObject* gameObject)
 	{
-		GameObjectPtr childObject = ProcessTranform(pNode);
+		GameObject* childObject = ProcessTranform(pNode);
 		ProcessContent(pNode,childObject);
 		gameObject->AddChild(childObject);
 		int childnum = pNode->GetChildCount();
@@ -208,7 +202,7 @@ namespace Disorder
 				 
 	}
 
-	void FbxSceneImporter::ProcessContent(FbxNode* pNode,GameObjectPtr const& gameObject)
+	void FbxSceneImporter::ProcessContent(FbxNode* pNode,GameObject* gameObject)
 	{
 		if(pNode->GetNodeAttribute() == NULL)
 			return;
@@ -254,17 +248,15 @@ namespace Disorder
 			GLogger->Info("Node has LodGroup info!");
             break;
         }   
-
-
-    
+ 
 	}
 
-	void FbxSceneImporter::ProcessCamera(FbxNode* pNode,GameObjectPtr const& gameObject)
+	void FbxSceneImporter::ProcessCamera(FbxNode* pNode,GameObject* gameObject)
 	{
 		FbxCamera *pCamera = (FbxCamera*)pNode->GetNodeAttribute();
 		BOOST_ASSERT(pCamera);
 
-		CameraPtr cameraPtr = Camera::Create(pNode->GetName());
+		Camera* cameraPtr = new Camera(pNode->GetName());
 		BOOST_ASSERT(pNode->GetTarget() == NULL); // don't process target node now.
 
 		FbxDouble3& position = pCamera->Position.Get();
@@ -281,7 +273,7 @@ namespace Disorder
 		
 	}
 
-	void FbxSceneImporter::ProcessGeometry(FbxMesh *pMesh,GeometryPtr const& geometry)
+	void FbxSceneImporter::ProcessGeometry(FbxMesh *pMesh,Geometry* geometry)
 	{
 		int lPolygonCount = pMesh->GetPolygonCount();
         FbxVector4* lControlPoints = pMesh->GetControlPoints(); 
@@ -713,13 +705,13 @@ namespace Disorder
 
 	}
 
-	void FbxSceneImporter::ProcessLight(FbxNode* pNode,GameObjectPtr const& gameObject)
+	void FbxSceneImporter::ProcessLight(FbxNode* pNode,GameObject* gameObject)
 	{
 		 FbxLight* lLight = (FbxLight*) pNode->GetNodeAttribute();
 	 
 		 if(lLight->LightType.Get() == FbxLight::ePoint )
 		 {
-			 PointLightPtr lightObj = PointLight::Create(gameObject->Name);
+			 PointLight* lightObj = new PointLight(gameObject->Name);
 			 lightObj->Range = 50;
 			 lightObj->Color.x = (float)lLight->Color.Get()[0];
 		     lightObj->Color.y= (float)lLight->Color.Get()[1];
@@ -730,7 +722,7 @@ namespace Disorder
 		 }
 		 else if(lLight->LightType.Get() == FbxLight::eDirectional )
 		 {
-			 DirectionLightPtr lightObj = DirectionLight::Create(gameObject->Name);
+			 DirectionLight* lightObj = new DirectionLight(gameObject->Name);
 			 lightObj->Color.x = (float)lLight->Color.Get()[0];
 		     lightObj->Color.y = (float)lLight->Color.Get()[1];
 		     lightObj->Color.z = (float)lLight->Color.Get()[2];
@@ -740,7 +732,7 @@ namespace Disorder
 		 }
 		 else if(lLight->LightType.Get() == FbxLight::eSpot )
 		 {
-			 SpotLightPtr lightObj = SpotLight::Create(gameObject->Name);
+			 SpotLight* lightObj = new SpotLight(gameObject->Name);
 			 lightObj->Range = 50;
 			 lightObj->Color.x = (float)lLight->Color.Get()[0];
 		     lightObj->Color.y = (float)lLight->Color.Get()[1];
@@ -760,7 +752,7 @@ namespace Disorder
  
 	}
 
-	void FbxSceneImporter::ProcessTextures(FbxSurfaceMaterial *pMaterial, SurfaceMaterialPtr& materials)
+	void FbxSceneImporter::ProcessTextures(FbxSurfaceMaterial *pMaterial, SurfaceMaterial* materials)
 	{
 		if (!pMaterial)
 			return;
@@ -791,7 +783,7 @@ namespace Disorder
 		}
 	}
 
-	void FbxSceneImporter::ProcessMaterials(FbxMesh *pMesh,std::vector<SurfaceMaterialPtr> & materials, int &usedMaterial)
+	void FbxSceneImporter::ProcessMaterials(FbxMesh *pMesh,std::vector<SurfaceMaterial*> & materials, int &usedMaterial)
 	{
 		int lMaterialCount = 0;
 		FbxNode* lNode = pMesh->GetNode();
@@ -807,7 +799,7 @@ namespace Disorder
 			for (int lCount = 0; lCount < lMaterialCount; lCount ++)
 			{			
 				FbxSurfaceMaterial *lMaterial = lNode->GetMaterial(lCount);
-				SurfaceMaterialPtr material = SurfaceMaterial::Create(lMaterial->GetName());
+				SurfaceMaterial* material = new SurfaceMaterial(lMaterial->GetName());
 				//Get the implementation to see if it's a hardware shader.
 				const FbxImplementation* lImplementation = GetImplementation(lMaterial, FBXSDK_IMPLEMENTATION_HLSL);
 				if(lImplementation)
@@ -1097,7 +1089,7 @@ namespace Disorder
 
 	}*/
  
-	void FbxSceneImporter::ProcessFileTexture(const char* propertyName, FbxFileTexture* pTexture, SurfaceMaterialPtr& materials)
+	void FbxSceneImporter::ProcessFileTexture(const char* propertyName, FbxFileTexture* pTexture, SurfaceMaterial* materials)
 	{
 		if (materials->TextureChannelMap.find(propertyName) != materials->TextureChannelMap.end())
 			return;
@@ -1125,7 +1117,7 @@ namespace Disorder
 			if (pos + 5 < LoadFileName.size())
 			{
 				LoadFileName = LoadFileName.substr(pos + 5);
-				LoadFileName = GConfig->sResourceFBXPath + LoadFileName;
+				LoadFileName = GConfig->ResourceFBXPath + LoadFileName;
 
 				p = boost::filesystem::path(LoadFileName);
 				if (!boost::filesystem::exists(p) || !boost::filesystem::is_regular_file(p))
@@ -1161,37 +1153,37 @@ namespace Disorder
 		else if (wrapV == FbxTexture::eClamp)
 			desc.AddressV = TAM_Clamp;
 
-		ImagePtr img = GImageManager->Load(LoadFileName, &desc);
+		Image* img = GImageManager->Load(LoadFileName, &desc);
 		if (img != NULL && img->GetResource() != NULL )
 		{
-			const RenderTexture2DPtr texRes = img->GetResource();
-			materials->TextureChannelMap.insert(std::pair<std::string, RenderTexture2DPtr>(propertyName, texRes));
+			RenderTexture2D* texRes = img->GetResource();
+			materials->TextureChannelMap.insert(std::pair<std::string, RenderTexture2D*>(propertyName, texRes));
 		}
 	}
 
-	void FbxSceneImporter::ProcessLayerTexture(const char* propertyName, FbxLayeredTexture* pTexture, SurfaceMaterialPtr& materials)
+	void FbxSceneImporter::ProcessLayerTexture(const char* propertyName, FbxLayeredTexture* pTexture, SurfaceMaterial* materials)
 	{
 		GLogger->Error("Not support layer texture now!");
 		BOOST_ASSERT(0);
 	}
 
-	void FbxSceneImporter::ProcessProceduralTexture(const char* propertyName, FbxProceduralTexture* pTexture, SurfaceMaterialPtr& materials)
+	void FbxSceneImporter::ProcessProceduralTexture(const char* propertyName, FbxProceduralTexture* pTexture, SurfaceMaterial* materials)
 	{
 		GLogger->Error("Not support procedural texture now!");
 		BOOST_ASSERT(0);
 	}
  
-	void FbxSceneImporter::ProcessMesh(FbxNode *pNode,GameObjectPtr const& gameObject)
+	void FbxSceneImporter::ProcessMesh(FbxNode *pNode,GameObject* gameObject)
 	{
 		 FbxMesh* lMesh = (FbxMesh*) pNode->GetNodeAttribute ();
-		 GeometryPtr geometry = Geometry::Create(lMesh->GetName());
-		 GeometryRendererPtr geometryRender = GeometryRenderer::Create(gameObject->Name);
+		 Geometry* geometry = new Geometry(lMesh->GetName());
+		 GeometryRenderer* geometryRender = new GeometryRenderer(gameObject->Name);
 	 
 		 // skip meta data connections...
  
 		 ProcessGeometry(lMesh,geometry);
 
-		 std::vector<SurfaceMaterialPtr> matArray;
+		 std::vector<SurfaceMaterial*> matArray;
 		 int usedMaterial = 0;
 		 ProcessMaterials(lMesh,matArray,usedMaterial);
 
@@ -1200,7 +1192,7 @@ namespace Disorder
 			 geometryRender->SetGeometry(geometry,matArray[usedMaterial]);
 		 else
 		 {
-			 SurfaceMaterialPtr mat = SurfaceMaterial::Create("DefaultMaterial");
+			 SurfaceMaterial* mat = new SurfaceMaterial("DefaultMaterial");
 		     geometryRender->SetGeometry(geometry,mat);
 		 }
 
@@ -1220,7 +1212,7 @@ namespace Disorder
 	/// The fbx transform same to maya and as follow
 	/// WorldTransform = ParentWorldTransform * T * Roff * Rp * Rpre * R * Rpost -1 * Rp -1 * Soff * Sp * S * Sp -1
 	//////////////////////////////////////////////////////////////////////////
-	GameObjectPtr FbxSceneImporter::ProcessTranform(FbxNode* pNode)
+	GameObject* FbxSceneImporter::ProcessTranform(FbxNode* pNode)
 	{
 		// now we don't take care of pose information
 		FbxVector4 lGeometryPostion = pNode->GetGeometricTranslation(FbxNode::eSourcePivot);
@@ -1235,7 +1227,7 @@ namespace Disorder
 		lTmpVector = pNode->EvaluateLocalScaling();
 		glm::vec3 scale((float)lTmpVector[0], (float)lTmpVector[1], (float)lTmpVector[2]);
 		std::string name(pNode->GetName());
-		GameObjectPtr gameObject = GameObject::Create(name,position,rot,scale);
+		GameObject* gameObject = new GameObject(name,position,rot,scale);
 		return gameObject;
 	}
 }

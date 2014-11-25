@@ -7,29 +7,26 @@ namespace Disorder
 	class GLRenderResourceManager : public RenderResourceManager
 	{
 	public:
-		virtual RenderLayoutPtr CreateRenderLayout(RenderEffectPtr const& renderEffect, TopologyType topologyType, bool soloBuffer);
-		virtual ShaderObjectPtr CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel, std::string const& entryPoint);
-		virtual RenderBufferPtr CreateBuffer(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint = 0);
+		virtual RenderLayout* CreateRenderLayout(RenderEffect* renderEffect, TopologyType topologyType, bool soloBuffer);
+		virtual ShaderObject* CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel, std::string const& entryPoint);
+		virtual RenderBuffer* CreateBuffer(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint = 0);
 
-		virtual void CreateBufferArray(const std::string& bufferName, GeometryPtr const& data, BufferUsage bufferUsage, RenderEffectPtr const& renderEffect, std::vector<RenderBufferPtr> & bufferArray);
+		virtual void CreateBufferArray(const std::string& bufferName, Geometry* data, BufferUsage bufferUsage, RenderEffect* renderEffect, std::vector<RenderBuffer*> & bufferArray);
 
-		virtual RenderTexture2DPtr CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag);
-		virtual RenderTexture2DPtr CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample, ImagePtr image);
-		virtual RenderTexture2DPtr CreateTexture2D(SamplerStatePtr const& sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<ImagePtr>& image, unsigned int flag);
+		virtual RenderTexture2D* CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag);
+		virtual RenderTexture2D* CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample, Image* image);
+		virtual RenderTexture2D* CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<Image*>& image, unsigned int flag);
 
-		virtual SurfaceViewPtr CreateSurfaceView(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat Format, unsigned int Flag = 0);
-		virtual RenderSurfacePtr CreateRenderSurface(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap);
-		virtual RenderEffectPtr CreateRenderEffect();
-		virtual SamplerStatePtr CreateSamplerState(SamplerDesc* pSamplerDesc);
-		virtual RasterizeStatePtr CreateRasterizeState(RasterizeDesc *pDesc);
-		virtual DepthStencilStatePtr CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc, unsigned int stencilRef);
-		virtual BlendStatePtr CreateBlendState(BlendDesc *pBlendDescArray, int BlendArraySize, bool AlphaToCoverageEnable = false, bool IndependentBlendEnable = false);
+		virtual SurfaceView* CreateSurfaceView(ESurfaceViewType type, RenderTexture* resource, PixelFormat Format, unsigned int Flag = 0);
+		virtual RenderSurface* CreateRenderSurface(const std::map<ESurfaceLocation, SurfaceView*>& viewMap);
+		virtual RenderEffect* CreateRenderEffect();
+		virtual SamplerState* CreateSamplerState(SamplerDesc* pSamplerDesc);
+		virtual RasterizeState* CreateRasterizeState(RasterizeDesc *pDesc);
+		virtual DepthStencilState* CreateDepthStencilState(DepthStencilDesc *pDepthStencilDesc, unsigned int stencilRef);
+		virtual BlendState* CreateBlendState(BlendDesc *pBlendDescArray, int BlendArraySize, bool AlphaToCoverageEnable = false, bool IndependentBlendEnable = false);
 
 		virtual void RegisterPropertyManager(std::string const& name);
-		static GLRenderResourceManagerPtr Create();
-
-	private:
-		GLRenderResourceManager(){}
+ 
 
 
 	};

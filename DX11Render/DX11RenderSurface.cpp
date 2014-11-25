@@ -5,32 +5,31 @@ namespace Disorder
 	void* DX11SurfaceView::GetHandle()
 	{
 		if (Type == SV_DepthStencil)
-			return DepthStencilHandle.get();
+			return DepthStencilHandle;
 
 		if (Type == SV_RenderTarget)
-			return RenderTargetHandle.get();
+			return RenderTargetHandle;
 
 		if (Type == SV_ShaderResource)
-			return ShaderResourceHandle.get();
+			return ShaderResourceHandle;
 
 		return NULL;
 	}
 
-	DX11SurfaceViewPtr DX11SurfaceView::Create(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat format, unsigned int flag)
+	DX11SurfaceView::DX11SurfaceView(ESurfaceViewType type, RenderTexture* resource, PixelFormat format, unsigned int flag)
 	{
-		DX11SurfaceView *pSurface = new DX11SurfaceView;
-		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine);
-		pSurface->Type = type;
-		pSurface->Resource = resource;
-		pSurface->Format = format;
-		pSurface->Flag = flag;
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine;
+		Type = type;
+		Resource = resource;
+		Format = format;
+		Flag = flag;
 
 		if (type == SV_ShaderResource)
 		{
 			ID3D11ShaderResourceView* pShaderResourceView = NULL;
 			D3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc;
 			SRVDesc.Format = DX11RenderEngine::GetPixelFormat(format);
-			RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(resource);
+			RenderTexture2D* tex = (RenderTexture2D*)resource;
 			
 			if (tex->ArraySize == 6 && flag & SF_AsCubeMap)
 			{
@@ -53,7 +52,7 @@ namespace Disorder
 			
 			HRESULT hr = renderEngine->D3DDevice()->CreateShaderResourceView((ID3D11Resource *)resource->GetHandle(), &SRVDesc, &pShaderResourceView);
 			BOOST_ASSERT(SUCCEEDED(hr));
-			pSurface->ShaderResourceHandle = MakeComPtr<ID3D11ShaderResourceView>(pShaderResourceView);
+			ShaderResourceHandle = pShaderResourceView;
 		}
 		else if (type == SV_DepthStencil)
 		{
@@ -61,7 +60,7 @@ namespace Disorder
 			D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
 			ZeroMemory(&descDSV, sizeof(descDSV));
 			descDSV.Format = DX11RenderEngine::GetPixelFormat(format);
-			RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(resource);
+			RenderTexture2D* tex = (RenderTexture2D*)resource;
 			if (tex->ArraySize > 1)
 			{
 				if (flag & SF_MultiSliceView )
@@ -84,10 +83,10 @@ namespace Disorder
 
 						HRESULT hr = renderEngine->D3DDevice()->CreateDepthStencilView((ID3D11Resource *)resource->GetHandle(), &descDSV, &pDepthStencilView);
 						BOOST_ASSERT(SUCCEEDED(hr));
-						pSurface->DepthStencilHandleArray.push_back(MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView));
+						DepthStencilHandleArray.push_back(pDepthStencilView);
 					}
 
-					return DX11SurfaceViewPtr(pSurface);
+					return;
 				}
 				else
 				{
@@ -120,7 +119,7 @@ namespace Disorder
  
 			HRESULT hr = renderEngine->D3DDevice()->CreateDepthStencilView((ID3D11Resource *)resource->GetHandle(), &descDSV, &pDepthStencilView);
 			BOOST_ASSERT(SUCCEEDED(hr));
-			pSurface->DepthStencilHandle = MakeComPtr<ID3D11DepthStencilView>(pDepthStencilView);
+			DepthStencilHandle = pDepthStencilView;
 
 			ID3D11DepthStencilView* pDepthStencilViewReadOnly = NULL;
 			if (flag != 0 && renderEngine->GetFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
@@ -132,10 +131,10 @@ namespace Disorder
 
 				hr = renderEngine->D3DDevice()->CreateDepthStencilView((ID3D11Resource *)resource->GetHandle(), &descDSV, &pDepthStencilViewReadOnly);
 				BOOST_ASSERT(SUCCEEDED(hr));
-				pSurface->ReadonlyDepthStencil = MakeComPtr<ID3D11DepthStencilView>(pDepthStencilViewReadOnly);
+				ReadonlyDepthStencil = pDepthStencilViewReadOnly;
 			}
 			else
-				pSurface->ReadonlyDepthStencil = NULL;
+				ReadonlyDepthStencil = NULL;
 			
 		}
 		else if (type == SV_RenderTarget)
@@ -143,7 +142,7 @@ namespace Disorder
 			ID3D11RenderTargetView* pRenderTargetView = NULL;
 			D3D11_RENDER_TARGET_VIEW_DESC SRVDesc;
 			SRVDesc.Format = DX11RenderEngine::GetPixelFormat(format);
-			RenderTexture2DPtr tex = boost::dynamic_pointer_cast<RenderTexture2D>(resource);
+			RenderTexture2D* tex = (RenderTexture2D*)resource;
 
 			if (tex->ArraySize > 1)
 			{
@@ -167,11 +166,11 @@ namespace Disorder
 
 						HRESULT hr = renderEngine->D3DDevice()->CreateRenderTargetView((ID3D11Resource *)resource->GetHandle(), &SRVDesc, &pRenderTargetView);
 						BOOST_ASSERT(SUCCEEDED(hr));
-						pSurface->RenderTargetHandleArray.push_back(MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView));
+						RenderTargetHandleArray.push_back(pRenderTargetView);
 						
 					}
 
-					return DX11SurfaceViewPtr(pSurface);
+					return;
 				}
 				else
 				{
@@ -206,26 +205,24 @@ namespace Disorder
 			
 			HRESULT hr = renderEngine->D3DDevice()->CreateRenderTargetView((ID3D11Resource *)resource->GetHandle(), &SRVDesc, &pRenderTargetView);
 			BOOST_ASSERT(SUCCEEDED(hr));
-			pSurface->RenderTargetHandle = MakeComPtr<ID3D11RenderTargetView>(pRenderTargetView);
+			RenderTargetHandle = pRenderTargetView;
 		}
 		else
 		{
 			BOOST_ASSERT(0);
 		}
 
-		return DX11SurfaceViewPtr(pSurface);
+		return;
 	}
 
-	DX11RenderSurfacePtr DX11RenderSurface::Create(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap)
+	DX11RenderSurface::DX11RenderSurface(const std::map<ESurfaceLocation, SurfaceView*>& viewMap)
 	{
-		DX11RenderSurface *pSurface = new DX11RenderSurface;
-		std::map<ESurfaceLocation, SurfaceViewPtr>::const_iterator iter = viewMap.cbegin();
+		std::map<ESurfaceLocation, SurfaceView*>::const_iterator iter = viewMap.cbegin();
 		while (iter != viewMap.cend())
 		{
-			pSurface->_surfacesViewArray[iter->first] = iter->second;
+			_surfacesViewArray[iter->first] = iter->second;
 			++iter;
 		}
-		return DX11RenderSurfacePtr(pSurface);
 	}
  
 }

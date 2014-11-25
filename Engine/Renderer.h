@@ -1,38 +1,37 @@
 #ifndef _DISORDER_RENDERER_H_
 #define _DISORDER_RENDERER_H_
 
+ 
+
 namespace Disorder
 {
 	class Renderer : public Component
 	{
 	public:
-	 
 		Renderer(std::string const& name);
 		virtual ~Renderer(){};
 
-		virtual void Render(CameraPtr const& camera) = 0;
+		virtual void Render(Camera* camera) = 0;
 
 		virtual bool Overlaps(const Frustrum& frustrum)
 		{
 			return true;
 		}
  
-	 
-
-		const RenderLayoutPtr& GetRenderLayout() const
+		const RenderLayout* GetRenderLayout() const
 		{
 			return _renderLayout;
 		}
 
-		const RenderEffectPtr& GetRenderEffect() const
+		const RenderEffect* GetRenderEffect() const
 		{
 			return _renderEffect;
 		}
 
-		virtual void BuildRenderLayout(RenderEffectPtr const& effect,bool releaseOld){};
+		virtual void BuildRenderLayout(RenderEffect* effect,bool releaseOld){};
 		 
 
-		void SetRenderEffect(RenderEffectPtr const& effect)
+		void SetRenderEffect(RenderEffect* effect)
 		{
 			_renderEffect = effect;
 		}
@@ -40,8 +39,8 @@ namespace Disorder
 		virtual void DebugDraw(){};
 
 	protected:
-		RenderEffectPtr _renderEffect;
-		RenderLayoutPtr _renderLayout;
+		RenderEffect* _renderEffect;
+		RenderLayout* _renderLayout;
 	};
  
 	class BatchScreenString : public Renderer
@@ -51,12 +50,12 @@ namespace Disorder
 		BatchScreenString(std::string const& name);
 		~BatchScreenString();
 
-		void SetTexture(SurfaceViewPtr const& texture);
+		void SetTexture(SurfaceView* texture);
 		
 		BatchTileVertex* PrepareAddVertex();
 		void EndAddVertex();
 
-		virtual void Render(CameraPtr const& camera);
+		virtual void Render(Camera* camera);
   
 	protected:
 		BatchTileVertex* _vertexs;
@@ -67,7 +66,7 @@ namespace Disorder
 
 		unsigned int _savedVertexBufferSize;
 		unsigned int _savedIndexBufferSize;
-		SurfaceViewPtr _texture;
+		SurfaceView* _texture;
 	};
 
 	 
@@ -75,7 +74,7 @@ namespace Disorder
 	{
 	public:
 		BatchLines(std::string const& name);
-		virtual void Render(CameraPtr const& camera);
+		virtual void Render(Camera* camera);
 		~BatchLines();
 
 		BatchLineVertex* PrepareAddVertex();
@@ -91,7 +90,7 @@ namespace Disorder
 	{
 	public:
 		BatchVolumeLines(std::string const& name);
-		virtual void Render(CameraPtr const& camera);
+		virtual void Render(Camera* camera);
 		~BatchVolumeLines();
  
 		BatchLineVertex* PrepareAddVertex();
@@ -109,58 +108,56 @@ namespace Disorder
 		float *_otherPositions;
 		float *_colors;
 
-		ShaderPropertyPtr _sLineTextureProperty;
-		ShaderPropertyPtr _sLineSamplerProperty;
+		ShaderProperty* _sLineTextureProperty;
+		ShaderProperty* _sLineSamplerProperty;
 	};
 
 	class SimpleTile : public Renderer
 	{
 	public:
 		SimpleTile();
-		SimpleTile(std::string const& name,const TileTexVertex* positions,const RenderEffectPtr& renderEffect);
+		SimpleTile(std::string const& name,const TileTexVertex* positions,RenderEffect* renderEffect);
 		 
-		virtual void Render(CameraPtr const& camera);
+		virtual void Render(Camera* camera);
 	};
 
 	class GeometryRenderer : public Renderer
 	{
 	private:
-		  GeometryPtr _geometryObject;
-	      SurfaceMaterialPtr _material;
-		  RenderLayoutPtr _shadowLayout;
+		  Geometry* _geometryObject;
+	      SurfaceMaterial* _material;
+		  RenderLayout* _shadowLayout;
 		  BoxBounds    _boxBounds;
 	private:
 
-		  void DrawAxis(CameraPtr const& camera);
-		  void DrawBoundingBox(CameraPtr const& camera);
+		  void DrawAxis(Camera* camera);
+		  void DrawBoundingBox(Camera* camera);
 
-		  GeometryRenderer(std::string const& name);
+		  
 
 	public:
-		 
+		GeometryRenderer(std::string const& name);
 		const BoxBounds& GetBoxBounds() const
 		{
 			return _boxBounds;
 		}
 
-		  static GeometryRendererPtr Create(std::string const& name);
+        void SetGeometry(Geometry* geometry,SurfaceMaterial* mat);
+		virtual void BuildRenderLayout(RenderEffect* effect,bool releaseOld);
 
-          void SetGeometry(GeometryPtr const& geometry,SurfaceMaterialPtr const& mat);
-		  virtual void BuildRenderLayout(RenderEffectPtr const& effect,bool releaseOld);
+		void UpdateBoundingBox();
 
-		  void UpdateBoundingBox();
+		virtual bool Overlaps(const Frustrum& frustrum);		 
+		void UpdateShaderProperty();
+		virtual void Render(Camera* camera);
+		virtual void RenderShadow(Camera* camera, RenderEffect* shadowEffect);
 
-		  virtual bool Overlaps(const Frustrum& frustrum);		 
-		  void UpdateShaderProperty();
-		  virtual void Render(CameraPtr const& camera);
-		  virtual void RenderShadow(CameraPtr const& camera, RenderEffectPtr shadowEffect);
+		virtual void DebugDraw();
 
-		  virtual void DebugDraw();
-
-		  const GeometryPtr GetGeometry() const
-		  {
-			  return _geometryObject;
-		  }
+		const Geometry* GetGeometry() const
+		{
+			return _geometryObject;
+		}
  
 	};
 }

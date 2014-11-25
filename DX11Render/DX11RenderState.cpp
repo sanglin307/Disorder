@@ -4,14 +4,12 @@ namespace Disorder
 {
 	void* DX11SamplerState::GetHandle()
 	{
-		return D3DInterface.get();
+		return D3DInterface;
 	}
 
-	DX11SamplerStatePtr DX11SamplerState::Create(SamplerDesc* pSamplerDesc)
+	DX11SamplerState::DX11SamplerState(SamplerDesc* pSamplerDesc)
 	{
-		DX11SamplerState *pSampler = new DX11SamplerState;
-
-		pSampler->Desc = *pSamplerDesc;
+		Desc = *pSamplerDesc;
 
 		D3D11_SAMPLER_DESC samDesc;
         ZeroMemory( &samDesc, sizeof(samDesc) );
@@ -30,16 +28,14 @@ namespace Disorder
 		samDesc.MinLOD = pSamplerDesc->MinLOD;
 		samDesc.MipLODBias = pSamplerDesc->MipLODBias;
 
-        DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
+        DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine; 
 
 		ID3D11SamplerState *pSamplerState;
 
 		HRESULT hr = renderEngine->D3DDevice()->CreateSamplerState( &samDesc, &pSamplerState );
 		BOOST_ASSERT(hr == S_OK);
 
-		pSampler->D3DInterface = MakeComPtr<ID3D11SamplerState>(pSamplerState);
-
-		return DX11SamplerStatePtr(pSampler);
+		D3DInterface = pSamplerState;
 
 	}
 
@@ -47,14 +43,12 @@ namespace Disorder
 
 	void* DX11RasterizeState::GetHandle()
 	{
-		return D3DInterface.get();
+		return D3DInterface;
 	}
 
-	DX11RasterizeStatePtr DX11RasterizeState::Create(RasterizeDesc *pDesc)
+	DX11RasterizeState::DX11RasterizeState(RasterizeDesc *pDesc)
 	{
-		DX11RasterizeState *pRasterizeState = new DX11RasterizeState;
-
-		pRasterizeState->Desc = *pDesc;
+		Desc = *pDesc;
 
 		D3D11_RASTERIZER_DESC desc;
 		ZeroMemory(&desc,sizeof(desc));
@@ -88,28 +82,22 @@ namespace Disorder
 		desc.ScissorEnable = pDesc->ScissorEnable;
 
 		ID3D11RasterizerState *pState;
-		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine; 
 		HRESULT hr = renderEngine->D3DDevice()->CreateRasterizerState(&desc,&pState);
 		BOOST_ASSERT(hr==S_OK);
 
-		pRasterizeState->D3DInterface = MakeComPtr<ID3D11RasterizerState>(pState);
-
-
-		return DX11RasterizeStatePtr(pRasterizeState);
-
+		D3DInterface = pState;
 	}
 	//==================================================================
 
 	void* DX11DepthStencilState::GetHandle()
 	{
-		return D3DInterface.get();
+		return D3DInterface;
 	}
 
-	DX11DepthStencilStatePtr DX11DepthStencilState::Create(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef)
+	DX11DepthStencilState::DX11DepthStencilState(DepthStencilDesc *pDepthStencilDesc,unsigned int stencilRef)
 	{
-		DX11DepthStencilState *pDepthStencilState = new DX11DepthStencilState;
-
-		pDepthStencilState->Desc = *pDepthStencilDesc;
+		Desc = *pDepthStencilDesc;
 
 		D3D11_DEPTH_STENCIL_DESC desc;
 		ZeroMemory(&desc,sizeof(desc));
@@ -136,27 +124,22 @@ namespace Disorder
 		desc.BackFace.StencilFunc = DX11RenderEngine::GetD3DComparisonFunc(pDepthStencilDesc->BackFaceStencilFunc);
 
 		ID3D11DepthStencilState *pState;
-		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine; 
 		HRESULT hr = renderEngine->D3DDevice()->CreateDepthStencilState(&desc,&pState);
 		BOOST_ASSERT(hr==S_OK);
 
-		pDepthStencilState->StencilRef = stencilRef;
-		pDepthStencilState->D3DInterface = MakeComPtr<ID3D11DepthStencilState>(pState);
-
-		return DX11DepthStencilStatePtr(pDepthStencilState);
-
+		StencilRef = stencilRef;
+		D3DInterface = pState;
 	}
 
 
 	// ===================================================================
-	DX11BlendStatePtr DX11BlendState::Create(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable,bool IndependentBlendEnable)
+	DX11BlendState::DX11BlendState(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable,bool IndependentBlendEnable)
 	{
 		BOOST_ASSERT(BlendArraySize <= 8 );
-
-		DX11BlendState *pState = new DX11BlendState;
  
-		pState->AlphaToCoverageEnable = AlphaToCoverageEnable;
-		pState->IndependentBlendEnable = IndependentBlendEnable;
+		AlphaToCoverageEnable = AlphaToCoverageEnable;
+		IndependentBlendEnable = IndependentBlendEnable;
 
 		D3D11_BLEND_DESC desc;
 		ZeroMemory(&desc,sizeof(desc));
@@ -166,7 +149,7 @@ namespace Disorder
 
 		for( int index = 0; index < BlendArraySize; index ++ )
 		{
-			pState->Desc[index] = pBlendDescArray[index];
+			Desc[index] = pBlendDescArray[index];
 			desc.RenderTarget[index].BlendEnable = pBlendDescArray[index].BlendEnable;
 			desc.RenderTarget[index].DestBlend = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].DestBlend);
 			desc.RenderTarget[index].DestBlendAlpha = DX11RenderEngine::GetD3DBlendDesc(pBlendDescArray[index].DestBlendAlpha);
@@ -177,20 +160,17 @@ namespace Disorder
 			desc.RenderTarget[index].BlendOpAlpha = DX11RenderEngine::GetD3DBlendOp(pBlendDescArray[index].BlendOpAlpha);
 		}
 
-		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine);
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine;
 		ID3D11BlendState* pBlendState;
 		HRESULT hr = renderEngine->D3DDevice()->CreateBlendState(&desc,&pBlendState);
 
 		BOOST_ASSERT(hr==S_OK);
 
-		pState->D3DInterface = MakeComPtr<ID3D11BlendState>(pBlendState);
-
-		return DX11BlendStatePtr(pState);
-
+		D3DInterface = pBlendState;
 	}
 
 	void* DX11BlendState::GetHandle()
 	{
-		return D3DInterface.get();
+		return D3DInterface;
 	}
 }

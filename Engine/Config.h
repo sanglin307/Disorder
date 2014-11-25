@@ -71,24 +71,22 @@ namespace Disorder
 		}
 	};
  
-	class Config : public Singleton<Config>
+	class Config 
 	{
-		friend class Singleton<Config>;
-
 	public:
-		
+		Config(const std::string& rRootPath);
 		~Config();
 
 		bool Load();
 		bool Save();
 
-		static std::string sRootPath; 
-		static std::string sLogPath;
-		static std::string sConfigPath;
-		static std::string sResourceFBXPath;
-		static std::string sResourceFXPath;
-		static std::string sResourceTexPath;
-		static std::string sResourceFontPath;
+		std::string RootPath; 
+		std::string LogPath;
+		std::string ConfigPath;
+		std::string ResourceFBXPath;
+		std::string ResourceFXPath;
+		std::string ResourceTexPath;
+		std::string ResourceFontPath;
 
 
 		RenderConfig* pRenderConfig; 
@@ -97,8 +95,6 @@ namespace Disorder
 		
 
 	private:
-		static ConfigPtr Create();
-		Config();
 
 		bool LoadRenderConfig();
 		bool LoadCameraConfig();
@@ -110,7 +106,7 @@ namespace Disorder
 
 	};
 
-	#define GConfig Config::GetSingleton()
+	extern Config* GConfig;
 }
 
 #endif

@@ -15,7 +15,7 @@ namespace Disorder
  
 			for (unsigned int i = 0; i < ShaderReflect->ResourceBindings.size(); ++i)
 			{
-				ShaderPropertyPtr res = ShaderReflect->ResourceBindings[i].ParamRef;
+				ShaderProperty* res = ShaderReflect->ResourceBindings[i].ParamRef;
 				if (ShaderReflect->ResourceBindings[i].Type == D3D_SIT_CBUFFER)
 				{
 					if (res == NULL || res->GetDataAsConstBuffer() == NULL)
@@ -46,7 +46,7 @@ namespace Disorder
 		CachedShaderResourceView.clear();
 		for (unsigned int i = 0; i < ShaderReflect->ResourceBindings.size(); ++i)
 		{
-			ShaderPropertyPtr res = ShaderReflect->ResourceBindings[i].ParamRef;
+			ShaderProperty* res = ShaderReflect->ResourceBindings[i].ParamRef;
 			if (ShaderReflect->ResourceBindings[i].Type == D3D_SIT_TEXTURE)
 			{
 				if (res == NULL || res->GetDataAsShaderResource() == NULL)
@@ -63,23 +63,17 @@ namespace Disorder
 
 		
 	}
-
-	DX11ShaderObjectPtr DX11ShaderObject::Create(std::string const& effectName,std::string const& entryPoint,ShaderType shaderType,ShaderModel shaderModel)
-	{
-		DX11ShaderObject *pObject = new DX11ShaderObject(effectName,entryPoint,shaderType,shaderModel);
-		return DX11ShaderObjectPtr(pObject);
-	}
-
+ 
 	void* DX11ShaderObject::GetHandle()
 	{
 		switch(_type)
 		{
 		case ST_VertexShader:
-			return VertexShaderInterface.get();
+			return VertexShaderInterface;
 		case ST_PixelShader:
-			return PixelShaderInterface.get();
+			return PixelShaderInterface;
 		case ST_GeometryShader:
-			return GeometryShaderInterface.get();
+			return GeometryShaderInterface;
 		}
 	 
 		BOOST_ASSERT(0);
@@ -89,23 +83,15 @@ namespace Disorder
 
 	void* DX11ShaderObject::GetDataInterface()
 	{
-		if ( DataInterface != NULL )
-			return DataInterface.get();
-
-		return 0;
+		return DataInterface;
 	}
 	 
-	DX11ShaderReflectionPtr DX11ShaderReflection::Create()
-	{
-		DX11ShaderReflection *pReflection = new DX11ShaderReflection();
-		return DX11ShaderReflectionPtr(pReflection);
-	}
- 
+	 
 	HRESULT DX11ShaderObject::CompileShaderFromFile(std::string const& fileName, std::string const& entryPoint, std::string const& shaderModel, ID3DBlob** ppBlobOut)
 	{
 		HRESULT hr = S_OK;
 
-		FileObjectPtr fileptr = GEngine->FileManager->OpenTextFile(fileName,eF_Read);
+		FileObject* fileptr = GEngine->FileManager->OpenTextFile(fileName,eF_Read);
 		std::string shaderContent = fileptr->ReadText();
 
 		DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
@@ -168,7 +154,7 @@ namespace Disorder
 			return false;
 		}
 
-		DX11RenderEnginePtr renderEngine = boost::dynamic_pointer_cast<DX11RenderEngine>(GEngine->RenderEngine); 
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GRenderEngine; 
 		BOOST_ASSERT(renderEngine);
 
 		// Create the vertex shader
@@ -184,8 +170,8 @@ namespace Disorder
 				return false;
 			}
 
-			VertexShaderInterface =  MakeComPtr<ID3D11VertexShader>(_pVertexShader);
-			DataInterface = MakeComPtr<ID3DBlob>(pVSBlob);
+			VertexShaderInterface = _pVertexShader;
+			DataInterface = pVSBlob;
 
 			ShaderReflection();
 			return true;
@@ -203,8 +189,8 @@ namespace Disorder
 			}
 
 			 
-			PixelShaderInterface =  MakeComPtr<ID3D11PixelShader>(_pPixelShader);
-			DataInterface = MakeComPtr<ID3DBlob>(pVSBlob);
+			PixelShaderInterface = _pPixelShader;
+			DataInterface = pVSBlob;
 			ShaderReflection();
 			return true;
 		}
@@ -221,8 +207,8 @@ namespace Disorder
 			}
 
 
-			GeometryShaderInterface = MakeComPtr<ID3D11GeometryShader>(_pGeometryShader);
-			DataInterface = MakeComPtr<ID3DBlob>(pVSBlob);
+			GeometryShaderInterface = _pGeometryShader;
+			DataInterface = pVSBlob;
 			ShaderReflection();
 			return true;
 		}
@@ -236,10 +222,7 @@ namespace Disorder
  
 	void DX11ShaderObject::ShaderReflection()
 	{
-		DX11ShaderReflectionPtr pReflection = DX11ShaderReflection::Create();
-
-		RenderResourceManagerPtr resourceManager  = GEngine->RenderResourceMgr;
-	 
+		DX11ShaderReflection* pReflection = new DX11ShaderReflection;
 		ID3D11ShaderReflection* pReflector = NULL;
 		BOOST_ASSERT(DataInterface != NULL);
 
@@ -271,7 +254,7 @@ namespace Disorder
 			pReflection->OutputSignatureParameters.push_back( ShaderSignatureDesc(output_desc) );
 		}
   
-		ShaderPropertyManagerPtr GlobalPropertyManager = resourceManager->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderPropertyManager* GlobalPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 	    //constant buffer information 
 		for ( UINT i = 0; i < desc.ConstantBuffers; i++ )
 		{
@@ -288,13 +271,13 @@ namespace Disorder
 				constantBuffer.CBType = bufferDesc.Type;
 				constantBuffer.CBuFlags = bufferDesc.uFlags;
 				constantBuffer.CBVariables = bufferDesc.Variables;
-				DX11ShaderPropertyManagerPtr propertyManager = boost::dynamic_pointer_cast<DX11ShaderPropertyManager>(resourceManager->GetPropertyManager(constantBuffer.CBName));		 
+				DX11ShaderPropertyManager* propertyManager = (DX11ShaderPropertyManager*)GEngine->RenderResourceMgr->GetPropertyManager(constantBuffer.CBName);
 				BOOST_ASSERT(propertyManager->Name != ShaderPropertyManager::sManagerGlobal); // don't registe const buffer name ,please registe it in ShaderPropertyManager
 
 				constantBuffer.BufferParamRef = GlobalPropertyManager->GetProperty(constantBuffer.CBName);
 				if( constantBuffer.BufferParamRef == NULL )
 				{
-					RenderBufferPtr constBuffer = resourceManager->CreateBuffer(constantBuffer.CBName,RBT_Constant, BU_DynamicDraw, bufferDesc.Size, bufferDesc.Size, NULL);
+					RenderBuffer* constBuffer = GEngine->RenderResourceMgr->CreateBuffer(constantBuffer.CBName, RBT_Constant, BU_DynamicDraw, bufferDesc.Size, bufferDesc.Size, NULL);
 					constantBuffer.BufferParamRef = GlobalPropertyManager->CreateProperty(constantBuffer.CBName,eSP_ConstBuffer); 
 					constantBuffer.BufferParamRef->SetData(constBuffer);
 				}
@@ -322,7 +305,7 @@ namespace Disorder
 					constantBuffer.Types.push_back( ShaderTypeDesc(type_desc) );
 
 					// Get references to the parameters for binding to these variables.
-					ShaderPropertyPtr pParam;
+					ShaderProperty* pParam;
 					std::string varName = var_desc.Name;
 					EShaderProperty shaderProperty;
 					unsigned int length = 1;
@@ -442,7 +425,7 @@ namespace Disorder
 		if( ConstantBuffer == NULL )
 			return;
 
-		RenderBufferPtr constBuffer = ConstantBuffer->BufferParamRef->GetDataAsConstBuffer();
+		RenderBuffer* constBuffer = ConstantBuffer->BufferParamRef->GetDataAsConstBuffer();
 		BYTE *pContent = (BYTE*)(GEngine->RenderEngine->Map(constBuffer, BA_Write_Only));
 
 		memset(pContent, 0, ConstantBuffer->CBSize);
@@ -451,14 +434,14 @@ namespace Disorder
 		{
 			ShaderVariableDesc &vaDesc = ConstantBuffer->Variables[j];
 			ShaderTypeDesc &taDesc = ConstantBuffer->Types[j];
-			ShaderPropertyPtr &paDesc = ConstantBuffer->Parameters[j];
+			ShaderProperty* paDesc = ConstantBuffer->Parameters[j];
 			pDest = pContent + vaDesc.StartOffset;
 
 			void *pSrc = paDesc->GetData();
 			memcpy(pDest, pSrc, vaDesc.Size);
 		}
 
-		GEngine->RenderEngine->UnMap(constBuffer);
+		GRenderEngine->UnMap(constBuffer);
 
 	}
 
@@ -475,11 +458,7 @@ namespace Disorder
 		ConstantBuffer = NULL;
 	}
 
-	DX11ShaderPropertyManagerPtr DX11ShaderPropertyManager::Create(const std::string& name)
-	{
-		DX11ShaderPropertyManager *pManager = new DX11ShaderPropertyManager(name);
-		return DX11ShaderPropertyManagerPtr(pManager);
-	}
+ 
 
 	bool DX11ShaderPropertyManager::Validate(ConstantBufferDesc *pConstBuffer)
 	{

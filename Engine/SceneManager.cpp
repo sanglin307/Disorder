@@ -2,11 +2,11 @@
 
 namespace Disorder
 {
-	InitialiseSingleton(SceneManager);
+	SceneManager* GSceneManager = NULL;
 
 	void SceneManager::Init()
 	{
-		_sceneImporter = FbxSceneImporter::Create();
+		_sceneImporter = new FbxSceneImporter;
 
 		_vAmbientLowerColor = glm::vec3(0.f);
 		_vAmbientUpperColor = glm::vec3(0.25f);
@@ -17,7 +17,7 @@ namespace Disorder
 		_sScreenHeightProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sScreenHeight, eSP_Int, 1);
 		_sShadowMapSizeProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sShadowMapSize, eSP_Int, 1);
 		_sLineRadius = _propertyManager->CreateProperty(ShaderPropertyManager::sLineRadius, eSP_Float, 1);
-		_skyBox = Skybox::Create();
+		_skyBox = new Skybox;
 
 		EnableDebugDraw = true;
 	}
@@ -58,7 +58,7 @@ namespace Disorder
 			_mDefaultCamera->DebugDraw();
 	}
 
-	void SceneManager::GetRendererList(std::vector<GeometryRendererPtr>& renderObjList) const
+	void SceneManager::GetRendererList(std::vector<GeometryRenderer*>& renderObjList) const
 	{
 		if (_vRenderObjects.size() == 0)
 			return;
@@ -70,7 +70,7 @@ namespace Disorder
 		}
 	}
 
-	void SceneManager::GetRendererList(CameraPtr const camera, std::vector<GeometryRendererPtr>& renderObjList) const
+	void SceneManager::GetRendererList(Camera* camera, std::vector<GeometryRenderer*>& renderObjList) const
 	{
 		if( _vRenderObjects.size() == 0 )
 			return;
@@ -83,11 +83,7 @@ namespace Disorder
 		}
 	}
 
-	SceneManagerPtr SceneManager::Create()
-	{
-		SceneManager *pManager = new SceneManager;
-		return SceneManagerPtr(pManager);
-	}
+ 
 
 	void SceneManager::UpdateShaderProperty()
 	{
@@ -104,8 +100,8 @@ namespace Disorder
 	void SceneManager::CreateDefaultLight()
 	{
 		BOOST_ASSERT(_vLightList.size() == 0);
-		GameObjectPtr go = GameObject::Create("DefaultDirLight");
-		DirectionLightPtr light = DirectionLight::Create("DefaultDirLight");
+		GameObject* go = new GameObject("DefaultDirLight");
+		DirectionLight* light = new DirectionLight("DefaultDirLight");
 		go->AddComponent(light);
 		GWorld->GetLevel()->AddGameObject(go);
 	}
@@ -114,30 +110,30 @@ namespace Disorder
 	{
 		BOOST_ASSERT(_mDefaultCamera == NULL);
 
-	    GameObjectPtr go = GameObject::Create("DefaultCamera");
-	    CameraPtr sceneCamera = Camera::Create("DefaultCamera");
+	    GameObject* go = new GameObject("DefaultCamera");
+	    Camera* sceneCamera = new Camera("DefaultCamera");
 	    go->AddComponent(sceneCamera);
 		GWorld->GetLevel()->AddGameObject(go);
 
 		_mDefaultCamera = sceneCamera;
 		AddCamera(_mDefaultCamera);
 
-		GEngine->GameClient->AddInputListener(_mDefaultCamera);
+		GClient->AddInputListener(_mDefaultCamera);
 	}
 
-	void SceneManager::SetDefaultCamera(CameraPtr const& camera)
+	void SceneManager::SetDefaultCamera(Camera* camera)
 	{
 		if( _mDefaultCamera != NULL )
 		{
-			GEngine->GameClient->ReleaseInputListener(_mDefaultCamera);		
+			GClient->ReleaseInputListener(_mDefaultCamera);		
 		}
 
-		GEngine->GameClient->AddInputListener(camera);
+		GClient->AddInputListener(camera);
 	   _mDefaultCamera = camera;
 
 	}
 
-	GeometryRendererPtr SceneManager::GetRenderer(std::string const& name)
+	GeometryRenderer* SceneManager::GetRenderer(std::string const& name)
 	{
 		if( _mRenderObjects.find(name) != _mRenderObjects.end() )
 			return _mRenderObjects.at(name);
@@ -145,7 +141,7 @@ namespace Disorder
 		return NULL;
 	}
 
-	LightPtr SceneManager::GetLight(std::string const& name)
+	Light* SceneManager::GetLight(std::string const& name)
 	{
 		if( _mLightObjects.find(name) != _mLightObjects.end() )
 			return _mLightObjects.at(name);
@@ -153,7 +149,7 @@ namespace Disorder
 		return NULL;
 	}
 
-	CameraPtr SceneManager::GetCamera(std::string const& name)
+	Camera* SceneManager::GetCamera(std::string const& name)
 	{
 		if( _mCameraObjects.find(name) != _mCameraObjects.end() )
 			return _mCameraObjects.at(name);
@@ -161,32 +157,32 @@ namespace Disorder
 		return NULL;
 	}
 
-	void SceneManager::AddCamera(CameraPtr const& camera)
+	void SceneManager::AddCamera(Camera* camera)
 	{
 		BOOST_ASSERT(camera->Name != "");
 
 		if(_mCameraObjects.find(camera->Name) == _mCameraObjects.end())
-			_mCameraObjects.insert(std::pair<std::string,CameraPtr>(camera->Name,camera));
+			_mCameraObjects.insert(std::pair<std::string,Camera*>(camera->Name,camera));
 	}
  
-	void SceneManager::AddLight(LightPtr const& light)
+	void SceneManager::AddLight(Light* light)
 	{
 		BOOST_ASSERT(light->Name != "");
 
 		if( _mLightObjects.find(light->Name) == _mLightObjects.end() )
 		{
-			_mLightObjects.insert(std::pair<std::string,LightPtr>(light->Name,light));
+			_mLightObjects.insert(std::pair<std::string,Light*>(light->Name,light));
 			_vLightList.push_back(light);
 		}
 	}
 
-	void SceneManager::AddRenderer(GeometryRendererPtr const& renderer)
+	void SceneManager::AddRenderer(GeometryRenderer* renderer)
 	{
 		BOOST_ASSERT(renderer->Name != "");
 
 		if( _mRenderObjects.find(renderer->Name) == _mRenderObjects.end() )
 		{
-			_mRenderObjects.insert(std::pair<std::string, GeometryRendererPtr>(renderer->Name, renderer));
+			_mRenderObjects.insert(std::pair<std::string, GeometryRenderer*>(renderer->Name, renderer));
 			_vRenderObjects.push_back(renderer);
 			renderer->UpdateBoundingBox();
 		}

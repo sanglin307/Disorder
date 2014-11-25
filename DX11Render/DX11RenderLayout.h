@@ -6,17 +6,16 @@ namespace Disorder
 	class DX11RenderLayout : public RenderLayout
 	{
 	public:
-
 		static std::string POSITION;
 		static std::string COLOR;
 		static std::string NORMAL;
 		static std::string TEXCOORD;
 
-		static DX11RenderLayoutPtr Create(RenderEffectPtr const& renderEffect,TopologyType topologyType,bool soloBuffer);
+		DX11RenderLayout(RenderEffect* renderEffect,TopologyType topologyType,bool soloBuffer);
 
 	    DXGI_FORMAT GetInputFormat(D3D_REGISTER_COMPONENT_TYPE component,BYTE mask);
 
-		virtual void BindVertexBuffer(RenderBufferPtr const& renderBuffer)
+		virtual void BindVertexBuffer(RenderBuffer* renderBuffer)
 		{
 			RenderLayout::BindVertexBuffer(renderBuffer);
 			VertexArray.push_back((ID3D11Buffer*)(renderBuffer->GetHandle()));
@@ -27,17 +26,10 @@ namespace Disorder
 		virtual void * GetHandle();
 
 	public:
-		ID3D11InputLayoutPtr D3DInterface;
+		ID3D11InputLayout* D3DInterface;
 		std::vector<ID3D11Buffer*> VertexArray;
 		std::vector<UINT> VertexArrayElementSize;
 		std::vector<UINT> VertexArrayOffset;
-
-	private:
-		DX11RenderLayout()
-		{
-		}
-
-
 	};
 }
 

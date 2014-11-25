@@ -31,29 +31,25 @@ namespace Disorder
 		glm::vec3   ShadowColor;
 		ELightDecayType DecayType;
 
-		virtual bool Touch(GeometryRendererPtr renderObject) = 0;
+		virtual bool Touch(GeometryRenderer* renderObject) = 0;
 		virtual bool Overlaps(const Frustrum& frustrum) = 0;
 		virtual void DebugDraw(){};
 		virtual void CalculateShadowMatrix() = 0;
-
-	protected:
 		Light(std::string const& name);
+		
 	};
 
 	class DirectionLight : public Light
 	{
-	protected:
-		DirectionLight(std::string const& name);
-		
 	public:
+		DirectionLight(std::string const& name);
 		static glm::vec3 DefaultDirection;
 
 		glm::mat4 ShadowViewMatrix;
 		glm::mat4 ShadowProjMatrix;
 
-		static DirectionLightPtr Create(std::string const& name);
 		glm::vec3 GetDirection();
-		virtual bool Touch(GeometryRendererPtr renderObject);
+		virtual bool Touch(GeometryRenderer* renderObject);
 		virtual bool Overlaps(const Frustrum& frustrum);
 		virtual void DebugDraw();
 
@@ -62,18 +58,14 @@ namespace Disorder
 
 	class PointLight : public Light
 	{
-	protected:
-		PointLight(std::string const& name);
-	
 	public:
-
+		PointLight(std::string const& name);
 		glm::mat4 ShadowViewMatrix[6];
 		glm::mat4 ShadowProjMatrix;
 
 		float Range;
 		glm::vec3 GetPosition();
-		static PointLightPtr Create(std::string const& name);
-		virtual bool Touch(GeometryRendererPtr renderObject);
+		virtual bool Touch(GeometryRenderer* renderObject);
 		virtual bool Overlaps(const Frustrum& frustrum);
         virtual void DebugDraw();
 		virtual void CalculateShadowMatrix();
@@ -81,11 +73,8 @@ namespace Disorder
 
 	class SpotLight : public Light
 	{
-	protected:
-		SpotLight(std::string const& name);
-
 	public:
-
+		SpotLight(std::string const& name);
 		glm::mat4 ShadowViewMatrix;
 		glm::mat4 ShadowProjMatrix;
 
@@ -94,8 +83,8 @@ namespace Disorder
 		float SpotOuterAngle;
 		glm::vec3 GetDirection();
 		glm::vec3 GetPosition();
-		static SpotLightPtr Create(std::string const& name);
-		virtual bool Touch(GeometryRendererPtr renderObject);
+		 
+		virtual bool Touch(GeometryRenderer* renderObject);
 		virtual bool Overlaps(const Frustrum& frustrum);
 		virtual void CalculateShadowMatrix();
 		virtual void DebugDraw();

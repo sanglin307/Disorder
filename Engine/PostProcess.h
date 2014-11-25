@@ -7,26 +7,23 @@ namespace Disorder
 	class FXAA
 	{
 	public:
-		static FXAAPtr Create();
-		void Render(const CameraPtr camera, const SurfaceViewPtr aaRenderView);
-
-	private:
 		FXAA();
-
+		void Render(Camera* camera, SurfaceView* aaRenderView);
+	private:
 		SimpleTile _ScreenTile;
-		ShaderPropertyPtr _ScreenAATexture;
-		ShaderPropertyPtr _ScreenAASampler;
+		ShaderProperty* _ScreenAATexture;
+		ShaderProperty* _ScreenAASampler;
 
-		RenderEffectPtr _AAPrepareEffect;
-		RenderEffectPtr _AAEffect;
+		RenderEffect* _AAPrepareEffect;
+		RenderEffect* _AAEffect;
 
-		RenderTexture2DPtr _PrepareBufferTexture;
-		RenderSurfacePtr _PrepareBufferSurface;
-		SurfaceViewPtr _PrepareShaderResource;
+		RenderTexture2D* _PrepareBufferTexture;
+		RenderSurface* _PrepareBufferSurface;
+		SurfaceView* _PrepareShaderResource;
 
-		RenderTexture2DPtr _TargetBufferTexture;
-		RenderSurfacePtr _TargetBufferSurface;
-		SurfaceViewPtr _TargetShaderResource;
+		RenderTexture2D* _TargetBufferTexture;
+		RenderSurface* _TargetBufferSurface;
+		SurfaceView* _TargetShaderResource;
 
 	};
 

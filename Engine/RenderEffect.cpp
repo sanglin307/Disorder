@@ -32,9 +32,5 @@ namespace Disorder
 			_pixelShader->UpdateShaderParameter();
 	}
 
-	RenderEffectPtr RenderEffect::Create()
-	{
-		RenderEffect *pEffect = new RenderEffect;
-		return RenderEffectPtr(pEffect);
-	}
+ 
 }

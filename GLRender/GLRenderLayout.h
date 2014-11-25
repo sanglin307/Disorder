@@ -15,18 +15,13 @@ namespace Disorder
 		static GLint Location_Tex0;
 
 		~GLRenderLayout();
-
-		static GLRenderLayoutPtr Create(RenderEffectPtr const& renderEffect,TopologyType topologyType,bool soloBuffer);
+		GLRenderLayout(RenderEffect* renderEffect,TopologyType topologyType,bool soloBuffer);
  
 		virtual void * GetHandle();
-		virtual void FinishBufferBinding(RenderEffectPtr const& renderEffect);
+		virtual void FinishBufferBinding(RenderEffect* renderEffect);
 
 		static GLint GetGLTypeSize(GLint type);
-	public:
- 
-
 	private:
-		GLRenderLayout(){}
 
 		GLuint _VAOHandle;
 	};

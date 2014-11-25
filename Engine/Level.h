@@ -5,10 +5,10 @@ namespace Disorder
 {
 	class Level
 	{
-		typedef std::list<GameObjectPtr> GameObjectContainer;
+		typedef std::list<GameObject*> GameObjectContainer;
 	public:
         
-		void AddGameObject(GameObjectPtr const& gameObject);
+		void AddGameObject(GameObject* gameObject);
 
 		void Init();
 		void Exit();
@@ -24,15 +24,12 @@ namespace Disorder
 			return _vAmbientColor;
 		}
  
-		static LevelPtr Create(std::string const& levelName);
-		
+		Level(std::string const& levelName);
 		~Level();
 
 		std::string Name;
 
 	private:
-		Level(std::string const& levelName);
-
 		GameObjectContainer _vGameObjects;
 		glm::vec4     _vAmbientColor;
  

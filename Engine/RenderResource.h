@@ -34,7 +34,6 @@ namespace Disorder
 		virtual void * GetHandle(){ return 0;}
 
 	protected:
-		RenderBuffer(){}
 
 		BufferUsage  _bufferUsage;
 		unsigned int _bindFlags;
@@ -55,7 +54,7 @@ namespace Disorder
 		unsigned int MultiSampleCount;
 		unsigned int MultiSampleQuality;
 		int ArraySize;
-		SamplerStatePtr Sampler;
+		SamplerState* Sampler;
 	};
 
 	class RenderTexture1D: public RenderTexture

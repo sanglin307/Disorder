@@ -3,17 +3,12 @@
 
 namespace Disorder
 {
-	void Level::AddGameObject(GameObjectPtr const& gameObject)
+	void Level::AddGameObject(GameObject* gameObject)
 	{
 		_vGameObjects.push_back(gameObject);
 	}
 
-	LevelPtr Level::Create(std::string const& levelName)
-	{
-		Level* pLevel = new Level(levelName);
-		return LevelPtr(pLevel);
-	}
-
+	 
 	Level::Level(std::string const& levelName)
 		:Name(levelName)
 	{

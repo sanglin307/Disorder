@@ -21,9 +21,6 @@ namespace Disorder
 		static int GetOpenGLShaderType(ShaderType sType);
 		static void PrepareShaderPathInclude();
 
-		static GLShaderObjectPtr Create(std::string const& effectName, std::string const& entryPoint, ShaderType shaderType, ShaderModel shaderMode);
-
-	private:
 		explicit GLShaderObject(std::string const& fileName, std::string const& entryPoint, ShaderType shaderType, ShaderModel shaderModel)
 		{
 			_GLHandle = 0;
@@ -32,7 +29,7 @@ namespace Disorder
 			_type = shaderType;
 			_shaderModel = shaderModel;
 		}
-
+	private:
 		GLuint _GLHandle;
 
 		static GLchar* _cachedShaderPath[64];  
@@ -56,7 +53,7 @@ namespace Disorder
 		GLint BlockIndex;
 		GLint Offset;
 		GLint Size;
-		ShaderPropertyPtr ParamRef;
+		ShaderProperty* ParamRef;
 	};
 
 	struct GLShaderUniformBlock
@@ -65,21 +62,18 @@ namespace Disorder
 		GLint               BlockIndex;
 		GLint               BlockBinding;
 		GLint               BlockSize;
-		ShaderPropertyPtr	BufferParamRef;
+		ShaderProperty*	    BufferParamRef;
 		std::vector<GLShaderResourceBinding> Members;
-		std::vector<ShaderPropertyPtr> MembersRef;
+		std::vector<ShaderProperty*> MembersRef;
 	};
 
 	class GLProgramReflection
 	{
 	public:
-		static GLProgramReflectionPtr Create();
 		std::vector<GLShaderSignatureDesc> InputArray;
 		std::vector<GLShaderUniformBlock> UniformBlockArray;
 		std::vector<GLShaderResourceBinding> ResourceArray;
-
-	private:
-		GLProgramReflection(){};
+ 
 	};
 
 	
@@ -87,21 +81,20 @@ namespace Disorder
 	class GLRenderEffect : public RenderEffect
 	{
 	public:
+		GLRenderEffect();
 		~GLRenderEffect();
 
-		virtual void BindShader(ShaderObjectPtr const& shaderObject);
+		virtual void BindShader(ShaderObject* shaderObject);
 		virtual void LinkShaders();
 		 
 		virtual void* GetHandle(){ return (void*)_GLHandle; }
 
-		static GLRenderEffectPtr Create();
-		GLProgramReflectionPtr EffectReflection;
+		GLProgramReflection* EffectReflection;
 
 		static void GetShaderPropertyTypeLength(GLint type, EShaderProperty& propertyType, int &lenght,  int &size);
 		static void GetGLShaderPropertyTypeLength(GLint type, GLenum& propertyType, int &lenght);
 
 	private:
-		GLRenderEffect();
 		void Reflection();
 
 		GLuint _GLHandle;
@@ -114,12 +107,12 @@ namespace Disorder
 		virtual void UpdateShaderProperty();
 	  
 		bool Validate(GLShaderUniformBlock *pUniformBlock);
-		static GLShaderPropertyManagerPtr Create(const std::string& name);
- 
+		GLShaderPropertyManager(const std::string& name);
+
 		GLint BindingPoint;
 
 	protected:
-		GLShaderPropertyManager(const std::string& name);
+		
 		
 		GLShaderUniformBlock* _uniformBlock;
 

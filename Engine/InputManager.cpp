@@ -9,12 +9,6 @@ namespace Disorder
 
 	}
 
-	InputEventHandlerPtr InputEventHandler::Create()
-	{
-		InputEventHandler *pHandler = new InputEventHandler();
-		return InputEventHandlerPtr(pHandler);
-	}
-
 	bool InputEventHandler::keyPressed( const OIS::KeyEvent &arg )
 	{
 	/*	std::cout << " KeyPressed {" << arg.key
@@ -26,7 +20,7 @@ namespace Disorder
 		keyEvent.state = IS_Press;
 		keyEvent.text = arg.text;
 
-		GEngine->GameClient->AddKeyboardEvent(keyEvent);
+		GClient->AddKeyboardEvent(keyEvent);
 
 	    return true;
 	}
@@ -42,7 +36,7 @@ namespace Disorder
 		keyEvent.state = IS_Release;
 		keyEvent.text = arg.text;
 
-		GEngine->GameClient->AddKeyboardEvent(keyEvent);
+		GClient->AddKeyboardEvent(keyEvent);
 
 
 		return true;
@@ -66,7 +60,7 @@ namespace Disorder
 
 		mouseEvent.buttons = s.buttons;
 
-		GEngine->GameClient->AddMouseEvent(mouseEvent);
+		GClient->AddMouseEvent(mouseEvent);
  
 		return true;
 	}
@@ -110,17 +104,11 @@ namespace Disorder
 		mouseEvent.RelativeZ = s.Z.rel;
 		mouseEvent.buttons = s.buttons;
 
-		GEngine->GameClient->AddMouseEvent(mouseEvent);
+		GClient->AddMouseEvent(mouseEvent);
 
 		return true;
 	}
 	//================================InputManager===========================================
-
-	InputManagerPtr InputManager::Create(unsigned int hWnd)
-	{
-		InputManager *pManager = new InputManager(hWnd);
-		return InputManagerPtr(pManager);
-	}
 
 	InputManager::InputManager(unsigned int hWnd)
 	{
@@ -134,23 +122,24 @@ namespace Disorder
 		_oisInputManager = OIS::InputManager::createInputSystem(paramList);
 		_oisInputManager->enableAddOnFactory(OIS::InputManager::AddOn_All);
 
-		_eventHandler = InputEventHandler::Create();
+		_eventHandler = new InputEventHandler;
 
 		_oisKeyboard = (OIS::Keyboard*)_oisInputManager->createInputObject( OIS::OISKeyboard, true );
-		_oisKeyboard->setEventCallback(_eventHandler.get());
+		_oisKeyboard->setEventCallback(_eventHandler);
 		_oisMouse    = (OIS::Mouse*)_oisInputManager->createInputObject( OIS::OISMouse, true );
-		_oisMouse->setEventCallback(_eventHandler.get());
+		_oisMouse->setEventCallback(_eventHandler);
 
 		const OIS::MouseState &ms = _oisMouse->getMouseState();
-		ms.width = GEngine->GameClient->GetViewport(0)->SizeX;
-		ms.height = GEngine->GameClient->GetViewport(0)->SizeX;
+		ms.width = GClient->GetViewport(0)->SizeX;
+		ms.height = GClient->GetViewport(0)->SizeX;
 
 
 	}
 
 	InputManager::~InputManager()
 	{
-		_eventHandler.reset();
+		if (_eventHandler!=NULL)
+		   delete _eventHandler;
 		OIS::InputManager::destroyInputSystem(_oisInputManager);
 	}
 

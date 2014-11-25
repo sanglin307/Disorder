@@ -5,13 +5,11 @@
 
 namespace Disorder
 {
-	class SceneManager : public Singleton<SceneManager>
+	class SceneManager  
 	{	
-		friend class Singleton<SceneManager>;
-
-		typedef boost::unordered_map<std::string, GeometryRendererPtr>  RendererMap;
-		typedef boost::unordered_map<std::string,LightPtr> LightMap;
-		typedef boost::unordered_map<std::string,CameraPtr> CameraMap;
+		typedef boost::unordered_map<std::string, GeometryRenderer*>  RendererMap;
+		typedef boost::unordered_map<std::string,Light*> LightMap;
+		typedef boost::unordered_map<std::string,Camera*> CameraMap;
 
 	public:
 	 
@@ -19,29 +17,29 @@ namespace Disorder
 		void Exit();
 	    void Tick(float deltaSeconds);
 
-		void AddRenderer(GeometryRendererPtr const& renderer);
-		void AddLight(LightPtr const& light);
-		void AddCamera(CameraPtr const& camera);
+		void AddRenderer(GeometryRenderer* renderer);
+		void AddLight(Light* light);
+		void AddCamera(Camera*  camera);
 
-		GeometryRendererPtr GetRenderer(std::string const& name);
-		LightPtr GetLight(std::string const& name);
-		CameraPtr GetCamera(std::string const& name);
+		GeometryRenderer* GetRenderer(std::string const& name);
+		Light* GetLight(std::string const& name);
+		Camera* GetCamera(std::string const& name);
 
 		void CreateDefaultLight();
 
 		void CreateDefaultCamera();
-		const CameraPtr& GetDefaultCamera() const
+		Camera* GetDefaultCamera()
 		{
 			return _mDefaultCamera;
 		}
 
-		void SetDefaultCamera(CameraPtr const& camera);
+		void SetDefaultCamera(Camera* camera);
  
 		// get render list according camera
-		void GetRendererList(CameraPtr const camera, std::vector<GeometryRendererPtr>& renderObjList) const;
-		void GetRendererList(std::vector<GeometryRendererPtr>& renderObjList) const;
+		void GetRendererList(Camera* camera, std::vector<GeometryRenderer*>& renderObjList) const;
+		void GetRendererList(std::vector<GeometryRenderer*>& renderObjList) const;
 
-		const std::vector<LightPtr>& GetLightsList() const
+		const std::vector<Light*>& GetLightsList() const
 		{
 			return _vLightList;
 		}
@@ -61,7 +59,7 @@ namespace Disorder
 			return _sceneBounds;
 		}
 
-		const SkyboxPtr& GetSkybox() const
+		Skybox* GetSkybox() const
 		{
 			return _skyBox;
 		}
@@ -69,37 +67,35 @@ namespace Disorder
 		bool EnableDebugDraw;
 
 	protected:
-		static SceneManagerPtr Create();
-		SceneManager(){};
-
+ 
 		RendererMap _mRenderObjects;
         LightMap    _mLightObjects;	
 		CameraMap   _mCameraObjects;
-		CameraPtr   _mDefaultCamera;
+		Camera*   _mDefaultCamera;
 		BoxBounds   _sceneBounds;
-		SkyboxPtr   _skyBox;
+		Skybox*   _skyBox;
 
-		std::vector<LightPtr> _vLightList;
-		std::vector<GeometryRendererPtr> _vRenderObjects;
+		std::vector<Light*> _vLightList;
+		std::vector<GeometryRenderer*> _vRenderObjects;
 
-		SceneImporterPtr _sceneImporter;
+		SceneImporter* _sceneImporter;
 
 		glm::vec3 _vAmbientLowerColor;
 		glm::vec3 _vAmbientUpperColor;
 
-		ShaderPropertyPtr _sAmbientLowerProperty;
-		ShaderPropertyPtr _sAmbientUpperProperty;
+		ShaderProperty* _sAmbientLowerProperty;
+		ShaderProperty* _sAmbientUpperProperty;
 
-		ShaderPropertyPtr _sScreenWidthProperty;
-		ShaderPropertyPtr _sScreenHeightProperty;
-		ShaderPropertyPtr _sShadowMapSizeProperty;
-		ShaderPropertyPtr _sLineRadius;
+		ShaderProperty* _sScreenWidthProperty;
+		ShaderProperty* _sScreenHeightProperty;
+		ShaderProperty* _sShadowMapSizeProperty;
+		ShaderProperty* _sLineRadius;
 
-		ShaderPropertyManagerPtr _propertyManager;
+		ShaderPropertyManager* _propertyManager;
 
 	};
 
-	#define GSceneManager SceneManager::GetSingleton()
+	extern SceneManager* GSceneManager;
 }
 
 

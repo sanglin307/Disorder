@@ -2,27 +2,20 @@
 
 namespace Disorder
 {
-	SkyboxPtr Skybox::Create()
-	{
-		Skybox *pBox = new Skybox;
-		return SkyboxPtr(pBox);
-	}
-
 	Skybox::Skybox()
 	{ 
-
-		ShaderPropertyManagerPtr globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderPropertyManager* globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 		_skyTextureProperty = globalProperty->CreateProperty(ShaderPropertyManager::sSkyboxTexture, eSP_ShaderResource, 1);
 		_skySamplerProperty = globalProperty->CreateProperty(ShaderPropertyManager::sSkyboxSampler, eSP_SampleState, 1);
 
 		std::string skyTextureName = "early_morning_";
-		std::vector<ImagePtr> textureArray;
-		textureArray.push_back(GImageManager->Load(GConfig->sResourceTexPath + skyTextureName + "RT.jpg"));
-		textureArray.push_back(GImageManager->Load(GConfig->sResourceTexPath + skyTextureName + "LF.jpg"));
-		textureArray.push_back(GImageManager->Load(GConfig->sResourceTexPath + skyTextureName + "UP.jpg"));
-		textureArray.push_back(GImageManager->Load(GConfig->sResourceTexPath + skyTextureName + "DN.jpg"));
-		textureArray.push_back(GImageManager->Load(GConfig->sResourceTexPath + skyTextureName + "FR.jpg"));
-		textureArray.push_back(GImageManager->Load(GConfig->sResourceTexPath + skyTextureName + "BK.jpg"));
+		std::vector<Image*> textureArray;
+		textureArray.push_back(GImageManager->Load(GConfig->ResourceTexPath + skyTextureName + "RT.jpg"));
+		textureArray.push_back(GImageManager->Load(GConfig->ResourceTexPath + skyTextureName + "LF.jpg"));
+		textureArray.push_back(GImageManager->Load(GConfig->ResourceTexPath + skyTextureName + "UP.jpg"));
+		textureArray.push_back(GImageManager->Load(GConfig->ResourceTexPath + skyTextureName + "DN.jpg"));
+		textureArray.push_back(GImageManager->Load(GConfig->ResourceTexPath + skyTextureName + "FR.jpg"));
+		textureArray.push_back(GImageManager->Load(GConfig->ResourceTexPath + skyTextureName + "BK.jpg"));
 		
 		SamplerDesc sdesc;
 		sdesc.Filter = SF_Anisotropic;
@@ -34,8 +27,8 @@ namespace Disorder
 		_skySamplerProperty->SetData(_skyCubeSampler);
 
 		_renderEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "Skybox", SM_4_0, "VS");
-		ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "Skybox", SM_4_0, "PS");
+		ShaderObject* vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "Skybox", SM_4_0, "VS");
+		ShaderObject* pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "Skybox", SM_4_0, "PS");
 		_renderEffect->BindShader(vertexShader);
 		_renderEffect->BindShader(pixelShader);
 		_renderEffect->LinkShaders();
@@ -43,7 +36,7 @@ namespace Disorder
 		DepthStencilDesc desc;
 		desc.DepthWrite = false;
 		desc.DepthEnable = false;
-		DepthStencilStatePtr depthPtr = GEngine->RenderResourceMgr->CreateDepthStencilState(&desc, 0);
+		DepthStencilState* depthPtr = GEngine->RenderResourceMgr->CreateDepthStencilState(&desc, 0);
 		_renderEffect->BindDepthStencilState(depthPtr);
 
 		glm::vec3 positions[] = 
@@ -57,7 +50,7 @@ namespace Disorder
 		};
 
 		_renderLayout = GEngine->RenderResourceMgr->CreateRenderLayout(_renderEffect, TT_TriangleList,true);
-		RenderBufferPtr vertexBuffer = GEngine->RenderResourceMgr->CreateBuffer("SkyBoxVertex",RBT_Vertex, BU_StaticDraw, sizeof(glm::vec3), sizeof(glm::vec3)*36, positions);
+		RenderBuffer* vertexBuffer = GEngine->RenderResourceMgr->CreateBuffer("SkyBoxVertex",RBT_Vertex, BU_StaticDraw, sizeof(glm::vec3), sizeof(glm::vec3)*36, positions);
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 
 		_renderLayout->FinishBufferBinding(_renderEffect);

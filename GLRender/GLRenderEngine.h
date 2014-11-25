@@ -15,9 +15,7 @@ namespace Disorder
 		void Init();
 		void Exit();
 
-		static GLDebugLayerPtr Create();
 	private:
-		GLDebugLayer(){};
 
 		static void APIENTRY DebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, GLvoid* userParam)
 		{
@@ -36,10 +34,9 @@ namespace Disorder
 	{
 
 	public:
+		GLRenderEngine();
 		~GLRenderEngine();
-
-		static GLRenderEnginePtr Create();
-
+ 
 		virtual void Init();
 		virtual void Exit();
 
@@ -48,24 +45,24 @@ namespace Disorder
  
 		virtual void CreateViewport(void *hWnd);
 
-		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex = -1);
+		virtual void ClearRenderSurface(RenderSurface* renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex = -1);
 
  
-		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget, int sliceIndex = -1, bool useReadOnlyDepthStencil = false);
-		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout);
+		virtual void SetRenderTarget(RenderSurface* renderTarget, int sliceIndex = -1, bool useReadOnlyDepthStencil = false);
+		virtual void SetRenderLayout(RenderLayout* renderLayout);
 		virtual void SetPrimitiveTopology(TopologyType topologyType);
 
 		virtual void SetViewport(float width, float height, float minDepth, float maxDepth, float topX, float topY);
 
-		virtual void SetEffect(RenderEffectPtr const& effect);
+		virtual void SetEffect(RenderEffect* effect);
 		virtual void DrawIndexed(unsigned int indexCount, unsigned int startIndexLocation, int baseVertexLocation);
 		virtual void Draw(unsigned int vertexCount, unsigned int startVertexLocation);
 
-		virtual void* Map(RenderBufferPtr const& buffer, BufferAccess bufferAccess);
-		virtual void UnMap(RenderBufferPtr const& buffer);
-		virtual void UpdateSubresource(RenderBufferPtr const& buffer, void* pSrcData, unsigned int srcDataSize);
-		virtual void CopyTexture2D(RenderTexture2DPtr srcTexture, RenderTexture2DPtr dstTexture);
-		virtual void SaveSurfaceView(SurfaceViewPtr const& surface, std::string const& fileName);
+		virtual void* Map(RenderBuffer* buffer, BufferAccess bufferAccess);
+		virtual void UnMap(RenderBuffer* buffer);
+		virtual void UpdateSubresource(RenderBuffer* buffer, void* pSrcData, unsigned int srcDataSize);
+		virtual void CopyTexture2D(RenderTexture2D* srcTexture, RenderTexture2D* dstTexture);
+		virtual void SaveSurfaceView(SurfaceView* surface, std::string const& fileName);
 
 		static GLenum GetPixelFormat(PixelFormat format, GLenum &glFormat, GLenum &glType);
 		static GLint GetGLAddressMode(TextureAddressMode addrMode);
@@ -304,14 +301,13 @@ namespace Disorder
 		//	void Init();
 		//};
 
-		virtual void SetBlendState(BlendStatePtr const& blendState);
-		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState);
-		virtual void SetDepthStencilState(DepthStencilStatePtr const& depthStencilState);
+		virtual void SetBlendState(BlendState* blendState);
+		virtual void SetRasterizeState(RasterizeState* rasterizeState);
+		virtual void SetDepthStencilState(DepthStencilState* depthStencilState);
  
 		static GLenum GetPlatformTopology(TopologyType tType);
 		static GLenum GetBufferAccessFlag(BufferAccess ba);
 
-		GLRenderEngine();
 		bool CreateGLContext(HWND window);
 		void CreateMainTarget();
 
@@ -329,7 +325,7 @@ namespace Disorder
  
 		int _indexElementSize;
 
-		GLDebugLayerPtr _debugLayer;
+		GLDebugLayer* _debugLayer;
 
 		//GLEngineCache _renderCache;
 

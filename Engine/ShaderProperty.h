@@ -31,26 +31,25 @@ namespace Disorder
 		void SetData(int* data);
 		void SetData(float* data);
 		void SetData(double* data);
-		void SetData(RenderBufferPtr constBuffer);
-		void SetData(SurfaceViewPtr shaderResource);
-		void SetData(SamplerStatePtr sample);
+		void SetData(RenderBuffer* constBuffer);
+		void SetData(SurfaceView* shaderResource);
+		void SetData(SamplerState* sample);
 
 		void* GetData();
 		int* GetDataAsInt();
 		float* GetDataAsFloat();
 		double* GetDataAsDouble();
 
-		RenderBufferPtr GetDataAsConstBuffer();
-		SurfaceViewPtr GetDataAsShaderResource();
-		SamplerStatePtr GetDataAsSampler();
+		RenderBuffer* GetDataAsConstBuffer();
+		SurfaceView* GetDataAsShaderResource();
+		SamplerState* GetDataAsSampler();
 
 		EShaderProperty PropertyType;
 		std::string PropertyName;
  
-		static ShaderPropertyPtr Create(EShaderProperty type,unsigned int length,std::string const& name);
+		ShaderProperty(EShaderProperty type, unsigned int length, std::string const& name);
 
 	private:
-		ShaderProperty(EShaderProperty type,unsigned int length,std::string const& name);
 		void* _data;
 		unsigned int _length;
 
@@ -58,7 +57,7 @@ namespace Disorder
  
 	class ShaderPropertyManager
 	{
-		typedef boost::unordered_map<std::string,ShaderPropertyPtr> ShaderPropertyMap;
+		typedef boost::unordered_map<std::string,ShaderProperty*> ShaderPropertyMap;
    public:    // for shader name mapping...................
 	    virtual ~ShaderPropertyManager();
 
@@ -165,8 +164,8 @@ namespace Disorder
 		virtual void ClearShaderPropertyValue();
 		virtual void UpdateShaderProperty() = 0;
 		 
-		ShaderPropertyPtr GetProperty(std::string const& name);
-		ShaderPropertyPtr CreateProperty(std::string const& name,EShaderProperty type,unsigned int length = 1);
+		ShaderProperty* GetProperty(std::string const& name);
+		ShaderProperty* CreateProperty(std::string const& name,EShaderProperty type,unsigned int length = 1);
 
 		virtual void DumpContent();
 	protected:

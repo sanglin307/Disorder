@@ -4,36 +4,43 @@
 namespace Disorder
 {
  
-	WindowsViewport::WindowsViewport(int sizeX,int sizeY,void *hWnd)
+	WinViewport::WinViewport(int sizeX, int sizeY, void *hWnd)
 		:Viewport(sizeX,sizeY),_window((HWND)hWnd)
 	{		
 	}
 
-	void WindowsViewport::Render()
+	void WinViewport::Render()
 	{
-		Viewport::Render();
-		
+		Viewport::Render();	
 	}
 
-	WindowsViewportPtr WindowsViewport::Create(int sizeX,int sizeY,void* hWnd)
+	bool WinViewport::MessageProcess(HWND hWnd, UINT Message, UINT wParam, LONG lParam)
 	{
-		WindowsViewport *pViewport = new WindowsViewport(sizeX,sizeY,hWnd);
-		return WindowsViewportPtr(pViewport);
+		switch (Message)
+		{
+		case WM_ACTIVATE:
+			if (WA_INACTIVE == LOWORD(wParam))
+				Active(false);
+			else
+				Active(true);
+			return true;
+		case WM_PAINT:
+			Render();
+			return true;
+		case WM_CLOSE:
+			GIsRequestingExit = true;
+			PostQuitMessage(0);
+			return true;
+		}
+
+		return false;
 	}
 
 	//==========================WindowsClient=================================
 
-	WinClientPtr WinClient::Create()
-	{
-		WinClient* pClient = new WinClient;
-		return WinClientPtr(pClient);
-	}
-
 	void WinClient::Init()
 	{
-
 		TCHAR *winClassName = TEXT("Disorder");
-
 		WNDCLASSEXW Cls;
 		memset( &Cls, 0,sizeof(Cls));
 		Cls.cbSize			= sizeof(Cls);
@@ -132,7 +139,7 @@ namespace Disorder
 		CreateViewport(GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, windows);
 
 		//Create InputManager
-		_inputManager = InputManager::Create((unsigned int)windows);
+		_inputManager = new InputManager((unsigned int)windows);
 
 	 
 	}
@@ -147,7 +154,7 @@ namespace Disorder
 				std::list<KeyboardInputEvent>::iterator iterKey = _keyboardEvents.begin();
 				while( iterKey != _keyboardEvents.end() )
 				{
-					std::list<InputListenerPtr>::iterator inputIter = _inputListenerList.begin();
+					std::list<InputListener*>::iterator inputIter = _inputListenerList.begin();
 					while( inputIter != _inputListenerList.end() )
 					{
 						(*inputIter)->KeyboardEvent(iterKey->key,iterKey->text,iterKey->state,delta);
@@ -165,7 +172,7 @@ namespace Disorder
 				std::list<MouseInputEvent>::iterator iterKey = _mouseEvents.begin();
 				while( iterKey != _mouseEvents.end() )
 				{
-					std::list<InputListenerPtr>::iterator inputIter = _inputListenerList.begin();
+					std::list<InputListener*>::iterator inputIter = _inputListenerList.begin();
 					while( inputIter != _inputListenerList.end() )
 					{
 						(*inputIter)->MouseEvent(*iterKey,delta);
@@ -198,15 +205,37 @@ namespace Disorder
 	void WinClient::CreateViewport(int sizeX,int sizeY,void* hWnd)
 	{
 		// only support one viewport now!
-		BOOST_ASSERT(_Viewports.empty());
-		_Viewports.push_back(WindowsViewport::Create(sizeX,sizeY,hWnd));
+		BOOST_ASSERT(_viewports.empty());
+		_viewports.push_back(new WinViewport(sizeX,sizeY,hWnd));
 
+	}
+
+	bool WinClient::MessageProcess(HWND hWnd, UINT Message, UINT wParam, LONG lParam)
+	{
+		WinViewport* pViewport = NULL;
+		for (size_t i = 0; i < _viewports.size(); i++)
+		{
+			if (_viewports[i]->GetWindow() == hWnd)
+			{
+				pViewport = (WinViewport *)_viewports[i];
+				break;
+			}
+		}
+
+		if (pViewport == NULL)
+		{
+			return false;
+		}
+		else
+		{
+			return pViewport->MessageProcess(hWnd, Message, wParam, lParam);
+		}
 	}
 
 	LONG APIENTRY WinClient::StaticWndProc( HWND hWnd, UINT Message, UINT wParam, LONG lParam )
 	{	
 		// Prevent power management
-		/*if (Message == WM_POWERBROADCAST)
+		if (Message == WM_POWERBROADCAST)
 		{
 			switch( wParam )
 			{
@@ -214,70 +243,16 @@ namespace Disorder
 				case PBT_APMQUERYSTANDBY:
 					return BROADCAST_QUERY_DENY;
 			}
-		}*/
- 
-		if(_Viewports.empty())
+		}
+		
+		bool result = ((WinClient *)GClient)->MessageProcess(hWnd, Message, wParam, lParam);
+
+		if (!result)
 		{
 			return DefWindowProc(hWnd, Message, wParam, lParam);
 		}
 
-		std::vector<ViewportPtr>::iterator viewportIter = std::find_if(_Viewports.begin(),_Viewports.end(),FinderViewport(hWnd));
-	    
-		if(viewportIter == _Viewports.end())
-		{
-			return DefWindowProc(hWnd, Message, wParam, lParam);
-		}
-
-		switch (Message)
-		{
-		case WM_ACTIVATE:
-			if (WA_INACTIVE == LOWORD(wParam))
-			{
-				(*viewportIter)->Active(false);
-			}
-			else
-			{
-				(*viewportIter)->Active(true);
-			}
-			break;
-
-	/*	case WM_ERASEBKGND:
-			return 1;*/
-
-		case WM_PAINT:
-			(*viewportIter)->Render();
-			break;
- 
-		//case WM_SIZE:
-		//	// Check to see if we are losing or gaining our window.  Set the
-		//	// active flag to match
-		//	if ((SIZE_MAXHIDE == wParam) || (SIZE_MINIMIZED == wParam))
-		//	{
-		//		this->OnSize()(*this, false);
-		//	}
-		//	else
-		//	{
-		//		this->OnSize()(*this, true);
-		//	}
-		//	break;
-
-		//case WM_GETMINMAXINFO:
-		//	// Prevent the window from going smaller than some minimu size
-		//	reinterpret_cast<MINMAXINFO*>(lParam)->ptMinTrackSize.x = 100;
-		//	reinterpret_cast<MINMAXINFO*>(lParam)->ptMinTrackSize.y = 100;
-		//	break;
-
-		/*case WM_SETCURSOR:
-		    this->OnSetCursor()(*this);
-			break;*/
-
-		case WM_CLOSE:
-			GIsRequestingExit = true;
-	        PostQuitMessage(0);
-			return 0;
-		}
-
-		return DefWindowProc(hWnd, Message, wParam, lParam);
+		return 0;
 	}
 
 	void WinClient::Close()

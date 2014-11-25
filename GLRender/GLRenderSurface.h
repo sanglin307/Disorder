@@ -8,10 +8,7 @@ namespace Disorder
 	class GLSurfaceView : public SurfaceView
 	{
 	public:
-		static GLSurfaceViewPtr Create(ESurfaceViewType type, RenderTexturePtr resource, PixelFormat Format, unsigned int Flag);
-
-	private:
-		GLSurfaceView(){}
+		GLSurfaceView(ESurfaceViewType type, RenderTexture* resource, PixelFormat Format, unsigned int Flag);
 
 	};
 
@@ -21,15 +18,13 @@ namespace Disorder
 
 	public:
 		~GLRenderSurface();
+		GLRenderSurface(const std::map<ESurfaceLocation, SurfaceView*>& viewMap);
 
-		static GLRenderSurfacePtr Create(const std::map<ESurfaceLocation, SurfaceViewPtr>& viewMap);
 		virtual void* GetHandle();
 
 		void GetGLDrawBuffers(std::vector<GLenum>& buffers);
 
 	private:
-		GLRenderSurface();
-
 		GLuint _frameBuffer;
 		 
 	};

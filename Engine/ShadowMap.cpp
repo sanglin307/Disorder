@@ -2,13 +2,6 @@
 
 namespace Disorder
 {
-
-	ShadowMapPtr ShadowMap::Create(unsigned int width, unsigned int height)
-	{
-		ShadowMap* pMap = new ShadowMap(width, height);
-		return ShadowMapPtr(pMap);
-	}
-
 	ShadowMap::ShadowMap(unsigned int width, unsigned int height)
 	{
 		_width = width;
@@ -21,23 +14,23 @@ namespace Disorder
 		_viewArrayMatrix = _propertyMgr->CreateProperty(ShaderPropertyManager::sShadowMapViewArray, eSP_Float, 16 * 6);
 		_projMatrix = _propertyMgr->CreateProperty(ShaderPropertyManager::sShadowMapProj, eSP_Float,16);
  
-		ShaderPropertyManagerPtr globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderPropertyManager* globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 		_shadowTexture2D = globalProperty->CreateProperty(ShaderPropertyManager::sShadowMapTexture2D, eSP_ShaderResource, 1);
 		_shadowTextureCube = globalProperty->CreateProperty(ShaderPropertyManager::sShadowMapTextureCube, eSP_ShaderResource, 1);
 		_shadowSampler = globalProperty->CreateProperty(ShaderPropertyManager::sShadowSampler, eSP_SampleState, 1);
  
 		_DepthGenEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ShadowMap", SM_4_0, "DepthVertexShader");
+		ShaderObject* vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ShadowMap", SM_4_0, "DepthVertexShader");
 		_DepthGenEffect->BindShader(vertexShader);
 
 		_DepthCubeGenEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObjectPtr vertexShaderCube = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ShadowMap", SM_4_0, "DepthCubeMapVS");
-		ShaderObjectPtr geometryShader = GEngine->RenderResourceMgr->CreateShader(ST_GeometryShader, "ShadowMap", SM_4_0, "DepthCubeMapGS");
+		ShaderObject* vertexShaderCube = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ShadowMap", SM_4_0, "DepthCubeMapVS");
+		ShaderObject* geometryShader = GEngine->RenderResourceMgr->CreateShader(ST_GeometryShader, "ShadowMap", SM_4_0, "DepthCubeMapGS");
 		_DepthCubeGenEffect->BindShader(vertexShaderCube);
 		_DepthCubeGenEffect->BindShader(geometryShader);
 		if (GConfig->pRenderConfig->RenderEngine == RET_OpenGL)  // for openGL , must define a pixel shader when we need rasterization.
 		{
-			ShaderObjectPtr pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "ShadowMap", SM_4_0, "DepthPixelShader");
+			ShaderObject* pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "ShadowMap", SM_4_0, "DepthPixelShader");
 			_DepthGenEffect->BindShader(pixelShader);
 			_DepthCubeGenEffect->BindShader(pixelShader);
 		}
@@ -48,7 +41,7 @@ namespace Disorder
 		RasterizeDesc rDesc;
 		rDesc.DepthBias = 50;
 		rDesc.SlopeScaledDepthBias = 27.0f;
-		RasterizeStatePtr rasterObject= GEngine->RenderResourceMgr->CreateRasterizeState(&rDesc);
+		RasterizeState* rasterObject= GEngine->RenderResourceMgr->CreateRasterizeState(&rDesc);
 		_DepthGenEffect->BindRasterizeState(rasterObject);
 		_DepthCubeGenEffect->BindRasterizeState(rasterObject);
 		 
@@ -64,8 +57,8 @@ namespace Disorder
 		_depthView2D = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, _shadowDataTex2D, PF_D32_FLOAT);
 		_shaderView2D = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowDataTex2D, PF_R32_FLOAT);
 
-		std::map<ESurfaceLocation, SurfaceViewPtr> viewMap;
-		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, _depthView2D));
+		std::map<ESurfaceLocation, SurfaceView*> viewMap;
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_DepthStencil, _depthView2D));
 		_depthSurface2D = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 
 		unsigned int viewFlag = SF_AsCubeMap;
@@ -80,7 +73,7 @@ namespace Disorder
 		//_shaderRenderViewCube = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _shadowRenderTexCube, PF_R32_FLOAT, SF_AsCubeMap);
 
 		viewMap.clear();
-		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, _depthViewCube));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_DepthStencil, _depthViewCube));
 		//viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, _renderViewCube));
 		_depthSurfaceCube = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 
@@ -90,7 +83,7 @@ namespace Disorder
 
 	}
 
-	void ShadowMap::PrepareRenderLight(const LightPtr& light)
+	void ShadowMap::PrepareRenderLight(const Light* light)
 	{
 		_shadowSampler->SetData(_shadowSamplerState);
 		if (light->CastShadows)
@@ -104,11 +97,11 @@ namespace Disorder
 		}
 	}
 
-	void ShadowMap::RenderDepth(const CameraPtr& camera, std::vector<GeometryRendererPtr>& geometryList, const LightPtr& light)
+	void ShadowMap::RenderDepth(Camera* camera, const std::vector<GeometryRenderer*>& geometryList, Light* light)
 	{	 
 		if (light->LightType == LT_Spot)
 		{
-			SpotLightPtr spot = boost::dynamic_pointer_cast<SpotLight>(light);
+			SpotLight* spot = (SpotLight*)light;
 			_viewMatrix->SetData(glm::value_ptr(spot->ShadowViewMatrix));
 			_projMatrix->SetData(glm::value_ptr(spot->ShadowProjMatrix));
 			_propertyMgr->UpdateShaderProperty();
@@ -132,7 +125,7 @@ namespace Disorder
 		}
 		else if (light->LightType == LT_Directional)
 		{
-			DirectionLightPtr dirLight = boost::dynamic_pointer_cast<DirectionLight>(light);
+			DirectionLight* dirLight = (DirectionLight*)light;
 			_viewMatrix->SetData(glm::value_ptr(dirLight->ShadowViewMatrix));
 			_projMatrix->SetData(glm::value_ptr(dirLight->ShadowProjMatrix));
 			_propertyMgr->UpdateShaderProperty();
@@ -157,7 +150,7 @@ namespace Disorder
 		}
 		else if ( light->LightType == LT_Point )
 		{
-			PointLightPtr pLight = boost::dynamic_pointer_cast<PointLight>(light);
+			PointLight* pLight = (PointLight*)light;
 
 			if (_bUseGeometryShader)
 			{

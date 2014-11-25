@@ -3,15 +3,9 @@
 
 namespace Disorder
 {
-	GLDebugLayerPtr GLDebugLayer::Create()
-	{
-		GLDebugLayer *pLayer = new GLDebugLayer;
-		return GLDebugLayerPtr(pLayer);
-	}
-
 	void GLDebugLayer::Init()
 	{
-		GLRenderEnginePtr engine = boost::dynamic_pointer_cast<GLRenderEngine>(GEngine->RenderEngine);
+		GLRenderEngine* engine = (GLRenderEngine*)GEngine->RenderEngine;
 		if (engine->IsVersionSupported(4, 3))
 		{
 			glDebugMessageCallback(DebugCallback, this);
@@ -94,11 +88,6 @@ namespace Disorder
 
 	}
 
-	GLRenderEnginePtr GLRenderEngine::Create()
-	{
-		GLRenderEngine *pEngine = new GLRenderEngine;
-		return GLRenderEnginePtr(pEngine);
-	}
 
 	GLenum GLRenderEngine::GetPixelFormat(PixelFormat format,GLenum &glFormat,GLenum &glType)
 	{
@@ -509,19 +498,19 @@ namespace Disorder
 
 	void GLRenderEngine::CreateMainTarget()
 	{
-		RenderTexture2DPtr depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil,1, NULL,0);
-		SurfaceViewPtr DepthBufferView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, depthStencilTex, GConfig->pRenderConfig->DepthStencilFormat, 0);
+		RenderTexture2D* depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil,1, NULL,0);
+		SurfaceView* DepthBufferView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, depthStencilTex, GConfig->pRenderConfig->DepthStencilFormat, 0);
  
-		RenderTexture2DPtr mainTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->ColorFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_RenderTarget ,1, NULL,0);
-		SurfaceViewPtr mainTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, mainTex, GConfig->pRenderConfig->ColorFormat);
-		SurfaceViewPtr shaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, mainTex, GConfig->pRenderConfig->ColorFormat);
+		RenderTexture2D* mainTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->ColorFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_RenderTarget ,1, NULL,0);
+		SurfaceView* mainTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, mainTex, GConfig->pRenderConfig->ColorFormat);
+		SurfaceView* shaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, mainTex, GConfig->pRenderConfig->ColorFormat);
 
-		std::map<ESurfaceLocation, SurfaceViewPtr> viewMap;
-		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_DepthStencil, DepthBufferView));
-		viewMap.insert(std::pair<ESurfaceLocation, SurfaceViewPtr>(SL_RenderTarget1, mainTargetView));
-		RenderSurfacePtr mainSurface = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
+		std::map<ESurfaceLocation, SurfaceView*> viewMap;
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_DepthStencil, DepthBufferView));
+		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_RenderTarget1, mainTargetView));
+		RenderSurface* mainSurface = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
 
-		GEngine->RenderSurfaceCache->MainTarget = MainRenderTarget::Create(mainSurface, shaderView, mainTargetView, DepthBufferView);
+		GEngine->SurfaceCache->MainTarget = new MainRenderTarget(mainSurface, shaderView, mainTargetView, DepthBufferView);
 	}
 
  
@@ -544,7 +533,7 @@ namespace Disorder
 
 		LoadGLProfile();
 
-		_debugLayer = GLDebugLayer::Create();
+		_debugLayer = new GLDebugLayer;
 		_debugLayer->Init();
 	}
 
@@ -609,7 +598,7 @@ namespace Disorder
 					filekey[i] = '/';
 			}
 
-			FileObjectPtr file = GEngine->FileManager->OpenTextFile(path, eF_Read);
+			FileObject* file = GEngine->FileManager->OpenTextFile(path, eF_Read);
 			std::string content = file->ReadText();
 			if (ShaderObject::sMapIncludeFiles.find(filekey) == ShaderObject::sMapIncludeFiles.end())
 			{
@@ -620,7 +609,7 @@ namespace Disorder
 
 	void GLRenderEngine::LoadShaderIncludeFiles()
 	{
-		std::string shaderPath = GConfig->sResourceFXPath + "GLSL\\";
+		std::string shaderPath = GConfig->ResourceFXPath + "GLSL\\";
 		boost::filesystem::path p(shaderPath);
 		if (!boost::filesystem::exists(p) || !boost::filesystem::is_directory(p) )
 		{
@@ -834,10 +823,10 @@ namespace Disorder
 		GEngine->Stat.OnFrameBegin();
 	}
 
-	void GLRenderEngine::CopyTexture2D(RenderTexture2DPtr srcTexture, RenderTexture2DPtr dstTexture)
+	void GLRenderEngine::CopyTexture2D(RenderTexture2D* srcTexture, RenderTexture2D* dstTexture)
 	{
-		GLRenderTexture2DPtr srcTex = boost::dynamic_pointer_cast<GLRenderTexture2D>(srcTexture);
-		GLRenderTexture2DPtr dstTex = boost::dynamic_pointer_cast<GLRenderTexture2D>(dstTexture);
+		GLRenderTexture2D* srcTex = (GLRenderTexture2D*)srcTexture;
+		GLRenderTexture2D* dstTex = (GLRenderTexture2D*)dstTexture;
 
 		glCopyImageSubData((GLuint)srcTex->GetHandle(), srcTex->GetGLFormat(), 0, 0, 0, 0, (GLuint)dstTex->GetHandle(), dstTex->GetGLFormat(), 0, 0, 0, 0, srcTex->Width, srcTex->Height, 1);
 	}
@@ -847,7 +836,7 @@ namespace Disorder
 		//blit
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glDrawBuffer(GL_BACK);
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLint)GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface->GetHandle());
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLint)GEngine->SurfaceCache->MainTarget->RenderTargetSurface->GetHandle());
 		glReadBuffer(GL_COLOR_ATTACHMENT0);
 
 		GLint SizeX = GConfig->pRenderConfig->SizeX;
@@ -863,7 +852,7 @@ namespace Disorder
 	}
 
   
-	void GLRenderEngine::ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex)
+	void GLRenderEngine::ClearRenderSurface(RenderSurface* renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil, int sliceIndex)
 	{
 		//SetRenderTarget(renderSurface,sliceIndex);
 
@@ -883,7 +872,7 @@ namespace Disorder
 			return;
 		}
 
-		GLRenderSurfacePtr surface = boost::dynamic_pointer_cast<GLRenderSurface>(renderSurface);
+		GLRenderSurface* surface = (GLRenderSurface*)renderSurface;
  
 		for (int i = 0; i < SL_SurfaceLoactionMax; i++)
 		{
@@ -911,7 +900,7 @@ namespace Disorder
 
  
 
-	void GLRenderEngine::SetRenderTarget(const RenderSurfacePtr& renderTarget, int sliceIndex,bool useReadOnlyDepthStencil)
+	void GLRenderEngine::SetRenderTarget(RenderSurface* renderTarget, int sliceIndex,bool useReadOnlyDepthStencil)
 	{
 		if (renderTarget == NULL)
 		{
@@ -928,7 +917,7 @@ namespace Disorder
 		{
 			for (int index = SL_DepthStencil; index < SL_SurfaceLoactionMax; index++)
 			{
-				SurfaceViewPtr view = renderTarget->GetSurfaceView((ESurfaceLocation)index);
+				SurfaceView* view = renderTarget->GetSurfaceView((ESurfaceLocation)index);
 				if (view != NULL && view->Resource->ArraySize > 1)
 				{
 					GLenum attachment = GL_DEPTH_ATTACHMENT;
@@ -951,7 +940,7 @@ namespace Disorder
 			}
 		}
 
-		GLRenderSurfacePtr GLSurface = boost::dynamic_pointer_cast<GLRenderSurface>(renderTarget);
+		GLRenderSurface* GLSurface = (GLRenderSurface*)renderTarget;
 		std::vector<GLenum> bufferArray;
 		GLSurface->GetGLDrawBuffers(bufferArray);
 		 
@@ -980,12 +969,12 @@ namespace Disorder
 		return false;
 	}
 
-	void GLRenderEngine::SetRenderLayout(RenderLayoutPtr const& renderLayout)
+	void GLRenderEngine::SetRenderLayout(RenderLayout* renderLayout)
 	{
 		TopologyType topology = renderLayout->GetTopology();
 		CachedTopology = topology;
 	
-		RenderBufferPtr indexBuffer = renderLayout->GetIndexBuffer();
+		RenderBuffer* indexBuffer = renderLayout->GetIndexBuffer();
 		GLuint vao = (GLuint)renderLayout->GetHandle();
 		if (indexBuffer)
 		{	
@@ -1002,7 +991,7 @@ namespace Disorder
 		CachedTopology = topologyType;
 	}
 
-	void GLRenderEngine::SetEffect(RenderEffectPtr const& effect)
+	void GLRenderEngine::SetEffect(RenderEffect* effect)
 	{
 		if (effect == NULL)
 		{
@@ -1016,7 +1005,7 @@ namespace Disorder
 		SetRasterizeState(effect->GetRasterizeState());
 		SetDepthStencilState(effect->GetDepthStencilState());
 
-		GLRenderEffectPtr effectGL = boost::dynamic_pointer_cast<GLRenderEffect>(effect);
+		GLRenderEffect* effectGL = (GLRenderEffect*)effect;
 		GLShaderResourceBinding* pDesc = NULL;
 		std::vector<GLuint> samplerBinding;
  
@@ -1026,8 +1015,8 @@ namespace Disorder
 			pDesc = &(effectGL->EffectReflection->ResourceArray[i]);
 			if (GLRenderEngine::IsTextureSamplerResouce(pDesc->Type))
 			{
-				SurfaceViewPtr tex = pDesc->ParamRef->GetDataAsShaderResource();
-				GLRenderTexture2DPtr res = boost::dynamic_pointer_cast<GLRenderTexture2D>(tex->Resource);
+				SurfaceView* tex = pDesc->ParamRef->GetDataAsShaderResource();
+				GLRenderTexture2D* res = (GLRenderTexture2D*)tex->Resource;
 				
 				if (pDesc->Type == GL_SAMPLER_CUBE)
 				{
@@ -1102,7 +1091,7 @@ namespace Disorder
 		return GL_NONE;
 	}
 
-	void* GLRenderEngine::Map(RenderBufferPtr const& buffer, BufferAccess bufferAccess)
+	void* GLRenderEngine::Map(RenderBuffer* buffer, BufferAccess bufferAccess)
 	{
 		if (buffer->GetBufferType() == RBT_Vertex)
 		{
@@ -1118,7 +1107,7 @@ namespace Disorder
 		}
 		else if (buffer->GetBufferType() == RBT_Constant)
 		{
-			GLRenderBufferPtr GLbuffer = boost::dynamic_pointer_cast<GLRenderBuffer>(buffer);
+			GLRenderBuffer* GLbuffer = (GLRenderBuffer*)buffer;
 			GLuint ubo = (GLuint)GLbuffer->GetHandle();
 			glBindBufferBase(GL_UNIFORM_BUFFER, GLbuffer->GetBindingPoint(), ubo);
 			return glMapBufferRange(GL_UNIFORM_BUFFER, 0, buffer->GetBufferSize(), GetBufferAccessFlag(bufferAccess));
@@ -1126,7 +1115,7 @@ namespace Disorder
 
 		return NULL;
 	}
-	void GLRenderEngine::UnMap(RenderBufferPtr const& buffer)
+	void GLRenderEngine::UnMap(RenderBuffer* buffer)
 	{
 		if (buffer->GetBufferType() == RBT_Vertex)
 		{
@@ -1142,14 +1131,14 @@ namespace Disorder
 		}
 		else if (buffer->GetBufferType() == RBT_Constant)
 		{
-			GLRenderBufferPtr GLbuffer = boost::dynamic_pointer_cast<GLRenderBuffer>(buffer);
+			GLRenderBuffer* GLbuffer = (GLRenderBuffer*)buffer;
 			GLuint ubo = (GLuint)GLbuffer->GetHandle();
 			glBindBufferBase(GL_UNIFORM_BUFFER, GLbuffer->GetBindingPoint(), ubo);
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 		}
 	}
 
-	void GLRenderEngine::UpdateSubresource(RenderBufferPtr const& buffer, void* pSrcData, unsigned int srcDataSize)
+	void GLRenderEngine::UpdateSubresource(RenderBuffer* buffer, void* pSrcData, unsigned int srcDataSize)
 	{
 		if (buffer->GetBufferType() == RBT_Vertex)
 		{
@@ -1165,7 +1154,7 @@ namespace Disorder
 		}
 		else if (buffer->GetBufferType() == RBT_Constant)
 		{
-			GLRenderBufferPtr GLbuffer = boost::dynamic_pointer_cast<GLRenderBuffer>(buffer);
+			GLRenderBuffer* GLbuffer = (GLRenderBuffer*)buffer;
 			GLuint ubo = (GLuint)GLbuffer->GetHandle();
 			glBindBufferBase(GL_UNIFORM_BUFFER, GLbuffer->GetBindingPoint(), ubo);
 			glBufferSubData(GL_UNIFORM_BUFFER, 0, srcDataSize, pSrcData);
@@ -1173,14 +1162,14 @@ namespace Disorder
 		
 	}
 
-	void GLRenderEngine::SaveSurfaceView(SurfaceViewPtr const& surface, std::string const& fileName)
+	void GLRenderEngine::SaveSurfaceView(SurfaceView* surface, std::string const& fileName)
 	{
 		// use glGetTexLevelParameterfv to get texture information, and then download texture use glGetTexImage
 		BOOST_ASSERT(0);
 	}
 
 
-	void GLRenderEngine::SetBlendState(BlendStatePtr const& blendState)
+	void GLRenderEngine::SetBlendState(BlendState* blendState)
 	{
 		if (CachedBlendState != blendState)
 		{
@@ -1227,7 +1216,7 @@ namespace Disorder
 		}
 	}
 
-	void GLRenderEngine::SetRasterizeState(RasterizeStatePtr const& rasterizeState)
+	void GLRenderEngine::SetRasterizeState(RasterizeState* rasterizeState)
 	{
 		if (CachedRasterizeState != rasterizeState)
 		{
@@ -1272,7 +1261,7 @@ namespace Disorder
 		}
 	}
 
-	void GLRenderEngine::SetDepthStencilState(DepthStencilStatePtr const& depthStencilState)
+	void GLRenderEngine::SetDepthStencilState(DepthStencilState* depthStencilState)
 	{
 		if (CachedDepthStencilState != depthStencilState)
 		{

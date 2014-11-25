@@ -16,12 +16,11 @@ namespace Disorder
 			_data = new float[length];
 		else if(PropertyType == eSP_Double )
 			_data = new double[length];
-		else if(PropertyType == eSP_ConstBuffer)
-			_data = new RenderBufferPtr;
-		else if( PropertyType == eSP_SampleState )
-			_data = new SamplerStatePtr;
-		else if( PropertyType == eSP_ShaderResource )
-			_data = new SurfaceViewPtr;
+		else if (PropertyType == eSP_ConstBuffer || PropertyType == eSP_SampleState || PropertyType == eSP_ShaderResource)
+		{
+			BOOST_ASSERT(length <= 1);
+			_data = NULL;
+		}
 		else
 			BOOST_ASSERT(0);
 	}
@@ -31,11 +30,11 @@ namespace Disorder
 		if( PropertyType == eSP_Int || PropertyType == eSP_Float || PropertyType == eSP_Double || PropertyType == eSP_Bool )
 			delete[] _data;
 		else if(PropertyType == eSP_ConstBuffer)
-			delete (RenderBufferPtr *)_data;
+			delete (RenderBuffer *)_data;
 		else if( PropertyType == eSP_SampleState )
-			delete (SamplerStatePtr *)_data;
+			delete (SamplerState *)_data;
 		else if( PropertyType == eSP_ShaderResource )
-			delete (SurfaceViewPtr *)_data;
+			delete (SurfaceView *)_data;
 		else
 			BOOST_ASSERT(0);
 	}
@@ -89,31 +88,24 @@ namespace Disorder
 		memcpy(_data,data,sizeof(double)*_length);
 	}
 
-	void ShaderProperty::SetData(RenderBufferPtr constBuffer)
+	void ShaderProperty::SetData(RenderBuffer* constBuffer)
 	{
 		BOOST_ASSERT(PropertyType == eSP_ConstBuffer);
-		*(RenderBufferPtr*)_data = constBuffer;
+		_data = constBuffer;
 	}
 
-	void ShaderProperty::SetData(SurfaceViewPtr shaderResource)
+	void ShaderProperty::SetData(SurfaceView* shaderResource)
 	{
 		BOOST_ASSERT(PropertyType == eSP_ShaderResource);
-		*(SurfaceViewPtr*)_data = shaderResource;
+		_data = shaderResource;
 	}
 
-	void ShaderProperty::SetData(SamplerStatePtr sample)
+	void ShaderProperty::SetData(SamplerState* sample)
 	{
 		BOOST_ASSERT(PropertyType == eSP_SampleState);
-		*(SamplerStatePtr*)_data = sample;
+		_data = sample;
 	}
-
-
-	ShaderPropertyPtr ShaderProperty::Create(EShaderProperty type,unsigned int length,std::string const& name)
-	{
-		ShaderProperty* pProperty = new ShaderProperty(type,length,name);
-		return ShaderPropertyPtr(pProperty);
-	}
-
+ 
 	void* ShaderProperty::GetData()
 	{
 		return _data;
@@ -137,22 +129,22 @@ namespace Disorder
 		return (double*)_data;
 	}
  
-	RenderBufferPtr ShaderProperty::GetDataAsConstBuffer()
+	RenderBuffer* ShaderProperty::GetDataAsConstBuffer()
 	{
 		BOOST_ASSERT(PropertyType == eSP_ConstBuffer );
-		return *(RenderBufferPtr*)_data;
+		return (RenderBuffer*)_data;
 	}
 
-	SurfaceViewPtr ShaderProperty::GetDataAsShaderResource()
+	SurfaceView* ShaderProperty::GetDataAsShaderResource()
 	{
 		BOOST_ASSERT(PropertyType == eSP_ShaderResource );
-		return *(SurfaceViewPtr*)_data;
+		return (SurfaceView*)_data;
 	}
 
-	SamplerStatePtr ShaderProperty::GetDataAsSampler()
+	SamplerState* ShaderProperty::GetDataAsSampler()
 	{
 		BOOST_ASSERT(PropertyType == eSP_SampleState );
-		return *(SamplerStatePtr*)_data;
+		return (SamplerState*)_data;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -257,7 +249,7 @@ namespace Disorder
 	const std::string ShaderPropertyManager::sScreenAATexture = "ScreenAATexture";
 	const std::string ShaderPropertyManager::sScreenAASampler = "ScreenAASampler";
 
-	ShaderPropertyPtr ShaderPropertyManager::GetProperty(std::string const& name)
+	ShaderProperty* ShaderPropertyManager::GetProperty(std::string const& name)
 	{
 		if( _shaderPropertyMap.find(name) != _shaderPropertyMap.end() )
 			return _shaderPropertyMap.at(name);
@@ -281,14 +273,14 @@ namespace Disorder
 
 	}
 
-	ShaderPropertyPtr ShaderPropertyManager::CreateProperty(std::string const& name,EShaderProperty type,unsigned int length)
+	ShaderProperty* ShaderPropertyManager::CreateProperty(std::string const& name,EShaderProperty type,unsigned int length)
 	{
 		if( _shaderPropertyMap.find(name) != _shaderPropertyMap.end() )
 			return _shaderPropertyMap.at(name);
 
-		ShaderPropertyPtr shaderProperty = ShaderProperty::Create(type,length,name);
+		ShaderProperty* shaderProperty = new ShaderProperty(type,length,name);
 
-		_shaderPropertyMap.insert(std::pair<std::string,ShaderPropertyPtr>(name,shaderProperty));
+		_shaderPropertyMap.insert(std::pair<std::string,ShaderProperty*>(name,shaderProperty));
 
 		return shaderProperty;
 	}

@@ -2,19 +2,13 @@
 
 namespace Disorder
 {
-	 InitialiseSingleton(World);
-
-	 WorldPtr World::Create()
-	 {
-		 World* pWorld = new World;
-		 return WorldPtr(pWorld);
-	 }
+	 World *GWorld = NULL;
 
 	 void World::Init()
 	 {
  
 		 // temp code to init a world		
-		 LevelPtr level = GEngine->SceneImporter->Import(GConfig->pSceneConfig->LevelName);
+		 Level* level = GEngine->SceneImporter->Import(GConfig->pSceneConfig->LevelName);
 
 		 if( GSceneManager->GetDefaultCamera() == NULL ) // create default camera
 		 {
@@ -32,37 +26,41 @@ namespace Disorder
 
 	 void World::Exit()
 	 {
-		 _Levels.empty();
+		 for (size_t i = 0; i < _levels.size(); i++)
+		 {
+			 delete _levels[i];
+		 }
+
+		 _levels.empty();
 	 }
  
 	 void World::Tick(float deltaSeconds)
 	 {
-		 LevelContainer::iterator iter;
-		 for(iter = _Levels.begin();iter!= _Levels.end();iter++)
+		 for (size_t i = 0; i < _levels.size(); i++)
 		 {
-			 (*iter)->Tick(deltaSeconds);
+			 _levels[i]->Tick(deltaSeconds);
 		 }
 	 }
 
-	 void World::AddLevel(LevelPtr const& level)
+	 void World::AddLevel(Level *level)
 	 {
-		 _Levels.push_back(level);
+		 _levels.push_back(level);
 	 }
 
-	 LevelPtr World::GetLevel()
+	 Level* World::GetLevel()
 	 {
-		 if(_Levels.size() > 0 )
-			 return *(_Levels.begin());
+		 if(_levels.size() > 0 )
+			 return _levels[0];
 
 		 return NULL;
 	 }
 
-	LevelPtr World::GetLevel(std::string const& name)
+	Level* World::GetLevel(std::string const& name)
 	{
-		 LevelContainer::iterator iter;
-		 for(iter = _Levels.begin();iter!= _Levels.end();iter++)
+		for (size_t i = 0; i < _levels.size();i++)
 		 {
-			 return *iter;
+			if (_levels[i]->Name == name)
+			   return _levels[i];
 		 }
 
 		 return NULL;

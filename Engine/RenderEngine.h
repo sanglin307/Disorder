@@ -24,29 +24,29 @@ namespace Disorder
 
 		virtual void CreateViewport(void *hWnd) = 0;
 
-		virtual void ClearRenderSurface(const RenderSurfacePtr& renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil,int sliceIndex = -1) = 0;
+		virtual void ClearRenderSurface(RenderSurface* renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil,int sliceIndex = -1) = 0;
  
 		virtual void SetViewport(float width, float height, float minDepth, float maxDepth, float topX, float topY) = 0;
 
-		virtual void SetRenderTarget(const RenderSurfacePtr& renderTarget,int sliceIndex = -1,bool useReadOnlyDepthStencil = false) = 0;
-		virtual void SetRenderLayout(RenderLayoutPtr const& renderLayout) = 0;
+		virtual void SetRenderTarget(RenderSurface* renderTarget,int sliceIndex = -1,bool useReadOnlyDepthStencil = false) = 0;
+		virtual void SetRenderLayout(RenderLayout* renderLayout) = 0;
 		virtual void SetPrimitiveTopology(TopologyType topologyType) = 0;
 
-		virtual void SetEffect(RenderEffectPtr const& effect) = 0;
+		virtual void SetEffect(RenderEffect* effect) = 0;
 		virtual void DrawIndexed(unsigned int indexCount,unsigned int startIndexLocation,int baseVertexLocation) = 0;
 		virtual void Draw(unsigned int vertexCount,unsigned int startVertexLocation) = 0;
 
-		virtual void* Map(RenderBufferPtr const& buffer,BufferAccess bufferAccess) = 0;
-		virtual void UnMap(RenderBufferPtr const& buffer) = 0;
-		virtual void UpdateSubresource(RenderBufferPtr const& buffer,void* pSrcData,unsigned int srcDataSize) = 0;
-		virtual void CopyTexture2D(RenderTexture2DPtr srcTexture, RenderTexture2DPtr dstTexture) = 0;
-		virtual void SaveSurfaceView(SurfaceViewPtr const& surface,std::string const& fileName){};
+		virtual void* Map(RenderBuffer* buffer,BufferAccess bufferAccess) = 0;
+		virtual void UnMap(RenderBuffer* buffer) = 0;
+		virtual void UpdateSubresource(RenderBuffer* buffer,void* pSrcData,unsigned int srcDataSize) = 0;
+		virtual void CopyTexture2D(RenderTexture2D* srcTexture, RenderTexture2D* dstTexture) = 0;
+		virtual void SaveSurfaceView(SurfaceView* surface,std::string const& fileName){};
 
-        BlendStatePtr CachedBlendState;
+        BlendState* CachedBlendState;
 		float CachedBlendFactor[4];
 		unsigned int CachedBlendSampleMask;
-        RasterizeStatePtr CachedRasterizeState;
-		DepthStencilStatePtr CachedDepthStencilState;
+        RasterizeState* CachedRasterizeState;
+		DepthStencilState* CachedDepthStencilState;
 		unsigned int CachedStencilRef;
 		TopologyType CachedTopology;
  
@@ -63,11 +63,13 @@ namespace Disorder
 
 	protected:
 
-		virtual void SetBlendState(BlendStatePtr const& blendState) = 0;
-		virtual void SetRasterizeState(RasterizeStatePtr const& rasterizeState)=0;
-		virtual void SetDepthStencilState(DepthStencilStatePtr const& depthStencilState) = 0;
+		virtual void SetBlendState(BlendState* blendState) = 0;
+		virtual void SetRasterizeState(RasterizeState* rasterizeState)=0;
+		virtual void SetDepthStencilState(DepthStencilState* depthStencilState) = 0;
 
 	};
+
+	extern RenderEngine* GRenderEngine;
  
 }
 

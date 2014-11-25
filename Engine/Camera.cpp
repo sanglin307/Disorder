@@ -3,18 +3,11 @@
 
 namespace Disorder
 {
- 
-	CameraSphereTargetUpdatePtr CameraSphereTargetUpdate::Create(float fRadius,const glm::vec3& target)
-	{
-		CameraSphereTargetUpdate *pTarget = new CameraSphereTargetUpdate(fRadius,target);
-		return CameraSphereTargetUpdatePtr(pTarget);
-	}
-
 	bool CameraSphereTargetUpdate::KeyboardEvent(Camera *pCamera,OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds)
 	{
 		if( key == OIS::KC_LMENU )
 		{
-			const InputManagerPtr inputManager = GEngine->GameClient->GetInputManager();
+			InputManager* inputManager = GClient->GetInputManager();
 			if( state == IS_Press )
 			{
 				_zoomPos = inputManager->GetMousePosWheel();
@@ -32,7 +25,7 @@ namespace Disorder
 
     bool CameraSphereTargetUpdate::MouseEvent(Camera *pCamera,MouseInputEvent const& mouseEvent,float deltaSeconds)
 	{
-		const InputManagerPtr inputManager = GEngine->GameClient->GetInputManager();
+		InputManager* inputManager = GClient->GetInputManager();
 		if( inputManager->IsKeyDown( OIS::KC_LMENU ) )
 		{
 			if( mouseEvent.buttonDown(OIS::MB_Right) )
@@ -64,9 +57,7 @@ namespace Disorder
 				float zAngle = 0.f;
 
 				float speed = GConfig->pCameraConfig->mFreeMode.RotateSpeed;
-
-			
-
+ 
 				Math::ConvertToSphericalCoord(pCamera->EyePos,_target,_radius,yAngle,zAngle);
  
 				if( mouseEvent.RelativeX != 0 && mouseEvent.buttonDown(OIS::MB_Left) )
@@ -177,7 +168,7 @@ namespace Disorder
 
 	bool CameraFirstPersonUpdate::Update(Camera *pCamera, float deltaSeconds)
 	{
-		const InputManagerPtr inputManager = GEngine->GameClient->GetInputManager();
+		InputManager* inputManager = GClient->GetInputManager();
 		float speed = GConfig->pCameraConfig->mFreeMode.MoveSpeed ;
 		if( inputManager->IsKeyDown(OIS::KC_W) )
 		{
@@ -218,16 +209,12 @@ namespace Disorder
 		return true;
 	}
 		 
-	CameraFirstPersonUpdatePtr CameraFirstPersonUpdate::Create()
-	{
-		CameraFirstPersonUpdate *pObject = new CameraFirstPersonUpdate;
-		return CameraFirstPersonUpdatePtr(pObject);
-	}
 
 	Camera::Camera(std::string const& name)
 		:Component(name,CT_Camera)
 	{
 
+		_updateStrategy = NULL;
 		ProjectMode = ePerspectiveCamera;
 		_nearPlane = GConfig->pCameraConfig->NearClip;
 		_farPlane = GConfig->pCameraConfig->FarClip;
@@ -334,11 +321,6 @@ namespace Disorder
 
 	}
 
-	CameraPtr Camera::Create(std::string const& name)
-	{
-		Camera *pCamera = new Camera(name);
-		return CameraPtr(pCamera);
-	}
 
 	bool Camera::KeyboardEvent(OIS::KeyCode key,unsigned int text, InputState state,float deltaSeconds)
 	{
@@ -370,15 +352,20 @@ namespace Disorder
 
 	void Camera::SetUpdateStrategy(ECameraUpdateStrategy mode)
 	{
- 
+		if (_updateStrategy != NULL)
+		{
+			delete _updateStrategy;
+			_updateStrategy = NULL;
+		}
+
 		_updateMode = mode;
 		if( _updateMode == eFirstPersonMode )
 		{
-			_updateStrategy = CameraFirstPersonUpdate::Create();
+			_updateStrategy = new CameraFirstPersonUpdate;
 		}
 		else if( _updateMode == eSphericalTargetMode )
 		{
-			_updateStrategy = CameraSphereTargetUpdate::Create(10,EyePos - Direction() * glm::vec3(10));
+			_updateStrategy = new CameraSphereTargetUpdate(10,EyePos - Direction() * glm::vec3(10));
 		}
 
 	}
@@ -395,10 +382,19 @@ namespace Disorder
 		} 
 	}
 
+	Camera::~Camera()
+	{
+		if (_updateStrategy != NULL)
+		{
+			delete _updateStrategy;
+			_updateStrategy = NULL;
+		}
+	}
+
 	void Camera::Update(float delta)
 	{
  
-		if( GSceneManager->GetDefaultCamera().get() != this )
+		if( GSceneManager->GetDefaultCamera() != this )
 			return;
  
 		if(_updateStrategy != NULL )

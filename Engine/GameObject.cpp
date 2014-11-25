@@ -7,12 +7,6 @@ namespace Disorder
 		_vComponents.clear();
 	}
 
-	GameObjectPtr GameObject::Create(std::string const& name, glm::vec3 const& pos, glm::quat const& rot, glm::vec3 const& scale)
-	{
-		GameObject *pGo = new GameObject(name,pos,rot,scale);
-		return GameObjectPtr(pGo);
-	}
-
 	GameObject::GameObject(std::string const& name, glm::vec3 const& pos, glm::quat const& rot, glm::vec3 const& scale)
 		:Name(name)
 	{
@@ -39,7 +33,7 @@ namespace Disorder
 		_propertyManager->UpdateShaderProperty();
 	}
 
-	 ComponentPtr GameObject::GetComponent(std::string const& name) const
+	 const Component* GameObject::GetComponent(std::string const& name) const
 	 {
 		 for(size_t i=0;i<_vComponents.size();i++)
 		 {
@@ -50,13 +44,13 @@ namespace Disorder
 		 return NULL;
 	 }
  
-	void GameObject::AddComponent(ComponentPtr const& component)
+	void GameObject::AddComponent(Component* component)
 	{
 		_vComponents.push_back(component);
-		component->SetBase(shared_from_this());
+		component->SetBase(this);
 		if( component->ComponentType == CT_Renderer )
 		{
-			GeometryRendererPtr renderer = boost::dynamic_pointer_cast<GeometryRenderer>(component);
+			GeometryRenderer* renderer = (GeometryRenderer*)component;
 			if( renderer != NULL )
 				GSceneManager->AddRenderer(renderer);
 			else
@@ -64,7 +58,7 @@ namespace Disorder
 		}
 		else if( component->ComponentType == CT_Light )
 		{
-			LightPtr light = boost::dynamic_pointer_cast<Light>(component);
+			Light* light = (Light*)component;
 			if( light != NULL )
 				GSceneManager->AddLight(light);
 			else
@@ -72,7 +66,7 @@ namespace Disorder
 		}
 		else if( component->ComponentType == CT_Camera )
 		{
-			CameraPtr camera = boost::dynamic_pointer_cast<Camera>(component);
+			Camera* camera = (Camera*)component;
 			if( camera != NULL )
 				GSceneManager->AddCamera(camera);
 			else 
@@ -88,7 +82,7 @@ namespace Disorder
 		{
 			if (_vComponents[i]->ComponentType == CT_Light)
 			{
-				LightPtr light = boost::dynamic_pointer_cast<Light>(_vComponents[i]);
+				Light* light = (Light*)_vComponents[i];
 				if (light->LightType == LT_Point)
 				{
 					static glm::vec3 vDir(1.0, 0.0, 1.0);
@@ -114,7 +108,7 @@ namespace Disorder
 		}
 	}
 
-	GameObjectPtr GameObject::GetChild(std::string const& name)
+	const GameObject* GameObject::GetChild(std::string const& name)
 	{
 	    if( _mapChildren.find(name) != _mapChildren.end() )
 			return _mapChildren[name];
@@ -176,17 +170,16 @@ namespace Disorder
  
 	void GameObject::RefreshWorldTransform()
 	{
-		GameObjectPtr parent = _parent.lock();
-		if(parent != NULL )
+		if(_parent != NULL )
 		{
-			const glm::quat& parentRot = parent->GetWorldRotation();
-			const glm::vec3& parentScale = parent->GetWorldScale();
+			const glm::quat& parentRot = _parent->GetWorldRotation();
+			const glm::vec3& parentScale = _parent->GetWorldScale();
 
 			_wldRot = parentRot * _locRot;
 			_wldScale = parentScale / _locScale;
 		 
 			_wldPos = parentRot * ( parentScale * _locPos);
-			_wldPos += parent->GetWorldPosition();
+			_wldPos += _parent->GetWorldPosition();
 		}
 		else
 		{
@@ -200,12 +193,12 @@ namespace Disorder
 		{
 			if (_vComponents[i]->ComponentType == CT_Renderer)
 			{
-				GeometryRendererPtr renderer = boost::dynamic_pointer_cast<GeometryRenderer>(_vComponents[i]);
+				GeometryRenderer* renderer = (GeometryRenderer*)_vComponents[i];
 				renderer->UpdateBoundingBox();
 			}
 		}
 
-		for(std::map<std::string,GameObjectPtr>::const_iterator iter=_mapChildren.begin();iter != _mapChildren.end();iter++)
+		for(std::map<std::string,GameObject*>::const_iterator iter=_mapChildren.begin();iter != _mapChildren.end();iter++)
 		{
 			iter->second->RefreshWorldTransform();
 		}
@@ -236,10 +229,9 @@ namespace Disorder
 	
 	void GameObject::WorldTranslate(const glm::vec3& delta)
 	{
-		GameObjectPtr parent = _parent.lock();
-		if( parent )
+		if( _parent )
 		{
-			_locPos += (glm::conjugate(parent->GetWorldRotation()) * delta) / parent->GetWorldScale();
+			_locPos += (glm::conjugate(_parent->GetWorldRotation()) * delta) / _parent->GetWorldScale();
 		}
 		else
 			_locPos += delta;
@@ -270,10 +262,9 @@ namespace Disorder
 
 	void GameObject::SetWorldPosition(glm::vec3 const& position)
 	{
-		GameObjectPtr parent = _parent.lock();
-		if( parent )
+		if( _parent )
 		{
-			SetLocalPosition(parent->WorldToLocalPosition(position));
+			SetLocalPosition(_parent->WorldToLocalPosition(position));
 		}
 		else
 			SetLocalPosition(position);
@@ -281,23 +272,22 @@ namespace Disorder
 
 	void GameObject::SetWorldRotation(glm::quat const& rot)
 	{
-		GameObjectPtr parent = _parent.lock();
-		if( parent )
+		if( _parent )
 		{
-			SetLocalRotation(parent->WorldToLocalRotation(rot));
+			SetLocalRotation(_parent->WorldToLocalRotation(rot));
 		}
 		else
 			SetLocalRotation(rot);
 	}
 
-	void GameObject::AddChild(GameObjectPtr const& child)
+	void GameObject::AddChild(GameObject* child)
 	{
 		AddChild(child,child->GetLocalPosition(),child->GetLocalRotation(),child->GetLocalScale());
 	}
 
-	void GameObject::AddChild(GameObjectPtr const& child, glm::vec3 const& pos, glm::quat const& rot, glm::vec3 const& scale)
+	void GameObject::AddChild(GameObject* child, glm::vec3 const& pos, glm::quat const& rot, glm::vec3 const& scale)
 	{
-		child->SetParent(shared_from_this());
+		child->SetParent(this);
 		child->SetLocalPosition(pos);
 		child->SetLocalRotation(rot);
 		child->SetLocalScale(scale);

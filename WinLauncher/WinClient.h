@@ -4,63 +4,34 @@
 
 namespace Disorder
 {
-	 class WindowsViewport : public Viewport
+	 class WinViewport : public Viewport
 	 {
 	 public:
-		
-		 static WindowsViewportPtr Create(int sizeX,int sizeY,void* hWnd);
-
+		 WinViewport(int sizeX, int sizeY, void* hWnd);
 		 virtual void Render();
-
 		 virtual inline void* GetWindow()
 		 {
 			 return _window;
 		 }
 
-	 private:
+		 bool MessageProcess(HWND hWnd, UINT Message, UINT wParam, LONG lParam);
 
-		 WindowsViewport(int sizeX,int sizeY,void* hWnd);
+	 private:
 		 HWND _window;
 	 };
-	
-
-
-	class FinderViewport
-	{
-	public:
-		FinderViewport(void* hWnd):_hWnd(hWnd)
-		{
-		}
-
-		bool inline operator()(ViewportPtr const& viewport)
-		{
-			if(viewport->GetWindow() == _hWnd)
-				return true;
-
-			return false;
-		}
-	private:
-		void * _hWnd;
-	};
  
 	class WinClient : public Client
 	{
 	public:
-
 		virtual void Init();
 		virtual void Tick(float delta);
 		virtual void Exit();
 		virtual void Close();
 		void ProcessInput(float delta);
-
-		static WinClientPtr Create();
-
 	protected:
 		virtual void CreateViewport(int sizeX,int sizeY,void* hWnd);
-
 	    static LONG APIENTRY StaticWndProc( HWND hWnd, UINT Message, UINT wParam, LONG lParam );
-
-		WinClient(){}
+		bool MessageProcess(HWND hWnd, UINT Message, UINT wParam, LONG lParam);
 	
 	};
 

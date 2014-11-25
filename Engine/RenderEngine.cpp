@@ -2,6 +2,8 @@
 
 namespace Disorder
 {
+	RenderEngine* GRenderEngine = NULL;
+
 	void RenderEngine::ComputePixelColorAlphaSize(PixelFormat format, int& colorSize, int& alphaSize)
 	{
 		colorSize = 0;

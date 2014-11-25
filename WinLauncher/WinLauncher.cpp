@@ -1,5 +1,7 @@
 #include "WinLauncher.h"
 
+using namespace Disorder;
+
 HINSTANCE GAppInstance;
 
 void AppPeekMessage()
@@ -12,44 +14,72 @@ void AppPeekMessage()
 	}
 }
 
+void CreateRenderEngine()
+{
+	if (GConfig->pRenderConfig->RenderEngine == Disorder::RET_DirectX)
+	{
+		GRenderEngine = new DX11RenderEngine;
+		GRenderResourceMgr = new DX11RenderResourceManager;
+	}
+	else if (GConfig->pRenderConfig->RenderEngine == Disorder::RET_OpenGL)
+	{
+		GRenderEngine = new GLRenderEngine;
+		GRenderResourceMgr = new GLRenderResourceManager;
+	}
+	else
+	{
+		BOOST_ASSERT(0);
+	}
+}
+
  void InitGame()
  {
-	 //set environment
+	GMainLoop = new MainLoop;
+
 	TCHAR exeFullPath[MAX_PATH]; // MAX_PATH
-    GetModuleFileName(NULL,exeFullPath,MAX_PATH);//
+	GetModuleFileName(NULL, exeFullPath, MAX_PATH);//
 	std::wstring fullPath = exeFullPath;
 	boost::to_lower(fullPath);
 	std::wstring fstr(TEXT("disorder"));
 	int pos = fullPath.find(fstr);
-	fullPath = fullPath.substr(0,pos+fstr.size());	
-	Disorder::GConfig->sRootPath = boost::locale::conv::from_utf(fullPath,"UTF-8");
-	Disorder::GConfig->sConfigPath = Disorder::GConfig->sRootPath + "\\Config\\";
-	Disorder::GConfig->sLogPath = Disorder::GConfig->sRootPath + "\\Log\\";
-	Disorder::GConfig->sResourceFBXPath = Disorder::GConfig->sRootPath + "\\Resource\\Fbx\\";
-	Disorder::GConfig->sResourceFXPath = Disorder::GConfig->sRootPath + "\\Resource\\FX\\";
-	Disorder::GConfig->sResourceTexPath = Disorder::GConfig->sRootPath + "\\Resource\\Texture\\";
-	Disorder::GConfig->sResourceFontPath = Disorder::GConfig->sRootPath + "\\Resource\\Font\\";
-	Disorder::GConfig->Load();
- 
-	Disorder::GEngine->GameClient = Disorder::WinClient::Create();
+	fullPath = fullPath.substr(0, pos + fstr.size());
+	GConfig = new Config(boost::locale::conv::from_utf(fullPath, "UTF-8"));
+    
+	GEngine = new Engine;
+	GClient = new WinClient;
 
-	if( Disorder::GConfig->pRenderConfig->RenderEngine == Disorder::RET_DirectX )
-	{
-		Disorder::GEngine->RenderEngine = Disorder::DX11RenderEngine::Create();
-	    Disorder::GEngine->RenderResourceMgr = Disorder::DX11RenderResourceManager::Create();
-	    
-	}
-	else if( Disorder::GConfig->pRenderConfig->RenderEngine == Disorder::RET_OpenGL )
-	{
-		Disorder::GEngine->RenderEngine = Disorder::GLRenderEngine::Create();
-	    Disorder::GEngine->RenderResourceMgr = Disorder::GLRenderResourceManager::Create();
-	}
+	CreateRenderEngine();
 
-	Disorder::GEngine->RenderSurfaceCache = Disorder::RenderSurfaceCache::Create();
+	GMainLoop->Init();
+	GEngine->Init();
+	GClient->Init();
+ }
 
-	Disorder::GEngine->SceneImporter = Disorder::FbxSceneImporter::Create();
-	Disorder::GMainLoop->Init();
+ void ExitGame()
+ {
+	 GRenderEngine->Exit();
+	 GRenderResourceManager->Exit();
+	 GClient->Exit();
+	 GEngine->Exit();
+	 GMainLoop->Exit();
 
+	 delete GRenderEngine;
+	 GRenderEngine = NULL;
+
+	 delete GRenderResourceManager;
+	 GRenderResourceManager = NULL;
+
+	 delete GClient;
+	 GClient = NULL;
+
+	 delete GEngine;
+	 GEngine = NULL;
+
+	 delete GMainLoop;
+	 GMainLoop = NULL;
+
+	 delete GConfig;
+	 GConfig = NULL;
  }
 
 int WINAPI WinMain( HINSTANCE hInInstance, HINSTANCE hPrevInstance, char*, INT nCmdShow )
@@ -58,13 +88,13 @@ int WINAPI WinMain( HINSTANCE hInInstance, HINSTANCE hPrevInstance, char*, INT n
 
 	InitGame();
 		
-    while( !Disorder::GIsRequestingExit )
+    while( !GIsRequestingExit )
 	{
-	    Disorder::GMainLoop->Tick();
+	    GMainLoop->Tick();
 		AppPeekMessage();
 	}
 
-	Disorder::GMainLoop->Exit();
+	ExitGame();
  
 	return 0;
 }

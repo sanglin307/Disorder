@@ -3,16 +3,9 @@
 namespace Disorder
 {
 	/////////////////////////////////////////////////////////////////////////
-	GeometryPtr Geometry::Create(std::string const& name)
-	{
-		Geometry *pGeometry = new Geometry();
-		pGeometry->Name = name;
-		return GeometryPtr(pGeometry);
 
-	}
-
-	Geometry::Geometry()
-		:CastShadow(true)
+	Geometry::Geometry(std::string const& name)
+		:Name(name),CastShadow(true)
 	{
 
 	}
@@ -28,9 +21,9 @@ namespace Disorder
 	//////////////////////////////////////////////////////////////////////////
 	
 
-	GeometryPtr GeometryGenerator::CreateCube(float length)
+	Geometry* GeometryGenerator::CreateCube(float length)
 	{
-		GeometryPtr geometry = Geometry::Create("DefaultCube");
+		Geometry* geometry = new Geometry("DefaultCube");
 		geometry->PrimitiveType = TT_TriangleList;
 
         //0

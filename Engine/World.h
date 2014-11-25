@@ -1,36 +1,24 @@
 #ifndef _DISORDER_WORLD_H_
 #define _DISORDER_WORLD_H_
 
-
-
-
 namespace Disorder
 {
-	class World : public Singleton<World>
+	class World
 	{
-		friend class Singleton<World>;
-
-		typedef std::list<LevelPtr> LevelContainer;
 	public:
 		void Init();
 		void Exit();
 		void Tick(float deltaSeconds);
 
-		void AddLevel(LevelPtr const& level);
-		LevelPtr GetLevel(); // the top level;
-		LevelPtr GetLevel(std::string const& name);
-		
-
-	protected:
-		static WorldPtr Create();
+		void AddLevel(Level *level);
+		Level* GetLevel(); // the top level;
+		Level* GetLevel(std::string const& name);
 
 	private:
-
-		World(){};
-		LevelContainer _Levels;
+		std::vector<Level*> _levels;
 	};
 
-    #define GWorld World::GetSingleton()
+	extern World* GWorld;
 
 }
 
