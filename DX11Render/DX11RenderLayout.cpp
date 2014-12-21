@@ -50,18 +50,7 @@ namespace Disorder
 		ID3DBlob* shaderData = (ID3DBlob*)(vertexShader->GetDataInterface());
 		BOOST_ASSERT(shaderData != NULL );
 
-		//cached layout interface
-		std::wstring hashKey;
-		Math::HashBuffer(vElementDes.data(), sizeof(D3D11_INPUT_ELEMENT_DESC)* vElementDes.size(), hashKey);
-		DX11RenderResourceManager* mgr = (DX11RenderResourceManager*)GEngine->RenderResourceMgr;
-		ID3D11InputLayout* cacheLayout = mgr->GetRenderLayout(hashKey);
-		if (cacheLayout != NULL)
-		{
-			D3DInterface = cacheLayout;
-			return;
-		}
-
-		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine; 
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GRenderEngine; 
  
 		// Create the input layout
 		ID3D11InputLayout* pInputLayout = NULL;
@@ -74,10 +63,7 @@ namespace Disorder
 			return;
 		}
 
-		
-
 		D3DInterface = pInputLayout;
-		mgr->UpdateRenderLayout(hashKey, D3DInterface);
 	}
 
 	DXGI_FORMAT DX11RenderLayout::GetInputFormat(D3D_REGISTER_COMPONENT_TYPE component,BYTE mask)

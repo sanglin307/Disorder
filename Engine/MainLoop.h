@@ -7,14 +7,13 @@ namespace Disorder
 	class MainLoop
 	{ 
 	public:
-		 
-		void Init();
-		void Exit();	 
+		MainLoop();
+		~MainLoop();
 		void Tick();
 		void CalculateTimeDelta();
 	};
 
-	extern MainLoop* GMainLoop;
+	
 }
 
 

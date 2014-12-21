@@ -4,10 +4,14 @@ namespace Disorder
 {
 	MainLoop *GMainLoop = NULL;
  
-	void MainLoop::Init()
+	MainLoop::MainLoop()
 	{
 		GameTime::Init();
-		GEngine->Init();
+	}
+
+	MainLoop::~MainLoop()
+	{
+
 	}
  
 	void MainLoop::CalculateTimeDelta()
@@ -41,9 +45,5 @@ namespace Disorder
 		GEngine->Tick((float)GameTime::FrameDelta);
 	}
 
-	void MainLoop::Exit()
-	{
-		GEngine->Exit();
-	}
 
 }

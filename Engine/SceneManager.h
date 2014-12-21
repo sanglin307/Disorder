@@ -95,7 +95,7 @@ namespace Disorder
 
 	};
 
-	extern SceneManager* GSceneManager;
+	
 }
 
 

@@ -4,8 +4,6 @@
 
 namespace Disorder
 {
-	class Client;
-
 	class EngineStat
 	{
 	public:
@@ -55,8 +53,6 @@ namespace Disorder
 	class Engine 
 	{
 	public:
-		void Init();
-		void Exit();
 
 		int GetMaxTickRate(float delta) { return 0;}
 		void Tick(float deltaSeconds);
@@ -65,15 +61,11 @@ namespace Disorder
 		~Engine();
 
 	public :
-		Canvas* GameCanvas;
-		Console* GameConsole;
-		SceneImporter* SceneImporter;
-		RenderSurfaceCache* SurfaceCache;
 	    EngineStat Stat;
-		FileSystem* FileManager;
+		
 	};
 
-	extern Engine *GEngine;
+	
 
 }
 

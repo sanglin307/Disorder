@@ -15,14 +15,9 @@ namespace Disorder
 	{
 	public:
 		virtual ~RenderEngine(){};
-
-		virtual void Init() = 0;
-		virtual void Exit() = 0;
 		
 		virtual void OnFrameBegin(){};
 		virtual void OnFrameEnd(){};
-
-		virtual void CreateViewport(void *hWnd) = 0;
 
 		virtual void ClearRenderSurface(RenderSurface* renderSurface, const glm::vec4& color, bool bClearDepth, float depth, bool bClearStencil, unsigned char stencil,int sliceIndex = -1) = 0;
  
@@ -69,7 +64,7 @@ namespace Disorder
 
 	};
 
-	extern RenderEngine* GRenderEngine;
+	
  
 }
 

@@ -34,6 +34,11 @@ namespace Disorder
 			return _imageSpec;
 		}
 
+		const std::string& GetName() const
+		{
+			return _name;
+		}
+
 		const BYTE* GetImageData() const
 		{
 			return _pPixelRawData;
@@ -49,7 +54,7 @@ namespace Disorder
 			return _resource;
 		}
  
-		static Image* Create(EImageType type,int width, int height, PixelFormat format, BYTE* pData, unsigned int dataSize);
+		Image(const std::string& name,EImageType type,int width, int height, PixelFormat format, BYTE* pData, unsigned int dataSize);
 	 
 		~Image();
 
@@ -57,13 +62,11 @@ namespace Disorder
 		static unsigned int GetJpgFormat(PixelFormat format);
 
 	protected:
-		
-
-		Image(ImageSpec const& spec, BYTE *pPixels, unsigned int size);
 	
 		ImageSpec _imageSpec;
 		BYTE* _pPixelRawData; 
 		RenderTexture2D* _resource;
+		std::string _name;
 	};
 
 	class ImageManager  

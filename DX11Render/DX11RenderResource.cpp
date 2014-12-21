@@ -25,7 +25,7 @@ namespace Disorder
 		bd.BindFlags = _bindFlags;
 		GetD3DFlags(pData,bd.Usage,bd.CPUAccessFlags,bd.MiscFlags);
 
-		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine; 
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GRenderEngine; 
 		 
 		ID3D11Buffer *pBuffer = NULL;
 
@@ -328,7 +328,7 @@ namespace Disorder
 		if (arraySize == 6 && (flag & SF_AsCubeMap))
 			desc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
 
-		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine; 
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GRenderEngine; 
 
 		ID3D11Texture2D* pTex2D = NULL;
 		if( pData != NULL )

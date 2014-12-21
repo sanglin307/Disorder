@@ -5,18 +5,16 @@ namespace Disorder
 {
 	class DX11RenderResourceManager : public RenderResourceManager
 	{
-		typedef boost::unordered_map<std::wstring, ID3D11InputLayout*> RenderLayoutMap;
-
 	public :
-		virtual RenderLayout* CreateRenderLayout(RenderEffect* renderEffect,TopologyType topologyType,bool soloBuffer);
+		virtual RenderLayout* CreateRenderLayout(RenderEffect* renderEffect, TopologyType topologyType, bool soloBuffer);
 		virtual ShaderObject* CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel,std::string const& entryPoint);
 		virtual RenderBuffer* CreateBuffer(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint = 0);
 
 		virtual void CreateBufferArray(const std::string& bufferName, Geometry* data, BufferUsage bufferUsage, RenderEffect* renderEffect, std::vector<RenderBuffer*> & bufferArray);
 		
-		virtual RenderTexture2D* CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag);
-		virtual RenderTexture2D* CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample, Image* image);
-		virtual RenderTexture2D* CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<Image*>& image, unsigned int flag);
+		virtual RenderTexture2D* CreateTexture2D(const std::string& name, SamplerState* sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag);
+		virtual RenderTexture2D* CreateTexture2D(const std::string& name, SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample, Image* image);
+		virtual RenderTexture2D* CreateTexture2D(const std::string& name, SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<Image*>& image, unsigned int flag);
 
 		virtual RenderEffect* CreateRenderEffect();
 		virtual SurfaceView* CreateSurfaceView(ESurfaceViewType type, RenderTexture* resource, PixelFormat Format, unsigned int Flag = 0);
@@ -28,12 +26,6 @@ namespace Disorder
 		virtual BlendState* CreateBlendState(BlendDesc *pBlendDescArray,int BlendArraySize,bool AlphaToCoverageEnable = false,bool IndependentBlendEnable = false);
 
 		virtual void RegisterPropertyManager(std::string const& name);
-	 
-		void UpdateRenderLayout(const std::wstring& hashKey, ID3D11InputLayout* layout);
-		ID3D11InputLayout* GetRenderLayout(const std::wstring& hashKey);
-
-	private:
-		RenderLayoutMap _renderLayoutMap;
 	
 	};
 }

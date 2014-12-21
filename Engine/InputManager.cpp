@@ -82,7 +82,7 @@ namespace Disorder
 		mouseEvent.RelativeZ = s.Z.rel;
 		mouseEvent.buttons = s.buttons;
 
-		GEngine->GameClient->AddMouseEvent(mouseEvent);
+		GClient->AddMouseEvent(mouseEvent);
 
 		return true;
 	}

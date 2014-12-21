@@ -19,7 +19,7 @@ namespace Disorder
 
 		_worldMatrix = glm::translate(_wldPos) * glm::scale(_wldScale) * glm::toMat4(_wldRot);
 
-		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerObject);
+		_propertyManager = GRenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerObject);
 		_worldMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sObjectWorld,eSP_Float,16);	
 		_worldNormalMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sObjectNormal,eSP_Float,16);
 	}

@@ -23,9 +23,9 @@ namespace Disorder
 	class WinClient : public Client
 	{
 	public:
-		virtual void Init();
+		WinClient();
+		~WinClient();
 		virtual void Tick(float delta);
-		virtual void Exit();
 		virtual void Close();
 		void ProcessInput(float delta);
 	protected:

@@ -164,8 +164,21 @@ namespace Disorder
 			else
 			{
 				std::string strFilePath = GConfig->ResourceFXPath + "HLSL\\" + std::string(pFileName);
-				FileObject* fileptr = GEngine->FileManager->OpenTextFile(strFilePath, eF_Read);
-		        std::string shaderContent = fileptr->ReadText();
+				FILE* fileHandle;
+				if (fopen_s(&fileHandle, strFilePath.c_str(), "rt"))
+				{
+					BOOST_ASSERT(0);
+					return S_FALSE;
+				}
+				
+				std::string shaderContent;
+				char buff[65535];
+				while (fgets(buff, 65535, fileHandle) != NULL)
+				{
+					shaderContent += buff;
+				}
+				fclose(fileHandle);
+		      
 				ShaderObject::sMapIncludeFiles.insert(std::pair<std::string,std::string>(pFileName,shaderContent));
 				length = shaderContent.length();
 				pData = new char[shaderContent.length() + 1];

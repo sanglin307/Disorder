@@ -8,10 +8,7 @@ namespace Disorder
 	public:
         Client();
 		virtual ~Client();
-		virtual void Init();
 		virtual void Tick(float delta);
-		virtual void Exit();
-
 		virtual void Close(){};
 
 		void AddKeyboardEvent(KeyboardInputEvent const& keyEvent);
@@ -19,7 +16,6 @@ namespace Disorder
 
 		void AddInputListener(InputListener* listener);
 		void ReleaseInputListener(InputListener* listener);
-		void ReleaseAllInputListener();
 
 		inline Viewport* const& GetViewport(unsigned int Index)
 		{
@@ -44,7 +40,7 @@ namespace Disorder
 
 	};
 
-	extern Client* GClient;
+	
 }
  
 

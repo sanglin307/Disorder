@@ -7,16 +7,6 @@ namespace Disorder
 	Client::Client()
 	{
 	}
-	
-	Client::~Client()
-	{
-		ReleaseAllInputListener();
-	}
-
-	void Client::Init()
-	{
- 
-	}
 
 	void Client::Tick(float delta)
 	{
@@ -26,7 +16,7 @@ namespace Disorder
 	{
 	}
 
-	void Client::Exit()
+	Client::~Client()
 	{
 		for (size_t i = 0; i < _viewports.size(); i++)
 		{
@@ -34,9 +24,13 @@ namespace Disorder
 		}
 		_viewports.empty();
 
+		delete _inputManager;
 		_inputManager = NULL;
+
 		_keyboardEvents.empty();
 		_mouseEvents.empty();
+
+		// we don't delete the obj of inputlistenner,other place will delete it!
 	    _inputListenerList.empty();
 	}
  
@@ -85,11 +79,6 @@ namespace Disorder
 			return;
  
 		_inputListenerList.remove(listener);
-	}
-
-	void Client::ReleaseAllInputListener()
-	{
-		_inputListenerList.clear();
 	}
   
 }

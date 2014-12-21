@@ -5,7 +5,7 @@ namespace Disorder
 {
 	void GLDebugLayer::Init()
 	{
-		GLRenderEngine* engine = (GLRenderEngine*)GEngine->RenderEngine;
+		GLRenderEngine* engine = (GLRenderEngine*)GRenderEngine;
 		if (engine->IsVersionSupported(4, 3))
 		{
 			glDebugMessageCallback(DebugCallback, this);
@@ -498,19 +498,19 @@ namespace Disorder
 
 	void GLRenderEngine::CreateMainTarget()
 	{
-		RenderTexture2D* depthStencilTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil,1, NULL,0);
-		SurfaceView* DepthBufferView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, depthStencilTex, GConfig->pRenderConfig->DepthStencilFormat, 0);
+		RenderTexture2D* depthStencilTex = GRenderResourceMgr->CreateTexture2D("DepthStencilTex",NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil,1, NULL,0);
+		SurfaceView* DepthBufferView = GRenderResourceMgr->CreateSurfaceView(SV_DepthStencil, depthStencilTex, GConfig->pRenderConfig->DepthStencilFormat, 0);
  
-		RenderTexture2D* mainTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->ColorFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_RenderTarget ,1, NULL,0);
-		SurfaceView* mainTargetView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, mainTex, GConfig->pRenderConfig->ColorFormat);
-		SurfaceView* shaderView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, mainTex, GConfig->pRenderConfig->ColorFormat);
+		RenderTexture2D* mainTex = GRenderResourceMgr->CreateTexture2D("MainTargetTex",NULL, GConfig->pRenderConfig->ColorFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_RenderTarget ,1, NULL,0);
+		SurfaceView* mainTargetView = GRenderResourceMgr->CreateSurfaceView(SV_RenderTarget, mainTex, GConfig->pRenderConfig->ColorFormat);
+		SurfaceView* shaderView = GRenderResourceMgr->CreateSurfaceView(SV_ShaderResource, mainTex, GConfig->pRenderConfig->ColorFormat);
 
 		std::map<ESurfaceLocation, SurfaceView*> viewMap;
 		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_DepthStencil, DepthBufferView));
 		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_RenderTarget1, mainTargetView));
-		RenderSurface* mainSurface = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
+		RenderSurface* mainSurface = GRenderResourceMgr->CreateRenderSurface(viewMap);
 
-		GEngine->SurfaceCache->MainTarget = new MainRenderTarget(mainSurface, shaderView, mainTargetView, DepthBufferView);
+		GRenderSurface->MainTarget = new MainRenderTarget(mainSurface, shaderView, mainTargetView, DepthBufferView);
 	}
 
  
@@ -598,8 +598,21 @@ namespace Disorder
 					filekey[i] = '/';
 			}
 
-			FileObject* file = GEngine->FileManager->OpenTextFile(path, eF_Read);
-			std::string content = file->ReadText();
+			FILE* fileHandle;
+			if (fopen_s(&fileHandle, path.c_str(), "rt"))
+			{
+				BOOST_ASSERT(0);
+				return;
+			}
+
+			std::string content;
+			char buff[65535];
+			while (fgets(buff, 65535, fileHandle) != NULL)
+			{
+				content += buff;
+			}
+			fclose(fileHandle);
+
 			if (ShaderObject::sMapIncludeFiles.find(filekey) == ShaderObject::sMapIncludeFiles.end())
 			{
 				ShaderObject::sMapIncludeFiles.insert(std::pair<std::string, std::string>(filekey, content));
@@ -836,7 +849,7 @@ namespace Disorder
 		//blit
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 		glDrawBuffer(GL_BACK);
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLint)GEngine->SurfaceCache->MainTarget->RenderTargetSurface->GetHandle());
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, (GLint)GRenderSurface->MainTarget->RenderTargetSurface->GetHandle());
 		glReadBuffer(GL_COLOR_ATTACHMENT0);
 
 		GLint SizeX = GConfig->pRenderConfig->SizeX;

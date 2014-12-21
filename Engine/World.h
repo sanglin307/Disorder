@@ -6,8 +6,8 @@ namespace Disorder
 	class World
 	{
 	public:
-		void Init();
-		void Exit();
+		World();
+		~World();
 		void Tick(float deltaSeconds);
 
 		void AddLevel(Level *level);
@@ -18,7 +18,7 @@ namespace Disorder
 		std::vector<Level*> _levels;
 	};
 
-	extern World* GWorld;
+
 
 }
 

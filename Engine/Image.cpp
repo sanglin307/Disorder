@@ -36,11 +36,11 @@ namespace Disorder
 			{
 				if (desc != NULL)
 				{
-					SamplerState* sampler = GEngine->RenderResourceMgr->CreateSamplerState(desc);
-					img->SetResource(GEngine->RenderResourceMgr->CreateTexture2D(sampler, img->GetSpec().format, false, img));
+					SamplerState* sampler = GRenderResourceMgr->CreateSamplerState(desc);
+					img->SetResource(GRenderResourceMgr->CreateTexture2D(fileName,sampler, img->GetSpec().format, false, img));
 				}
 				else
-				    img->SetResource(GEngine->RenderResourceMgr->CreateTexture2D(NULL, img->GetSpec().format, false, img));
+				    img->SetResource(GRenderResourceMgr->CreateTexture2D(fileName,NULL, img->GetSpec().format, false, img));
 			}
 
 			return img;
@@ -52,11 +52,11 @@ namespace Disorder
 			{
 				if (desc != NULL)
 				{
-					SamplerState* sampler = GEngine->RenderResourceMgr->CreateSamplerState(desc);
-					img->SetResource(GEngine->RenderResourceMgr->CreateTexture2D(sampler, img->GetSpec().format, false, img));
+					SamplerState* sampler = GRenderResourceMgr->CreateSamplerState(desc);
+					img->SetResource(GRenderResourceMgr->CreateTexture2D(fileName,sampler, img->GetSpec().format, false, img));
 				}
 				else
-					img->SetResource(GEngine->RenderResourceMgr->CreateTexture2D(NULL, img->GetSpec().format, false, img));
+					img->SetResource(GRenderResourceMgr->CreateTexture2D(fileName,NULL, img->GetSpec().format, false, img));
 			}
 
 			return img;
@@ -111,7 +111,7 @@ namespace Disorder
 
 			if (buffer != NULL && png_image_finish_read(&image, NULL, buffer, 0, NULL))
 			{
-				Image* imagePtr = Image::Create(eIT_PNG, image.width, image.height, PF_R8G8B8A8_TYPELESS, buffer, size);
+				Image* imagePtr = new Image(fileName,eIT_PNG, image.width, image.height, PF_R8G8B8A8_TYPELESS, buffer, size);
 				_mapImages[fileName] = imagePtr;
 				free(buffer);
 				return imagePtr;
@@ -233,7 +233,7 @@ namespace Disorder
 			unsigned int imgDataSize = dataSize / 3 * 4;
 			BYTE *pImageData = (BYTE*)malloc(imgDataSize);
 			Convert_R8G8B8_R8G8B8A8(pData, dataSize, pImageData, imgDataSize);
-			 imagePtr = Image::Create(eIT_JPG, cinfo.output_width, cinfo.output_height, pixelFormat, pImageData, imgDataSize);
+			 imagePtr = new Image(fileName,eIT_JPG, cinfo.output_width, cinfo.output_height, pixelFormat, pImageData, imgDataSize);
 			_mapImages[fileName] = imagePtr;
 		}
 		else
@@ -388,18 +388,20 @@ namespace Disorder
 		_pPixelRawData = NULL;
 	}
  
-	Image* Image::Create(EImageType type,int width, int height, PixelFormat format, BYTE* pData, unsigned int dataSize)
+	Image::Image(const std::string& name,EImageType type,int width, int height, PixelFormat format, BYTE* pData, unsigned int dataSize)
 	{
-		ImageSpec spec;
-		spec.type = type;
-		spec.dataSize = dataSize;
-		spec.format = format;
-		spec.height = height;
-		spec.width = width;
+		_name = name;
+		_imageSpec.type = type;
+		_imageSpec.dataSize = dataSize;
+		_imageSpec.format = format;
+		_imageSpec.height = height;
+		_imageSpec.width = width;
 
-		Image *pImage = new Image(spec,pData,dataSize);
-		 
-		return pImage;
+		if (pData != NULL && dataSize > 0)
+		{
+			_pPixelRawData = new BYTE[dataSize];
+			memcpy(_pPixelRawData, pData, dataSize);
+		}
 	}
  
  
@@ -439,15 +441,6 @@ namespace Disorder
 		}
 
 		return PNG_FORMAT_RGBA;
-	}
-	Image::Image(ImageSpec const& spec,BYTE *pPixels,unsigned int size)
-		:_imageSpec(spec)
-	{
-		if (pPixels != NULL && size > 0)
-		{
-			_pPixelRawData = new BYTE[size];
-			memcpy(_pPixelRawData, pPixels, size);
-		}
 	}
  
 }

@@ -4,7 +4,7 @@ namespace Disorder
 {
 	Skybox::Skybox()
 	{ 
-		ShaderPropertyManager* globalProperty = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderPropertyManager* globalProperty = GRenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 		_skyTextureProperty = globalProperty->CreateProperty(ShaderPropertyManager::sSkyboxTexture, eSP_ShaderResource, 1);
 		_skySamplerProperty = globalProperty->CreateProperty(ShaderPropertyManager::sSkyboxSampler, eSP_SampleState, 1);
 
@@ -20,15 +20,15 @@ namespace Disorder
 		SamplerDesc sdesc;
 		sdesc.Filter = SF_Anisotropic;
 		sdesc.MaxAnisotropy = 16;
-		_skyCubeSampler = GEngine->RenderResourceMgr->CreateSamplerState(&sdesc);
-		_skyTexture = GEngine->RenderResourceMgr->CreateTexture2D(_skyCubeSampler, PF_R8G8B8A8_TYPELESS, false, textureArray, SF_AsCubeMap);
-		_skyCubeView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _skyTexture, PF_R8G8B8A8_UNORM, SF_AsCubeMap);
+		_skyCubeSampler = GRenderResourceMgr->CreateSamplerState(&sdesc);
+		_skyTexture = GRenderResourceMgr->CreateTexture2D("skyboxcubetex",_skyCubeSampler, PF_R8G8B8A8_TYPELESS, false, textureArray, SF_AsCubeMap);
+		_skyCubeView = GRenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _skyTexture, PF_R8G8B8A8_UNORM, SF_AsCubeMap);
 		_skyTextureProperty->SetData(_skyCubeView);
 		_skySamplerProperty->SetData(_skyCubeSampler);
 
-		_renderEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObject* vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "Skybox", SM_4_0, "VS");
-		ShaderObject* pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "Skybox", SM_4_0, "PS");
+		_renderEffect = GRenderResourceMgr->CreateRenderEffect();
+		ShaderObject* vertexShader = GRenderResourceMgr->CreateShader(ST_VertexShader, "Skybox", SM_4_0, "VS");
+		ShaderObject* pixelShader = GRenderResourceMgr->CreateShader(ST_PixelShader, "Skybox", SM_4_0, "PS");
 		_renderEffect->BindShader(vertexShader);
 		_renderEffect->BindShader(pixelShader);
 		_renderEffect->LinkShaders();
@@ -36,7 +36,7 @@ namespace Disorder
 		DepthStencilDesc desc;
 		desc.DepthWrite = false;
 		desc.DepthEnable = false;
-		DepthStencilState* depthPtr = GEngine->RenderResourceMgr->CreateDepthStencilState(&desc, 0);
+		DepthStencilState* depthPtr = GRenderResourceMgr->CreateDepthStencilState(&desc, 0);
 		_renderEffect->BindDepthStencilState(depthPtr);
 
 		glm::vec3 positions[] = 
@@ -49,8 +49,8 @@ namespace Disorder
 			glm::vec3(1, -1, 1), glm::vec3(1, -1, -1), glm::vec3(-1, -1, -1), glm::vec3(1, -1, 1), glm::vec3(-1, -1, -1), glm::vec3(-1,-1,1) // bottom
 		};
 
-		_renderLayout = GEngine->RenderResourceMgr->CreateRenderLayout(_renderEffect, TT_TriangleList,true);
-		RenderBuffer* vertexBuffer = GEngine->RenderResourceMgr->CreateBuffer("SkyBoxVertex",RBT_Vertex, BU_StaticDraw, sizeof(glm::vec3), sizeof(glm::vec3)*36, positions);
+		_renderLayout = GRenderResourceMgr->CreateRenderLayout(_renderEffect, TT_TriangleList,true);
+		RenderBuffer* vertexBuffer = GRenderResourceMgr->CreateBuffer("SkyBoxVertex",RBT_Vertex, BU_StaticDraw, sizeof(glm::vec3), sizeof(glm::vec3)*36, positions);
 		_renderLayout->BindVertexBuffer(vertexBuffer);
 
 		_renderLayout->FinishBufferBinding(_renderEffect);
@@ -58,8 +58,8 @@ namespace Disorder
 
 	void Skybox::Render()
 	{
-		GEngine->RenderEngine->SetRenderLayout(_renderLayout);
-		GEngine->RenderEngine->SetEffect(_renderEffect);
-		GEngine->RenderEngine->Draw(36, 0);
+		GRenderEngine->SetRenderLayout(_renderLayout);
+		GRenderEngine->SetEffect(_renderEffect);
+		GRenderEngine->Draw(36, 0);
 	}
 }

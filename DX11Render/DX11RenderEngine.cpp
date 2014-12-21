@@ -50,17 +50,45 @@ namespace Disorder
 		}
 	}
  
-	 DX11RenderEngine::DX11RenderEngine()
-	 {
-	 }
+	DX11RenderEngine::DX11RenderEngine(HWND hWnd)
+	{
+		_driverType = D3D_DRIVER_TYPE_NULL;
+		_featureLevel = D3D_FEATURE_LEVEL_11_0;
+
+		HRESULT hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)(&_pDXGIFactory));
+		BOOST_ASSERT(SUCCEEDED(hr));
+
+		EnumAdapters();
+		CreateDevice();
+		CreateViewport(hWnd);
+	}
+
+	DX11RenderEngine::~DX11RenderEngine()
+	{
+		if (_pImmediateContext)
+		{
+			_pImmediateContext->ClearState();
+			_pImmediateContext->Release();
+		}
+
+		_pSwapChain->Release();
+		_pd3dDevice->Release();
+		for (size_t i = 0; i < _vDXGIAdapter.size(); i++)
+		{
+			_vDXGIAdapter[i]->Release();
+		}
+		_vDXGIAdapter.clear();
+
+		_pDXGIFactory->Release();
+	}
+
 
 	 void DX11RenderEngine::EnumAdapters()
 	 {
 		 BOOST_ASSERT(_pDXGIFactory != NULL );
+		 BOOST_ASSERT(_vDXGIAdapter.size() == 0);
 
-		 _vDXGIAdapter.clear();
 		 IDXGIAdapter * pAdapter; 
-		 
 		 UINT i =0;
 		 while(_pDXGIFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND) 
 		 { 
@@ -94,7 +122,7 @@ namespace Disorder
  
 	 }
 
-	 void DX11RenderEngine::CreateViewport(void *hWnd)
+	 void DX11RenderEngine::CreateViewport(HWND hWnd)
 	{
 		HRESULT hr = S_OK;
 	
@@ -124,7 +152,7 @@ namespace Disorder
 		sd.BufferDesc.RefreshRate.Denominator = 1;
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_SHADER_INPUT;
 		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-		sd.OutputWindow = (HWND)hWnd;
+		sd.OutputWindow =  hWnd;
 		sd.SampleDesc.Count = GConfig->pRenderConfig->MultiSampleCount;
 		sd.SampleDesc.Quality = GConfig->pRenderConfig->MultiSampleQuality;
 		sd.Windowed = !GConfig->pRenderConfig->FullScreen;
@@ -132,7 +160,7 @@ namespace Disorder
 		hr = _pDXGIFactory->CreateSwapChain(_pd3dDevice, &sd, &_pSwapChain);
 		BOOST_ASSERT(SUCCEEDED(hr));
 		 
-		hr = _pDXGIFactory->MakeWindowAssociation((HWND)hWnd,DXGI_MWA_NO_WINDOW_CHANGES);
+		hr = _pDXGIFactory->MakeWindowAssociation(hWnd,DXGI_MWA_NO_WINDOW_CHANGES);
 		BOOST_ASSERT(SUCCEEDED(hr));
 
 		// Create a render target view
@@ -142,19 +170,19 @@ namespace Disorder
 		DX11RenderTexture2D* BackBufferTex = new DX11RenderTexture2D(GConfig->pRenderConfig->ColorFormat, sd.BufferDesc.Width, sd.BufferDesc.Height, SV_RenderTarget | SV_ShaderResource, false, 
 			GConfig->pRenderConfig->MultiSampleCount, GConfig->pRenderConfig->MultiSampleQuality,pBackBuffer);
  
-		SurfaceView* rtView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, BackBufferTex,GConfig->pRenderConfig->ColorFormat);
-		SurfaceView* srView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, BackBufferTex, GConfig->pRenderConfig->ColorFormat);
+		SurfaceView* rtView = GRenderResourceMgr->CreateSurfaceView(SV_RenderTarget, BackBufferTex,GConfig->pRenderConfig->ColorFormat);
+		SurfaceView* srView = GRenderResourceMgr->CreateSurfaceView(SV_ShaderResource, BackBufferTex, GConfig->pRenderConfig->ColorFormat);
 
-		RenderTexture2D* DepthBufferTex = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil,1, NULL,0);
+		RenderTexture2D* DepthBufferTex = GRenderResourceMgr->CreateTexture2D("DepthBufferTex",NULL, GConfig->pRenderConfig->DepthStencilFormat, GConfig->pRenderConfig->SizeX, GConfig->pRenderConfig->SizeY, false, false, SV_DepthStencil,1, NULL,0);
 
-		SurfaceView* dsView = GEngine->RenderResourceMgr->CreateSurfaceView(SV_DepthStencil, DepthBufferTex, GConfig->pRenderConfig->DepthStencilFormat);
+		SurfaceView* dsView = GRenderResourceMgr->CreateSurfaceView(SV_DepthStencil, DepthBufferTex, GConfig->pRenderConfig->DepthStencilFormat);
 
 		std::map<ESurfaceLocation, SurfaceView*> viewMap;
 		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_RenderTarget1, rtView));
 		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_DepthStencil, dsView));
 		RenderSurface* mainSurface = new DX11RenderSurface(viewMap);
  
-		GEngine->SurfaceCache->MainTarget = new MainRenderTarget(mainSurface, srView, rtView, dsView);
+		GRenderSurface->MainTarget = new MainRenderTarget(mainSurface, srView, rtView, dsView);
 
 		// Setup the viewport
 		SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
@@ -173,32 +201,7 @@ namespace Disorder
 		 vp.TopLeftY = topY;
 		 _pImmediateContext->RSSetViewports(1, &vp);
 	}
-
-	void DX11RenderEngine::Init()
-	{
-		_driverType = D3D_DRIVER_TYPE_NULL;
-		_featureLevel = D3D_FEATURE_LEVEL_11_0;
-
-		HRESULT hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)(&_pDXGIFactory));
-		BOOST_ASSERT(SUCCEEDED(hr));
  
-
-		EnumAdapters();
-
-		CreateDevice();
-	}
-
-	void DX11RenderEngine::Exit()
-	{
-		 if( _pImmediateContext ) 
-		 {
-			 _pImmediateContext->ClearState();
-		 }
-
-		 _pImmediateContext->Release();
-		 _pSwapChain->Release();
-		 _pd3dDevice->Release();
-	}
 
    	void* DX11RenderEngine::Map(RenderBuffer* buffer,BufferAccess bufferAccess)
 	{
@@ -813,7 +816,7 @@ namespace Disorder
 		_pImmediateContext->Map(pStageTex2D,D3D11CalcSubresource(0, 0, 1),D3D11_MAP_READ,0,&MappedResource);
 		
 		int dataSize = desc.Width * desc.Height * RenderEngine::ComputePixelSizeBits(tex->Format) / 8;
-		Image* image = Image::Create(eIT_PNG,desc.Width,desc.Height,tex->Format,(BYTE*)MappedResource.pData,dataSize);
+		Image* image = new Image(fileName,eIT_PNG,desc.Width,desc.Height,tex->Format,(BYTE*)MappedResource.pData,dataSize);
 		GImageManager->Save(fileName,image);
 
 		_pImmediateContext->Unmap(pStageTex2D,D3D11CalcSubresource(0, 0, 1));

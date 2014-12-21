@@ -5,28 +5,28 @@ namespace Disorder
  
 	FXAA::FXAA()
 	{
-		ShaderPropertyManager* globalMgr = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderPropertyManager* globalMgr = GRenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 
 		_ScreenAATexture = globalMgr->CreateProperty(ShaderPropertyManager::sScreenAATexture, eSP_ShaderResource, 1);
 		_ScreenAASampler = globalMgr->CreateProperty(ShaderPropertyManager::sScreenAASampler, eSP_SampleState, 1);
 
-		_AAPrepareEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObject* vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "FXAA", SM_4_0, "VS");
-		ShaderObject* pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "FXAA", SM_4_0, "PrepareSurfacePS");
+		_AAPrepareEffect = GRenderResourceMgr->CreateRenderEffect();
+		ShaderObject* vertexShader = GRenderResourceMgr->CreateShader(ST_VertexShader, "FXAA", SM_4_0, "VS");
+		ShaderObject* pixelShader = GRenderResourceMgr->CreateShader(ST_PixelShader, "FXAA", SM_4_0, "PrepareSurfacePS");
 		_AAPrepareEffect->BindShader(vertexShader);
 		_AAPrepareEffect->BindShader(pixelShader);
 		_AAPrepareEffect->LinkShaders();
 
-		_AAEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "FXAA", SM_4_0, "VS");
-		pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "FXAA", SM_4_0, "PS");
+		_AAEffect = GRenderResourceMgr->CreateRenderEffect();
+		vertexShader = GRenderResourceMgr->CreateShader(ST_VertexShader, "FXAA", SM_4_0, "VS");
+		pixelShader = GRenderResourceMgr->CreateShader(ST_PixelShader, "FXAA", SM_4_0, "PS");
 		_AAEffect->BindShader(vertexShader);
 		_AAEffect->BindShader(pixelShader);
 		_AAEffect->LinkShaders();
 
 		SamplerDesc sDesc;
 		sDesc.Filter = SF_Min_Mag_Mip_Linear;
-		SamplerState* sState = GEngine->RenderResourceMgr->CreateSamplerState(&sDesc);
+		SamplerState* sState = GRenderResourceMgr->CreateSamplerState(&sDesc);
 		_ScreenAASampler->SetData(sState);
 
 		TileTexVertex vertex[4];
@@ -41,44 +41,44 @@ namespace Disorder
 
 		_ScreenTile = SimpleTile("FXAATile", vertex, _AAEffect);
 
-		_PrepareBufferTexture = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->ColorFormat, GConfig->pRenderConfig->SizeX,
+		_PrepareBufferTexture = GRenderResourceMgr->CreateTexture2D("AATex0",NULL, GConfig->pRenderConfig->ColorFormat, GConfig->pRenderConfig->SizeX,
 			GConfig->pRenderConfig->SizeY, false, false, SV_RenderTarget | SV_ShaderResource, 1, NULL, 0);
-		_PrepareShaderResource = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _PrepareBufferTexture, GConfig->pRenderConfig->ColorFormat);
-		SurfaceView* svPrepareRes = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, _PrepareBufferTexture, GConfig->pRenderConfig->ColorFormat);
+		_PrepareShaderResource = GRenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _PrepareBufferTexture, GConfig->pRenderConfig->ColorFormat);
+		SurfaceView* svPrepareRes = GRenderResourceMgr->CreateSurfaceView(SV_RenderTarget, _PrepareBufferTexture, GConfig->pRenderConfig->ColorFormat);
 		std::map<ESurfaceLocation, SurfaceView*> viewMap;
 		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_RenderTarget1, svPrepareRes));
-		_PrepareBufferSurface = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
+		_PrepareBufferSurface = GRenderResourceMgr->CreateRenderSurface(viewMap);
 
 
 		viewMap.clear();
-		_TargetBufferTexture = GEngine->RenderResourceMgr->CreateTexture2D(NULL, GConfig->pRenderConfig->ColorFormat, GConfig->pRenderConfig->SizeX,
+		_TargetBufferTexture = GRenderResourceMgr->CreateTexture2D("AATex1",NULL, GConfig->pRenderConfig->ColorFormat, GConfig->pRenderConfig->SizeX,
 			GConfig->pRenderConfig->SizeY, false, false, SV_RenderTarget | SV_ShaderResource, 1, NULL, 0);
-		_TargetShaderResource = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _TargetBufferTexture, GConfig->pRenderConfig->ColorFormat);
-		SurfaceView* svTargetRes = GEngine->RenderResourceMgr->CreateSurfaceView(SV_RenderTarget, _TargetBufferTexture, GConfig->pRenderConfig->ColorFormat); 
+		_TargetShaderResource = GRenderResourceMgr->CreateSurfaceView(SV_ShaderResource, _TargetBufferTexture, GConfig->pRenderConfig->ColorFormat);
+		SurfaceView* svTargetRes = GRenderResourceMgr->CreateSurfaceView(SV_RenderTarget, _TargetBufferTexture, GConfig->pRenderConfig->ColorFormat); 
 		viewMap.insert(std::pair<ESurfaceLocation, SurfaceView*>(SL_RenderTarget1, svTargetRes));
-		_TargetBufferSurface = GEngine->RenderResourceMgr->CreateRenderSurface(viewMap);
+		_TargetBufferSurface = GRenderResourceMgr->CreateRenderSurface(viewMap);
 
 	}
 
 	void FXAA::Render(Camera* camera,SurfaceView* aaRenderView)
 	{
-		GEngine->GameCanvas->DrawString(5, 63, "FXAA: On");
+		GCanvas->DrawString(5, 63, "FXAA: On");
 
 		//prepare surface first
-		GEngine->RenderEngine->SetRenderTarget(_PrepareBufferSurface);
-		GEngine->RenderEngine->ClearRenderSurface(_PrepareBufferSurface, glm::vec4(0, 0, 0, 1.f), false, 0, false, 0);
+		GRenderEngine->SetRenderTarget(_PrepareBufferSurface);
+		GRenderEngine->ClearRenderSurface(_PrepareBufferSurface, glm::vec4(0, 0, 0, 1.f), false, 0, false, 0);
 		_ScreenAATexture->SetData(aaRenderView);
 		_ScreenTile.SetRenderEffect(_AAPrepareEffect);
 		_ScreenTile.Render(camera);
 
 		// AA pass
-		GEngine->RenderEngine->SetRenderTarget(_TargetBufferSurface);
-		GEngine->RenderEngine->ClearRenderSurface(_TargetBufferSurface, glm::vec4(0, 0, 0, 1.f), false, 0, false, 0);
+		GRenderEngine->SetRenderTarget(_TargetBufferSurface);
+		GRenderEngine->ClearRenderSurface(_TargetBufferSurface, glm::vec4(0, 0, 0, 1.f), false, 0, false, 0);
 		_ScreenAATexture->SetData(_PrepareShaderResource);
 		_ScreenTile.SetRenderEffect(_AAEffect);
 		_ScreenTile.Render(camera);
 
-		RenderTexture2D* dstTexture = (RenderTexture2D*)GEngine->RenderSurfaceCache->MainTarget->RenderTargetView->Resource;
-		GEngine->RenderEngine->CopyTexture2D(_TargetBufferTexture, dstTexture);
+		RenderTexture2D* dstTexture = (RenderTexture2D*)GRenderSurface->MainTarget->RenderTargetView->Resource;
+		GRenderEngine->CopyTexture2D(_TargetBufferTexture, dstTexture);
 	}
 }

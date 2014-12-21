@@ -28,7 +28,7 @@ namespace Disorder
 		samDesc.MinLOD = pSamplerDesc->MinLOD;
 		samDesc.MipLODBias = pSamplerDesc->MipLODBias;
 
-        DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine; 
+        DX11RenderEngine* renderEngine = (DX11RenderEngine*)GRenderEngine; 
 
 		ID3D11SamplerState *pSamplerState;
 
@@ -82,7 +82,7 @@ namespace Disorder
 		desc.ScissorEnable = pDesc->ScissorEnable;
 
 		ID3D11RasterizerState *pState;
-		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine; 
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GRenderEngine; 
 		HRESULT hr = renderEngine->D3DDevice()->CreateRasterizerState(&desc,&pState);
 		BOOST_ASSERT(hr==S_OK);
 
@@ -124,7 +124,7 @@ namespace Disorder
 		desc.BackFace.StencilFunc = DX11RenderEngine::GetD3DComparisonFunc(pDepthStencilDesc->BackFaceStencilFunc);
 
 		ID3D11DepthStencilState *pState;
-		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine; 
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GRenderEngine; 
 		HRESULT hr = renderEngine->D3DDevice()->CreateDepthStencilState(&desc,&pState);
 		BOOST_ASSERT(hr==S_OK);
 
@@ -160,7 +160,7 @@ namespace Disorder
 			desc.RenderTarget[index].BlendOpAlpha = DX11RenderEngine::GetD3DBlendOp(pBlendDescArray[index].BlendOpAlpha);
 		}
 
-		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine;
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GRenderEngine;
 		ID3D11BlendState* pBlendState;
 		HRESULT hr = renderEngine->D3DDevice()->CreateBlendState(&desc,&pBlendState);
 

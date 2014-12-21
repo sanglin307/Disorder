@@ -3,8 +3,9 @@
 
 namespace Disorder
 {
- 
-	void FbxSceneImporter::Init()
+	SceneImporter *GSceneImporter;
+
+	FbxSceneImporter::FbxSceneImporter()
 	{
 		 //The first thing to do is to create the FBX Manager which is the object allocator for almost all the classes in the SDK
 		_sdkManager = FbxManager::Create();
@@ -23,10 +24,13 @@ namespace Disorder
 
 	}
 
-	void FbxSceneImporter::Exit()
+	FbxSceneImporter::~FbxSceneImporter()
 	{
-		if( _sdkManager ) 
+		if (_sdkManager)
+		{
 			_sdkManager->Destroy();
+			_sdkManager = NULL;
+		}
 	}
  
 	

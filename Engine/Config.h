@@ -106,7 +106,6 @@ namespace Disorder
 
 	};
 
-	extern Config* GConfig;
 }
 
 #endif

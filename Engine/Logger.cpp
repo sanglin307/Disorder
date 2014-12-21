@@ -5,25 +5,48 @@ namespace Disorder
 {
 	Logger* GLogger = NULL;
 
-	void Logger::Init()
+	Logger::Logger()
 	{
-		_errorFile = GEngine->FileManager->OpenTextFile(GConfig->LogPath + "Error.log",eF_Write);
-		_warningFile = GEngine->FileManager->OpenTextFile(GConfig->LogPath + "Warning.log", eF_Write);
-		_infoFile = GEngine->FileManager->OpenTextFile(GConfig->LogPath + "Info.log", eF_Write);
+		std::string fileName = GConfig->LogPath + "Error.log";
+		if (fopen_s(&_errorFile, fileName.c_str(), "at"))
+		{
+			BOOST_ASSERT(0);
+			return;
+		}
+		
+		fileName = GConfig->LogPath + "Warning.log";
+		if (fopen_s(&_warningFile, fileName.c_str(), "at"))
+		{
+			BOOST_ASSERT(0);
+			return;
+		}
 
+		fileName = GConfig->LogPath + "Info.log";
+		if (fopen_s(&_infoFile, fileName.c_str(), "at"))
+		{
+			BOOST_ASSERT(0);
+			return;
+		}
+		
 		_thread =  boost::thread(LoggerRunner());
 	}
 
-	void Logger::Exit()
+	Logger::~Logger()
 	{
 		_thread.join();
+		fclose(_errorFile);
+		_errorFile = NULL;
+		fclose(_warningFile);
+		_warningFile = NULL;
+		fclose(_infoFile);
+		_infoFile = NULL;
 	}
 
 	void Logger::Info(std::string const& info)
 	{
 		boost::mutex::scoped_lock lock(_infoMutex);
-		LogObj log;
-		strncpy_s(log.content,info.c_str(),Min<unsigned int>(info.size(), LogObj::StringMaxLengh));
+		std::string log = info;
+		log += "\n";
 		_infoCache.push_back(log);
 
 	}
@@ -31,54 +54,50 @@ namespace Disorder
 	void Logger::Warning(std::string const& warning)
 	{
 		boost::mutex::scoped_lock lock(_warningMutex);
-		LogObj log;
-		unsigned int length = Min<unsigned int>(warning.size() , LogObj::StringMaxLengh);
-		strncpy_s(log.content,warning.c_str(),length);
+		std::string log = warning;
+		log += "\n";
 		_warningCache.push_back(log);
 	}
 
 	void Logger::Error(std::string const& error)
 	{
 		boost::mutex::scoped_lock lock(_errorMutex);
-		LogObj log;
-		strncpy_s(log.content,error.c_str(),Min<unsigned int>(error.size() , LogObj::StringMaxLengh));
-		_errorCache.push_back(log);
+		std::string err = error;
+		err += "\n";
+		_errorCache.push_back(err);
 	}
 
 	void Logger::Flush()
 	{
 		boost::mutex::scoped_lock errorlock(_errorMutex);
-		std::list<LogObj>::const_iterator iter = _errorCache.begin();
+		std::list<std::string>::const_iterator iter = _errorCache.begin();
 		while(iter != _errorCache.end())
 		{
-			_errorFile->Write(iter->content);
-			_errorFile->Write("\n");
+			fputs(iter->c_str(), _errorFile);
 			iter++;
 		}
 		_errorCache.clear();
-		_errorFile->Flush();
+		fflush(_errorFile);
 
 		boost::mutex::scoped_lock warninglock(_warningMutex);
 		iter = _warningCache.begin();
 		while(iter != _warningCache.end())
 		{
-			_warningFile->Write(iter->content);
-			_warningFile->Write("\n");
+			fputs(iter->c_str(), _warningFile);
 			iter++;
 		}
 		_warningCache.clear();
-		_warningFile->Flush();
+		fflush(_warningFile);
 
 		boost::mutex::scoped_lock infolock(_infoMutex);
 		iter = _infoCache.begin();
 		while(iter != _infoCache.end())
 		{
-			_infoFile->Write(iter->content);
-			_infoFile->Write("\n");
+			fputs(iter->c_str(), _infoFile);
 			iter++;
 		}
 		_infoCache.clear();
-		_infoFile->Flush();
+		fflush(_infoFile);
 
 	}
 

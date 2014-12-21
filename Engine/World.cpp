@@ -4,11 +4,10 @@ namespace Disorder
 {
 	 World *GWorld = NULL;
 
-	 void World::Init()
+	 World::World()
 	 {
- 
 		 // temp code to init a world		
-		 Level* level = GEngine->SceneImporter->Import(GConfig->pSceneConfig->LevelName);
+		 GSceneImporter->Import(GConfig->pSceneConfig->LevelName);
 
 		 if( GSceneManager->GetDefaultCamera() == NULL ) // create default camera
 		 {
@@ -21,10 +20,10 @@ namespace Disorder
 		 }
  
 
-		 GEngine->RenderResourceMgr->DumpContent();
+		 GRenderResourceMgr->DumpContent();
 	 }
 
-	 void World::Exit()
+	 World::~World()
 	 {
 		 for (size_t i = 0; i < _levels.size(); i++)
 		 {

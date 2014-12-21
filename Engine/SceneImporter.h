@@ -10,17 +10,15 @@ namespace Disorder
 	{
 	public:
 		virtual Level* Import(std::string const& fileName) = 0;
-		virtual void Init() = 0;
-		virtual void Exit() = 0;
 	 
 	};
 
 	class FbxSceneImporter : public SceneImporter
 	{
 	public:
+		FbxSceneImporter();
+		~FbxSceneImporter();
 		virtual Level* Import(std::string const& fileName);	
-		virtual void Init();
-		virtual void Exit();
  
 	private:
 		 

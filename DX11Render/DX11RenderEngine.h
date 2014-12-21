@@ -7,9 +7,8 @@ namespace Disorder
 	class DX11RenderEngine : public RenderEngine
 	{
 	public:
-		DX11RenderEngine();
-		virtual void Init();
-		virtual void Exit();
+		DX11RenderEngine(HWND hWnd);
+		~DX11RenderEngine();
 		
 		virtual void OnFrameBegin();
 		virtual void OnFrameEnd();
@@ -33,8 +32,7 @@ namespace Disorder
 		virtual void UnMap(RenderBuffer* buffer);
 		virtual void UpdateSubresource(RenderBuffer* buffer,void* pSrcData,unsigned int srcDataSize);
 		virtual void CopyTexture2D(RenderTexture2D* srcTexture, RenderTexture2D* dstTexture);
-		virtual void CreateViewport(void *hWnd);
-
+		
 		ID3D11Device* DX11RenderEngine::D3DDevice() const
 		{
 			return _pd3dDevice;
@@ -70,6 +68,7 @@ namespace Disorder
 
 		void EnumAdapters();
 		void CreateDevice();
+		void CreateViewport(HWND hWnd);
 
 		virtual void SetBlendState(BlendState* blendState);
 		virtual void SetRasterizeState(RasterizeState* rasterizeState);
@@ -88,9 +87,6 @@ namespace Disorder
 		ID3D11Device*                         _pd3dDevice;
 		ID3D11DeviceContext*                  _pImmediateContext;
 		IDXGISwapChain*                       _pSwapChain;
- 
-	 
-
 	};
 }
 

@@ -4,20 +4,20 @@ namespace Disorder
 {
 	RenderPath::RenderPath()
 	{
-		_DirectionLightPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerDirectionLight);
+		_DirectionLightPropertyManager = GRenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerDirectionLight);
 		_DirectionLightIntensityProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightIntensity,eSP_Float,1);
 		_DirectionLightDirProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightDir,eSP_Float,3);
 		_DirectionLightColorProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightColor,eSP_Float,3);
 		_DirectionLightCastShadowProperty = _DirectionLightPropertyManager->CreateProperty(ShaderPropertyManager::sDirectionLightCastShadow, eSP_Bool,1);
 
-		_PointLightPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerPointLight);
+		_PointLightPropertyManager = GRenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerPointLight);
 		_PointLightPosProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightPos,eSP_Float,3);
 		_PointLightColorProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightColor, eSP_Float, 3);
 		_PointLightRangeRcpProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightRangeRcp, eSP_Float, 1);
 		_PointLightIntensityProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightIntensity, eSP_Float, 1);
 		_PointLightCastShadowProperty = _PointLightPropertyManager->CreateProperty(ShaderPropertyManager::sPointLightCastShadow, eSP_Bool, 1);
 
-		_SpotLightPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerSpotLight);
+		_SpotLightPropertyManager = GRenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerSpotLight);
 		_SpotLightPosProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightPos,eSP_Float,3);
 		_SpotLightDirProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightDir, eSP_Float, 3);
 		_SpotLightColorProperty = _SpotLightPropertyManager->CreateProperty(ShaderPropertyManager::sSpotLightColor, eSP_Float, 3);
@@ -97,14 +97,14 @@ namespace Disorder
 			{
 				light->CalculateShadowMatrix();
 				// begin render depth
-				GEngine->RenderSurfaceCache->ShadowMapBuffer->RenderDepth(camera, allGeometryList, light);
+				GRenderSurface->ShadowMapBuffer->RenderDepth(camera, allGeometryList, light);
 
 				// render object
-				GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
-				GEngine->RenderEngine->SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
+				GRenderEngine->SetRenderTarget(GRenderSurface->MainTarget->RenderTargetSurface);
+				GRenderEngine->SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
 			}
 
-			GEngine->RenderSurfaceCache->ShadowMapBuffer->PrepareRenderLight(light); 
+			GRenderSurface->ShadowMapBuffer->PrepareRenderLight(light); 
 			if (light->LightType == LT_Directional)
 			{
 				DirectionLight* dirLight = (DirectionLight*)light;
@@ -166,10 +166,10 @@ namespace Disorder
 
 		GSceneManager->UpdateBoundingBox();
 
-		GEngine->RenderEngine->OnFrameBegin();
+		GRenderEngine->OnFrameBegin();
 
-		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
-		GEngine->RenderEngine->ClearRenderSurface(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
+		GRenderEngine->SetRenderTarget(GRenderSurface->MainTarget->RenderTargetSurface);
+		GRenderEngine->ClearRenderSurface(GRenderSurface->MainTarget->RenderTargetSurface, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
  
 		GSceneManager->UpdateShaderProperty();
 		mainCamera->UpdateShaderProperty();
@@ -185,22 +185,22 @@ namespace Disorder
 		RenderLights(mainCamera, rendererList);
  
 
-		GEngine->GameCanvas->DrawString(5, 35, "Forward Lighting Mode");
+		GCanvas->DrawString(5, 35, "Forward Lighting Mode");
 		GSceneManager->DebugDraw();
 		GEngine->Stat.DrawStat();
-		GEngine->GameCanvas->RenderLines(mainCamera);
+		GCanvas->RenderLines(mainCamera);
 
 		// postprocess not include the string renders.
 		if (GConfig->pRenderConfig->FXAA)
 		{
-			_aaRender->Render(mainCamera, GEngine->RenderSurfaceCache->MainTarget->RenderTargetShaderView);
-			GEngine->RenderEngine->SetEffect(NULL);
-			GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
+			_aaRender->Render(mainCamera, GRenderSurface->MainTarget->RenderTargetShaderView);
+			GRenderEngine->SetEffect(NULL);
+			GRenderEngine->SetRenderTarget(GRenderSurface->MainTarget->RenderTargetSurface);
 		}
 		// the last ... render string.
-		GEngine->GameCanvas->RenderStrings(mainCamera);
+		GCanvas->RenderStrings(mainCamera);
 
-		GEngine->RenderEngine->OnFrameEnd();
+		GRenderEngine->OnFrameEnd();
 	}
  
 	ForwardRenderPath::ForwardRenderPath()
@@ -208,31 +208,31 @@ namespace Disorder
 		_type = RPT_ForwardLighting;
 
 	 
-		_BasePassEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObject* vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ForwardLighting", SM_4_0, "SceneVS");
-		ShaderObject* pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "ForwardLighting", SM_4_0, "BasePassPS");
+		_BasePassEffect = GRenderResourceMgr->CreateRenderEffect();
+		ShaderObject* vertexShader = GRenderResourceMgr->CreateShader(ST_VertexShader, "ForwardLighting", SM_4_0, "SceneVS");
+		ShaderObject* pixelShader = GRenderResourceMgr->CreateShader(ST_PixelShader, "ForwardLighting", SM_4_0, "BasePassPS");
 		 
 		_BasePassEffect->BindShader(vertexShader);
 		_BasePassEffect->BindShader(pixelShader);
 		_BasePassEffect->LinkShaders();
 
-		_DirectionLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObject* dvertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"SceneVS");
-		ShaderObject* dpixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"DirectionLightingPS");
+		_DirectionLightEffect = GRenderResourceMgr->CreateRenderEffect();
+		ShaderObject* dvertexShader = GRenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"SceneVS");
+		ShaderObject* dpixelShader = GRenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"DirectionLightingPS");
 		_DirectionLightEffect->BindShader(dvertexShader);
 		_DirectionLightEffect->BindShader(dpixelShader);
 		_DirectionLightEffect->LinkShaders();
  
-		_PointLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObject* pVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"SceneVS");
-		ShaderObject* pPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"PointLightingPS");
+		_PointLightEffect = GRenderResourceMgr->CreateRenderEffect();
+		ShaderObject* pVertexShader = GRenderResourceMgr->CreateShader(ST_VertexShader,"ForwardLighting",SM_4_0,"SceneVS");
+		ShaderObject* pPixelShader = GRenderResourceMgr->CreateShader(ST_PixelShader,"ForwardLighting",SM_4_0,"PointLightingPS");
 		_PointLightEffect->BindShader(pVertexShader);
 		_PointLightEffect->BindShader(pPixelShader);
 		_PointLightEffect->LinkShaders();
 
-		_SpotLightEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-		ShaderObject* sVertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader, "ForwardLighting", SM_4_0, "SceneVS");
-		ShaderObject* sPixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader, "ForwardLighting", SM_4_0, "SpotLightingPS");
+		_SpotLightEffect = GRenderResourceMgr->CreateRenderEffect();
+		ShaderObject* sVertexShader = GRenderResourceMgr->CreateShader(ST_VertexShader, "ForwardLighting", SM_4_0, "SceneVS");
+		ShaderObject* sPixelShader = GRenderResourceMgr->CreateShader(ST_PixelShader, "ForwardLighting", SM_4_0, "SpotLightingPS");
 		_SpotLightEffect->BindShader(sVertexShader);
 		_SpotLightEffect->BindShader(sPixelShader);
 		_SpotLightEffect->LinkShaders();
@@ -245,7 +245,7 @@ namespace Disorder
 		bDesc.BlendOpAlpha = BLEND_OP_ADD;
 		bDesc.SrcBlendAlpha = BLEND_ONE;
 		bDesc.DestBlendAlpha = BLEND_ONE;
-		BlendState* blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc,1);
+		BlendState* blendState = GRenderResourceMgr->CreateBlendState(&bDesc,1);
 		_DirectionLightEffect->BindBlendState(blendState);
 		_PointLightEffect->BindBlendState(blendState);
 		_SpotLightEffect->BindBlendState(blendState);
@@ -253,7 +253,7 @@ namespace Disorder
 		DepthStencilDesc dsDesc;
 		dsDesc.DepthFunc = CF_Less_Equal;
 		dsDesc.DepthWrite = false;
-		DepthStencilState* noDepthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dsDesc,0);
+		DepthStencilState* noDepthState = GRenderResourceMgr->CreateDepthStencilState(&dsDesc,0);
 		_DirectionLightEffect->BindDepthStencilState(noDepthState);
 		_PointLightEffect->BindDepthStencilState(noDepthState);
 		_SpotLightEffect->BindDepthStencilState(noDepthState);
@@ -271,8 +271,8 @@ namespace Disorder
 
 	 
 		_RenderSceneEffect = new RenderEffect;
-		ShaderObject* vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"SceneVS");
-		ShaderObject* pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"ScenePS");
+		ShaderObject* vertexShader = GRenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"SceneVS");
+		ShaderObject* pixelShader = GRenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"ScenePS");
 		_RenderSceneEffect->BindShader(vertexShader);
 		_RenderSceneEffect->BindShader(pixelShader);
 		_RenderSceneEffect->LinkShaders();
@@ -286,12 +286,12 @@ namespace Disorder
 		depthDesc.BackFaceStencilFailOp = depthDesc.FrontFaceStencilFailOp = STENCIL_OP_REPLACE;
 		depthDesc.BackFaceStencilPassOp = depthDesc.FrontFaceStencilPassOp = STENCIL_OP_REPLACE;
 		depthDesc.BackFaceStencilFunc = depthDesc.BackFaceStencilFunc = CF_Always;
-		DepthStencilState* _DepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&depthDesc,0);
+		DepthStencilState* _DepthWriteState = GRenderResourceMgr->CreateDepthStencilState(&depthDesc,0);
 		_RenderSceneEffect->BindDepthStencilState(_DepthWriteState);
 
-		_BasePassEffect = GEngine->RenderResourceMgr->CreateRenderEffect();
-	     vertexShader = GEngine->RenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"LightingVS");
-		 pixelShader = GEngine->RenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"BasePassPS");
+		_BasePassEffect = GRenderResourceMgr->CreateRenderEffect();
+	     vertexShader = GRenderResourceMgr->CreateShader(ST_VertexShader,"DeferredShading",SM_4_0,"LightingVS");
+		 pixelShader = GRenderResourceMgr->CreateShader(ST_PixelShader,"DeferredShading",SM_4_0,"BasePassPS");
 		 _BasePassEffect->BindShader(vertexShader);
 		 _BasePassEffect->BindShader(pixelShader);
 		 _BasePassEffect->LinkShaders();
@@ -327,7 +327,7 @@ namespace Disorder
 		nodepthWriteDesc.BackFaceStencilFailOp = nodepthWriteDesc.FrontFaceStencilFailOp = STENCIL_OP_KEEP;
 		nodepthWriteDesc.BackFaceStencilPassOp = nodepthWriteDesc.FrontFaceStencilPassOp = STENCIL_OP_KEEP;
 		nodepthWriteDesc.BackFaceStencilFunc = nodepthWriteDesc.BackFaceStencilFunc = CF_Equal;
-		DepthStencilState* _noDepthWriteState = GEngine->RenderResourceMgr->CreateDepthStencilState(&nodepthWriteDesc, 0);
+		DepthStencilState* _noDepthWriteState = GRenderResourceMgr->CreateDepthStencilState(&nodepthWriteDesc, 0);
 		_BasePassEffect->BindDepthStencilState(_noDepthWriteState);
  
 		BlendDesc bBaseDesc;
@@ -338,7 +338,7 @@ namespace Disorder
 		bBaseDesc.BlendOpAlpha = BLEND_OP_ADD;
 		bBaseDesc.SrcBlendAlpha = BLEND_ONE;
 		bBaseDesc.DestBlendAlpha = BLEND_ONE;
-		BlendState* blendStateBase = GEngine->RenderResourceMgr->CreateBlendState(&bBaseDesc, 1);
+		BlendState* blendStateBase = GRenderResourceMgr->CreateBlendState(&bBaseDesc, 1);
 		_BasePassEffect->BindBlendState(blendStateBase);
 
 		BlendDesc bDesc;
@@ -349,7 +349,7 @@ namespace Disorder
 		bDesc.BlendOpAlpha = BLEND_OP_ADD;
 		bDesc.SrcBlendAlpha = BLEND_ONE;
 		bDesc.DestBlendAlpha = BLEND_ONE;
-		BlendState* blendState = GEngine->RenderResourceMgr->CreateBlendState(&bDesc,1);
+		BlendState* blendState = GRenderResourceMgr->CreateBlendState(&bDesc,1);
 		
 		_DirectionLightEffect->BindBlendState(blendState);
 		_PointLightEffect->BindBlendState(blendState);
@@ -357,7 +357,7 @@ namespace Disorder
  
 		DepthStencilDesc dsDesc;
 		dsDesc.DepthFunc = CF_Less_Equal;
-		DepthStencilState* noDepthState = GEngine->RenderResourceMgr->CreateDepthStencilState(&dsDesc,0);
+		DepthStencilState* noDepthState = GRenderResourceMgr->CreateDepthStencilState(&dsDesc,0);
 		_DirectionLightEffect->BindDepthStencilState(noDepthState);
 		_PointLightEffect->BindDepthStencilState(noDepthState);
 		_SpotLightEffect->BindDepthStencilState(noDepthState);
@@ -376,7 +376,7 @@ namespace Disorder
 	
 		_LightingTile = SimpleTile("DeferLightingTile", vertex, _BasePassEffect);
  
-		GEngine->RenderSurfaceCache->GBuffer = new RenderGBuffer(GConfig->pRenderConfig->SizeX,GConfig->pRenderConfig->SizeY);
+		GRenderSurface->GBuffer = new RenderGBuffer(GConfig->pRenderConfig->SizeX,GConfig->pRenderConfig->SizeY);
 
 		_aaRender = new FXAA;
 	}
@@ -399,15 +399,15 @@ namespace Disorder
 			{
 				light->CalculateShadowMatrix();
 				// begin render depth
-				GEngine->RenderSurfaceCache->ShadowMapBuffer->RenderDepth(camera, allGeometryList, light);
+				GRenderSurface->ShadowMapBuffer->RenderDepth(camera, allGeometryList, light);
 
 				// render object
-				GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
-				GEngine->RenderEngine->SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
+				GRenderEngine->SetRenderTarget(GRenderSurface->MainTarget->RenderTargetSurface);
+				GRenderEngine->SetViewport((float)GConfig->pRenderConfig->SizeX, (float)GConfig->pRenderConfig->SizeY, 0.f, 1.f, 0.f, 0.f);
 			}
 			
 
-			GEngine->RenderSurfaceCache->ShadowMapBuffer->PrepareRenderLight(light);
+			GRenderSurface->ShadowMapBuffer->PrepareRenderLight(light);
 
 			if (light->LightType == LT_Directional)
 			{
@@ -442,30 +442,30 @@ namespace Disorder
 			return;
 
 		GSceneManager->UpdateBoundingBox();
-		GEngine->RenderEngine->OnFrameBegin();
+		GRenderEngine->OnFrameBegin();
 
 		GSceneManager->UpdateShaderProperty();
 		mainCamera->UpdateShaderProperty();
 
-		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
-		GEngine->RenderEngine->ClearRenderSurface(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
+		GRenderEngine->SetRenderTarget(GRenderSurface->MainTarget->RenderTargetSurface);
+		GRenderEngine->ClearRenderSurface(GRenderSurface->MainTarget->RenderTargetSurface, glm::vec4(0.f, 0.f, 0.f, 1.0f), true, 1.0f, false, 0);
 		
 		GSceneManager->GetSkybox()->Render();
 
 		// draw to GBuffer
-		RenderSurface* renderTargetPtr = GEngine->RenderSurfaceCache->GBuffer->RenderTargetBuffer;
-		GEngine->RenderEngine->SetRenderTarget(renderTargetPtr);
-		GEngine->RenderEngine->ClearRenderSurface(renderTargetPtr, glm::vec4(0.f),true, 1.f, true, 0);
+		RenderSurface* renderTargetPtr = GRenderSurface->GBuffer->RenderTargetBuffer;
+		GRenderEngine->SetRenderTarget(renderTargetPtr);
+		GRenderEngine->ClearRenderSurface(renderTargetPtr, glm::vec4(0.f),true, 1.f, true, 0);
  
 		std::vector<GeometryRenderer*> rendererList;
 		GSceneManager->GetRendererList(mainCamera, rendererList);
 		
 		RenderScene(mainCamera,rendererList);
 
-		GEngine->RenderSurfaceCache->GBuffer->UpdateShaderProperty();
+		GRenderSurface->GBuffer->UpdateShaderProperty();
 	
 		//lighting pass, draw to main render target
-		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->MainTarget->RenderTargetSurface);
+		GRenderEngine->SetRenderTarget(GRenderSurface->MainTarget->RenderTargetSurface);
 
 		//base pass light
 		_LightingTile.SetRenderEffect(_BasePassEffect);
@@ -474,30 +474,30 @@ namespace Disorder
 		RenderLights(mainCamera, rendererList);
  
 		// the last hud things, must use GBuffer's depth buffer surface view
-		GEngine->RenderEngine->SetEffect(NULL);
-		GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->GBuffer->MainTargetGDepth, true);
-		GEngine->GameCanvas->DrawString(5,35,"Deferred Shading Mode");
+		GRenderEngine->SetEffect(NULL);
+		GRenderEngine->SetRenderTarget(GRenderSurface->GBuffer->MainTargetGDepth, true);
+		GCanvas->DrawString(5,35,"Deferred Shading Mode");
 		GSceneManager->DebugDraw();
 		GEngine->Stat.DrawStat();
 
-		GEngine->GameCanvas->RenderLines(mainCamera);
+		GCanvas->RenderLines(mainCamera);
  
 
 		// postprocess not include the string renders.
 		if (GConfig->pRenderConfig->FXAA)
 		{
-			_aaRender->Render(mainCamera, GEngine->RenderSurfaceCache->MainTarget->RenderTargetShaderView);
-			GEngine->RenderEngine->SetEffect(NULL);
-			GEngine->RenderEngine->SetRenderTarget(GEngine->RenderSurfaceCache->GBuffer->MainTargetGDepth);
+			_aaRender->Render(mainCamera, GRenderSurface->MainTarget->RenderTargetShaderView);
+			GRenderEngine->SetEffect(NULL);
+			GRenderEngine->SetRenderTarget(GRenderSurface->GBuffer->MainTargetGDepth);
 		}
 		// the last ... render string.
 
-		GEngine->GameCanvas->RenderStrings(mainCamera);
+		GCanvas->RenderStrings(mainCamera);
 
-		GEngine->RenderSurfaceCache->GBuffer->DebugVisual();
+		GRenderSurface->GBuffer->DebugVisual();
 
-		GEngine->RenderEngine->SetEffect(NULL);
-		GEngine->RenderEngine->OnFrameEnd();
+		GRenderEngine->SetEffect(NULL);
+		GRenderEngine->OnFrameEnd();
 	}
 
 	void DeferredShading::RenderScene(Camera* mainCamera,const std::vector<GeometryRenderer*>& rendererList)

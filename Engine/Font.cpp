@@ -32,9 +32,9 @@ namespace Disorder
 	{
 		SamplerDesc desc;
 		desc.Filter = SF_Min_Mag_Linear_Mip_Point;
-		SamplerState* sampler = GEngine->RenderResourceMgr->CreateSamplerState(&desc);
-		RenderTexture2D* fontTexture = GEngine->RenderResourceMgr->CreateTexture2D(sampler, image->GetSpec().format, false, image);
-		_glyphsTexture = GEngine->RenderResourceMgr->CreateSurfaceView(SV_ShaderResource, fontTexture, image->GetSpec().format);
+		SamplerState* sampler = GRenderResourceMgr->CreateSamplerState(&desc);
+		RenderTexture2D* fontTexture = GRenderResourceMgr->CreateTexture2D(image->GetName(),sampler, image->GetSpec().format, false, image);
+		_glyphsTexture = GRenderResourceMgr->CreateSurfaceView(SV_ShaderResource, fontTexture, image->GetSpec().format);
 	}
 
 	void Font::LoadFontFromTrueTypeFile(std::string const& fontName)
@@ -189,7 +189,7 @@ namespace Disorder
 
 		// save it to image 
 		PixelFormat pixelFormat = PF_R8G8_UNORM;
-		Image* fontImage = Image::Create(eIT_PNG, finalWidth, finalHeight, pixelFormat, imageData, data_size);
+		Image* fontImage = new Image(fontName,eIT_PNG, finalWidth, finalHeight, pixelFormat, imageData, data_size);
 		GImageManager->Add(fontName,fontImage);
 		std::string strImageFileName = GConfig->ResourceFontPath + "png\\" + fontName + ".png";
 		GImageManager->Save(strImageFileName,fontImage);

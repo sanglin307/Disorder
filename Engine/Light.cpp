@@ -76,7 +76,7 @@ namespace Disorder
 		glm::vec3 beginPos = go->GetWorldPosition();
 		glm::vec3 endPos = beginPos + GetDirection() * 2.f;
 			
-		GEngine->GameCanvas->DrawLine(beginPos, glm::vec4(1.f, 1.f, 1.f, 1.f), endPos, glm::vec4(0, 0, 0, 1.f));
+		GCanvas->DrawLine(beginPos, glm::vec4(1.f, 1.f, 1.f, 1.f), endPos, glm::vec4(0, 0, 0, 1.f));
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	PointLight::PointLight(std::string const& name)

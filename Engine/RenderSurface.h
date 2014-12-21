@@ -122,6 +122,7 @@ namespace Disorder
 	class RenderSurfaceCache
 	{
 	public:
+		RenderSurfaceCache();
 		~RenderSurfaceCache();
 		MainRenderTarget* MainTarget;
 		RenderGBuffer* GBuffer;

@@ -110,29 +110,29 @@ namespace Disorder
 
 		glm::vec4 color(1.0f,0,1,1.0f);
 
-		GEngine->GameCanvas->DrawLine(_Points[0],color,_Points[1],color);
-		GEngine->GameCanvas->DrawLine(_Points[1],color,_Points[2],color);
-		GEngine->GameCanvas->DrawLine(_Points[2],color,_Points[3],color);
-		GEngine->GameCanvas->DrawLine(_Points[3],color,_Points[0],color);
+		GCanvas->DrawLine(_Points[0],color,_Points[1],color);
+		GCanvas->DrawLine(_Points[1],color,_Points[2],color);
+		GCanvas->DrawLine(_Points[2],color,_Points[3],color);
+		GCanvas->DrawLine(_Points[3],color,_Points[0],color);
 
-		GEngine->GameCanvas->DrawLine(_Points[4],color,_Points[5],color);
-		GEngine->GameCanvas->DrawLine(_Points[5],color,_Points[6],color);
-		GEngine->GameCanvas->DrawLine(_Points[6],color,_Points[7],color);
-		GEngine->GameCanvas->DrawLine(_Points[7],color,_Points[4],color);
+		GCanvas->DrawLine(_Points[4],color,_Points[5],color);
+		GCanvas->DrawLine(_Points[5],color,_Points[6],color);
+		GCanvas->DrawLine(_Points[6],color,_Points[7],color);
+		GCanvas->DrawLine(_Points[7],color,_Points[4],color);
 
-		GEngine->GameCanvas->DrawLine(_Points[0],color,_Points[4],color);
-		GEngine->GameCanvas->DrawLine(_Points[1],color,_Points[5],color);
-		GEngine->GameCanvas->DrawLine(_Points[2],color,_Points[6],color);
-		GEngine->GameCanvas->DrawLine(_Points[3],color,_Points[7],color);
+		GCanvas->DrawLine(_Points[0],color,_Points[4],color);
+		GCanvas->DrawLine(_Points[1],color,_Points[5],color);
+		GCanvas->DrawLine(_Points[2],color,_Points[6],color);
+		GCanvas->DrawLine(_Points[3],color,_Points[7],color);
 
 	 
 		color = glm::vec4(0, 1, 0, 1);
-		GEngine->GameCanvas->DrawLine(_Points[0],color,_Points[0] + _Planes[PS_Near].Normal,glm::vec4(0,0,0,1.0f));
-		GEngine->GameCanvas->DrawLine(_Points[4], color, _Points[4] + _Planes[PS_Far].Normal, glm::vec4(0, 0, 0, 1.0f));
-		GEngine->GameCanvas->DrawLine(_Points[0], color, _Points[0] + _Planes[PS_Left].Normal, glm::vec4(0, 0, 0, 1.0f));
-		GEngine->GameCanvas->DrawLine(_Points[2], color, _Points[2] + _Planes[PS_Right].Normal, glm::vec4(0, 0, 0, 1.0f));
-		GEngine->GameCanvas->DrawLine(_Points[1], color, _Points[1] + _Planes[PS_Top].Normal, glm::vec4(0, 0, 0, 1.0f));
-		GEngine->GameCanvas->DrawLine(_Points[3], color, _Points[3] + _Planes[PS_Bottom].Normal, glm::vec4(0, 0, 0, 1.0f));
+		GCanvas->DrawLine(_Points[0],color,_Points[0] + _Planes[PS_Near].Normal,glm::vec4(0,0,0,1.0f));
+		GCanvas->DrawLine(_Points[4], color, _Points[4] + _Planes[PS_Far].Normal, glm::vec4(0, 0, 0, 1.0f));
+		GCanvas->DrawLine(_Points[0], color, _Points[0] + _Planes[PS_Left].Normal, glm::vec4(0, 0, 0, 1.0f));
+		GCanvas->DrawLine(_Points[2], color, _Points[2] + _Planes[PS_Right].Normal, glm::vec4(0, 0, 0, 1.0f));
+		GCanvas->DrawLine(_Points[1], color, _Points[1] + _Planes[PS_Top].Normal, glm::vec4(0, 0, 0, 1.0f));
+		GCanvas->DrawLine(_Points[3], color, _Points[3] + _Planes[PS_Bottom].Normal, glm::vec4(0, 0, 0, 1.0f));
 	}
 
 }

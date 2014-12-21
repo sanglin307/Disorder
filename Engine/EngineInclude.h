@@ -136,7 +136,6 @@ namespace Disorder
 #include "GameTime.h"
 #include "Bounds.h"
 #include "Frustrum.h"
-#include "FileSystem.h"
 #include "MainLoop.h"
 #include "InputManager.h"
 #include "Component.h"
@@ -177,3 +176,20 @@ namespace Disorder
 #include "Logger.h"
  
 // TODO: reference additional headers your program requires here
+
+namespace Disorder
+{
+	extern RenderResourceManager* GRenderResourceMgr;
+	extern RenderEngine* GRenderEngine;
+	extern Logger* GLogger;	
+	extern World* GWorld;
+	extern SceneManager* GSceneManager;
+	extern MainLoop* GMainLoop;
+	extern Client* GClient;
+	extern Config* GConfig;
+	extern Engine *GEngine;
+	extern SceneImporter *GSceneImporter;
+	extern RenderSurfaceCache *GRenderSurface;
+	extern Canvas *GCanvas;
+	extern Console *GConsole;
+}

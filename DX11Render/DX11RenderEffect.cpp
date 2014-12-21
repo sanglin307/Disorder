@@ -91,8 +91,20 @@ namespace Disorder
 	{
 		HRESULT hr = S_OK;
 
-		FileObject* fileptr = GEngine->FileManager->OpenTextFile(fileName,eF_Read);
-		std::string shaderContent = fileptr->ReadText();
+		FILE* fileHandle;
+		if (fopen_s(&fileHandle, fileName.c_str(), "rt"))
+		{
+			BOOST_ASSERT(0);
+			return S_FALSE;
+		}
+
+		std::string shaderContent;
+		char buff[65535];
+		while (fgets(buff, 65535, fileHandle) != NULL)
+		{
+			shaderContent += buff;
+		}
+		fclose(fileHandle);
 
 		DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 	#ifdef _DEBUG
@@ -254,7 +266,7 @@ namespace Disorder
 			pReflection->OutputSignatureParameters.push_back( ShaderSignatureDesc(output_desc) );
 		}
   
-		ShaderPropertyManager* GlobalPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderPropertyManager* GlobalPropertyManager = GRenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 	    //constant buffer information 
 		for ( UINT i = 0; i < desc.ConstantBuffers; i++ )
 		{
@@ -271,13 +283,13 @@ namespace Disorder
 				constantBuffer.CBType = bufferDesc.Type;
 				constantBuffer.CBuFlags = bufferDesc.uFlags;
 				constantBuffer.CBVariables = bufferDesc.Variables;
-				DX11ShaderPropertyManager* propertyManager = (DX11ShaderPropertyManager*)GEngine->RenderResourceMgr->GetPropertyManager(constantBuffer.CBName);
+				DX11ShaderPropertyManager* propertyManager = (DX11ShaderPropertyManager*)GRenderResourceMgr->GetPropertyManager(constantBuffer.CBName);
 				BOOST_ASSERT(propertyManager->Name != ShaderPropertyManager::sManagerGlobal); // don't registe const buffer name ,please registe it in ShaderPropertyManager
 
 				constantBuffer.BufferParamRef = GlobalPropertyManager->GetProperty(constantBuffer.CBName);
 				if( constantBuffer.BufferParamRef == NULL )
 				{
-					RenderBuffer* constBuffer = GEngine->RenderResourceMgr->CreateBuffer(constantBuffer.CBName, RBT_Constant, BU_DynamicDraw, bufferDesc.Size, bufferDesc.Size, NULL);
+					RenderBuffer* constBuffer = GRenderResourceMgr->CreateBuffer(constantBuffer.CBName, RBT_Constant, BU_DynamicDraw, bufferDesc.Size, bufferDesc.Size, NULL);
 					constantBuffer.BufferParamRef = GlobalPropertyManager->CreateProperty(constantBuffer.CBName,eSP_ConstBuffer); 
 					constantBuffer.BufferParamRef->SetData(constBuffer);
 				}
@@ -426,7 +438,7 @@ namespace Disorder
 			return;
 
 		RenderBuffer* constBuffer = ConstantBuffer->BufferParamRef->GetDataAsConstBuffer();
-		BYTE *pContent = (BYTE*)(GEngine->RenderEngine->Map(constBuffer, BA_Write_Only));
+		BYTE *pContent = (BYTE*)(GRenderEngine->Map(constBuffer, BA_Write_Only));
 
 		memset(pContent, 0, ConstantBuffer->CBSize);
 		BYTE* pDest = pContent;

@@ -18,7 +18,7 @@ namespace Disorder
 
 	DX11SurfaceView::DX11SurfaceView(ESurfaceViewType type, RenderTexture* resource, PixelFormat format, unsigned int flag)
 	{
-		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GEngine->RenderEngine;
+		DX11RenderEngine* renderEngine = (DX11RenderEngine*)GRenderEngine;
 		Type = type;
 		Resource = resource;
 		Format = format;

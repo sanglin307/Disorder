@@ -46,27 +46,16 @@ namespace Disorder
 		_rasterizeStateMap.insert(std::pair<std::wstring, RasterizeState*>(hashKey, state));
 		return state;
 	}
-
-	void DX11RenderResourceManager::UpdateRenderLayout(const std::wstring& hashKey, ID3D11InputLayout* layout)
+ 
+	RenderLayout* DX11RenderResourceManager::CreateRenderLayout(RenderEffect* renderEffect, TopologyType topologyType, bool soloBuffer)
 	{
-		if (_renderLayoutMap.find(hashKey) != _renderLayoutMap.end())
-			return;
+		std::string name = renderEffect->GetVertexShader()->GetShaderName();
+		if (_renderLayoutMap.find(name) != _renderLayoutMap.end())
+			return _renderLayoutMap.at(name);
 
-		_renderLayoutMap.insert(std::pair<std::wstring, ID3D11InputLayout*>(hashKey, layout));
-	}
+		RenderLayout* renderLayout = new DX11RenderLayout(renderEffect, topologyType, soloBuffer);
 
-	ID3D11InputLayout* DX11RenderResourceManager::GetRenderLayout(const std::wstring& hashKey)
-	{
-		if (_renderLayoutMap.find(hashKey) != _renderLayoutMap.end())
-			return _renderLayoutMap.at(hashKey);
-
-		return NULL;
-	}
-
-	RenderLayout* DX11RenderResourceManager::CreateRenderLayout(RenderEffect* renderEffect,TopologyType topologyType,bool soloBuffer)
-	{
-
-		RenderLayout* renderLayout = new DX11RenderLayout(renderEffect,topologyType,soloBuffer);
+		_renderLayoutMap.insert(std::pair<std::string, RenderLayout*>(name, renderLayout));
 		return renderLayout;
 	}
  
@@ -77,19 +66,40 @@ namespace Disorder
 		for(unsigned int i=0; i< shader->ShaderReflect->InputSignatureParameters.size();++i)
 		{
 			std::string name = bufferName + "_" + shader->ShaderReflect->InputSignatureParameters[i].SemanticName;
-			RenderBuffer* renderBuffer = new DX11RenderBuffer(name,RBT_Vertex,data,shader->ShaderReflect->InputSignatureParameters[i].SemanticName,bufferUsage,shader);
-			bufferArray.push_back(renderBuffer);
+			if (_renderBufferMap.find(name) == _renderBufferMap.end())
+			{
+				RenderBuffer* renderBuffer = new DX11RenderBuffer(name, RBT_Vertex, data, shader->ShaderReflect->InputSignatureParameters[i].SemanticName, bufferUsage, shader);
+				bufferArray.push_back(renderBuffer);
+				_renderBufferMap.insert(std::pair<std::string, RenderBuffer*>(name, renderBuffer));
+			}
+			else
+			{
+				bufferArray.push_back(_renderBufferMap.at(name));
+			}
 		}
 
 		std::string indexName = bufferName + "_IndexBuffer";
-		RenderBuffer* indexBuffer = new DX11RenderBuffer(indexName,RBT_Index,data,"",bufferUsage,shader);
-		bufferArray.push_back(indexBuffer);
+		if (_renderBufferMap.find(indexName) == _renderBufferMap.end())
+		{
+			RenderBuffer* indexBuffer = new DX11RenderBuffer(indexName, RBT_Index, data, "", bufferUsage, shader);
+			bufferArray.push_back(indexBuffer);
+			_renderBufferMap.insert(std::pair<std::string, RenderBuffer*>(indexName, indexBuffer));
+		}
+		else
+		{
+			bufferArray.push_back(_renderBufferMap.at(indexName));
+		}
+		
 	}
 
 	RenderBuffer* DX11RenderResourceManager::CreateBuffer(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint)
 	{
+		if (_renderBufferMap.find(bufferName) != _renderBufferMap.end())
+			return _renderBufferMap.at(bufferName);
+
 		RenderBuffer* renderBuffer = new DX11RenderBuffer(bufferName,type,bufferUsage,elementSize,size,pData);
 	 
+		_renderBufferMap.insert(std::pair<std::string, RenderBuffer*>(bufferName, renderBuffer));
 		return renderBuffer;
 	}
  
@@ -105,24 +115,39 @@ namespace Disorder
 	}
  
 
-	RenderTexture2D* DX11RenderResourceManager::CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample,Image* image)
+	RenderTexture2D* DX11RenderResourceManager::CreateTexture2D(const std::string& name, SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample, Image* image)
 	{
+		if (_renderTexture2DMap.find(name) != _renderTexture2DMap.end())
+			return _renderTexture2DMap.at(name);
+
 		RenderTexture2D* texture = new DX11RenderTexture2D(pixelFormat, bMultiSample, image);
 		texture->Sampler = sampler;
+
+		_renderTexture2DMap.insert(std::pair<std::string, RenderTexture2D*>(name, texture));
 		return texture;
 	}
 
-	RenderTexture2D* DX11RenderResourceManager::CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<Image*>& image, unsigned int flag)
+	RenderTexture2D* DX11RenderResourceManager::CreateTexture2D(const std::string& name, SamplerState* sampler, PixelFormat pixelFormat, bool bMultiSample, const std::vector<Image*>& image, unsigned int flag)
 	{
+		if (_renderTexture2DMap.find(name) != _renderTexture2DMap.end())
+			return _renderTexture2DMap.at(name);
+
 		RenderTexture2D* texture = new DX11RenderTexture2D(pixelFormat, bMultiSample, image, flag);
 		texture->Sampler = sampler;
+
+		_renderTexture2DMap.insert(std::pair<std::string, RenderTexture2D*>(name, texture));
 		return texture;
 	}
 
-	RenderTexture2D* DX11RenderResourceManager::CreateTexture2D(SamplerState* sampler, PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
+	RenderTexture2D* DX11RenderResourceManager::CreateTexture2D(const std::string& name, SamplerState* sampler, PixelFormat pixelFormat, unsigned int width, unsigned int height, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
 	{
+		if (_renderTexture2DMap.find(name) != _renderTexture2DMap.end())
+			return _renderTexture2DMap.at(name);
+
 		RenderTexture2D* texture = new DX11RenderTexture2D(pixelFormat, width, height, bMipmap, bMultiSample, viewFlag, arraySize, pData, flag);
 		texture->Sampler = sampler;
+
+		_renderTexture2DMap.insert(std::pair<std::string, RenderTexture2D*>(name, texture));
 		return texture;
 
 	}

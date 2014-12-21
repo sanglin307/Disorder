@@ -226,7 +226,7 @@ namespace Disorder
 
 		SetUpdateStrategy(eSphericalTargetMode);
 
-		_propertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerCamera);
+		_propertyManager = GRenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerCamera);
 		_viewMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraView,eSP_Float,16);
 		_projMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraProjection,eSP_Float,16);
 		_viewProjMatrixProperty = _propertyManager->CreateProperty(ShaderPropertyManager::sCameraViewProj,eSP_Float,16);
@@ -374,11 +374,11 @@ namespace Disorder
 	{
 		if( _updateMode == eFirstPersonMode )
 		{
-			GEngine->GameCanvas->DrawString(5, GConfig->pRenderConfig->SizeY - 25, "First Person Mode");
+			GCanvas->DrawString(5, GConfig->pRenderConfig->SizeY - 25, "First Person Mode");
 		}
 		else if( _updateMode == eSphericalTargetMode )
 		{
-			GEngine->GameCanvas->DrawString(5, GConfig->pRenderConfig->SizeY - 25, "Spherical Coordinate Mode");
+			GCanvas->DrawString(5, GConfig->pRenderConfig->SizeY - 25, "Spherical Coordinate Mode");
 		} 
 	}
 

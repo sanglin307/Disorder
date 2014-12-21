@@ -13,23 +13,14 @@ namespace Disorder
 
 	};
 
-
-
 	class Logger 
 	{
 		friend class LoggerRunner;
 	public:
 
-		struct LogObj
-		{
-			static const unsigned int StringMaxLengh = 8096;
-			char content[StringMaxLengh+1];
-		};
+		Logger();
+		~Logger();
 		
-		void Init();
-		void Exit();
-
-
 		void Error(std::string const& error);
 		void Warning(std::string const& warning);
 		void Info(std::string const& info);
@@ -39,22 +30,19 @@ namespace Disorder
 
 		boost::thread _thread;
 
-		FileObject* _errorFile;
-		FileObject* _warningFile;
-		FileObject* _infoFile;
+		FILE* _errorFile;
+		FILE* _warningFile;
+		FILE* _infoFile;
 
 		boost::mutex _errorMutex;
 		boost::mutex _warningMutex;
 		boost::mutex _infoMutex;
 
-		std::list<LogObj> _errorCache;
-		std::list<LogObj> _warningCache;
-		std::list<LogObj> _infoCache;
-
-
+		std::list<std::string> _errorCache;
+		std::list<std::string> _warningCache;
+		std::list<std::string> _infoCache;
 	};
 
-	extern Logger* GLogger;
 }
 
 

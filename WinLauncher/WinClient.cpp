@@ -28,8 +28,7 @@ namespace Disorder
 			Render();
 			return true;
 		case WM_CLOSE:
-			GIsRequestingExit = true;
-			PostQuitMessage(0);
+			GClient->Close();
 			return true;
 		}
 
@@ -38,7 +37,7 @@ namespace Disorder
 
 	//==========================WindowsClient=================================
 
-	void WinClient::Init()
+	WinClient::WinClient()
 	{
 		TCHAR *winClassName = TEXT("Disorder");
 		WNDCLASSEXW Cls;
@@ -140,8 +139,6 @@ namespace Disorder
 
 		//Create InputManager
 		_inputManager = new InputManager((unsigned int)windows);
-
-	 
 	}
 
 
@@ -197,9 +194,8 @@ namespace Disorder
 	    ProcessInput(delta);
 	}
 
-	void WinClient::Exit()
+	WinClient::~WinClient()
 	{
-		Client::Exit();
 	}
 
 	void WinClient::CreateViewport(int sizeX,int sizeY,void* hWnd)
@@ -257,8 +253,11 @@ namespace Disorder
 
 	void WinClient::Close()
 	{
-		GIsRequestingExit = true;
-	    PostQuitMessage(0);
+		if (!GIsRequestingExit)
+		{
+			GIsRequestingExit = true;
+			PostQuitMessage(0);
+		}	
 	}
 
 }

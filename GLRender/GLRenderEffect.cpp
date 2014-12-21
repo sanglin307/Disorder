@@ -76,8 +76,21 @@ namespace Disorder
 	bool GLShaderObject::LoadShaderFromFile(std::string const& fileName, std::string const& entryPoint, ShaderType shaderType)
 	{
 		PrepareShaderPathInclude();
-		FileObject* file = GEngine->FileManager->OpenTextFile(fileName, eF_Read);
-		std::string shaderContent = file->ReadText();
+
+		FILE* fileHandle;
+		if (fopen_s(&fileHandle, fileName.c_str(), "rt"))
+		{
+			BOOST_ASSERT(0);
+			return false;
+		}
+
+		std::string shaderContent;
+		char buff[65535];
+		while (fgets(buff, 65535, fileHandle) != NULL)
+		{
+			shaderContent += buff;
+		}
+		fclose(fileHandle);
 
 		_GLHandle = glCreateShader(GLShaderObject::GetOpenGLShaderType(shaderType));
 		const char* pSource = shaderContent.c_str();
@@ -413,7 +426,7 @@ namespace Disorder
 		}
  
 		// uniform block
-		ShaderPropertyManager* GlobalPropertyManager = GEngine->RenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
+		ShaderPropertyManager* GlobalPropertyManager = GRenderResourceMgr->GetPropertyManager(ShaderPropertyManager::sManagerGlobal);
 
 		GLint uniformBlockNumber;
 		glGetProgramInterfaceiv(_GLHandle, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &uniformBlockNumber);
@@ -429,14 +442,14 @@ namespace Disorder
 				desc.BlockIndex = glGetUniformBlockIndex(_GLHandle, name);
 				glGetActiveUniformBlockiv(_GLHandle, desc.BlockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &desc.BlockSize);
 				//glGetActiveUniformBlockiv(_GLHandle, desc.BlockIndex, GL_UNIFORM_BLOCK_BINDING, &desc.BlockBinding);
-				GLShaderPropertyManager* propertyManager = (GLShaderPropertyManager*)GEngine->RenderResourceMgr->GetPropertyManager(name);
+				GLShaderPropertyManager* propertyManager = (GLShaderPropertyManager*)GRenderResourceMgr->GetPropertyManager(name);
 				BOOST_ASSERT(propertyManager->Name != ShaderPropertyManager::sManagerGlobal);  // don't registe uniform block name ,please registe it in ShaderPropertyManager
 
 				desc.BufferParamRef = GlobalPropertyManager->GetProperty(name);
 				desc.BlockBinding = propertyManager->BindingPoint;
 				if (desc.BufferParamRef == NULL)
 				{
-					RenderBuffer* constBuffer = GEngine->RenderResourceMgr->CreateBuffer(name,RBT_Constant, BU_DynamicDraw, desc.BlockSize, desc.BlockSize, NULL, desc.BlockBinding);
+					RenderBuffer* constBuffer = GRenderResourceMgr->CreateBuffer(name,RBT_Constant, BU_DynamicDraw, desc.BlockSize, desc.BlockSize, NULL, desc.BlockBinding);
 					desc.BufferParamRef = GlobalPropertyManager->CreateProperty(name, eSP_ConstBuffer);
 					desc.BufferParamRef->SetData(constBuffer);					
 				}
@@ -498,7 +511,7 @@ namespace Disorder
 					}
 
 					BOOST_ASSERT(pBlock);
-					manager = GEngine->RenderResourceMgr->GetPropertyManager(pBlock->Name);
+					manager = GRenderResourceMgr->GetPropertyManager(pBlock->Name);
 				}
 				else
 					manager = GlobalPropertyManager;
@@ -550,7 +563,7 @@ namespace Disorder
 
 		for (size_t i = 0; i < EffectReflection->UniformBlockArray.size(); i++)
 		{
-			ShaderPropertyManager* mgr = GEngine->RenderResourceMgr->GetPropertyManager(EffectReflection->UniformBlockArray[i].Name);
+			ShaderPropertyManager* mgr = GRenderResourceMgr->GetPropertyManager(EffectReflection->UniformBlockArray[i].Name);
 			GLShaderPropertyManager* glMgr = (GLShaderPropertyManager*)(mgr);
 			BOOST_ASSERT(glMgr->Validate(&(EffectReflection->UniformBlockArray[i])));
 		}
@@ -584,7 +597,7 @@ namespace Disorder
 			return;
 
 		RenderBuffer* renderbuffer = _uniformBlock->BufferParamRef->GetDataAsConstBuffer();
-		BYTE *constBuffer = (BYTE*)GEngine->RenderEngine->Map(renderbuffer, BA_Write_Only);
+		BYTE *constBuffer = (BYTE*)GRenderEngine->Map(renderbuffer, BA_Write_Only);
 		memset(constBuffer, 0, _uniformBlock->BlockSize);
 		BYTE* pDest = constBuffer;
 		for (unsigned int j = 0; j<_uniformBlock->Members.size(); j++)
@@ -595,7 +608,7 @@ namespace Disorder
 			memcpy(pDest, pSrc, vaDesc->Size);
 		}
 
-		GEngine->RenderEngine->UnMap(renderbuffer);
+		GRenderEngine->UnMap(renderbuffer);
 
 	}
 
