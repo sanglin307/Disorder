@@ -493,7 +493,8 @@ namespace Disorder
 
 	GLRenderEngine::~GLRenderEngine()
 	{
-	
+		//wglMakeCurrent(NULL, NULL);
+		//wglDeleteContext(_hRC);
 	}
 
 	void GLRenderEngine::CreateMainTarget()
@@ -819,17 +820,6 @@ namespace Disorder
 	}
 
 
-	void GLRenderEngine::Init()
-	{
-		
-	}
-	
-	void GLRenderEngine::Exit()
-	{
-		//wglMakeCurrent(NULL, NULL);
-		//wglDeleteContext(_hRC);
-	}
-
 	void GLRenderEngine::OnFrameBegin()
 	{
  
@@ -1053,7 +1043,7 @@ namespace Disorder
 				else
 				{
 					//default texture binding
-					samplerBinding.push_back((GLuint)RenderResourceManager::DefaultSamplerState->GetHandle());
+					samplerBinding.push_back((GLuint)GRenderResourceMgr->DefaultSamplerState->GetHandle());
 				}
 				
 			}

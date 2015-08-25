@@ -36,9 +36,6 @@ namespace Disorder
 	public:
 		GLRenderEngine();
 		~GLRenderEngine();
- 
-		virtual void Init();
-		virtual void Exit();
 
 		virtual void OnFrameBegin();
 		virtual void OnFrameEnd();

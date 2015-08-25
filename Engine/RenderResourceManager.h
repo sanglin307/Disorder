@@ -23,7 +23,6 @@ namespace Disorder
 
 
 	public:
-		RenderResourceManager();
 		virtual ~RenderResourceManager();
 
 		virtual ShaderObject* CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel,std::string const& entryPoint) = 0;
@@ -51,12 +50,11 @@ namespace Disorder
  
 
 	public:
-		static RasterizeState* DefaultRasterizeState;
-		static BlendState* DefaultBlentState;
-		static DepthStencilState* DefaultDepthStencilState;
-		
-		static SurfaceView* DefaultWhiteTexture2D;
-		static SamplerState* DefaultSamplerState;
+		RasterizeState* DefaultRasterizeState;
+		BlendState* DefaultBlentState;
+		DepthStencilState* DefaultDepthStencilState;		
+		SurfaceView* DefaultWhiteTexture2D;
+		SamplerState* DefaultSamplerState;
 
 	protected:
 		ShaderMap _shaderMap;

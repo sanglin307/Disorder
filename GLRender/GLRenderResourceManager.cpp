@@ -109,6 +109,39 @@ namespace Disorder
 		return texture;
 	}
 
+	GLRenderResourceManager::GLRenderResourceManager()
+	{
+		RasterizeDesc rasterDesc;
+		DefaultRasterizeState = CreateRasterizeState(&rasterDesc);
+
+		BlendDesc blendDesc;
+		DefaultBlentState = CreateBlendState(&blendDesc, 1);
+
+		DepthStencilDesc dsDesc;
+		DefaultDepthStencilState = CreateDepthStencilState(&dsDesc, 0);
+
+		SamplerDesc samplerDesc;
+		DefaultSamplerState = CreateSamplerState(&samplerDesc);
+
+		unsigned int pixelData[16];
+		memset(pixelData, 0xFF, 16 * sizeof(unsigned int));
+		BufferInitData data;
+		data.Data = pixelData;
+		data.RowPitch = 4 * 4;
+		data.SlicePitch = 0;
+		RenderTexture2D* tex = CreateTexture2D("DefaultTex", NULL, PF_R8G8B8A8_UNORM, 4, 4, false, false, SV_ShaderResource, 1, &data, 0);
+		DefaultWhiteTexture2D = CreateSurfaceView(SV_ShaderResource, tex, PF_R8G8B8A8_UNORM);
+
+		RegisterPropertyManager(ShaderPropertyManager::sManagerCamera);
+		RegisterPropertyManager(ShaderPropertyManager::sManagerObject);
+		RegisterPropertyManager(ShaderPropertyManager::sManagerMaterial);
+		RegisterPropertyManager(ShaderPropertyManager::sManagerDirectionLight);
+		RegisterPropertyManager(ShaderPropertyManager::sManagerPointLight);
+		RegisterPropertyManager(ShaderPropertyManager::sManagerSpotLight);
+		RegisterPropertyManager(ShaderPropertyManager::sManagerScene);
+		RegisterPropertyManager(ShaderPropertyManager::sManagerShadowMapGen);
+		RegisterPropertyManager(ShaderPropertyManager::sManagerGlobal);
+	}
 
 	RenderTexture2D* GLRenderResourceManager::CreateTexture2D(const std::string& name, SamplerState* sampler, PixelFormat pixelFormat, unsigned int width, unsigned int hight, bool bMipmap, bool bMultiSample, unsigned int viewFlag, int arraySize, BufferInitData const* pData, unsigned int flag)
 	{

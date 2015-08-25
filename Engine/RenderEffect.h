@@ -115,9 +115,9 @@ namespace Disorder
 
 		RenderEffect()
 		{
-			_rasterizeState = RenderResourceManager::DefaultRasterizeState;
-			_blendState = RenderResourceManager::DefaultBlentState;
-			_depthStencilState = RenderResourceManager::DefaultDepthStencilState;
+			_rasterizeState = GRenderResourceMgr->DefaultRasterizeState;
+			_blendState = GRenderResourceMgr->DefaultBlentState;
+			_depthStencilState = GRenderResourceMgr->DefaultDepthStencilState;
 		}
 
 	protected:

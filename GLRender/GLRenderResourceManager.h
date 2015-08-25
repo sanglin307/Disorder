@@ -7,6 +7,8 @@ namespace Disorder
 	class GLRenderResourceManager : public RenderResourceManager
 	{
 	public:
+		GLRenderResourceManager();
+
 		virtual RenderLayout* CreateRenderLayout(RenderEffect* renderEffect, TopologyType topologyType, bool soloBuffer);
 		virtual ShaderObject* CreateShader(ShaderType type, std::string const& fileName, ShaderModel shaderModel, std::string const& entryPoint);
 		virtual RenderBuffer* CreateBuffer(const std::string& bufferName, RenderBufferType type, BufferUsage bufferUsage, unsigned int elementSize, unsigned int size, void *pData, int bindingPoint = 0);
